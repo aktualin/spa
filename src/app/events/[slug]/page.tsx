@@ -17,7 +17,7 @@ import {
 } from "@/components/public/events/event-parts";
 import { getEvent } from "@/lib/content/events";
 import { withPageSeo } from "@/lib/content/seo";
-import { waLink } from "@/lib/whatsapp";
+import { whatsAppHref } from "@/lib/content/whatsapp";
 
 export async function generateMetadata({
   params,
@@ -73,6 +73,11 @@ async function EventContent({
     notFound();
   }
 
+  // Nomor dari pengaturan situs; pesan khusus event menang atas template.
+  const registerHref = await whatsAppHref("default", {
+    custom: `Halo kak, saya mau ikut event ${event.title}`,
+  });
+
   return (
     <main className="flex-1">
       <PublicPageHeader
@@ -84,7 +89,8 @@ async function EventContent({
           {/* Pendaftaran hanya untuk event yang belum lewat. */}
           {event.phase !== "past" ? (
             <a
-              href={waLink(`Halo kak, saya mau ikut event ${event.title}`)}
+              href={registerHref}
+              data-wa-context="event"
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-primary"

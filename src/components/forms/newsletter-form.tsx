@@ -29,6 +29,7 @@ export function NewsletterForm() {
         method="get"
         className="newsletter"
         aria-label="Newsletter signup"
+        data-track-form="newsletter"
         onSubmit={onSubmit}
       >
         <input

@@ -24,7 +24,7 @@ export function ReservationForm() {
   }
 
   return (
-    <form className="newsletter" onSubmit={onSubmit}>
+    <form className="newsletter" data-track-form="reservation" onSubmit={onSubmit}>
       <div className="layout-row gap-medium">
         <input
           className="form_input w-input"

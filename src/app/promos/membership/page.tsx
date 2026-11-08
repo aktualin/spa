@@ -13,7 +13,7 @@ import { getMembershipTiers } from "@/lib/content/membership";
 import { withPageSeo } from "@/lib/content/seo";
 import { plainTextToHtml } from "@/lib/domain/rich-text";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
-import { MEMBER_MESSAGE, waLink } from "@/lib/whatsapp";
+import { whatsAppHref } from "@/lib/content/whatsapp";
 
 export async function generateMetadata(): Promise<Metadata> {
   return withPageSeo("/promos/membership", {
@@ -24,6 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PromosMembershipPage() {
+  const memberHref = await whatsAppHref("membership");
   const tiers = await getMembershipTiers();
 
   return (
@@ -37,7 +38,8 @@ export default async function PromosMembershipPage() {
         >
           <div className="button-group mt-4 flex flex-wrap gap-3">
             <a
-              href={waLink(MEMBER_MESSAGE)}
+              href={memberHref}
+              data-wa-context="membership"
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-primary"
@@ -98,7 +100,8 @@ export default async function PromosMembershipPage() {
                     ) : null}
 
                     <a
-                      href={waLink(MEMBER_MESSAGE)}
+                      href={memberHref}
+              data-wa-context="membership"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn btn-outline mt-6 border-cocoa/40"

@@ -201,6 +201,10 @@ export function CorporateInquiryForm({
       }
 
       setState("success");
+      // Lapor ke GA4 hanya setelah server menerima (bukan sekadar klik kirim).
+      window.dispatchEvent(
+        new CustomEvent("kama:track", { detail: { form: "corporate_inquiry" } }),
+      );
       formRef.current?.reset();
       resetCaptcha();
     } catch {

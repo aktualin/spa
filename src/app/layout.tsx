@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Analytics } from "@/components/analytics/analytics";
 import { WhatsAppButton } from "@/components/whatsapp-button";
 import { getSeoSettings } from "@/lib/content/seo";
 import {
@@ -105,6 +106,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {children}
         
         <WhatsAppButton />
+        <Analytics />
       </body>
     </html>
   );
