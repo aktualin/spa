@@ -20,8 +20,12 @@ export type OurStory = {
   seoDescription: string | null;
 };
 
-/** Fallback statis: deskripsi brand + nilai utama. */
-function staticOurStory(): OurStory {
+/**
+ * Fallback statis: deskripsi brand + nilai utama. Juga dipakai untuk mengisi
+ * form admin bila konten belum pernah disimpan, supaya menyimpan tanpa
+ * perubahan menghasilkan halaman yang sama.
+ */
+export function staticOurStory(): OurStory {
   return {
     heroTitle: "A sanctuary for deep rest.",
     heroImageUrl: "/img/kama/07-flower-bowl.jpg",

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { requireRole } from "@/lib/auth";
 import { MEMBERSHIP_BANNER_DEFAULTS } from "@/components/home/hero";
 import {
@@ -41,6 +43,20 @@ export default async function AdminHomepagePage({
       <p className="mt-1 text-sm text-neutral-600">
         Nyalakan/matikan tiap section, atur urutannya, dan edit teksnya. Urutan
         di sini sama dengan urutan render di homepage.
+      </p>
+      <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+        <Link
+          href="/admin/homepage/highlights"
+          className="font-medium text-neutral-900 underline underline-offset-2"
+        >
+          Kelola highlight “What’s New” →
+        </Link>
+        <Link
+          href="/admin/our-story"
+          className="font-medium text-neutral-900 underline underline-offset-2"
+        >
+          Edit Our Story →
+        </Link>
       </p>
 
       <StatusBanner saved={params.saved} />

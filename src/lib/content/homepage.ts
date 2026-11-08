@@ -5,9 +5,17 @@
  * Section yang tidak ada di DB tetap dirender dengan urutan bawaan, kecuali
  * section BARU (signature-treatments, promo-highlight, gallery-teaser) —
  * section baru hanya tampil bila barisnya ada di DB dengan `isEnabled = true`.
+ *
+ * Section `footer` hanya berupa saklar tampil/sembunyi footer DI HOMEPAGE
+ * (halaman lain selalu menampilkan footer). Tanpa baris DB → tampil.
+ *
+ * Kartu highlight "What's New" (`HomepageHighlight`) dibaca lewat
+ * `getWhatsNewCards`.
  */
 import { cacheLife, cacheTag } from "next/cache";
 
+import { journalPosts } from "@/data/content";
+import { selectHighlightCards, type HighlightCard } from "@/lib/domain/homepage";
 import { safeQueryWithMeta } from "@/lib/safe-query";
 
 import { CONTENT_TAGS } from "./tags";
@@ -22,7 +30,8 @@ export type HomepageSectionKey =
   | "booking-banner"
   | "signature-treatments"
   | "promo-highlight"
-  | "gallery-teaser";
+  | "gallery-teaser"
+  | "footer";
 
 export type HomepageSection = {
   key: HomepageSectionKey;
@@ -53,6 +62,24 @@ const LEGACY_SECTIONS: { key: HomepageSectionKey; title: string }[] = [
   { key: "booking-banner", title: "Booking Banner" },
 ];
 
+/**
+ * Footer homepage: tampil bila barisnya belum ada. Tidak ikut urutan section
+ * (selalu dirender paling bawah, di luar `<main>`).
+ */
+const FOOTER_SECTION: HomepageSection = {
+  key: "footer",
+  title: "Footer",
+  subtitle: null,
+  bodyHtml: null,
+  imageUrl: null,
+  mobileImageUrl: null,
+  imageAlt: null,
+  ctaLabel: null,
+  ctaHref: null,
+  isEnabled: true,
+  sortOrder: Number.MAX_SAFE_INTEGER,
+};
+
 /** Section baru — hanya aktif bila barisnya ada di DB dan `isEnabled`. */
 const NEW_SECTION_KEYS: HomepageSectionKey[] = [
   "signature-treatments",
@@ -61,7 +88,7 @@ const NEW_SECTION_KEYS: HomepageSectionKey[] = [
 ];
 
 function fallbackSections(): HomepageSection[] {
-  return LEGACY_SECTIONS.map((section, index) => ({
+  const legacy = LEGACY_SECTIONS.map((section, index) => ({
     key: section.key,
     title: section.title,
     subtitle: null,
@@ -74,6 +101,7 @@ function fallbackSections(): HomepageSection[] {
     isEnabled: true,
     sortOrder: index,
   }));
+  return [...legacy, { ...FOOTER_SECTION }];
 }
 
 /**
@@ -141,5 +169,43 @@ export async function getHomepageSections(): Promise<
 
   if (usedFallback) cacheLife("minutes");
   else cacheLife("minutes");
+  return data;
+}
+
+/** Kartu statis lama "What's New" — dipakai bila tabel highlight kosong. */
+function staticWhatsNewCards(): HighlightCard[] {
+  return journalPosts.map((post) => ({
+    key: post.slug,
+    href: post.href,
+    image: post.image,
+    imageAlt: "",
+    tag: post.tag,
+    title: post.title,
+    ctaLabel: "Learn More",
+  }));
+}
+
+/**
+ * Kartu section "What's New". Tabel `HomepageHighlight` kosong (atau DB tidak
+ * terbaca) → kartu statis lama. Ada baris → hanya highlight yang
+ * dipublikasikan dan sedang dalam periodenya (bisa nol kartu).
+ *
+ * Periode dievaluasi DI DALAM fungsi cached dengan umur cache beberapa menit,
+ * sehingga highlight terjadwal muncul/hilang sendiri tanpa perlu disimpan
+ * ulang.
+ */
+export async function getWhatsNewCards(): Promise<HighlightCard[]> {
+  "use cache";
+  cacheTag(CONTENT_TAGS.homepage);
+  cacheLife("minutes");
+
+  const { data } = await safeQueryWithMeta<HighlightCard[]>(async () => {
+    const { prisma } = await import("@/lib/prisma");
+    const rows = await prisma.homepageHighlight.findMany({
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    });
+    return selectHighlightCards(rows, new Date()) ?? staticWhatsNewCards();
+  }, staticWhatsNewCards());
+
   return data;
 }

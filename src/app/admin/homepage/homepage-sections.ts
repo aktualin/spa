@@ -3,8 +3,13 @@
  *
  * Berisi konstanta (bukan Server Action), jadi file ini tidak memakai
  * `"use server"`. Baris section yang belum ada di database dibuat admin lewat
- * tombol "Tambahkan section" dengan default `isEnabled: false`, sehingga
- * homepage publik tidak berubah sampai admin menyalakannya.
+ * tombol "Tambahkan section". Status awalnya mengikuti tampilan homepage
+ * sekarang, sehingga homepage publik tidak berubah saat baris dibuat:
+ * - section bawaan (hero … booking-banner, footer) sudah tampil walau belum
+ *   ada barisnya → dibuat AKTIF;
+ * - section baru (signature-treatments, promo-highlight, gallery-teaser) →
+ *   dibuat MATI sampai admin menyalakannya.
+ * Lihat `isDefaultVisibleSection` di `@/lib/domain/homepage`.
  */
 
 export const HOMEPAGE_SECTION_KEYS = [
@@ -18,6 +23,7 @@ export const HOMEPAGE_SECTION_KEYS = [
   "signature-treatments",
   "promo-highlight",
   "gallery-teaser",
+  "footer",
 ] as const;
 
 export type HomepageSectionKey = (typeof HOMEPAGE_SECTION_KEYS)[number];
@@ -33,8 +39,49 @@ const KEY_LABEL: Record<string, string> = {
   "signature-treatments": "Signature Treatments",
   "promo-highlight": "Promo Highlight",
   "gallery-teaser": "Gallery Teaser",
+  footer: "Footer",
 };
 
 export function sectionKeyLabel(key: string): string {
   return KEY_LABEL[key] ?? key;
 }
+
+/**
+ * Asal konten section non-banner. Section ini tidak memakai isian teks/gambar
+ * `HomepageSection` (hanya tampil/sembunyi & urutan), jadi admin diarahkan
+ * ke tempat kontennya diatur.
+ */
+export const SECTION_SOURCE: Record<
+  string,
+  { text: string; link?: { href: string; label: string } }
+> = {
+  "whats-new": {
+    text: "Kartu “What’s New” diatur di Highlight Homepage (gambar, label, judul, tautan, periode tampil).",
+    link: { href: "/admin/homepage/highlights", label: "Kelola highlight" },
+  },
+  reviews: {
+    text: "Ulasan pelanggan memakai teks bawaan situs dan belum bisa diubah dari admin.",
+  },
+  "brand-intro": {
+    text: "Teks & gambar brand intro memakai konten bawaan situs. Cerita lengkap brand diatur di halaman Our Story.",
+    link: { href: "/admin/our-story", label: "Buka Our Story" },
+  },
+  socials: {
+    text: "Foto & tautan Instagram memakai konten bawaan situs dan belum bisa diubah dari admin.",
+  },
+  "signature-treatments": {
+    text: "Menampilkan hingga 6 treatment yang ditandai best seller di modul Treatments. Section tidak tampil bila belum ada.",
+    link: { href: "/admin/treatments", label: "Buka Treatments" },
+  },
+  "promo-highlight": {
+    text: "Menampilkan promo aktif pertama dari modul Promos; bila tidak ada, event terdekat dari modul Events.",
+    link: { href: "/admin/promos", label: "Buka Promos" },
+  },
+  "gallery-teaser": {
+    text: "Menampilkan foto dari modul Gallery (atau feed Instagram bila token tersedia).",
+    link: { href: "/admin/gallery", label: "Buka Gallery" },
+  },
+  footer: {
+    text: "Isi footer berlaku untuk seluruh situs (tautan footer diatur di Menu Navigasi). Saklar ini hanya menyembunyikan footer DI HOMEPAGE — halaman lain tetap menampilkan footer. Saat footer homepage dimatikan, tombol “Subscribe to Newsletter” di What’s New ikut disembunyikan karena tujuannya ada di footer. Footer selalu berada di paling bawah, jadi tidak ikut diurutkan.",
+  },
+};

@@ -1,4 +1,5 @@
 import { requireRole } from "@/lib/auth";
+import { staticOurStory } from "@/lib/content/our-story";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 
 import { getOurStoryContent } from "../actions/our-story";
@@ -19,17 +20,21 @@ export default async function AdminOurStoryPage({
     searchParams,
   ]);
 
+  // Belum pernah disimpan: form diisi teks yang saat ini tampil di situs.
+  const source = content ?? staticOurStory();
+
   return (
     <>
       <StatusBanner saved={params.saved} />
       <OurStoryForm
+        isNew={!content}
         content={{
-          heroTitle: content?.heroTitle ?? "Our Story",
-          heroImageUrl: content?.heroImageUrl ?? "",
-          philosophyHtml: content?.philosophyHtml ?? "",
-          valuesHtml: content?.valuesHtml ?? "",
-          seoTitle: content?.seoTitle ?? "",
-          seoDescription: content?.seoDescription ?? "",
+          heroTitle: source.heroTitle,
+          heroImageUrl: source.heroImageUrl ?? "",
+          philosophyHtml: source.philosophyHtml ?? "",
+          valuesHtml: source.valuesHtml ?? "",
+          seoTitle: source.seoTitle ?? "",
+          seoDescription: source.seoDescription ?? "",
         }}
       />
     </>

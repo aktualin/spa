@@ -6,7 +6,7 @@ import { SocialsSection } from "@/components/home/socials";
 import { SignatureTreatmentsSection } from "@/components/public/home/signature-treatments";
 import { PromoHighlightSection } from "@/components/public/home/promo-highlight";
 import { GalleryTeaserSection } from "@/components/public/home/gallery-teaser";
-import { getHomepageSections } from "@/lib/content/homepage";
+import { getHomepageSections, getWhatsNewCards } from "@/lib/content/homepage";
 import { getMembershipProgram } from "@/lib/content/membership";
 
 /**
@@ -19,12 +19,21 @@ import { getMembershipProgram } from "@/lib/content/membership";
  *
  * Hero, banner membership, dan banner booking menerima data section-nya
  * (gambar, teks, tombol); isian kosong memakai teks/gambar bawaan.
+ *
+ * "What's New" menampilkan kartu highlight dari admin (`HomepageHighlight`),
+ * atau kartu statis lama bila tabel highlight kosong.
+ *
+ * Section `footer` hanya mengatur tampil/sembunyi footer di homepage; posisinya
+ * tetap di paling bawah (tidak ikut urutan). Tanpa baris DB → tampil.
  */
 export default async function Home() {
-  const [sections, membershipProgram] = await Promise.all([
+  const [sections, membershipProgram, whatsNewCards] = await Promise.all([
     getHomepageSections(),
     getMembershipProgram(),
+    getWhatsNewCards(),
   ]);
+
+  const showFooter = sections.footer?.isEnabled ?? true;
 
   const order = [
     "hero",
@@ -58,7 +67,13 @@ export default async function Home() {
             case "membership-banner":
               return <MembershipBanner key={key} section={section} program={membershipProgram} />;
             case "whats-new":
-              return <WhatsNewSection key={key} />;
+              return (
+                <WhatsNewSection
+                  key={key}
+                  cards={whatsNewCards}
+                  showNewsletterLink={showFooter}
+                />
+              );
             case "reviews":
               return <TestimonialsSection key={key} />;
             case "brand-intro":
@@ -78,7 +93,7 @@ export default async function Home() {
           }
         })}
       </main>
-      <Footer />
+      {showFooter ? <Footer /> : null}
     </>
   );
 }

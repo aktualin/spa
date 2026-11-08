@@ -11,6 +11,12 @@ import {
   isBannerKey,
   validateBannerInput,
 } from "@/lib/domain/homepage-banner";
+import {
+  FIXED_POSITION_SECTION_KEYS,
+  isDefaultVisibleSection,
+  isFixedPositionSection,
+  isToggleOnlySection,
+} from "@/lib/domain/homepage";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { prisma } from "@/lib/prisma";
@@ -98,15 +104,17 @@ export async function moveHomepageSectionAction(formData: FormData) {
 
   const section = await prisma.homepageSection.findUnique({
     where: { id },
-    select: { id: true, sortOrder: true },
+    select: { id: true, key: true, sortOrder: true },
   });
-  if (!section) return;
+  // Footer selalu di paling bawah — tidak ikut diurutkan.
+  if (!section || isFixedPositionSection(section.key)) return;
 
+  const fixedKeys = [...FIXED_POSITION_SECTION_KEYS];
   const neighbour = await prisma.homepageSection.findFirst({
     where:
       direction === "up"
-        ? { sortOrder: { lt: section.sortOrder } }
-        : { sortOrder: { gt: section.sortOrder } },
+        ? { sortOrder: { lt: section.sortOrder }, key: { notIn: fixedKeys } }
+        : { sortOrder: { gt: section.sortOrder }, key: { notIn: fixedKeys } },
     orderBy: direction === "up" ? { sortOrder: "desc" } : { sortOrder: "asc" },
     select: { id: true, sortOrder: true },
   });
@@ -148,6 +156,10 @@ export async function saveHomepageSectionAction(
     select: { key: true },
   });
   if (!existing) return { error: "Section tidak ditemukan." };
+
+  if (isToggleOnlySection(existing.key)) {
+    return { error: "Section ini hanya bisa dinyalakan/dimatikan." };
+  }
 
   if (isBannerKey(existing.key)) {
     const shape = bannerSchema.safeParse({
@@ -208,8 +220,9 @@ export async function saveHomepageSectionAction(
 }
 
 /**
- * Buat baris section untuk key yang belum ada. Default `isEnabled: false`
- * supaya homepage publik tetap sama sampai admin menyalakannya.
+ * Buat baris section untuk key yang belum ada. Status awal mengikuti tampilan
+ * homepage sekarang (lihat `isDefaultVisibleSection`): section bawaan & footer
+ * dibuat aktif, section baru dibuat mati — homepage publik tidak berubah.
  */
 export async function createHomepageSectionAction(formData: FormData) {
   await requireRole(CONTENT_ROLES);
@@ -234,7 +247,7 @@ export async function createHomepageSectionAction(formData: FormData) {
     data: {
       key,
       title: sectionKeyLabel(key),
-      isEnabled: false,
+      isEnabled: isDefaultVisibleSection(key),
       sortOrder: (last?.sortOrder ?? 0) + 1,
     },
   });

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 
 import {
@@ -25,7 +26,11 @@ import {
   type BannerDefaults,
   type BannerKey,
 } from "@/lib/domain/homepage-banner";
-import { sectionKeyLabel } from "./homepage-sections";
+import {
+  isDefaultVisibleSection,
+  isFixedPositionSection,
+} from "@/lib/domain/homepage";
+import { SECTION_SOURCE, sectionKeyLabel } from "./homepage-sections";
 
 export type HomepageSectionRow = {
   id: string;
@@ -53,15 +58,30 @@ export function HomepageSectionList({
   missing: string[];
   bannerDefaults: Record<BannerKey, BannerDefaults>;
 }) {
+  // Footer tidak ikut diurutkan — selalu ditampilkan paling bawah.
+  const ordered = sections.filter((section) => !isFixedPositionSection(section.key));
+  const fixed = sections.filter((section) => isFixedPositionSection(section.key));
+
   return (
     <div className="space-y-6">
-      {sections.map((section, index) => (
+      {ordered.map((section, index) => (
         <HomepageSectionCard
           key={section.id}
           section={section}
           bannerDefaults={bannerDefaults}
           isFirst={index === 0}
-          isLast={index === sections.length - 1}
+          isLast={index === ordered.length - 1}
+        />
+      ))}
+
+      {fixed.map((section) => (
+        <HomepageSectionCard
+          key={section.id}
+          section={section}
+          bannerDefaults={bannerDefaults}
+          isFirst
+          isLast
+          fixedPosition
         />
       ))}
 
@@ -71,8 +91,10 @@ export function HomepageSectionList({
             Tambahkan section
           </h2>
           <p className="mt-1 text-xs text-neutral-600">
-            Section baru dibuat dalam keadaan <strong>mati</strong> (tidak
-            tampil di homepage) sampai admin menyalakannya.
+            Status awal mengikuti homepage sekarang: section bawaan yang sudah
+            tampil (mis. Footer) dibuat <strong>aktif</strong>, section baru
+            dibuat <strong>mati</strong> sampai admin menyalakannya. Jadi
+            homepage tidak berubah saat tombol ini ditekan.
           </p>
           <ul className="mt-3 flex flex-wrap gap-2">
             {missing.map((key) => (
@@ -84,6 +106,7 @@ export function HomepageSectionList({
                     className="rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm text-neutral-800 hover:bg-neutral-100"
                   >
                     Tambahkan {sectionKeyLabel(key)}
+                    {isDefaultVisibleSection(key) ? " (aktif)" : " (mati)"}
                   </button>
                 </form>
               </li>
@@ -100,11 +123,14 @@ function HomepageSectionCard({
   bannerDefaults,
   isFirst,
   isLast,
+  fixedPosition = false,
 }: {
   section: HomepageSectionRow;
   bannerDefaults: Record<BannerKey, BannerDefaults>;
   isFirst: boolean;
   isLast: boolean;
+  /** Section berposisi tetap (footer): tanpa tombol urutan. */
+  fixedPosition?: boolean;
 }) {
   const [state, formAction] = useActionState(
     saveHomepageSectionAction,
@@ -119,7 +145,8 @@ function HomepageSectionCard({
             {sectionKeyLabel(section.key)}
           </h2>
           <p className="text-xs text-neutral-500">
-            key: {section.key} · urutan {section.sortOrder}
+            key: {section.key} ·{" "}
+            {fixedPosition ? "selalu paling bawah" : `urutan ${section.sortOrder}`}
           </p>
         </div>
 
@@ -152,85 +179,136 @@ function HomepageSectionCard({
             </button>
           </form>
 
-          <form action={moveHomepageSectionAction}>
-            <input type="hidden" name="id" value={section.id} />
-            <input type="hidden" name="direction" value="up" />
-            <button
-              type="submit"
-              disabled={isFirst}
-              className="rounded-md border border-neutral-300 px-2 py-1.5 text-xs text-neutral-700 hover:bg-neutral-50 disabled:opacity-40"
-            >
-              ↑
-            </button>
-          </form>
+          {fixedPosition ? null : (
+            <>
+              <form action={moveHomepageSectionAction}>
+                <input type="hidden" name="id" value={section.id} />
+                <input type="hidden" name="direction" value="up" />
+                <button
+                  type="submit"
+                  disabled={isFirst}
+                  className="rounded-md border border-neutral-300 px-2 py-1.5 text-xs text-neutral-700 hover:bg-neutral-50 disabled:opacity-40"
+                >
+                  ↑
+                </button>
+              </form>
 
-          <form action={moveHomepageSectionAction}>
-            <input type="hidden" name="id" value={section.id} />
-            <input type="hidden" name="direction" value="down" />
-            <button
-              type="submit"
-              disabled={isLast}
-              className="rounded-md border border-neutral-300 px-2 py-1.5 text-xs text-neutral-700 hover:bg-neutral-50 disabled:opacity-40"
-            >
-              ↓
-            </button>
-          </form>
+              <form action={moveHomepageSectionAction}>
+                <input type="hidden" name="id" value={section.id} />
+                <input type="hidden" name="direction" value="down" />
+                <button
+                  type="submit"
+                  disabled={isLast}
+                  className="rounded-md border border-neutral-300 px-2 py-1.5 text-xs text-neutral-700 hover:bg-neutral-50 disabled:opacity-40"
+                >
+                  ↓
+                </button>
+              </form>
+            </>
+          )}
         </div>
       </div>
 
-      <form action={formAction} className="mt-4 space-y-4">
-        <input type="hidden" name="id" value={section.id} />
+      {isBannerKey(section.key) ? (
+        <form action={formAction} className="mt-4 space-y-4">
+          <input type="hidden" name="id" value={section.id} />
 
-        {isBannerKey(section.key) ? (
           <BannerFields
             section={section}
             bannerKey={section.key}
             defaults={bannerDefaults[section.key]}
           />
-        ) : (
-          <>
-            <Field label="Judul" htmlFor={`title-${section.id}`}>
-              <input
-                id={`title-${section.id}`}
-                name="title"
-                defaultValue={section.title}
-                required
-                className={inputClass}
-              />
-            </Field>
 
-            <Field label="Subjudul" htmlFor={`subtitle-${section.id}`}>
-              <input
-                id={`subtitle-${section.id}`}
-                name="subtitle"
-                defaultValue={section.subtitle}
-                className={inputClass}
-              />
-            </Field>
+          <ErrorMessage error={state.error} />
 
-            <RichTextField
-              name="bodyHtml"
-              label="Isi"
-              defaultValue={section.bodyHtml}
-              folder="homepage"
-            />
-
-            <ImageField
-              name="imageUrl"
-              label="Gambar"
-              folder="homepage"
-              defaultValue={section.imageUrl}
-            />
-          </>
-        )}
-
-        <ErrorMessage error={state.error} />
-
-        <div className="flex items-center gap-3 border-t border-neutral-200 pt-3">
-          <SaveButton label="Simpan section" />
-        </div>
-      </form>
+          <div className="flex items-center gap-3 border-t border-neutral-200 pt-3">
+            <SaveButton label="Simpan section" />
+          </div>
+        </form>
+      ) : SECTION_SOURCE[section.key] ? (
+        <SectionSourceNote source={SECTION_SOURCE[section.key]} />
+      ) : (
+        <GenericSectionForm section={section} />
+      )}
     </section>
+  );
+}
+
+/** Keterangan asal konten section non-banner (tanpa form isian). */
+function SectionSourceNote({
+  source,
+}: {
+  source: { text: string; link?: { href: string; label: string } };
+}) {
+  return (
+    <div className="mt-4 rounded-md bg-neutral-50 px-3 py-2 text-xs text-neutral-600">
+      <p>{source.text}</p>
+      {source.link ? (
+        <Link
+          href={source.link.href}
+          className="mt-1 inline-block font-medium text-neutral-900 underline underline-offset-2"
+        >
+          {source.link.label} →
+        </Link>
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * Form umum (judul, subjudul, isi, gambar) untuk section yang dibuat di luar
+ * daftar key bawaan. Section bawaan non-banner memakai `SectionSourceNote`
+ * karena isian ini tidak ditampilkan di homepage.
+ */
+function GenericSectionForm({ section }: { section: HomepageSectionRow }) {
+  const [state, formAction] = useActionState(
+    saveHomepageSectionAction,
+    initialState,
+  );
+
+  return (
+    <form action={formAction} className="mt-4 space-y-4">
+      <input type="hidden" name="id" value={section.id} />
+
+      <Field label="Judul" htmlFor={`title-${section.id}`}>
+        <input
+          id={`title-${section.id}`}
+          name="title"
+          defaultValue={section.title}
+          required
+          className={inputClass}
+        />
+      </Field>
+
+      <Field label="Subjudul" htmlFor={`subtitle-${section.id}`}>
+        <input
+          id={`subtitle-${section.id}`}
+          name="subtitle"
+          defaultValue={section.subtitle}
+          className={inputClass}
+        />
+      </Field>
+
+      <RichTextField
+        name="bodyHtml"
+        label="Isi"
+        defaultValue={section.bodyHtml}
+        folder="homepage"
+      />
+
+      <ImageField
+        name="imageUrl"
+        label="Gambar"
+        folder="homepage"
+        defaultValue={section.imageUrl}
+      />
+
+      <ErrorMessage error={state.error} />
+
+      <div className="flex items-center gap-3 border-t border-neutral-200 pt-3">
+        <SaveButton label="Simpan section" />
+      </div>
+    </form>
   );
 }
 
