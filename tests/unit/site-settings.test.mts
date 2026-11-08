@@ -36,6 +36,12 @@ const CURRENT_ROW: SiteSettingsRow = {
   facebookUrl: null,
   freshaUrl: null,
   ga4MeasurementId: null,
+  footerTagline: null,
+  priceDisclaimer: null,
+  bookNowLabel: null,
+  bookNowHref: null,
+  menuScanUrls: [],
+  menuPdfUrl: null,
 };
 
 const EMBED =
@@ -55,6 +61,12 @@ function input(overrides: Partial<SiteSettingsInput> = {}): SiteSettingsInput {
     freshaUrl: "",
     mapsEmbedUrl: "",
     ga4MeasurementId: "",
+    footerTagline: "",
+    priceDisclaimer: "",
+    bookNowLabel: "",
+    bookNowHref: "",
+    menuScanUrls: [],
+    menuPdfUrl: "",
     ...overrides,
   };
 }
@@ -141,6 +153,10 @@ describe("siteSettingsInputSchema", () => {
         mapsEmbedUrl: `<iframe src="${EMBED}"></iframe>`,
         ga4MeasurementId: "g-abcdef1234",
         instagramUrl: "https://www.instagram.com/kama__spa",
+        footerTagline: "  Your ritual, your pace.  ",
+        bookNowLabel: " Book Now ",
+        bookNowHref: "/contact",
+        menuScanUrls: [" https://cdn.example.com/menu-01.jpg ", "", "/img/menu-02.jpg"],
       }),
     );
     assert.equal(parsed.whatsappNumber, "6281316052040");
@@ -149,6 +165,12 @@ describe("siteSettingsInputSchema", () => {
     assert.equal(parsed.instagramUsername, "kama__spa");
     assert.equal(parsed.mapsEmbedUrl, EMBED);
     assert.equal(parsed.ga4MeasurementId, "G-ABCDEF1234");
+    assert.equal(parsed.footerTagline, "Your ritual, your pace.");
+    assert.equal(parsed.bookNowLabel, "Book Now");
+    assert.deepEqual(parsed.menuScanUrls, [
+      "https://cdn.example.com/menu-01.jpg",
+      "/img/menu-02.jpg",
+    ]);
     const write = toSiteSettingsWrite(parsed);
     assert.equal(write.facebookUrl, null);
     assert.equal(write.phone, null);
@@ -171,6 +193,9 @@ describe("siteSettingsInputSchema", () => {
     fail({ instagramUsername: "kama spa" });
     fail({ ga4MeasurementId: "UA-1234" });
     fail({ phone: "12ab" });
+    fail({ bookNowHref: "javascript:alert(1)" });
+    fail({ menuScanUrls: ["bukan-url"] });
+    fail({ menuPdfUrl: "javascript:alert(1)" });
   });
 });
 

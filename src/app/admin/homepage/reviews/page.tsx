@@ -37,16 +37,19 @@ export default async function AdminHomepageReviewsPage({
       emptyNote={
         <>
           <p>
-            Belum ada ulasan. Saat ini section Reviews menampilkan ulasan bawaan situs. Begitu
-            ulasan pertama disimpan, ulasan bawaan <strong>diganti seluruhnya</strong> oleh daftar
-            ini.
+            Belum ada ulasan. Section Reviews tidak ditampilkan di homepage sampai
+            minimal satu ulasan diterbitkan — tidak ada ulasan bawaan yang dipakai
+            otomatis.
           </p>
-          <p>Agar tampilan tidak berubah, salin dulu ulasan bawaan, lalu ubah/tambah sesuai kebutuhan.</p>
+          <p>
+            Agar tampilan tidak berubah, tekan <strong>Salin ulasan bawaan</strong> untuk
+            menyalin ulasan lama ke daftar ini, lalu ubah/tambah sesuai kebutuhan.
+          </p>
         </>
       }
       importLabel="Salin ulasan bawaan"
       importAction={importDefaultReviewsAction}
-      noLiveNote="Tidak ada ulasan yang tayang, jadi section Reviews tampil tanpa kartu. Terbitkan minimal satu ulasan, atau matikan section Reviews di halaman Section Homepage."
+      noLiveNote="Tidak ada ulasan yang tayang, jadi section Reviews tidak ditampilkan di homepage. Terbitkan minimal satu ulasan untuk menampilkannya."
       footnote="Judul section “Reviews” bersifat tetap. Section Reviews bisa disembunyikan dari halaman Section Homepage."
       toggleAction={toggleHomepageReviewAction}
       moveAction={moveHomepageReviewAction}

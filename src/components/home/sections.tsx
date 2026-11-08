@@ -139,6 +139,9 @@ export function TestimonialsSection({
   reviews: ReviewItem[];
   section?: HomepageSection | null;
 }) {
+  // Tidak ada ulasan terbit → section (termasuk judulnya) tidak ditampilkan;
+  // judul kosong tanpa kartu hanya terlihat seperti halaman rusak.
+  if (reviews.length === 0) return null;
   const heading = section?.title?.trim() || null;
   return (
     <Reveal as="section" className="bg-cream">

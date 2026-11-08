@@ -67,6 +67,13 @@ function readSiteSettingsInput(formData: FormData): SiteSettingsInput {
     freshaUrl: field("freshaUrl"),
     mapsEmbedUrl: field("mapsEmbedUrl"),
     ga4MeasurementId: field("ga4MeasurementId"),
+    footerTagline: field("footerTagline"),
+    priceDisclaimer: field("priceDisclaimer"),
+    bookNowLabel: field("bookNowLabel"),
+    bookNowHref: field("bookNowHref"),
+    // Satu URL per baris; baris kosong dibuang oleh normalizer di schema.
+    menuScanUrls: field("menuScanUrls").split("\n"),
+    menuPdfUrl: field("menuPdfUrl"),
   };
 }
 
@@ -130,6 +137,12 @@ export async function getContactSettingsRow() {
       facebookUrl: true,
       freshaUrl: true,
       ga4MeasurementId: true,
+      footerTagline: true,
+      priceDisclaimer: true,
+      bookNowLabel: true,
+      bookNowHref: true,
+      menuScanUrls: true,
+      menuPdfUrl: true,
     },
   });
 }

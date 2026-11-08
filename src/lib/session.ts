@@ -3,6 +3,15 @@ import { jwtVerify, SignJWT } from "jose";
 export const SESSION_COOKIE = "kama_admin_session";
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 8; // 8 jam kerja
 
+/**
+ * Login admin dimatikan sementara (permintaan user 9 Nov 2026): siapa pun yang
+ * membuka /admin langsung masuk sebagai admin. Proxy melewati guard, dan
+ * `getSession()` mengembalikan sesi ADMIN dari akun aktif pertama di database.
+ * Ubah ke `false` untuk mengaktifkan login kembali — tidak ada kode lain yang
+ * perlu disentuh.
+ */
+export const ADMIN_AUTH_DISABLED = true;
+
 export type AdminRoleName = "ADMIN" | "EDITOR";
 
 export type SessionPayload = {

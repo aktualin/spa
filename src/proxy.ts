@@ -19,7 +19,7 @@ import {
   getPublishedPageSlugs,
   getRedirectMap,
 } from "@/lib/redirects";
-import { SESSION_COOKIE, verifySessionToken } from "@/lib/session";
+import { ADMIN_AUTH_DISABLED, SESSION_COOKIE, verifySessionToken } from "@/lib/session";
 
 // Segmen di bawah /promos yang punya route statis sendiri (bukan slug promo).
 const PROMO_STATIC_SEGMENTS = ["membership"];
@@ -45,6 +45,15 @@ export async function proxy(request: NextRequest) {
       (await notFoundForUnpublishedEvent(request)) ??
       NextResponse.next()
     );
+  }
+
+  // Login dimatikan sementara: /admin bebas diakses, /admin/login dialihkan ke
+  // dashboard. Sesi aktif tetap diisi oleh `getSession()` (lihat lib/auth.ts).
+  if (ADMIN_AUTH_DISABLED) {
+    if (pathname === "/admin/login") {
+      return NextResponse.redirect(new URL("/admin", request.url));
+    }
+    return NextResponse.next();
   }
 
   // Sesi dicabut di database (password/role/status berubah): hapus cookie lewat
@@ -255,6 +264,10 @@ async function guardAdminApi(request: NextRequest) {
   if (isStateChangingMethod(request.method) && !isSameOrigin(request.headers)) {
     return NextResponse.json({ error: "Origin tidak diizinkan." }, { status: 403 });
   }
+
+  // Login dimatikan sementara: API admin terbuka tanpa cookie. Pemeriksaan
+  // origin di atas tetap dipertahankan agar situs lain tidak bisa menulis.
+  if (ADMIN_AUTH_DISABLED) return NextResponse.next();
 
   const token = request.cookies.get(SESSION_COOKIE)?.value;
   const session = token ? await verifySessionToken(token) : null;

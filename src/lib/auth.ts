@@ -5,6 +5,7 @@ import { cache } from "react";
 import { CHANGE_PASSWORD_PATH } from "@/lib/domain/admin-redirect";
 import { prisma } from "@/lib/prisma";
 import {
+  ADMIN_AUTH_DISABLED,
   SESSION_COOKIE,
   verifySessionToken,
   type AdminRoleName,
@@ -15,6 +16,37 @@ import {
 export const EXPIRED_LOGIN_PATH = "/admin/login?reason=expired";
 
 /**
+ * Sesi pengganti saat `ADMIN_AUTH_DISABLED`: pakai akun ADMIN aktif pertama di
+ * database supaya kolom jejak (`uploadedById`, `triggeredById`, dsb.) tetap
+ * menunjuk user yang valid. Tidak ada akun → id sentinel; modul yang menulis
+ * relasi ke `AdminUser` akan gagal dengan pesan jelas, bukan diam-diam.
+ */
+const getBypassSession = cache(async (): Promise<SessionPayload> => {
+  const user = await prisma.adminUser.findFirst({
+    where: { role: "ADMIN", isActive: true },
+    orderBy: { createdAt: "asc" },
+    select: { id: true, email: true, role: true, sessionVersion: true },
+  });
+  if (user) {
+    return {
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+      sessionVersion: user.sessionVersion,
+      // Jangan pernah memaksa ganti sandi saat login dimatikan.
+      mustChangePassword: false,
+    };
+  }
+  return {
+    userId: "auth-disabled",
+    email: "auth-disabled@kamaspa.local",
+    role: "ADMIN",
+    sessionVersion: 0,
+    mustChangePassword: false,
+  };
+});
+
+/**
  * Sesi aktif yang sudah dicocokkan dengan database, atau null. Token yang
  * tanda tangannya sah tetap ditolak bila akun dinonaktifkan atau
  * `sessionVersion`-nya sudah dinaikkan (password/role diganti). Role diambil
@@ -22,6 +54,13 @@ export const EXPIRED_LOGIN_PATH = "/admin/login?reason=expired";
  * dan Server Action dalam satu render hanya memicu satu query.
  */
 export const getSession = cache(async (): Promise<SessionPayload | null> => {
+  if (ADMIN_AUTH_DISABLED) {
+    // Tetap baca cookie: tanpa ini route admin tidak punya dependensi request
+    // dan ikut di-prerender statis (dashboard beku + `new Date()` error).
+    await cookies();
+    return getBypassSession();
+  }
+
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!token) return null;
 

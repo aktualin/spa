@@ -2,8 +2,13 @@
 
 import { useActionState, useRef, useState } from "react";
 
-import type { SiteSettingsInput } from "@/lib/domain/site-settings";
-
+import {
+  MAX_BOOK_NOW_LABEL,
+  MAX_FOOTER_TAGLINE,
+  MAX_MENU_SCANS,
+  MAX_PRICE_DISCLAIMER,
+  type SiteSettingsInput,
+} from "@/lib/domain/site-settings";
 import {
   saveSiteSettingsAction,
   type SiteSettingsFormState,
@@ -215,6 +220,106 @@ export function SiteSettingsForm({
               type="url"
               defaultValue={values.freshaUrl}
               placeholder="https://www.fresha.com/..."
+              className={inputClass}
+            />
+          </Field>
+        </fieldset>
+
+        <fieldset className="space-y-5">
+          <legend className="text-base font-semibold text-neutral-900">
+            Teks &amp; tombol situs
+          </legend>
+
+          <Field
+            label="Tagline footer"
+            htmlFor="footerTagline"
+            hint="Kalimat besar di footer. Kosongkan bila tidak ingin ditampilkan."
+          >
+            <textarea
+              id="footerTagline"
+              name="footerTagline"
+              defaultValue={values.footerTagline}
+              maxLength={MAX_FOOTER_TAGLINE}
+              rows={2}
+              className={inputClass}
+            />
+          </Field>
+
+          <Field
+            label="Label tombol Book Now"
+            htmlFor="bookNowLabel"
+            hint={`Teks tombol booking di header, maks. ${MAX_BOOK_NOW_LABEL} karakter.`}
+          >
+            <input
+              id="bookNowLabel"
+              name="bookNowLabel"
+              defaultValue={values.bookNowLabel}
+              maxLength={MAX_BOOK_NOW_LABEL}
+              placeholder="Book Now"
+              className={inputClass}
+            />
+          </Field>
+
+          <Field
+            label="Tujuan tombol Book Now"
+            htmlFor="bookNowHref"
+            hint="Path internal (/contact), anchor (#booking), atau URL https://."
+          >
+            <input
+              id="bookNowHref"
+              name="bookNowHref"
+              defaultValue={values.bookNowHref}
+              placeholder="/contact"
+              className={inputClass}
+            />
+          </Field>
+
+          <Field
+            label="Catatan harga di halaman menu"
+            htmlFor="priceDisclaimer"
+            hint={`Tampil di bawah daftar harga treatment. Maks. ${MAX_PRICE_DISCLAIMER} karakter.`}
+          >
+            <textarea
+              id="priceDisclaimer"
+              name="priceDisclaimer"
+              defaultValue={values.priceDisclaimer}
+              maxLength={MAX_PRICE_DISCLAIMER}
+              rows={2}
+              className={inputClass}
+            />
+          </Field>
+        </fieldset>
+
+        <fieldset className="space-y-5">
+          <legend className="text-base font-semibold text-neutral-900">
+            Halaman menu (scan &amp; PDF)
+          </legend>
+
+          <Field
+            label="Gambar halaman menu"
+            htmlFor="menuScanUrls"
+            hint={`Satu URL gambar per baris, urut sesuai tampil (maks. ${MAX_MENU_SCANS}). Ambil URL dari Media Library atau isi path internal /img/...`}
+          >
+            <textarea
+              id="menuScanUrls"
+              name="menuScanUrls"
+              defaultValue={values.menuScanUrls.join("\n")}
+              rows={4}
+              placeholder="https://.../menu-01.jpg"
+              className={inputClass}
+            />
+          </Field>
+
+          <Field
+            label="Berkas PDF menu"
+            htmlFor="menuPdfUrl"
+            hint="URL https:// atau path internal (/img/...). Kosongkan bila tidak ada PDF."
+          >
+            <input
+              id="menuPdfUrl"
+              name="menuPdfUrl"
+              defaultValue={values.menuPdfUrl}
+              placeholder="https://.../menu.pdf"
               className={inputClass}
             />
           </Field>
