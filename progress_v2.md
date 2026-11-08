@@ -32,7 +32,7 @@ Aturan kerja yang berlaku (dari user):
 | 21 | Halaman publik yang belum ada (cek kelengkapan + slug DB + redirect 301) | ✅ semua halaman sudah ada; promo kini mencatat 301 saat slug diganti | lihat `git log` |
 | 22 | Integrasi WhatsApp, GA4, Google Maps, Instagram feed | ✅ (GA4 dipasang bila ID diisi; WA lacak klik; Maps di Kontak; IG dari admin) | lihat `git log` |
 | 23 | Hardening (responsif, browser, HTTPS, gambar, login limit, Zod, sanitasi, rate limit) | ✅ sebagian — header keamanan + HSTS, kompresi gambar saat unggah; audit sanitasi/Zod/limit OK. Responsif & lintas browser belum diuji (butuh E2E/manual) | lihat `git log` |
-| 24 | Testing sesuai PLAN-9 + perbaikan sampai DoD PLAN-8 | ⏳ | |
+| 24 | Testing sesuai PLAN-9 + perbaikan sampai DoD PLAN-8 | ✅ sebagian — lihat "Hasil BUILD-24" | lihat `git log` |
 | 25 | Serah terima sesuai PLAN-10 | ⏳ | |
 
 ## Catatan per butir
@@ -55,3 +55,12 @@ Aturan kerja yang berlaku (dari user):
 - Rate limit login & inquiry tersimpan di memori per instance Vercel (tidak lintas instance).
 - CSP belum dipasang (perlu uji browser karena Leaflet/GA4/Maps).
 - Responsif desktop/tablet/mobile & kompatibilitas Chrome/Safari/Edge/Firefox belum diverifikasi ulang sejak BUILD-6 (masuk BUILD-24).
+
+### Hasil BUILD-24 (8 Nov 2026)
+- `npm run build`: lolos, tanpa peringatan.
+- Unit test: 491/491 lolos.
+- E2E Playwright (mobile/tablet/desktop + admin-flows): 108 lolos di run pertama; 2 timeout memuat halaman (GIF 28 MB) lolos saat diulang; admin-flows 7/7 lolos.
+  - Catatan: menjalankan suite dua kali berturut-turut memicu pembatas login (10×/15 menit per IP) — fitur bekerja sesuai desain; restart server sebelum run ulang.
+- Smoke test produksi lokal: `/` 200, event tak dikenal 404, `/corporate-wellness` 308, header keamanan aktif.
+- Butir PLAN-9 yang tercakup otomatis: regresi layout/nav/menu, WhatsApp link, auth admin, CRUD katalog & menu, slug → redirect 301, menu 3 level header/footer/mobile, pindah parent tanpa siklus (unit), hapus halaman yang dipakai menu → tautan rusak ditandai/disembunyikan (unit), 404 halaman.
+- BELUM tercakup otomatis (perlu uji manual/UAT): CRUD 19 modul di UI (selain katalog, menu, halaman, auth), GA4 (butuh Measurement ID), Maps embed, feed Instagram, form inquiry + email (butuh Turnstile & Resend), lintas browser Safari/Firefox/Edge, backup end-to-end.
