@@ -50,6 +50,7 @@ model AdminUser {
   passwordChangedAt  DateTime?
 
   mediaUploads MediaAsset[]
+  backupRuns   BackupRun[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -601,6 +602,16 @@ model SiteSettings {
   facebookUrl  String?
   freshaUrl    String?
 
+  // Username Instagram (tanpa @) untuk feed/tautan profil.
+  instagramUsername String?
+  // Google Analytics 4 Measurement ID, contoh "G-XXXXXXXXXX". Kosong = GA4 mati.
+  ga4MeasurementId  String?
+  // Isi meta google-site-verification (Google Search Console).
+  gscVerification   String?
+  // Favicon & gambar Open Graph bawaan (dipakai bila halaman tidak punya).
+  faviconUrl        String?
+  defaultOgImageUrl String?
+
   updatedAt DateTime @updatedAt
 }
 
@@ -703,4 +714,37 @@ model MediaAsset {
   updatedAt DateTime @updatedAt
 
   @@index([folder, sortOrder])
+}
+
+/* ---------- Modul 19: Backup & Status ---------- */
+
+enum BackupKind {
+  MANUAL   // diunduh admin dari dashboard
+  AUTO     // dijalankan terjadwal (mis. GitHub Actions mingguan)
+  HANDOVER // salinan lengkap saat serah terima
+}
+
+enum BackupStatus {
+  SUCCESS
+  FAILED
+}
+
+// Catatan setiap backup — isi backup TIDAK disimpan di sini.
+model BackupRun {
+  id         String       @id @default(cuid())
+  kind       BackupKind
+  status     BackupStatus
+  // Format/isi, contoh "pg_dump .sql.gz" atau "JSON (tanpa data inquiry)".
+  format     String
+  sizeBytes  Int?
+  // Lokasi penyimpanan (mis. "GitHub Actions artifact #123"), tanpa kredensial.
+  location   String?
+  note       String?
+  // Admin yang memicu (MANUAL/HANDOVER); null untuk AUTO.
+  triggeredById String?
+  triggeredBy   AdminUser? @relation(fields: [triggeredById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
 }
