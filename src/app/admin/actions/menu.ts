@@ -4,33 +4,109 @@ import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { requireRole, requireSession } from "@/lib/auth";
+import { requireRole } from "@/lib/auth";
 import { CONTENT_TAGS } from "@/lib/content/tags";
+import {
+  inheritRootLocations,
+  MENU_LINK_TYPES,
+  MENU_LOCATIONS,
+  validateMenuLabel,
+  validateMenuLink,
+  validateParent,
+  validateStructure,
+  type MenuLinkType,
+  type MenuLocation,
+} from "@/lib/domain/menu";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
+import { SLUG_PATTERN } from "@/lib/domain/slug";
 import { prisma } from "@/lib/prisma";
 
 export type ActionState = { error: string | null; ok?: boolean };
 
-const menuItemSchema = z.object({
+export type MenuAdminRow = {
+  id: string;
+  parentId: string | null;
+  label: string;
+  linkType: MenuLinkType;
+  url: string | null;
+  pageId: string | null;
+  page: { slug: string; title: string; published: boolean } | null;
+  sortOrder: number;
+  isVisible: boolean;
+  openInNew: boolean;
+  locations: MenuLocation[];
+  panelKey: string | null;
+  panelLinkLabel: string | null;
+};
+
+export type MenuPageOption = {
+  id: string;
+  title: string;
+  slug: string;
+  published: boolean;
+};
+
+function revalidateMenu() {
+  updateTag(CONTENT_TAGS.menu);
+  revalidatePath("/admin/menu");
+}
+
+export async function listMenuAdmin(): Promise<MenuAdminRow[]> {
+  await requireRole(CONTENT_ROLES);
+  const items = await prisma.menuItem.findMany({
+    include: { page: { select: { slug: true, title: true, status: true } } },
+    orderBy: [{ sortOrder: "asc" }, { label: "asc" }],
+  });
+  return items.map((item) => ({
+    id: item.id,
+    parentId: item.parentId,
+    label: item.label,
+    linkType: item.linkType,
+    url: item.url,
+    pageId: item.pageId,
+    page: item.page
+      ? {
+          slug: item.page.slug,
+          title: item.page.title,
+          published: item.page.status === "PUBLISHED",
+        }
+      : null,
+    sortOrder: item.sortOrder,
+    isVisible: item.isVisible,
+    openInNew: item.openInNew,
+    locations: item.locations,
+    panelKey: item.panelKey,
+    panelLinkLabel: item.panelLinkLabel,
+  }));
+}
+
+export async function listMenuPageOptions(): Promise<MenuPageOption[]> {
+  await requireRole(CONTENT_ROLES);
+  const pages = await prisma.staticPage.findMany({
+    select: { id: true, title: true, slug: true, status: true },
+    orderBy: { title: "asc" },
+  });
+  return pages.map((p) => ({
+    id: p.id,
+    title: p.title,
+    slug: p.slug,
+    published: p.status === "PUBLISHED",
+  }));
+}
+
+const itemSchema = z.object({
   id: z.string().trim().optional(),
-  label: z.string().trim().min(1, "Label menu wajib diisi."),
-  url: z
-    .string()
-    .trim()
-    .min(1, "URL wajib diisi.")
-    .refine(
-      (value) => value.startsWith("/") || value.startsWith("https://"),
-      "URL harus diawali \"/\" (halaman internal) atau \"https://\" (tautan luar).",
-    ),
-  sortOrder: z.coerce.number().int().min(0).default(0),
+  parentId: z.string().trim().optional(),
+  label: z.string(),
+  linkType: z.enum(MENU_LINK_TYPES),
+  url: z.string().trim().optional(),
+  pageId: z.string().trim().optional(),
   isVisible: z.boolean(),
   openInNew: z.boolean(),
-  parentId: z.string().trim().optional(),
+  locations: z.array(z.enum(MENU_LOCATIONS)),
+  panelKey: z.string().trim().max(40).optional(),
+  panelLinkLabel: z.string().trim().max(60).optional(),
 });
-
-function firstIssue(error: z.ZodError): string {
-  return error.issues[0]?.message ?? "Input tidak valid.";
-}
 
 export async function saveMenuItemAction(
   _prevState: ActionState,
@@ -38,139 +114,161 @@ export async function saveMenuItemAction(
 ): Promise<ActionState> {
   await requireRole(CONTENT_ROLES);
 
-  const rawParent = String(formData.get("parentId") ?? "").trim();
-  const parsed = menuItemSchema.safeParse({
-    id: formData.get("id") ?? undefined,
-    label: formData.get("label"),
-    url: formData.get("url"),
-    sortOrder: formData.get("sortOrder") ?? 0,
+  const parsed = itemSchema.safeParse({
+    id: String(formData.get("id") ?? "") || undefined,
+    parentId: String(formData.get("parentId") ?? "") || undefined,
+    label: String(formData.get("label") ?? ""),
+    linkType: formData.get("linkType"),
+    url: String(formData.get("url") ?? ""),
+    pageId: String(formData.get("pageId") ?? ""),
     isVisible: formData.get("isVisible") === "on",
-    openInNew: formData.get("openInNew") === "on",
-    parentId: rawParent || undefined,
+    openInNew: formData.get("target") === "_blank",
+    locations: formData.getAll("locations").map(String),
+    panelKey: String(formData.get("panelKey") ?? ""),
+    panelLinkLabel: String(formData.get("panelLinkLabel") ?? ""),
   });
-  if (!parsed.success) {
-    return { error: firstIssue(parsed.error) };
+  if (!parsed.success) return { error: "Isian menu tidak valid." };
+  const input = parsed.data;
+
+  const labelError = validateMenuLabel(input.label);
+  if (labelError) return { error: labelError };
+
+  const url = ["PAGE", "NO_LINK"].includes(input.linkType) ? null : input.url || null;
+  const pageId = input.linkType === "PAGE" ? input.pageId || null : null;
+  const linkError = validateMenuLink({ linkType: input.linkType, url, pageId });
+  if (linkError) return { error: linkError };
+
+  if (pageId && !(await prisma.staticPage.findUnique({ where: { id: pageId }, select: { id: true } }))) {
+    return { error: "Halaman tujuan tidak ditemukan. Mungkin sudah dihapus." };
   }
 
-  const { id, label, url, sortOrder, isVisible, openInNew } = parsed.data;
-  const parentId = parsed.data.parentId || null;
+  const all = await prisma.menuItem.findMany({
+    select: { id: true, parentId: true, sortOrder: true },
+  });
 
-  if (id) {
-    const item = await prisma.menuItem.findUnique({
-      where: { id },
-      select: { id: true, parentId: true },
-    });
-    if (!item) return { error: "Item menu tidak ditemukan." };
-
-    // Sub-menu hanya satu level: tidak boleh menjadi anak dari anaknya sendiri.
-    if (parentId) {
-      const parent = await prisma.menuItem.findUnique({
-        where: { id: parentId },
-        select: { parentId: true },
-      });
-      if (!parent) return { error: "Induk menu tidak ditemukan." };
-      if (parent.parentId) {
-        return { error: "Sub-menu hanya boleh satu level." };
-      }
-      if (parentId === id) {
-        return { error: "Item menu tidak boleh menjadi induk dirinya sendiri." };
-      }
-
-      // Item yang sudah punya anak tidak boleh dipindahkan, supaya tidak
-      // terbentuk sub-menu bertingkat lebih dari satu.
-      const childCount = await prisma.menuItem.count({ where: { parentId: id } });
-      if (childCount > 0) {
-        return {
-          error: "Item ini masih punya sub-menu. Pindahkan atau hapus sub-menu dulu.",
-        };
-      }
-    }
-
-    await prisma.menuItem.update({
-      where: { id },
-      data: { label, url, sortOrder, isVisible, openInNew, parentId },
-    });
+  let parentId: string | null;
+  if (input.id) {
+    const current = all.find((row) => row.id === input.id);
+    if (!current) return { error: "Item menu tidak ditemukan. Mungkin sudah dihapus." };
+    // Posisi diubah lewat susunan (drag-and-drop), bukan dari form ini.
+    parentId = current.parentId;
   } else {
+    parentId = input.parentId ?? null;
+    const parentError = validateParent(all, null, parentId);
+    if (parentError) return { error: parentError };
+  }
+
+  const isRoot = parentId === null;
+  if (isRoot && input.locations.length === 0) {
+    return { error: "Pilih minimal satu lokasi tampil (Header, Mobile, atau Footer)." };
+  }
+  if (isRoot && input.panelKey && !SLUG_PATTERN.test(input.panelKey)) {
+    return { error: "Kunci panel hanya boleh huruf kecil, angka, dan tanda hubung." };
+  }
+
+  const data = {
+    label: input.label.trim(),
+    linkType: input.linkType,
+    url,
+    pageId,
+    isVisible: input.isVisible,
+    openInNew: input.openInNew,
+    // Lokasi & panel hanya berlaku untuk level 1; anak mengikuti induknya.
+    locations: isRoot ? input.locations : [],
+    panelKey: isRoot ? input.panelKey || null : null,
+    panelLinkLabel: isRoot ? input.panelLinkLabel || null : null,
+  };
+
+  if (input.id) {
+    await prisma.menuItem.update({ where: { id: input.id }, data });
+  } else {
+    const siblingOrders = all.filter((row) => row.parentId === parentId).map((row) => row.sortOrder);
     await prisma.menuItem.create({
-      data: { label, url, sortOrder, isVisible, openInNew, parentId },
+      data: {
+        ...data,
+        parentId,
+        sortOrder: siblingOrders.length ? Math.max(...siblingOrders) + 1 : 0,
+      },
     });
   }
 
-  updateTag(CONTENT_TAGS.menu);
-  revalidatePath("/admin/menu");
-  revalidatePath("/", "layout");
-
+  revalidateMenu();
   redirect("/admin/menu?saved=1");
 }
 
 export async function deleteMenuItemAction(formData: FormData) {
   await requireRole(CONTENT_ROLES);
-
   const id = String(formData.get("id") ?? "");
   if (!id) return;
-
-  // Anak ikut terhapus (cascade di schema) supaya tidak ada nav item yatim.
-  await prisma.menuItem.delete({ where: { id } });
-
-  updateTag(CONTENT_TAGS.menu);
-  revalidatePath("/admin/menu");
-  revalidatePath("/", "layout");
-
+  // Sub-menu ikut terhapus (onDelete: Cascade); UI sudah meminta konfirmasi.
+  await prisma.menuItem.deleteMany({ where: { id } });
+  revalidateMenu();
   redirect("/admin/menu?deleted=1");
 }
 
-/** Naikkan/turunkan urutan item di antara sesame parent-nya. */
-export async function moveMenuItemAction(formData: FormData) {
+const structureSchema = z
+  .array(
+    z.object({
+      id: z.string().min(1),
+      parentId: z.string().min(1).nullable(),
+      sortOrder: z.number().int().min(0),
+    }),
+  )
+  .max(500);
+
+export async function saveMenuStructureAction(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
   await requireRole(CONTENT_ROLES);
 
-  const id = String(formData.get("id") ?? "");
-  const direction = String(formData.get("direction") ?? "");
-  if (!id) return;
+  let raw: unknown;
+  try {
+    raw = JSON.parse(String(formData.get("structure") ?? "[]"));
+  } catch {
+    return { error: "Data susunan menu tidak valid." };
+  }
+  const parsed = structureSchema.safeParse(raw);
+  if (!parsed.success) return { error: "Data susunan menu tidak valid." };
+  const structure = parsed.data;
 
-  const item = await prisma.menuItem.findUnique({
-    where: { id },
-    select: { id: true, sortOrder: true, parentId: true },
+  const existing = await prisma.menuItem.findMany({
+    select: { id: true, parentId: true, locations: true },
   });
-  if (!item) return;
+  const existingIds = new Set(existing.map((row) => row.id));
+  const sentIds = new Set(structure.map((row) => row.id));
+  if (
+    existingIds.size !== sentIds.size ||
+    [...existingIds].some((id) => !sentIds.has(id))
+  ) {
+    return {
+      error: "Menu sudah diubah di tempat lain. Muat ulang halaman, lalu susun kembali.",
+    };
+  }
 
-  const neighbour = await prisma.menuItem.findFirst({
-    where: {
-      parentId: item.parentId,
-      ...(direction === "up"
-        ? { sortOrder: { lt: item.sortOrder } }
-        : { sortOrder: { gt: item.sortOrder } }),
-    },
-    orderBy: direction === "up" ? { sortOrder: "desc" } : { sortOrder: "asc" },
-    select: { id: true, sortOrder: true },
-  });
-  if (!neighbour) return;
+  const structureError = validateStructure(structure);
+  if (structureError) return { error: structureError };
 
-  await prisma.$transaction([
-    prisma.menuItem.update({
-      where: { id: item.id },
-      data: { sortOrder: neighbour.sortOrder },
-    }),
-    prisma.menuItem.update({
-      where: { id: neighbour.id },
-      data: { sortOrder: item.sortOrder },
-    }),
-  ]);
+  const locationsById = new Map(existing.map((row) => [row.id, row.locations]));
+  const next = inheritRootLocations(
+    existing,
+    structure.map((row) => ({ ...row, locations: locationsById.get(row.id) ?? [] })),
+  );
 
-  updateTag(CONTENT_TAGS.menu);
-  revalidatePath("/admin/menu");
-  revalidatePath("/", "layout");
+  await prisma.$transaction(
+    next.map((row) =>
+      prisma.menuItem.update({
+        where: { id: row.id },
+        data: {
+          parentId: row.parentId,
+          sortOrder: row.sortOrder,
+          // Anak tidak menyimpan lokasi; akar baru mewarisi lokasi akar lamanya.
+          locations: row.parentId === null ? row.locations : [],
+        },
+      }),
+    ),
+  );
 
+  revalidateMenu();
   redirect("/admin/menu?saved=1");
-}
-
-/** Daftar menu (root + anak) untuk halaman admin. */
-export async function listMenuItems() {
-  await requireSession();
-
-  const items = await prisma.menuItem.findMany({
-    orderBy: [{ sortOrder: "asc" }, { label: "asc" }],
-    include: { children: { orderBy: [{ sortOrder: "asc" }, { label: "asc" }] } },
-  });
-
-  return items.filter((item) => item.parentId === null);
 }

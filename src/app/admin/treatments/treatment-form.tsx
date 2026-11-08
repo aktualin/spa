@@ -13,12 +13,28 @@ import { ImageField } from "../image-field";
 
 type OptionRow = { label: string; durationMin: string; priceIdr: string };
 
+export type TreatmentCategoryOption = {
+  id: string;
+  name: string;
+  kind: "TREATMENT" | "ADDON";
+};
+
+const ADDON_SECTIONS = [
+  { value: "BODY", label: "Body — grid scrub & mask" },
+  { value: "FACE", label: "Face Ritual — section tersendiri" },
+  { value: "HEAD_SCALP", label: "Head & Scalp — section tersendiri" },
+  { value: "BATH", label: "Bath Ritual — section tersendiri" },
+] as const;
+
 export type TreatmentFormData = {
   id: string | null;
   name: string;
   slug: string;
   categoryId: string;
+  tagline: string;
   description: string;
+  note: string;
+  addonSection: string;
   imageUrl: string;
   whatsappMessage: string;
   seoTitle: string;
@@ -53,9 +69,12 @@ export function TreatmentForm({
   categories,
 }: {
   treatment: TreatmentFormData;
-  categories: { id: string; name: string }[];
+  categories: TreatmentCategoryOption[];
 }) {
   const [state, formAction] = useActionState(saveTreatmentAction, initialState);
+  const [categoryId, setCategoryId] = useState(treatment.categoryId);
+  const isAddon = categories.find((c) => c.id === categoryId)?.kind === "ADDON";
+  const backHref = isAddon ? "/admin/treatments/addons" : "/admin/treatments";
   const [options, setOptions] = useState<OptionRow[]>(
     treatment.options.length > 0
       ? treatment.options
@@ -70,15 +89,16 @@ export function TreatmentForm({
 
   return (
     <div className="mx-auto max-w-2xl">
-      <Link
-        href="/admin/treatments"
-        className="text-sm text-neutral-600 hover:underline"
-      >
+      <Link href={backHref} className="text-sm text-neutral-600 hover:underline">
         ← Kembali ke daftar
       </Link>
 
       <h1 className="mt-3 text-xl font-semibold text-neutral-900">
-        {treatment.id ? `Ubah ${treatment.name}` : "Tambah treatment"}
+        {treatment.id
+          ? `Ubah ${treatment.name}`
+          : isAddon
+            ? "Tambah add-on"
+            : "Tambah treatment"}
       </h1>
 
       <form action={formAction} className="mt-6 space-y-5">
@@ -115,17 +135,56 @@ export function TreatmentForm({
           <select
             id="categoryId"
             name="categoryId"
-            defaultValue={treatment.categoryId}
+            value={categoryId}
+            onChange={(event) => setCategoryId(event.target.value)}
             required
             className={inputClass}
           >
             {categories.map((category) => (
               <option key={category.id} value={category.id}>
                 {category.name}
+                {category.kind === "ADDON" ? " (add-on)" : ""}
               </option>
             ))}
           </select>
         </Field>
+
+        {isAddon ? (
+          <Field
+            label="Letak di halaman Menu"
+            htmlFor="addonSection"
+            hint="Body tampil sebagai grid. Face, Head & Scalp, dan Bath masing-masing menampilkan satu add-on (yang urutannya paling atas)."
+          >
+            <select
+              id="addonSection"
+              name="addonSection"
+              defaultValue={treatment.addonSection}
+              required
+              className={inputClass}
+            >
+              <option value="">— pilih letak —</option>
+              {ADDON_SECTIONS.map((section) => (
+                <option key={section.value} value={section.value}>
+                  {section.label}
+                </option>
+              ))}
+            </select>
+          </Field>
+        ) : (
+          <Field
+            label="Tagline"
+            htmlFor="tagline"
+            hint="Kalimat singkat di kartu treatment halaman Menu."
+          >
+            <input
+              id="tagline"
+              name="tagline"
+              defaultValue={treatment.tagline}
+              maxLength={160}
+              className={inputClass}
+            />
+          </Field>
+        )}
 
         <Field label="Deskripsi" htmlFor="description">
           <textarea
@@ -136,6 +195,22 @@ export function TreatmentForm({
             className={inputClass}
           />
         </Field>
+
+        {isAddon ? null : (
+          <Field
+            label="Catatan"
+            htmlFor="note"
+            hint='Opsional, tampil kecil di halaman detail. Contoh: "We are using dry massage techniques without oil."'
+          >
+            <input
+              id="note"
+              name="note"
+              defaultValue={treatment.note}
+              maxLength={200}
+              className={inputClass}
+            />
+          </Field>
+        )}
 
         <ImageField
           name="imageUrl"

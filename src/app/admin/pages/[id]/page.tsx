@@ -19,6 +19,7 @@ export default async function EditStaticPage({
   return (
     <PageForm
       siteUrl={getSiteUrl()}
+      menuUsage={page._count.menuItems}
       page={{
         id: page.id,
         title: page.title,

@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { requireRole, requireSession } from "@/lib/auth";
 import { CONTENT_TAGS } from "@/lib/content/tags";
+import { recordPathMoves, treatmentPath } from "@/lib/path-moves";
 import { prisma } from "@/lib/prisma";
 import { deleteImageByUrl } from "@/lib/storage";
 
@@ -35,7 +36,10 @@ const treatmentSchema = z.object({
     .min(1, "Slug wajib diisi.")
     .regex(slugPattern, "Slug hanya boleh huruf kecil, angka, dan tanda hubung."),
   categoryId: z.string().trim().min(1, "Kategori wajib dipilih."),
+  tagline: z.string().trim().max(160, "Tagline maksimal 160 karakter.").optional(),
   description: z.string().trim().optional(),
+  note: z.string().trim().max(200, "Catatan maksimal 200 karakter.").optional(),
+  addonSection: z.enum(["BODY", "FACE", "HEAD_SCALP", "BATH"]).optional(),
   // Hanya URL yang disimpan; file-nya ada di Supabase Storage.
   imageUrl: z.union([z.string().trim().url(), z.literal("")]).optional(),
   whatsappMessage: z.string().trim().optional(),
@@ -74,7 +78,10 @@ function readForm(formData: FormData) {
     name: formData.get("name"),
     slug: formData.get("slug"),
     categoryId: formData.get("categoryId"),
+    tagline: formData.get("tagline") ?? undefined,
     description: formData.get("description") ?? undefined,
+    note: formData.get("note") ?? undefined,
+    addonSection: String(formData.get("addonSection") ?? "") || undefined,
     imageUrl: formData.get("imageUrl") ?? undefined,
     whatsappMessage: formData.get("whatsappMessage") ?? undefined,
     seoTitle: formData.get("seoTitle") ?? undefined,
@@ -105,13 +112,28 @@ export async function saveTreatmentAction(
     return { error: firstIssue(parsed.error) };
   }
 
-  const { options, imageUrl, seoTitle, seoDescription, ...rest } = parsed.data;
+  const { options, imageUrl, seoTitle, seoDescription, tagline, note, addonSection, ...rest } =
+    parsed.data;
+
+  const category = await prisma.treatmentCategory.findUnique({
+    where: { id: rest.categoryId },
+    select: { slug: true, kind: true, isPublished: true },
+  });
+  if (!category) return { error: "Kategori tidak ditemukan." };
+  if (category.kind === "ADDON" && !addonSection) {
+    return { error: "Pilih letak add-on di halaman Menu (Body, Face, Head & Scalp, atau Bath)." };
+  }
+
   // Field opsional yang dikosongkan admin disimpan sebagai NULL, bukan "".
   const data = {
     ...rest,
     imageUrl: imageUrl ? imageUrl : null,
     seoTitle: seoTitle ? seoTitle : null,
     seoDescription: seoDescription ? seoDescription : null,
+    tagline: tagline ? tagline : null,
+    note: note ? note : null,
+    // Letak di /menu hanya berarti untuk add-on.
+    addonSection: category.kind === "ADDON" ? (addonSection ?? null) : null,
   };
 
   // Slug dipakai di URL publik, jadi harus unik lintas treatment.
@@ -125,14 +147,19 @@ export async function saveTreatmentAction(
 
   // Gambar lama yang diganti/dihapus ikut dibuang dari bucket supaya tidak
   // menumpuk file yatim. Kegagalan hapus tidak boleh menggagalkan simpan.
-  if (id) {
-    const previous = await prisma.treatment.findUnique({
-      where: { id },
-      select: { imageUrl: true },
-    });
-    if (previous?.imageUrl && previous.imageUrl !== data.imageUrl) {
-      await deleteImageByUrl(previous.imageUrl).catch(() => {});
-    }
+  const previous = id
+    ? await prisma.treatment.findUnique({
+        where: { id },
+        select: {
+          imageUrl: true,
+          slug: true,
+          isPublished: true,
+          category: { select: { slug: true, isPublished: true } },
+        },
+      })
+    : null;
+  if (previous?.imageUrl && previous.imageUrl !== data.imageUrl) {
+    await deleteImageByUrl(previous.imageUrl).catch(() => {});
   }
 
   const treatment = id
@@ -152,12 +179,41 @@ export async function saveTreatmentAction(
     })),
   });
 
-  updateTag(CONTENT_TAGS.catalog);
-  revalidatePath("/admin/treatments");
-  revalidatePath("/menu");
+  // URL publik lama tetap hidup (301) bila slug atau kategorinya berubah.
+  const wasPublic = previous?.isPublished && previous.category.isPublished;
+  const redirectsChanged =
+    previous && wasPublic
+      ? await recordPathMoves(
+          prisma,
+          [
+            {
+              from: treatmentPath(previous.category.slug, previous.slug),
+              to: treatmentPath(category.slug, treatment.slug),
+            },
+          ],
+          `Treatment "${treatment.name}" pindah alamat`,
+        )
+      : false;
+
+  revalidateCatalog(redirectsChanged);
   revalidatePath(`/menu/${treatment.slug}`);
 
-  redirect("/admin/treatments?saved=1");
+  redirect(
+    category.kind === "ADDON" ? "/admin/treatments/addons?saved=1" : "/admin/treatments?saved=1",
+  );
+}
+
+function revalidateCatalog(redirectsChanged: boolean) {
+  updateTag(CONTENT_TAGS.catalog);
+  if (redirectsChanged) {
+    updateTag(CONTENT_TAGS.redirects);
+    revalidatePath("/admin/redirects");
+  }
+  revalidatePath("/admin/treatments");
+  revalidatePath("/admin/treatments/addons");
+  revalidatePath("/menu");
+  revalidatePath("/treatments");
+  revalidatePath("/sitemap.xml");
 }
 
 export async function deleteTreatmentAction(formData: FormData) {
@@ -166,23 +222,29 @@ export async function deleteTreatmentAction(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   if (!id) return;
 
-  const treatment = await prisma.treatment.delete({ where: { id } });
+  const treatment = await prisma.treatment.delete({
+    where: { id },
+    include: { category: { select: { kind: true } } },
+  });
   if (treatment.imageUrl) {
     await deleteImageByUrl(treatment.imageUrl).catch(() => {});
   }
 
-  updateTag(CONTENT_TAGS.catalog);
-  revalidatePath("/admin/treatments");
-  revalidatePath("/menu");
-  redirect("/admin/treatments?deleted=1");
+  revalidateCatalog(false);
+  redirect(
+    treatment.category.kind === "ADDON"
+      ? "/admin/treatments/addons?deleted=1"
+      : "/admin/treatments?deleted=1",
+  );
 }
 
 /** Dipakai halaman list; read-only tapi tetap butuh sesi. */
-export async function listTreatmentsByCategory() {
+export async function listTreatmentsByCategory(kind: "TREATMENT" | "ADDON" = "TREATMENT") {
   await requireSession();
 
   return prisma.treatmentCategory.findMany({
-    orderBy: { sortOrder: "asc" },
+    where: { kind },
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
     include: {
       treatments: {
         orderBy: [{ sortOrder: "asc" }, { name: "asc" }],

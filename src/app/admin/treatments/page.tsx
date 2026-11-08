@@ -3,6 +3,7 @@ import Link from "next/link";
 import { formatIdr } from "@/lib/format";
 
 import { listTreatmentsByCategory } from "../actions/treatments";
+import { CatalogTabs } from "./catalog-tabs";
 
 export const instant = false;
 
@@ -20,28 +21,16 @@ export default async function AdminTreatmentsPage({
 
   return (
     <div className="mx-auto max-w-4xl">
+      <CatalogTabs active="treatments" />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-neutral-900">
-            Treatments &amp; Harga
-          </h1>
+          <h1 className="text-xl font-semibold text-neutral-900">Treatments</h1>
           <p className="mt-1 text-sm text-neutral-600">
-            {total} treatment dalam {categories.length} kategori.
+            {total} treatment dalam {categories.length} kategori. Tampil di halaman Menu
+            dan Treatments.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link
-            href="/admin/treatments/prices"
-            className="rounded-md border border-neutral-300 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
-          >
-            Kelola harga
-          </Link>
-          <Link
-            href="/admin/treatments/packages"
-            className="rounded-md border border-neutral-300 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
-          >
-            Packages
-          </Link>
           <Link
             href="/admin/treatments/new"
             className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
@@ -71,8 +60,9 @@ export default async function AdminTreatmentsPage({
       <div className="mt-6 space-y-8">
         {categories.map((category) => (
           <section key={category.id}>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
+            <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-neutral-500">
               {category.name}
+              {!category.isPublished ? <Badge tone="muted">Kategori disembunyikan</Badge> : null}
             </h2>
 
             {category.treatments.length === 0 ? (

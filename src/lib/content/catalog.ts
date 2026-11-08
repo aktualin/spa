@@ -1,5 +1,5 @@
 /**
- * Bacaan publik katalog: kategori, treatment, opsi harga, dan package.
+ * Bacaan publik katalog: kategori, treatment, add-on, opsi harga, dan package.
  *
  * Pola yang dipakai seluruh `src/lib/content/*`:
  * 1. `"use cache"` + `cacheTag(CONTENT_TAGS.x)` — admin memanggil
@@ -13,12 +13,20 @@
 import { cacheLife, cacheTag } from "next/cache";
 
 import {
+  additionalServices as staticAdditionalServices,
   packages as staticPackages,
   treatments as staticTreatments,
+  type AdditionalService,
   type Package as StaticPackage,
   type Treatment as StaticTreatment,
 } from "@/data/content";
-import { parseDurationLabel, parsePriceLabel } from "@/lib/domain/pricing";
+import {
+  buildStaticCatalogSeed,
+  type AddonSectionValue,
+  type CategoryKindValue,
+} from "@/lib/domain/catalog-seed";
+import { toMenuAddons, toMenuPackages, toMenuTreatments } from "@/lib/domain/menu-catalog";
+import { formatPriceLabel } from "@/lib/domain/pricing";
 import { safeQueryWithMeta } from "@/lib/safe-query";
 
 import { CONTENT_TAGS } from "./tags";
@@ -32,8 +40,11 @@ export type CatalogOption = {
 export type CatalogTreatment = {
   slug: string;
   name: string;
+  tagline: string | null;
   description: string | null;
+  note: string | null;
   imageUrl: string | null;
+  addonSection: AddonSectionValue | null;
   isNew: boolean;
   isBestSeller: boolean;
   categorySlug: string;
@@ -47,107 +58,100 @@ export type CatalogTreatment = {
 export type CatalogCategory = {
   slug: string;
   name: string;
+  kind: CategoryKindValue;
   description: string | null;
+  imageUrl: string | null;
   seoTitle: string | null;
   seoDescription: string | null;
   treatments: CatalogTreatment[];
 };
 
+export type CatalogPackageItem = {
+  /** Teks tampil, mis. "Body Massage (90 min)". */
+  label: string;
+  name: string;
+  minutes: number | null;
+  treatmentSlug: string | null;
+};
+
 export type CatalogPackage = {
   slug: string;
   name: string;
+  subtitle: string | null;
+  quote: string | null;
   description: string | null;
   imageUrl: string | null;
   durationMin: number | null;
+  durationLabel: string | null;
   priceIdr: number;
-  items: { label: string; treatmentSlug: string | null }[];
+  isNew: boolean;
+  isBestSeller: boolean;
+  items: CatalogPackageItem[];
   seoTitle: string | null;
   seoDescription: string | null;
   whatsappMessage: string | null;
 };
 
-/* ---------- fallback statis (taksonomi sama dengan scripts/seed.mts) ---------- */
-
-const REFLEXOLOGY_SLUGS = new Set([
-  "chair-reflexology",
-  "chair-spa",
-  "chair-body-recovery",
-]);
-
-function staticTreatmentToCatalog(t: StaticTreatment): CatalogTreatment {
-  const reflexology = REFLEXOLOGY_SLUGS.has(t.slug);
-  return {
-    slug: t.slug,
-    name: t.name,
-    description: t.description,
-    imageUrl: t.image,
-    isNew: false,
-    isBestSeller: false,
-    categorySlug: reflexology ? "reflexology" : "body-massage",
-    categoryName: reflexology ? "Reflexology" : "Body Massage",
-    options: t.prices.map((p) => ({
-      label: p.duration,
-      durationMin: parseDurationLabel(p.duration),
-      priceIdr: parsePriceLabel(p.price),
-    })),
-    seoTitle: null,
-    seoDescription: t.tagline ?? null,
-    whatsappMessage: null,
-  };
+function itemLabel(name: string, minutes: number | null): string {
+  return minutes ? `${name} (${minutes} min)` : name;
 }
 
-function staticPackageToCatalogTreatment(p: StaticPackage): CatalogTreatment {
-  return {
-    slug: p.slug,
-    name: p.name,
-    description: p.description,
-    imageUrl: p.image,
-    isNew: false,
-    isBestSeller: false,
-    categorySlug: "all-day-spa",
-    categoryName: "All Day Spa",
-    options: [
-      {
-        label: p.duration,
-        durationMin: parseDurationLabel(p.duration),
-        priceIdr: parsePriceLabel(p.price),
-      },
-    ],
-    seoTitle: null,
-    seoDescription: p.subtitle,
-    whatsappMessage: null,
-  };
-}
+/* ---------- fallback statis (sama dengan scripts/seed.mts) ---------- */
+
+const staticSeed = buildStaticCatalogSeed({
+  treatments: staticTreatments,
+  packages: staticPackages,
+  additionalServices: staticAdditionalServices,
+});
 
 function staticCatalog(): CatalogCategory[] {
-  const all = [
-    ...staticTreatments.map(staticTreatmentToCatalog),
-    ...staticPackages.map(staticPackageToCatalogTreatment),
-  ];
-  const categories = [
-    { slug: "reflexology", name: "Reflexology" },
-    { slug: "body-massage", name: "Body Massage" },
-    { slug: "all-day-spa", name: "All Day Spa" },
-  ];
-  return categories.map((c) => ({
-    ...c,
+  return staticSeed.categories.map((c) => ({
+    slug: c.slug,
+    name: c.name,
+    kind: c.kind,
     description: null,
+    imageUrl: null,
     seoTitle: null,
     seoDescription: null,
-    treatments: all.filter((t) => t.categorySlug === c.slug),
+    treatments: staticSeed.treatments
+      .filter((t) => t.categorySlug === c.slug)
+      .map((t) => ({
+        slug: t.slug,
+        name: t.name,
+        tagline: t.tagline,
+        description: t.description,
+        note: t.note,
+        imageUrl: t.imageUrl,
+        addonSection: t.addonSection,
+        isNew: false,
+        isBestSeller: false,
+        categorySlug: c.slug,
+        categoryName: c.name,
+        options: t.options,
+        seoTitle: null,
+        seoDescription: t.tagline,
+        whatsappMessage: null,
+      })),
   }));
 }
 
 function staticPackagesList(): CatalogPackage[] {
-  return staticPackages.map((p) => ({
+  return staticSeed.packages.map((p) => ({
     slug: p.slug,
     name: p.name,
+    subtitle: p.subtitle,
+    quote: p.quote,
     description: p.description,
-    imageUrl: p.image,
-    durationMin: parseDurationLabel(p.duration) || null,
-    priceIdr: parsePriceLabel(p.price),
-    items: p.includes.map((i) => ({
-      label: `${i.label} (${i.minutes} min)`,
+    imageUrl: p.imageUrl,
+    durationMin: p.durationMin,
+    durationLabel: p.durationLabel,
+    priceIdr: p.priceIdr,
+    isNew: false,
+    isBestSeller: false,
+    items: p.items.map((i) => ({
+      label: itemLabel(i.name, i.minutes),
+      name: i.name,
+      minutes: i.minutes,
       treatmentSlug: null,
     })),
     seoTitle: null,
@@ -158,7 +162,130 @@ function staticPackagesList(): CatalogPackage[] {
 
 /* ---------- bacaan DB ---------- */
 
-/** Seluruh kategori beserta treatment published-nya. */
+const CATEGORY_INCLUDE = {
+  treatments: {
+    where: { isPublished: true },
+    orderBy: [{ sortOrder: "asc" as const }, { name: "asc" as const }],
+    include: { options: { orderBy: { sortOrder: "asc" as const } } },
+  },
+};
+
+type CategoryRow = {
+  slug: string;
+  name: string;
+  kind: CategoryKindValue;
+  description: string | null;
+  imageUrl: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  treatments: {
+    slug: string;
+    name: string;
+    tagline: string | null;
+    description: string | null;
+    note: string | null;
+    imageUrl: string | null;
+    addonSection: AddonSectionValue | null;
+    isNew: boolean;
+    isBestSeller: boolean;
+    seoTitle: string | null;
+    seoDescription: string | null;
+    whatsappMessage: string | null;
+    options: { label: string; durationMin: number; priceIdr: number }[];
+  }[];
+};
+
+function toCatalogCategory(c: CategoryRow): CatalogCategory {
+  return {
+    slug: c.slug,
+    name: c.name,
+    kind: c.kind,
+    description: c.description,
+    imageUrl: c.imageUrl,
+    seoTitle: c.seoTitle,
+    seoDescription: c.seoDescription,
+    treatments: c.treatments.map((t) => ({
+      slug: t.slug,
+      name: t.name,
+      tagline: t.tagline,
+      description: t.description,
+      note: t.note,
+      imageUrl: t.imageUrl,
+      addonSection: t.addonSection,
+      isNew: t.isNew,
+      isBestSeller: t.isBestSeller,
+      categorySlug: c.slug,
+      categoryName: c.name,
+      options: t.options.map((o) => ({
+        label: o.label,
+        durationMin: o.durationMin,
+        priceIdr: o.priceIdr,
+      })),
+      seoTitle: t.seoTitle,
+      seoDescription: t.seoDescription,
+      whatsappMessage: t.whatsappMessage,
+    })),
+  };
+}
+
+const PACKAGE_INCLUDE = {
+  items: {
+    orderBy: { sortOrder: "asc" as const },
+    include: { treatment: { select: { slug: true, name: true } } },
+  },
+};
+
+type PackageRow = {
+  slug: string;
+  name: string;
+  subtitle: string | null;
+  quote: string | null;
+  description: string | null;
+  imageUrl: string | null;
+  durationMin: number | null;
+  durationLabel: string | null;
+  priceIdr: number;
+  isNew: boolean;
+  isBestSeller: boolean;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  whatsappMessage: string | null;
+  items: {
+    label: string | null;
+    minutes: number | null;
+    treatment: { slug: string; name: string } | null;
+  }[];
+};
+
+function toCatalogPackage(p: PackageRow): CatalogPackage {
+  return {
+    slug: p.slug,
+    name: p.name,
+    subtitle: p.subtitle,
+    quote: p.quote,
+    description: p.description,
+    imageUrl: p.imageUrl,
+    durationMin: p.durationMin,
+    durationLabel: p.durationLabel,
+    priceIdr: p.priceIdr,
+    isNew: p.isNew,
+    isBestSeller: p.isBestSeller,
+    items: p.items.map((i) => {
+      const name = i.label ?? i.treatment?.name ?? "";
+      return {
+        label: itemLabel(name, i.minutes),
+        name,
+        minutes: i.minutes,
+        treatmentSlug: i.treatment?.slug ?? null,
+      };
+    }),
+    seoTitle: p.seoTitle,
+    seoDescription: p.seoDescription,
+    whatsappMessage: p.whatsappMessage,
+  };
+}
+
+/** Kategori yang tampil beserta treatment published-nya. */
 export async function getCatalog(): Promise<CatalogCategory[]> {
   "use cache";
   cacheTag(CONTENT_TAGS.catalog);
@@ -166,41 +293,12 @@ export async function getCatalog(): Promise<CatalogCategory[]> {
   const { data, usedFallback } = await safeQueryWithMeta(async () => {
     const { prisma } = await import("@/lib/prisma");
     const rows = await prisma.treatmentCategory.findMany({
-      orderBy: { sortOrder: "asc" },
-      include: {
-        treatments: {
-          where: { isPublished: true },
-          orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-          include: { options: { orderBy: { sortOrder: "asc" } } },
-        },
-      },
+      where: { isPublished: true },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      include: CATEGORY_INCLUDE,
     });
     if (rows.length === 0) throw new Error("katalog kosong");
-    return rows.map<CatalogCategory>((c) => ({
-      slug: c.slug,
-      name: c.name,
-      description: c.description,
-      seoTitle: c.seoTitle,
-      seoDescription: c.seoDescription,
-      treatments: c.treatments.map((t) => ({
-        slug: t.slug,
-        name: t.name,
-        description: t.description,
-        imageUrl: t.imageUrl,
-        isNew: t.isNew,
-        isBestSeller: t.isBestSeller,
-        categorySlug: c.slug,
-        categoryName: c.name,
-        options: t.options.map((o) => ({
-          label: o.label,
-          durationMin: o.durationMin,
-          priceIdr: o.priceIdr,
-        })),
-        seoTitle: t.seoTitle,
-        seoDescription: t.seoDescription,
-        whatsappMessage: t.whatsappMessage,
-      })),
-    }));
+    return rows.map(toCatalogCategory);
   }, staticCatalog());
 
   if (usedFallback) cacheLife("minutes");
@@ -208,11 +306,31 @@ export async function getCatalog(): Promise<CatalogCategory[]> {
   return data;
 }
 
-export async function getCategory(
-  slug: string,
-): Promise<CatalogCategory | null> {
-  const catalog = await getCatalog();
-  return catalog.find((c) => c.slug === slug) ?? null;
+/**
+ * Satu kategori. Sengaja di-cache per slug dan membaca DB langsung — bukan
+ * menyaring getCatalog(): halaman detail untuk slug yang belum ada saat build
+ * dilanjutkan dari shell hasil build beserta cache-nya, sehingga data daftar
+ * penuh di sana masih versi build dan kategori baru dari admin menjadi 404.
+ */
+export async function getCategory(slug: string): Promise<CatalogCategory | null> {
+  "use cache";
+  cacheTag(CONTENT_TAGS.catalog);
+
+  const { data, usedFallback } = await safeQueryWithMeta<CatalogCategory | null>(
+    async () => {
+      const { prisma } = await import("@/lib/prisma");
+      const row = await prisma.treatmentCategory.findFirst({
+        where: { slug, isPublished: true },
+        include: CATEGORY_INCLUDE,
+      });
+      return row ? toCatalogCategory(row) : null;
+    },
+    staticCatalog().find((c) => c.slug === slug) ?? null,
+  );
+
+  if (usedFallback) cacheLife("minutes");
+  else cacheLife("hours");
+  return data;
 }
 
 export async function getTreatment(
@@ -225,7 +343,9 @@ export async function getTreatment(
 
 /** Treatment ditandai `isBestSeller` — dipakai section Signature Treatments di homepage. */
 export async function getSignatureTreatments(limit = 6): Promise<CatalogTreatment[]> {
-  const all = (await getCatalog()).flatMap((c) => c.treatments);
+  const all = (await getCatalog())
+    .filter((c) => c.kind === "TREATMENT")
+    .flatMap((c) => c.treatments);
   const flagged = all.filter((t) => t.isBestSeller);
   return (flagged.length > 0 ? flagged : all).slice(0, limit);
 }
@@ -239,29 +359,10 @@ export async function getPackages(): Promise<CatalogPackage[]> {
     const rows = await prisma.package.findMany({
       where: { isPublished: true },
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-      include: {
-        items: {
-          orderBy: { sortOrder: "asc" },
-          include: { treatment: { select: { slug: true, name: true } } },
-        },
-      },
+      include: PACKAGE_INCLUDE,
     });
     if (rows.length === 0) throw new Error("package kosong");
-    return rows.map<CatalogPackage>((p) => ({
-      slug: p.slug,
-      name: p.name,
-      description: p.description,
-      imageUrl: p.imageUrl,
-      durationMin: p.durationMin,
-      priceIdr: p.priceIdr,
-      items: p.items.map((i) => ({
-        label: i.label ?? i.treatment?.name ?? "",
-        treatmentSlug: i.treatment?.slug ?? null,
-      })),
-      seoTitle: p.seoTitle,
-      seoDescription: p.seoDescription,
-      whatsappMessage: p.whatsappMessage,
-    }));
+    return rows.map(toCatalogPackage);
   }, staticPackagesList());
 
   if (usedFallback) cacheLife("minutes");
@@ -269,8 +370,26 @@ export async function getPackages(): Promise<CatalogPackage[]> {
   return data;
 }
 
+/** Satu package, di-cache per slug (alasannya sama dengan getCategory). */
 export async function getPackage(slug: string): Promise<CatalogPackage | null> {
-  return (await getPackages()).find((p) => p.slug === slug) ?? null;
+  "use cache";
+  cacheTag(CONTENT_TAGS.catalog);
+
+  const { data, usedFallback } = await safeQueryWithMeta<CatalogPackage | null>(
+    async () => {
+      const { prisma } = await import("@/lib/prisma");
+      const row = await prisma.package.findFirst({
+        where: { slug, isPublished: true },
+        include: PACKAGE_INCLUDE,
+      });
+      return row ? toCatalogPackage(row) : null;
+    },
+    staticPackagesList().find((p) => p.slug === slug) ?? null,
+  );
+
+  if (usedFallback) cacheLife("minutes");
+  else cacheLife("hours");
+  return data;
 }
 
 /** Semua treatment (published) dari seluruh kategori, beserta kategorinya. */
@@ -313,65 +432,27 @@ export async function getCatalogSlugs(): Promise<{
   };
 }
 
-/* ---------- overlay untuk halaman lama (/menu, /menu/[slug]) ---------- */
+/* ---------- halaman /menu (desain asli situs) ---------- */
 
 /** 145000 → "145k" — format harga yang dipakai desain halaman /menu. */
-export function toPriceLabel(priceIdr: number): string {
-  return priceIdr % 1000 === 0 ? `${priceIdr / 1000}k` : String(priceIdr);
-}
+export const toPriceLabel = formatPriceLabel;
 
-/**
- * Treatment untuk halaman /menu dengan bentuk data statis yang sama persis,
- * sehingga tampilan tidak berubah. Nama/deskripsi/gambar/harga diambil dari DB
- * bila slug-nya ada; field yang tidak ada di DB (tagline, note) tetap statis.
- */
+/** Treatment untuk grid /menu, dalam bentuk data statis lama (markup tidak berubah). */
 export async function getMenuTreatments(): Promise<StaticTreatment[]> {
-  const bySlug = new Map(
-    (await getCatalog()).flatMap((c) => c.treatments).map((t) => [t.slug, t]),
-  );
-  return staticTreatments.map((t) => {
-    const db = bySlug.get(t.slug);
-    if (!db) return t;
-    return {
-      ...t,
-      name: db.name,
-      description: db.description ?? t.description,
-      image: db.imageUrl ?? t.image,
-      prices:
-        db.options.length > 0
-          ? db.options.map((o) => ({
-              duration: o.label,
-              price: toPriceLabel(o.priceIdr),
-            }))
-          : t.prices,
-    };
-  });
+  return toMenuTreatments(await getCatalog());
 }
 
-/** Ritual All Day Spa untuk /menu, bentuk statis dengan harga dari DB. */
+/** Ritual All Day Spa untuk /menu, dari tabel Package. */
 export async function getMenuPackages(): Promise<StaticPackage[]> {
-  const bySlug = new Map(
-    (await getCatalog()).flatMap((c) => c.treatments).map((t) => [t.slug, t]),
-  );
-  return staticPackages.map((p) => {
-    const db = bySlug.get(p.slug);
-    const option = db?.options[0];
-    if (!db) return p;
-    return {
-      ...p,
-      name: db.name,
-      description: db.description ?? p.description,
-      image: db.imageUrl ?? p.image,
-      duration: option?.label ?? p.duration,
-      price: option ? toPriceLabel(option.priceIdr) : p.price,
-    };
-  });
+  return toMenuPackages(await getPackages());
 }
 
-/**
- * Semua entri /menu (treatment + package) dalam bentuk statis, dengan isi
- * yang sudah ditimpa dari DB. Dipakai `/menu` dan `/menu/[slug]`.
- */
+/** Add-on untuk section Body/Face/Head & Scalp/Bath di /menu. */
+export async function getMenuAddons(): Promise<AdditionalService[]> {
+  return toMenuAddons(await getCatalog());
+}
+
+/** Semua entri /menu (treatment + package). Dipakai `/menu` dan `/menu/[slug]`. */
 export async function getMenuEntries(): Promise<(StaticTreatment | StaticPackage)[]> {
   const [treatments, packages] = await Promise.all([
     getMenuTreatments(),
@@ -394,4 +475,55 @@ export async function getMenuEntriesCached(): Promise<
   cacheTag(CONTENT_TAGS.catalog);
   cacheLife("hours");
   return getMenuEntries();
+}
+
+/**
+ * Satu entri /menu/[slug] (treatment utama atau package), di-cache per slug
+ * supaya item baru dari admin tidak 404 (lihat getCategory).
+ */
+export async function getMenuEntry(
+  slug: string,
+): Promise<StaticTreatment | StaticPackage | null> {
+  "use cache";
+  cacheTag(CONTENT_TAGS.catalog);
+
+  const fallback =
+    [...toMenuTreatments(staticCatalog()), ...toMenuPackages(staticPackagesList())].find(
+      (entry) => entry.slug === slug,
+    ) ?? null;
+
+  const { data, usedFallback } = await safeQueryWithMeta<StaticTreatment | StaticPackage | null>(
+    async () => {
+      const { prisma } = await import("@/lib/prisma");
+      const treatment = await prisma.treatment.findFirst({
+        where: {
+          slug,
+          isPublished: true,
+          category: { isPublished: true, kind: "TREATMENT" },
+        },
+        include: { options: { orderBy: { sortOrder: "asc" } } },
+      });
+      if (treatment) {
+        return toMenuTreatments([{ kind: "TREATMENT", treatments: [treatment] }])[0] ?? null;
+      }
+      const pkg = await prisma.package.findFirst({
+        where: { slug, isPublished: true },
+        include: PACKAGE_INCLUDE,
+      });
+      return pkg ? toMenuPackages([toCatalogPackage(pkg)])[0] : null;
+    },
+    fallback,
+  );
+
+  if (usedFallback) cacheLife("minutes");
+  else cacheLife("hours");
+  return data;
+}
+
+/** Versi cached dari `getMenuAddons` untuk section add-on /menu. */
+export async function getMenuAddonsCached(): Promise<AdditionalService[]> {
+  "use cache";
+  cacheTag(CONTENT_TAGS.catalog);
+  cacheLife("hours");
+  return getMenuAddons();
 }

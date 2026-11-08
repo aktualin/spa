@@ -13,6 +13,7 @@ import {
 } from "@/lib/domain/pricing";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 import { SLUG_PATTERN } from "@/lib/domain/slug";
+import { packagePath, recordPathMoves } from "@/lib/path-moves";
 import { prisma } from "@/lib/prisma";
 import { deleteImageByUrl } from "@/lib/storage";
 
@@ -31,19 +32,24 @@ const packageSchema = z.object({
     .trim()
     .min(1, "Slug wajib diisi.")
     .regex(SLUG_PATTERN, "Slug hanya boleh huruf kecil, angka, dan tanda hubung."),
+  subtitle: optionalText,
+  quote: optionalText,
   description: optionalText,
   // Hanya URL yang disimpan; file-nya ada di Supabase Storage.
   imageUrl: z.union([z.string().trim().url(), z.literal("")]).optional(),
   priceIdr: z.string().trim(),
   durationMin: z.string().trim(),
+  durationLabel: optionalText,
   sortOrder: z.coerce.number().int().min(0).default(0),
+  isNew: z.boolean(),
+  isBestSeller: z.boolean(),
   isPublished: z.boolean(),
   seoTitle: optionalText,
   seoDescription: optionalText,
   whatsappMessage: optionalText,
 });
 
-type ItemRow = { treatmentId: string | null; label: string | null };
+type ItemRow = { treatmentId: string | null; label: string | null; minutes: number | null };
 
 /**
  * Form mengirim item sebagai items[0][treatmentId], items[0][label], dst.
@@ -63,10 +69,14 @@ function parseItems(formData: FormData): ItemRow[] {
 
   return [...rows.entries()]
     .sort(([a], [b]) => a - b)
-    .map(([, row]) => ({
-      treatmentId: row.treatmentId?.trim() || null,
-      label: row.label?.trim() || null,
-    }))
+    .map(([, row]) => {
+      const minutes = Number.parseInt(row.minutes ?? "", 10);
+      return {
+        treatmentId: row.treatmentId?.trim() || null,
+        label: row.label?.trim() || null,
+        minutes: Number.isFinite(minutes) && minutes > 0 ? minutes : null,
+      };
+    })
     .filter((row) => row.treatmentId || row.label);
 }
 
@@ -74,11 +84,16 @@ function readForm(formData: FormData) {
   return {
     name: formData.get("name"),
     slug: formData.get("slug"),
+    subtitle: formData.get("subtitle") ?? undefined,
+    quote: formData.get("quote") ?? undefined,
     description: formData.get("description") ?? undefined,
     imageUrl: formData.get("imageUrl") ?? undefined,
     priceIdr: formData.get("priceIdr") ?? "",
     durationMin: formData.get("durationMin") ?? "",
+    durationLabel: formData.get("durationLabel") ?? undefined,
     sortOrder: formData.get("sortOrder") ?? 0,
+    isNew: formData.get("isNew") === "on",
+    isBestSeller: formData.get("isBestSeller") === "on",
     isPublished: formData.get("isPublished") === "on",
     seoTitle: formData.get("seoTitle") ?? undefined,
     seoDescription: formData.get("seoDescription") ?? undefined,
@@ -90,11 +105,17 @@ function firstIssue(error: z.ZodError): string {
   return error.issues[0]?.message ?? "Input tidak valid.";
 }
 
-function revalidatePackages(slug?: string) {
+function revalidatePackages(slug?: string, redirectsChanged = false) {
   updateTag(CONTENT_TAGS.catalog);
+  if (redirectsChanged) {
+    updateTag(CONTENT_TAGS.redirects);
+    revalidatePath("/admin/redirects");
+  }
   revalidatePath("/admin/treatments/packages");
   revalidatePath("/admin/treatments/prices");
   revalidatePath("/treatments/packages");
+  revalidatePath("/menu");
+  revalidatePath("/sitemap.xml");
   if (slug) revalidatePath(`/treatments/packages/${slug}`);
 }
 
@@ -156,20 +177,22 @@ export async function savePackageAction(
   }
 
   let previousSlug: string | undefined;
+  let wasPublished = false;
   if (id) {
     const previous = await prisma.package.findUnique({
       where: { id },
-      select: { imageUrl: true, slug: true },
+      select: { imageUrl: true, slug: true, isPublished: true },
     });
     if (!previous) return { error: "Package tidak ditemukan." };
     previousSlug = previous.slug;
+    wasPublished = previous.isPublished;
     // Gambar lama yang diganti/dihapus ikut dibuang dari bucket.
     if (previous.imageUrl && previous.imageUrl !== data.imageUrl) {
       await deleteImageByUrl(previous.imageUrl).catch(() => {});
     }
   }
 
-  const pkg = await prisma.$transaction(async (tx) => {
+  const { pkg, redirectsChanged } = await prisma.$transaction(async (tx) => {
     const saved = id
       ? await tx.package.update({ where: { id }, data })
       : await tx.package.create({ data });
@@ -182,14 +205,25 @@ export async function savePackageAction(
           packageId: saved.id,
           treatmentId: item.treatmentId,
           label: item.label,
+          minutes: item.minutes,
           sortOrder: index,
         })),
       });
     }
-    return saved;
+
+    // Alamat lama package yang sudah tayang tetap hidup lewat 301.
+    const moved =
+      wasPublished && previousSlug
+        ? await recordPathMoves(
+            tx,
+            [{ from: packagePath(previousSlug), to: packagePath(saved.slug) }],
+            `Slug package "${saved.name}" diubah`,
+          )
+        : false;
+    return { pkg: saved, redirectsChanged: moved };
   });
 
-  revalidatePackages(pkg.slug);
+  revalidatePackages(pkg.slug, redirectsChanged);
   if (previousSlug && previousSlug !== pkg.slug) {
     revalidatePath(`/treatments/packages/${previousSlug}`);
   }

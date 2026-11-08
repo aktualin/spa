@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { requireRole } from "@/lib/auth";
@@ -9,24 +10,38 @@ export const instant = false;
 
 export default async function EditTreatmentPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ kind?: string }>;
 }) {
   await requireRole(["ADMIN", "EDITOR"]);
 
-  const { id } = await params;
+  const [{ id }, { kind }] = await Promise.all([params, searchParams]);
   const isNew = id === "new";
+  const wantAddon = kind === "addon";
 
   const categories = await prisma.treatmentCategory.findMany({
-    orderBy: { sortOrder: "asc" },
-    select: { id: true, name: true },
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    select: { id: true, name: true, kind: true },
   });
 
-  if (categories.length === 0) {
+  const defaultCategory = categories.find((c) => c.kind === (wantAddon ? "ADDON" : "TREATMENT"));
+
+  if (isNew && !defaultCategory) {
     return (
-      <p className="text-sm text-neutral-600">
-        Belum ada kategori treatment. Jalankan seeder terlebih dahulu.
-      </p>
+      <div className="mx-auto max-w-2xl space-y-3 text-sm text-neutral-600">
+        <p>
+          Belum ada kategori berjenis {wantAddon ? "Add-on" : "Treatment"}. Buat kategorinya
+          terlebih dahulu.
+        </p>
+        <Link
+          href="/admin/treatments/categories/new"
+          className="inline-block rounded-md bg-neutral-900 px-4 py-2 font-medium text-white"
+        >
+          Tambah kategori
+        </Link>
+      </div>
     );
   }
 
@@ -37,8 +52,11 @@ export default async function EditTreatmentPage({
       id: null,
       name: "",
       slug: "",
-      categoryId: categories[0].id,
+      categoryId: defaultCategory!.id,
+      tagline: "",
       description: "",
+      note: "",
+      addonSection: "",
       imageUrl: "",
       whatsappMessage: "",
       seoTitle: "",
@@ -61,7 +79,10 @@ export default async function EditTreatmentPage({
       name: treatment.name,
       slug: treatment.slug,
       categoryId: treatment.categoryId,
+      tagline: treatment.tagline ?? "",
       description: treatment.description ?? "",
+      note: treatment.note ?? "",
+      addonSection: treatment.addonSection ?? "",
       imageUrl: treatment.imageUrl ?? "",
       whatsappMessage: treatment.whatsappMessage ?? "",
       seoTitle: treatment.seoTitle ?? "",

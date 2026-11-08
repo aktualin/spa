@@ -3,6 +3,7 @@ import Link from "next/link";
 import { requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+import { CatalogTabs } from "../catalog-tabs";
 import { OptionPriceRow, PackagePriceRow } from "./price-forms";
 
 export const instant = false;
@@ -47,6 +48,7 @@ export default async function AdminPricesPage({
 
   return (
     <div className="mx-auto max-w-4xl">
+      <CatalogTabs active="prices" />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-neutral-900">Harga</h1>
@@ -55,12 +57,6 @@ export default async function AdminPricesPage({
             package. Harga dalam rupiah penuh tanpa titik, contoh: 145000.
           </p>
         </div>
-        <Link
-          href="/admin/treatments"
-          className="rounded-md border border-neutral-300 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
-        >
-          Kembali ke treatments
-        </Link>
       </div>
 
       {params.saved ? (

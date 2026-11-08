@@ -84,9 +84,39 @@ export async function getJournalPosts(category?: string): Promise<JournalPost[]>
 }
 
 /** Satu artikel (hanya yang terlihat publik). */
+/**
+ * Satu artikel, di-cache per slug dan membaca DB langsung — bukan menyaring
+ * getJournalPosts(): halaman artikel yang belum ada saat build dilanjutkan
+ * dari shell hasil build beserta cache-nya, sehingga artikel baru jadi 404.
+ */
 export async function getJournalPost(slug: string): Promise<JournalPost | null> {
-  const posts = await getJournalPosts();
-  return posts.find((p) => p.slug === slug) ?? null;
+  "use cache";
+  cacheTag(CONTENT_TAGS.journal);
+
+  const { data } = await safeQueryWithMeta<JournalPost | null>(
+    async () => {
+      const { prisma } = await import("@/lib/prisma");
+      const row = await prisma.journalPost.findUnique({ where: { slug } });
+      if (!row || !isJournalVisible(row, new Date())) return null;
+      return {
+        slug: row.slug,
+        title: row.title,
+        excerpt: row.excerpt,
+        bodyHtml: row.bodyHtml,
+        coverUrl: row.coverUrl,
+        category: row.category,
+        tags: row.tags,
+        publishedAt: row.publishedAt,
+        seoTitle: row.seoTitle,
+        seoDescription: row.seoDescription,
+      };
+    },
+    staticJournalPostsList().find((p) => p.slug === slug) ?? null,
+  );
+
+  // Bergantung waktu (artikel terjadwal), jadi cache pendek.
+  cacheLife("minutes");
+  return data;
 }
 
 /** Daftar kategori yang dipakai untuk filter. */

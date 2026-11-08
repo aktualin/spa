@@ -24,7 +24,11 @@ export const ADMIN_MODULES: readonly AdminModule[] = [
     href: "/admin/treatments",
     roles: ["ADMIN", "EDITOR"],
     ready: true,
-    children: [{ label: "Packages", href: "/admin/treatments/packages" }],
+    children: [
+      { label: "Add-on", href: "/admin/treatments/addons" },
+      { label: "Kategori", href: "/admin/treatments/categories" },
+      { label: "Packages", href: "/admin/treatments/packages" },
+    ],
   },
   {
     no: 2,

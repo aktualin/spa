@@ -129,3 +129,8 @@ export function parseDurationLabel(raw: string): number {
     (mins ? Number.parseFloat(mins[1]) : 0);
   return Number.isFinite(total) ? Math.round(total) : 0;
 }
+
+/** Rupiah penuh → label harga gaya halaman /menu: 145000 → "145k". */
+export function formatPriceLabel(priceIdr: number): string {
+  return priceIdr % 1000 === 0 ? `${priceIdr / 1000}k` : String(priceIdr);
+}

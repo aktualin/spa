@@ -55,12 +55,28 @@ model AdminUser {
 
 /* ---------- Modul 1 & 2: Treatments, Packages, Harga ---------- */
 
+enum CategoryKind {
+  TREATMENT // treatment utama
+  ADDON     // tambahan yang dipesan bersama treatment utama
+}
+
+// Letak add-on di halaman /menu.
+enum AddonSection {
+  BODY       // grid "Body" (scrub, mask)
+  FACE       // section Face Ritual
+  HEAD_SCALP // section Head & Scalp
+  BATH       // section Bath Ritual
+}
+
 model TreatmentCategory {
-  id          String  @id @default(cuid())
-  slug        String  @unique
+  id          String       @id @default(cuid())
+  slug        String       @unique
   name        String
   description String?
-  sortOrder   Int     @default(0)
+  imageUrl    String?
+  kind        CategoryKind @default(TREATMENT)
+  isPublished Boolean      @default(true)
+  sortOrder   Int          @default(0)
 
   seoTitle       String?
   seoDescription String?
@@ -75,8 +91,14 @@ model Treatment {
   id          String  @id @default(cuid())
   slug        String  @unique
   name        String
+  // Kalimat singkat di kartu /menu.
+  tagline     String?
   description String?
+  // Catatan kecil di halaman detail, mis. "tanpa minyak".
+  note        String?
   imageUrl    String?
+  // Hanya untuk treatment di kategori ADDON.
+  addonSection AddonSection?
 
   isNew        Boolean @default(false)
   isBestSeller Boolean @default(false)
@@ -122,10 +144,16 @@ model Package {
   id          String  @id @default(cuid())
   slug        String  @unique
   name        String
+  subtitle    String?
+  quote       String?
   description String?
   imageUrl    String?
   durationMin Int?
+  // Teks durasi yang ditampilkan, mis. "2 hours 30 minute"; kosong = dari durationMin.
+  durationLabel String?
   priceIdr    Int
+  isNew        Boolean @default(false)
+  isBestSeller Boolean @default(false)
   isPublished Boolean @default(true)
   sortOrder   Int     @default(0)
 
@@ -145,6 +173,7 @@ model PackageItem {
 
   // Item bisa merujuk treatment yang ada, atau sekadar teks bebas.
   label String?
+  minutes Int?
 
   packageId String
   package   Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
@@ -394,13 +423,41 @@ model OurStoryContent {
 
 /* ---------- Modul 11: Menu Navigasi ---------- */
 
+enum MenuLinkType {
+  PAGE         // halaman dari modul Halaman & URL; URL mengikuti slug-nya
+  INTERNAL_URL // path di situs ini, mis. /treatments
+  EXTERNAL_URL // https://…, mailto:, tel:
+  ANCHOR       // #bagian atau /halaman#bagian
+  NO_LINK      // judul/kelompok tanpa tautan (mis. judul kolom mega menu)
+}
+
+enum MenuLocation {
+  HEADER
+  FOOTER
+  MOBILE
+}
+
+// Pohon menu maks. 3 level. Lokasi hanya dibaca dari item level 1; anak
+// mengikuti induknya.
 model MenuItem {
-  id        String  @id @default(cuid())
+  id        String       @id @default(cuid())
   label     String
-  url       String
-  sortOrder Int     @default(0)
-  isVisible Boolean @default(true)
-  openInNew Boolean @default(false)
+  linkType  MenuLinkType @default(INTERNAL_URL)
+  // Dipakai INTERNAL_URL, EXTERNAL_URL, ANCHOR. Kosong untuk PAGE dan NO_LINK.
+  url       String?
+  sortOrder Int          @default(0)
+  isVisible Boolean      @default(true)
+  // true = target="_blank"
+  openInNew Boolean      @default(false)
+  locations MenuLocation[] @default([HEADER, MOBILE])
+
+  pageId String?
+  page   StaticPage? @relation(fields: [pageId], references: [id], onDelete: SetNull)
+
+  // Khusus level 1 di header: kunci panel (ID DOM + preset kartu highlight)
+  // dan teks tautan "lihat semua" di bawah mega menu.
+  panelKey       String?
+  panelLinkLabel String?
 
   parentId String?
   parent   MenuItem?  @relation("MenuTree", fields: [parentId], references: [id], onDelete: Cascade)
@@ -484,6 +541,8 @@ model StaticPage {
 
   status      PageStatus @default(DRAFT)
   publishedAt DateTime?
+
+  menuItems MenuItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

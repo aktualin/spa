@@ -4,10 +4,8 @@ import { Suspense } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { ArrowRight } from "@/components/icons";
-import {
-  additionalServices,
-  priceDisclaimer,
-} from "@/data/content";
+import { priceDisclaimer } from "@/data/content";
+import { getMenuAddonsCached } from "@/lib/content/catalog";
 import {
   MenuPackagesGrid,
   MenuPackagesGridFallback,
@@ -56,7 +54,9 @@ const menuBookPages = Array.from(
   }),
 );
 
-export default function MenuPage() {
+export default async function MenuPage() {
+  // Add-on dikelola dari admin (kategori berjenis Add-on).
+  const additionalServices = await getMenuAddonsCached();
   const bodyAddOns = additionalServices.filter((s) => s.category === "Body");
 
   return (

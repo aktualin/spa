@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { ArrowRight, Email, Instagram, TikTok } from "./icons";
 import { CopyrightYear } from "./copyright-year";
-import { footerLinks, footerTagline, socials } from "@/data/content";
+import { footerTagline, socials } from "@/data/content";
+import { getNavigationData } from "@/lib/content/navigation";
 import { MEMBER_MESSAGE, waLink } from "@/lib/whatsapp";
 
 /* One icon per social platform — never a generic link glyph. */
@@ -11,7 +12,8 @@ const socialIcons = {
   email: Email,
 } as const;
 
-export function Footer() {
+export async function Footer() {
+  const { footer: footerLinks } = await getNavigationData();
   return (
     <footer id="footer" className="mt-auto">
       {/* Membership call-to-action */}
@@ -96,7 +98,16 @@ export function Footer() {
                     <ul className="flex flex-col gap-2.5">
                       {links.map((link) => (
                         <li key={link.label}>
-                          {link.href.startsWith("mailto:") ? (
+                          {link.external ? (
+                            <a
+                              href={link.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-caption text-cream-soft/85 transition-colors hover:text-white"
+                            >
+                              {link.label}
+                            </a>
+                          ) : /^(mailto:|tel:|https?:)/.test(link.href) ? (
                             <a
                               href={link.href}
                               className="text-caption text-cream-soft/85 transition-colors hover:text-white"

@@ -28,9 +28,13 @@ export default defineConfig({
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
+  // Test yang mengubah data bersama (menu navigasi, katalog) dikeluarkan dari proyek
+  // biasa dan dijalankan terakhir, supaya test header/footer lain tidak melihat
+  // menu yang sedang diubah.
   projects: [
     {
       name: "mobile",
+      testIgnore: /admin-(menu|catalog)\.spec\.ts/,
       use: {
         browserName: "chromium",
         viewport: { width: 390, height: 844 },
@@ -41,6 +45,7 @@ export default defineConfig({
     },
     {
       name: "tablet",
+      testIgnore: /admin-(menu|catalog)\.spec\.ts/,
       use: {
         browserName: "chromium",
         viewport: { width: 768, height: 1024 },
@@ -49,6 +54,16 @@ export default defineConfig({
     },
     {
       name: "desktop",
+      testIgnore: /admin-(menu|catalog)\.spec\.ts/,
+      use: {
+        browserName: "chromium",
+        viewport: { width: 1440, height: 900 },
+      },
+    },
+    {
+      name: "admin-flows",
+      testMatch: /admin-(menu|catalog)\.spec\.ts/,
+      dependencies: ["mobile", "tablet", "desktop"],
       use: {
         browserName: "chromium",
         viewport: { width: 1440, height: 900 },
@@ -60,7 +75,9 @@ export default defineConfig({
     url: baseURL,
     reuseExistingServer: true,
     timeout: 180_000,
-    // Cache redirect di proxy dimatikan agar perubahan tabel Redirect langsung terlihat.
-    env: { REDIRECT_CACHE_TTL_MS: "0" },
+    // Cache proxy dipersingkat agar data uji redirect cepat terlihat (lihat
+    // PROXY_CACHE_TTL_MS di tests/redirects.spec.ts). Jangan 0: tanpa cache
+    // setiap request menanyai database dan test paralel jadi timeout.
+    env: { REDIRECT_CACHE_TTL_MS: "1000" },
   },
 });

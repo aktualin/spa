@@ -7,8 +7,8 @@ import { config as loadEnv } from "dotenv";
 
 /**
  * Redirect dari tabel `Redirect` diterapkan oleh src/proxy.ts. Data uji
- * ditulis langsung ke database; server uji memakai REDIRECT_CACHE_TTL_MS=0
- * (lihat playwright.config.ts) supaya baris baru langsung terbaca.
+ * ditulis langsung ke database; server uji memakai cache proxy 1 detik
+ * (lihat playwright.config.ts), jadi test menunggu sebentar sebelum memeriksa.
  */
 
 loadEnv({ path: ".env.local", quiet: true });
@@ -35,6 +35,15 @@ function uniqueSlug(kind: string): string {
 
 type Row = { fromPath: string; toPath: string; statusCode?: number };
 
+// Harus sama dengan REDIRECT_CACHE_TTL_MS di playwright.config.ts. Bukan 0:
+// tanpa cache, setiap request (termasuk prefetch tautan) menanyai database dan
+// pooler kewalahan saat test berjalan paralel.
+const PROXY_CACHE_TTL_MS = 1000;
+
+function waitForProxyCache() {
+  return new Promise((resolve) => setTimeout(resolve, PROXY_CACHE_TTL_MS + 300));
+}
+
 async function withRedirects(rows: Row[], run: () => Promise<void>) {
   try {
     await db().redirect.createMany({
@@ -46,6 +55,7 @@ async function withRedirects(rows: Row[], run: () => Promise<void>) {
         note: "e2e",
       })),
     });
+    await waitForProxyCache();
     await run();
   } finally {
     await db().redirect.deleteMany({

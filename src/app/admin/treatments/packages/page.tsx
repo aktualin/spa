@@ -4,6 +4,7 @@ import { requireRole } from "@/lib/auth";
 import { formatIdr } from "@/lib/format";
 
 import { listPackages } from "../../actions/packages";
+import { CatalogTabs } from "../catalog-tabs";
 
 export const instant = false;
 
@@ -18,6 +19,7 @@ export default async function AdminPackagesPage({
 
   return (
     <div className="mx-auto max-w-4xl">
+      <CatalogTabs active="packages" />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-neutral-900">Packages</h1>
@@ -26,12 +28,6 @@ export default async function AdminPackagesPage({
           </p>
         </div>
         <div className="flex gap-2">
-          <Link
-            href="/admin/treatments"
-            className="rounded-md border border-neutral-300 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50"
-          >
-            Kembali ke treatments
-          </Link>
           <Link
             href="/admin/treatments/packages/new"
             className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"

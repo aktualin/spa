@@ -6,11 +6,12 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { ArrowRight, Check } from "@/components/icons";
 import { packages, priceDisclaimer, treatments } from "@/data/content";
+import { getMenuEntry } from "@/lib/content/catalog";
 
-const allEntries = [...treatments, ...packages];
-
+// Daftar statis hanya untuk prerender saat build (Next mensyaratkan minimal
+// satu slug); isi halaman selalu dibaca dari database lewat getMenuEntry.
 export function generateStaticParams() {
-  return allEntries.map((e) => ({ slug: e.slug }));
+  return [...treatments, ...packages].map((e) => ({ slug: e.slug }));
 }
 
 export async function generateMetadata({
@@ -19,7 +20,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const entry = allEntries.find((e) => e.slug === slug);
+  const entry = await getMenuEntry(slug);
 
   if (!entry) {
     return { title: "Treatment Not Found" };
@@ -30,7 +31,7 @@ export async function generateMetadata({
     description:
       entry.kind === "package"
         ? `${entry.subtitle}. ${entry.description}`
-        : `${entry.tagline}. ${entry.description}`,
+        : [entry.tagline, entry.description].filter(Boolean).join(". "),
   };
 }
 
@@ -75,7 +76,7 @@ async function TreatmentContent({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const entry = allEntries.find((e) => e.slug === slug);
+  const entry = await getMenuEntry(slug);
 
   if (!entry) {
     notFound();

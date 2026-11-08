@@ -1,9 +1,10 @@
 import { requireRole } from "@/lib/auth";
+import { MAX_MENU_DEPTH } from "@/lib/domain/menu";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 
-import { listMenuItems } from "../actions/menu";
+import { listMenuAdmin, listMenuPageOptions } from "../actions/menu";
 import { StatusBanner } from "../settings/_components/form-ui";
-import { MenuItemList } from "./menu-item-list";
+import { MenuManager } from "./menu-manager";
 
 export const instant = false;
 
@@ -14,45 +15,34 @@ export default async function AdminMenuPage({
 }) {
   await requireRole(CONTENT_ROLES);
 
-  const [items, params] = await Promise.all([listMenuItems(), searchParams]);
+  const [rows, pages, params] = await Promise.all([
+    listMenuAdmin(),
+    listMenuPageOptions(),
+    searchParams,
+  ]);
+
+  // Komponen klien di-reset setiap data server berubah (setelah simpan/hapus).
+  const version = rows
+    .map((r) => `${r.id}:${r.parentId}:${r.sortOrder}:${r.label}:${r.isVisible}`)
+    .join("|");
 
   return (
-    <div className="mx-auto max-w-3xl">
-      <h1 className="text-xl font-semibold text-neutral-900">
-        Menu Navigasi
-      </h1>
+    <div className="mx-auto max-w-5xl">
+      <h1 className="text-xl font-semibold text-neutral-900">Menu Navigasi</h1>
       <p className="mt-1 text-sm text-neutral-600">
-        Item navigasi yang dipakai navbar &amp; footer publik. Sub-menu
-        dibatasi satu level di bawah induknya.
+        Atur menu header, menu ponsel, dan footer. Maksimal {MAX_MENU_DEPTH}{" "}
+        level: menu utama → sub-menu → sub-sub-menu. Seret item untuk
+        memindahkan, lalu tekan <strong>Simpan susunan</strong>.
       </p>
 
       <StatusBanner
         saved={params.saved}
         deleted={params.deleted}
-        deletedText="Item menu dihapus."
+        deletedText="Item menu beserta sub-menunya dihapus."
       />
 
       <div className="mt-6">
-        <MenuItemList
-          items={items.map((item) => ({
-            id: item.id,
-            label: item.label,
-            url: item.url,
-            sortOrder: item.sortOrder,
-            isVisible: item.isVisible,
-            openInNew: item.openInNew,
-            parentId: item.parentId,
-            children: item.children.map((child) => ({
-              id: child.id,
-              label: child.label,
-              url: child.url,
-              sortOrder: child.sortOrder,
-              isVisible: child.isVisible,
-              openInNew: child.openInNew,
-              parentId: child.parentId,
-            })),
-          }))}
-        />
+        <MenuManager key={version} rows={rows} pages={pages} />
       </div>
     </div>
   );

@@ -14,17 +14,23 @@ import { ImageField } from "../../image-field";
 export type PackageItemRow = {
   treatmentId: string;
   label: string;
+  minutes: string;
 };
 
 export type PackageFormData = {
   id: string | null;
   name: string;
   slug: string;
+  subtitle: string;
+  quote: string;
   description: string;
   imageUrl: string;
   priceIdr: string;
   durationMin: string;
+  durationLabel: string;
   sortOrder: number;
+  isNew: boolean;
+  isBestSeller: boolean;
   isPublished: boolean;
   seoTitle: string;
   seoDescription: string;
@@ -67,7 +73,7 @@ export function PackageForm({
   const [items, setItems] = useState<PackageItemRow[]>(
     pkg.items.length > 0
       ? pkg.items
-      : [{ treatmentId: "", label: "" }],
+      : [{ treatmentId: "", label: "", minutes: "" }],
   );
 
   function updateItem(index: number, patch: Partial<PackageItemRow>) {
@@ -117,12 +123,36 @@ export function PackageForm({
           />
         </Field>
 
+        <Field
+          label="Subjudul"
+          htmlFor="subtitle"
+          hint='Tampil di atas nama paket, contoh: "A state of balance & inner resolution".'
+        >
+          <input
+            id="subtitle"
+            name="subtitle"
+            defaultValue={pkg.subtitle}
+            maxLength={160}
+            className={inputClass}
+          />
+        </Field>
+
         <Field label="Deskripsi" htmlFor="description">
           <textarea
             id="description"
             name="description"
             defaultValue={pkg.description}
             rows={5}
+            className={inputClass}
+          />
+        </Field>
+
+        <Field label="Kutipan" htmlFor="quote" hint="Opsional, tampil miring di halaman detail paket.">
+          <input
+            id="quote"
+            name="quote"
+            defaultValue={pkg.quote}
+            maxLength={200}
             className={inputClass}
           />
         </Field>
@@ -165,6 +195,20 @@ export function PackageForm({
           </Field>
         </div>
 
+        <Field
+          label="Teks durasi"
+          htmlFor="durationLabel"
+          hint='Teks yang tampil di halaman Menu, contoh: "2 hours 30 minute". Kosong = dari durasi menit.'
+        >
+          <input
+            id="durationLabel"
+            name="durationLabel"
+            defaultValue={pkg.durationLabel}
+            maxLength={40}
+            className={inputClass}
+          />
+        </Field>
+
         <fieldset className="space-y-3">
           <legend className="text-sm font-medium text-neutral-700">
             Isi package
@@ -200,6 +244,15 @@ export function PackageForm({
                 placeholder="Contoh: Konsultasi gratis"
                 className={`${inputClass} min-w-40 flex-1`}
               />
+              <input
+                aria-label={`Menit baris ${index + 1}`}
+                name={`items[${index}][minutes]`}
+                value={item.minutes}
+                onChange={(e) => updateItem(index, { minutes: e.target.value })}
+                placeholder="Menit"
+                inputMode="numeric"
+                className={`${inputClass} w-24`}
+              />
               <button
                 type="button"
                 onClick={() =>
@@ -215,7 +268,7 @@ export function PackageForm({
           <button
             type="button"
             onClick={() =>
-              setItems((rows) => [...rows, { treatmentId: "", label: "" }])
+              setItems((rows) => [...rows, { treatmentId: "", label: "", minutes: "" }])
             }
             className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-50"
           >
@@ -266,15 +319,35 @@ export function PackageForm({
           />
         </Field>
 
-        <label className="flex items-center gap-2 text-sm text-neutral-700">
-          <input
-            type="checkbox"
-            name="isPublished"
-            defaultChecked={pkg.isPublished}
-            className="size-4 rounded border-neutral-300"
-          />
-          <span>Tampilkan di website</span>
-        </label>
+        <div className="flex flex-wrap gap-6">
+          <label className="flex items-center gap-2 text-sm text-neutral-700">
+            <input
+              type="checkbox"
+              name="isNew"
+              defaultChecked={pkg.isNew}
+              className="size-4 rounded border-neutral-300"
+            />
+            <span>Tandai sebagai New</span>
+          </label>
+          <label className="flex items-center gap-2 text-sm text-neutral-700">
+            <input
+              type="checkbox"
+              name="isBestSeller"
+              defaultChecked={pkg.isBestSeller}
+              className="size-4 rounded border-neutral-300"
+            />
+            <span>Tandai sebagai Best Seller</span>
+          </label>
+          <label className="flex items-center gap-2 text-sm text-neutral-700">
+            <input
+              type="checkbox"
+              name="isPublished"
+              defaultChecked={pkg.isPublished}
+              className="size-4 rounded border-neutral-300"
+            />
+            <span>Tampilkan di website</span>
+          </label>
+        </div>
 
         {state.error ? (
           <p

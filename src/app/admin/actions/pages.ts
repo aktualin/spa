@@ -48,6 +48,8 @@ function revalidatePages(paths: string[], redirectsChanged: boolean) {
     revalidatePath("/admin/redirects");
   }
   revalidatePath("/admin/pages");
+  // Item menu bertipe Halaman mengikuti slug & status halaman ini.
+  revalidatePath("/admin/menu");
   revalidatePath("/sitemap.xml");
   for (const path of new Set(paths)) revalidatePath(path);
 }
@@ -217,5 +219,8 @@ export async function listPages() {
 export async function getPage(id: string) {
   await requireRole(CONTENT_ROLES);
 
-  return prisma.staticPage.findUnique({ where: { id } });
+  return prisma.staticPage.findUnique({
+    where: { id },
+    include: { _count: { select: { menuItems: true } } },
+  });
 }

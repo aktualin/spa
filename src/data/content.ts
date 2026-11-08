@@ -16,6 +16,8 @@ export const site = {
 export type NavLink = {
   label: string;
   href: string;
+  /** Dibuka di tab baru (target="_blank"). */
+  external?: boolean;
 };
 
 export type NavHighlight = {

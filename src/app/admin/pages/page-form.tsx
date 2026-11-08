@@ -67,7 +67,16 @@ function Counter({ value, max }: { value: string; max: number }) {
   );
 }
 
-export function PageForm({ page, siteUrl }: { page: PageFormData; siteUrl: string }) {
+export function PageForm({
+  page,
+  siteUrl,
+  menuUsage = 0,
+}: {
+  page: PageFormData;
+  siteUrl: string;
+  /** Jumlah item menu navigasi yang menunjuk halaman ini. */
+  menuUsage?: number;
+}) {
   const [state, formAction] = useActionState(savePageAction, initialState);
 
   const isNew = page.id === null;
@@ -198,6 +207,13 @@ export function PageForm({ page, siteUrl }: { page: PageFormData; siteUrl: strin
           </Field>
         </div>
 
+        {menuUsage > 0 && status === "DRAFT" ? (
+          <p className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+            Halaman ini dipakai {menuUsage} item menu navigasi. Selama berstatus Draf, item menu
+            tersebut tidak tampil di situs.
+          </p>
+        ) : null}
+
         <RichTextField
           name="bodyHtml"
           label="Isi halaman"
@@ -260,7 +276,11 @@ export function PageForm({ page, siteUrl }: { page: PageFormData; siteUrl: strin
         <form action={deletePageAction} className="mt-8 border-t border-neutral-200 pt-4">
           <input type="hidden" name="id" value={page.id} />
           <ConfirmSubmit
-            message={`Hapus halaman "${page.title}"? Alamat /${page.slug} akan menampilkan "halaman tidak ditemukan". Tindakan ini tidak bisa dibatalkan.`}
+            message={`Hapus halaman "${page.title}"? Alamat /${page.slug} akan menampilkan "halaman tidak ditemukan".${
+              menuUsage > 0
+                ? ` Halaman ini dipakai ${menuUsage} item menu navigasi; item tersebut akan disembunyikan dari situs dan ditandai "Tujuan hilang".`
+                : ""
+            } Tindakan ini tidak bisa dibatalkan.`}
           >
             Hapus halaman ini
           </ConfirmSubmit>
