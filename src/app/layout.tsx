@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { WhatsAppButton } from "@/components/whatsapp-button";
+import { getSiteUrl } from "@/lib/site-url";
 
 export const metadata: Metadata = {
+  // Tanpa ini, URL Open Graph dan canonical dirender relatif dan ditolak
+  // sebagian crawler.
+  metadataBase: new URL(getSiteUrl()),
+  alternates: { canonical: "/" },
   title: {
     default: "KAMA Spa • Wellness Sanctuary di South Jakarta",
     template: "%s • KAMA Spa",

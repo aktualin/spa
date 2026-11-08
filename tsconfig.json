@@ -10,6 +10,9 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
+    // Script di scripts/*.mts dijalankan langsung oleh Node (type stripping),
+    // yang mewajibkan ekstensi .ts eksplisit pada import relatif.
+    "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,

@@ -3,19 +3,73 @@ import { Footer } from "@/components/footer";
 import { BookingBanner, Hero, HeroStats, MembershipBanner } from "@/components/home/hero";
 import { TestimonialsSection, WhatsNewSection } from "@/components/home/sections";
 import { SocialsSection } from "@/components/home/socials";
+import { SignatureTreatmentsSection } from "@/components/public/home/signature-treatments";
+import { PromoHighlightSection } from "@/components/public/home/promo-highlight";
+import { GalleryTeaserSection } from "@/components/public/home/gallery-teaser";
+import { getHomepageSections } from "@/lib/content/homepage";
 
-export default function Home() {
+/**
+ * Homepage.
+ *
+ * Section dirender mengikuti `HomepageSection` (admin bisa toggle & mengurutkan).
+ * Section yang dinonaktifkan TIDAK dirender sama sekali — bukan disembunyikan
+ * dengan CSS. Section baru (signature-treatments, promo-highlight,
+ * gallery-teaser) hanya muncul bila barisnya ada di DB dan aktif.
+ */
+export default async function Home() {
+  const sections = await getHomepageSections();
+
+  const order = [
+    "hero",
+    "membership-banner",
+    "whats-new",
+    "reviews",
+    "brand-intro",
+    "socials",
+    "booking-banner",
+    "signature-treatments",
+    "promo-highlight",
+    "gallery-teaser",
+  ];
+
+  const visible = order
+    .map((key, index) => ({ key, index, section: sections[key] }))
+    .filter(({ section }) => !!section && section.isEnabled)
+    .sort((a, b) => {
+      const diff = (a.section?.sortOrder ?? a.index) - (b.section?.sortOrder ?? b.index);
+      return diff !== 0 ? diff : a.index - b.index;
+    });
+
   return (
     <>
       <Navigation />
       <main className="flex-1">
-        <Hero />
-        <MembershipBanner />
-        <WhatsNewSection />
-        <TestimonialsSection />
-        <HeroStats />
-        <SocialsSection />
-        <BookingBanner />
+        {visible.map(({ key }) => {
+          switch (key) {
+            case "hero":
+              return <Hero key={key} />;
+            case "membership-banner":
+              return <MembershipBanner key={key} />;
+            case "whats-new":
+              return <WhatsNewSection key={key} />;
+            case "reviews":
+              return <TestimonialsSection key={key} />;
+            case "brand-intro":
+              return <HeroStats key={key} />;
+            case "socials":
+              return <SocialsSection key={key} />;
+            case "booking-banner":
+              return <BookingBanner key={key} />;
+            case "signature-treatments":
+              return <SignatureTreatmentsSection key={key} />;
+            case "promo-highlight":
+              return <PromoHighlightSection key={key} />;
+            case "gallery-teaser":
+              return <GalleryTeaserSection key={key} />;
+            default:
+              return null;
+          }
+        })}
       </main>
       <Footer />
     </>

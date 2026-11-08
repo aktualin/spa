@@ -36,8 +36,13 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# dump database dari scripts/backup-db.sh — berisi data asli, jangan di-commit
+/backups
+
 # env files (can opt-in for committing if needed)
 .env*
+# Kecuali contoh konfigurasi — tanpa satu pun nilai asli di dalamnya.
+!.env.example
 
 # vercel
 .vercel
@@ -54,6 +59,11 @@ opencode.json
 .opencode
 references/
 AGENTS.md
-docs
+# `docs/` TIDAK diabaikan: isinya dokumen serah terima (Pasal 8 ayat 7i & 11)
+# yang wajib ikut diserahkan bersama source code.
 .opencode-mem
 .agents
+.vscode
+.cursor
+.devin
+opencode-mem.jsonc

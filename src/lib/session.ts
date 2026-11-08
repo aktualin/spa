@@ -1,0 +1,52 @@
+import { jwtVerify, SignJWT } from "jose";
+
+export const SESSION_COOKIE = "kama_admin_session";
+export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 8; // 8 jam kerja
+
+export type AdminRoleName = "ADMIN" | "EDITOR";
+
+export type SessionPayload = {
+  userId: string;
+  email: string;
+  role: AdminRoleName;
+};
+
+function getSecret(): Uint8Array {
+  const secret = process.env.ADMIN_SESSION_SECRET;
+  if (!secret || secret.length < 32) {
+    throw new Error(
+      "ADMIN_SESSION_SECRET belum diset di .env.local (minimal 32 karakter)",
+    );
+  }
+  return new TextEncoder().encode(secret);
+}
+
+export async function createSessionToken(
+  payload: SessionPayload,
+): Promise<string> {
+  return new SignJWT({ email: payload.email, role: payload.role })
+    .setProtectedHeader({ alg: "HS256" })
+    .setSubject(payload.userId)
+    .setIssuedAt()
+    .setExpirationTime(`${SESSION_MAX_AGE_SECONDS}s`)
+    .sign(getSecret());
+}
+
+// Dipakai juga dari middleware (Edge runtime), jadi tidak boleh menyentuh Prisma.
+export async function verifySessionToken(
+  token: string,
+): Promise<SessionPayload | null> {
+  try {
+    const { payload } = await jwtVerify(token, getSecret());
+    const role = payload.role;
+    if (!payload.sub || (role !== "ADMIN" && role !== "EDITOR")) return null;
+
+    return {
+      userId: payload.sub,
+      email: String(payload.email ?? ""),
+      role,
+    };
+  } catch {
+    return null;
+  }
+}

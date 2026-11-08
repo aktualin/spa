@@ -33,7 +33,28 @@ export function locationWhatsApp(location: { address: string }): string {
   return waLink(locationMessage(location.address));
 }
 
+/**
+ * Normalisasi nomor yang diisi admin menjadi format `wa.me` (digit, awalan 62).
+ *
+ * Admin biasa menulis `0813-1605-2040`, `+62 813 1605 2040`, atau `62813...`.
+ * Mengembalikan `null` kalau hasilnya tidak masuk akal sebagai nomor Indonesia,
+ * supaya pemanggil bisa jatuh ke nomor default alih-alih membuat link rusak.
+ */
+export function toWaNumber(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+
+  let digits = raw.replace(/\D/g, "");
+  if (digits.startsWith("0")) digits = `62${digits.slice(1)}`;
+  else if (digits.startsWith("8")) digits = `62${digits}`;
+
+  if (!digits.startsWith("62")) return null;
+  // 62 + 9..13 digit nomor seluler Indonesia.
+  if (digits.length < 11 || digits.length > 15) return null;
+
+  return digits;
+}
+
 /** WhatsApp link for the corporate wellness line. */
-export function corporateWhatsApp(): string {
-  return waLink(RESERVE_MESSAGE, CORPORATE_NUMBER);
+export function corporateWhatsApp(number?: string | null): string {
+  return waLink(RESERVE_MESSAGE, toWaNumber(number) ?? CORPORATE_NUMBER);
 }
