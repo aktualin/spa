@@ -168,6 +168,7 @@ export const MEDIA_URL_COLUMNS = [
   { model: "corporateProgram", field: "imageUrl", label: "Program corporate" },
   { model: "corporateClient", field: "logoUrl", label: "Logo klien corporate" },
   { model: "homepageHighlight", field: "imageUrl", label: "Highlight homepage" },
+  { model: "instagramPost", field: "imageUrl", label: "Feed Instagram" },
   { model: "siteSettings", field: "faviconUrl", label: "Favicon" },
   { model: "siteSettings", field: "defaultOgImageUrl", label: "Gambar OG bawaan" },
 ] as const;

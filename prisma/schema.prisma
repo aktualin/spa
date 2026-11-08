@@ -748,3 +748,45 @@ model BackupRun {
 
   @@index([createdAt])
 }
+
+/* ---------- Konten section homepage ---------- */
+
+// Angka di section Brand Intro ("12 years of care", ...).
+model HomepageStat {
+  id          String  @id @default(cuid())
+  value       String
+  label       String
+  isPublished Boolean @default(true)
+  sortOrder   Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Ulasan di section Reviews.
+model HomepageReview {
+  id          String  @id @default(cuid())
+  quote       String
+  name        String
+  location    String?
+  role        String?
+  isPublished Boolean @default(true)
+  sortOrder   Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Foto feed Instagram yang dipilih admin (tanpa API berbayar / token).
+model InstagramPost {
+  id          String  @id @default(cuid())
+  imageUrl    String
+  imageAlt    String?
+  // Tautan ke postingan; kosong = tautan profil.
+  href        String?
+  isPublished Boolean @default(true)
+  sortOrder   Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

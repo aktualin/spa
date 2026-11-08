@@ -80,6 +80,7 @@ const DESCRIBE: Record<string, { select: Record<string, true>; name: (r: Row) =>
   corporateProgram: { select: { id: true, name: true }, name: (r) => str(r.name), href: () => "/admin/corporate" },
   corporateClient: { select: { id: true, name: true }, name: (r) => str(r.name), href: () => "/admin/corporate" },
   homepageHighlight: { select: { id: true, title: true }, name: (r) => str(r.title), href: () => "/admin/homepage" },
+  instagramPost: { select: { id: true, imageAlt: true }, name: (r) => str(r.imageAlt) || "Foto feed Instagram", href: () => "/admin/homepage" },
   siteSettings: { select: { id: true }, name: () => "Pengaturan situs", href: () => "/admin/seo" },
 };
 
