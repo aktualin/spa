@@ -17,7 +17,7 @@ export const SUGGESTED_SEO_PATHS = [
   "/promos",
   "/promos/membership",
   "/gift-card",
-  "/corporate-wellness",
+  "/corporate",
   "/our-story",
   "/our-story/journal",
   "/membership",

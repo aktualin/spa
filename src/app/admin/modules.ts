@@ -94,7 +94,11 @@ export const ADMIN_MODULES: readonly AdminModule[] = [
     href: "/admin/corporate",
     roles: ["ADMIN", "EDITOR"],
     ready: true,
-    children: [{ label: "Inquiries", href: "/admin/corporate/inquiries" }],
+    children: [
+      { label: "Konten halaman", href: "/admin/corporate/content" },
+      { label: "PIC", href: "/admin/corporate/pic" },
+      { label: "Inquiries", href: "/admin/corporate/inquiries" },
+    ],
   },
   {
     no: 10,
