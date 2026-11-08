@@ -10,6 +10,7 @@ import type { CatalogTreatment } from "@/lib/content/catalog";
 import { formatDuration } from "@/lib/domain/pricing";
 import { formatIdr } from "@/lib/format";
 
+import { CatalogBadges } from "./catalog-badges";
 import { WaButton } from "./wa-button";
 
 type TreatmentCardProps = {
@@ -39,6 +40,10 @@ export function TreatmentCard({ treatment, withCta = false }: TreatmentCardProps
       </Link>
       <div className="treatment-card_body">
         <div className="eyebrow-s text-style-allcaps">{treatment.categoryName}</div>
+        <CatalogBadges
+          isNew={treatment.isNew}
+          isBestSeller={treatment.isBestSeller}
+        />
         <h3 className="header-s">
           <Link href={`/treatments/${treatment.categorySlug}/${treatment.slug}`}>
             {treatment.name}

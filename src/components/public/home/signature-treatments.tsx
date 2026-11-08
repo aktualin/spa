@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "@/components/icons";
+import { CatalogBadges } from "@/components/public/catalog-badges";
 import { Reveal } from "@/components/reveal";
 import { getSignatureTreatments, toPriceLabel } from "@/lib/content/catalog";
 
@@ -59,6 +60,10 @@ export async function SignatureTreatmentsSection() {
                     <span className="eyebrow text-cocoa/60">
                       {treatment.categoryName}
                     </span>
+                    <CatalogBadges
+                      isNew={treatment.isNew}
+                      isBestSeller={treatment.isBestSeller}
+                    />
                     <h3 className="font-display text-title-sm md:text-[1.375rem] md:leading-[1.3]">
                       {treatment.name}
                     </h3>

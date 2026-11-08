@@ -161,8 +161,9 @@ export default async function AdminPricesPage({
             Membership
           </h2>
           <p className="mt-1 text-xs text-neutral-500">
-            Kalimat harga di banner membership homepage dan halaman /membership
-            (contoh &ldquo;Just Rp 1.5jt a month.&rdquo;) adalah teks terpisah — ubah juga di{" "}
+            Harga di kartu membership mengikuti angka di bawah ini. Namun
+            kalimat harga di banner membership homepage (contoh &ldquo;Just Rp
+            1.5jt a month.&rdquo;) adalah teks terpisah — ubah juga di{" "}
             <Link href="/admin/membership/program" className="underline">
               Program membership
             </Link>{" "}

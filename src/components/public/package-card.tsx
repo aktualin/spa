@@ -7,6 +7,7 @@ import type { CatalogPackage } from "@/lib/content/catalog";
 import { formatDuration } from "@/lib/domain/pricing";
 import { formatIdr } from "@/lib/format";
 
+import { CatalogBadges } from "./catalog-badges";
 import { WaButton } from "./wa-button";
 
 type PackageCardProps = {
@@ -30,6 +31,7 @@ export function PackageCard({ pkg, withCta = false }: PackageCardProps) {
       </Link>
       <div className="package-card_body">
         <div className="eyebrow-s text-style-allcaps">Package</div>
+        <CatalogBadges isNew={pkg.isNew} isBestSeller={pkg.isBestSeller} />
         <h3 className="header-s">
           <Link href={`/treatments/packages/${pkg.slug}`}>{pkg.name}</Link>
         </h3>

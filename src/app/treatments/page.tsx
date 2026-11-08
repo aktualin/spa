@@ -56,6 +56,7 @@ export default async function TreatmentsPage() {
                     eyebrow={`${category.treatments.length} treatment`}
                     title={category.name}
                     description={category.description ?? undefined}
+                    imageUrl={category.imageUrl}
                     action={{
                       label: "Lihat kategori",
                       href: `/treatments/${category.slug}`,

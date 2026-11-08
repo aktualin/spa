@@ -1,19 +1,18 @@
 /**
  * Bacaan publik membership (`MembershipTier`).
  *
- * Fallback memakai data statis `membership` di `src/data/content.ts` (paket
- * Individual / Keluarga / Tim KAMA) supaya halaman tetap punya isi ketika DB
- * kosong atau belum terisi.
+ * Tanpa fallback konten statis: tabel kosong atau DB tak terbaca → daftar
+ * kosong, dan halaman publik menampilkan empty state.
  */
 import { cacheLife, cacheTag } from "next/cache";
 
-import { membership as staticMembership } from "@/data/pages";
 import {
   type MembershipProgramData,
   readBenefits,
   readServices,
   staticMembershipProgram,
 } from "@/lib/domain/membership";
+import { formatMembershipPriceLabel } from "@/lib/domain/pricing";
 import { safeQueryWithMeta } from "@/lib/safe-query";
 
 import { CONTENT_TAGS } from "./tags";
@@ -22,25 +21,14 @@ export type MembershipTier = {
   id: string;
   slug: string;
   name: string;
+  /** Harga angka dari modul Harga; null = harga non-angka (contoh "Custom"). */
+  priceIdr: number | null;
   priceLabel: string;
   billingNote: string | null;
   summary: string | null;
   benefits: string[];
   terms: string | null;
 };
-
-function staticTiers(): MembershipTier[] {
-  return staticMembership.plans.map((plan, index) => ({
-    id: `static-${index}`,
-    slug: plan.name.toLowerCase().replace(/\s+/g, "-"),
-    name: plan.name,
-    priceLabel: plan.price,
-    billingNote: plan.billed,
-    summary: plan.note,
-    benefits: plan.features,
-    terms: null,
-  }));
-}
 
 /** Semua tier membership yang published, urut sesuai `sortOrder`. */
 export async function getMembershipTiers(): Promise<MembershipTier[]> {
@@ -50,17 +38,15 @@ export async function getMembershipTiers(): Promise<MembershipTier[]> {
   const { data, usedFallback } = await safeQueryWithMeta<MembershipTier[]>(
     async () => {
       const { prisma } = await import("@/lib/prisma");
-      // Fallback statis hanya bila tabel benar-benar kosong. Bila semua tier
-      // berstatus draf, halaman publik memang tidak menampilkan tier.
-      const all = await prisma.membershipTier.findMany({
+      const rows = await prisma.membershipTier.findMany({
+        where: { isPublished: true },
         orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
       });
-      if (all.length === 0) throw new Error("tier membership kosong");
-      const rows = all.filter((row) => row.isPublished);
       return rows.map((row) => ({
         id: row.id,
         slug: row.slug,
         name: row.name,
+        priceIdr: row.priceIdr,
         priceLabel: row.priceLabel,
         billingNote: row.billingNote,
         summary: row.summary,
@@ -68,12 +54,23 @@ export async function getMembershipTiers(): Promise<MembershipTier[]> {
         terms: row.terms,
       }));
     },
-    staticTiers(),
+    [],
   );
 
   if (usedFallback) cacheLife("minutes");
   else cacheLife("hours");
   return data;
+}
+
+/**
+ * Label harga tier untuk ditampilkan. Angka dari modul Harga menang supaya
+ * perubahan harga admin selalu tampil; `priceLabel` dipakai hanya untuk harga
+ * non-angka yang memang diketik manual (contoh "Custom").
+ */
+export function membershipPriceText(tier: MembershipTier): string {
+  return tier.priceIdr === null
+    ? tier.priceLabel
+    : formatMembershipPriceLabel(tier.priceIdr);
 }
 
 export type MembershipProgram = MembershipProgramData;

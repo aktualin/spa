@@ -4,17 +4,22 @@ import Link from "next/link";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { ArrowRight, Check, ChevronDown } from "@/components/icons";
-import { getMembershipProgram, getMembershipTiers } from "@/lib/content/membership";
+import {
+  getMembershipProgram,
+  getMembershipTiers,
+  membershipPriceText,
+} from "@/lib/content/membership";
 import { plainTextToHtml } from "@/lib/domain/rich-text";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { whatsAppHref } from "@/lib/content/whatsapp";
 import { Reveal } from "@/components/reveal";
 
 export async function generateMetadata(): Promise<Metadata> {
+  // Deskripsi diambil dari program agar tidak basi ketika harga berubah.
+  const program = await getMembershipProgram();
   return withPageSeo("/membership", {
-    title: "Membership",
-    description:
-      "KAMA Membership — Rp 1,5jt per bulan. Satu essential service setiap bulan, harga anggota untuk semua treatment, diskon retail, dan benefit khusus.",
+    title: program.title || "Membership",
+    description: [program.priceHeadline, program.intro].filter(Boolean).join(" "),
   });
 }
 
@@ -137,14 +142,20 @@ export default async function MembershipPage() {
                 <div className="eyebrow-s text-style-allcaps">Membership Plans</div>
                 <h2 className="header-l">Pilih yang paling sesuai dengan ritme Anda.</h2>
               </div>
+              {tiers.length === 0 ? (
+                <p className="body-m text-color-gray">
+                  Belum ada paket membership yang dipublikasikan.
+                </p>
+              ) : (
               <div className="w-layout-grid whats-new_list">
                 {tiers.map((plan) => (
                   <div key={plan.id} className="package-card w-dyn-item">
                     <div className="package-card_body">
-                      <div className="eyebrow-s text-style-allcaps">{plan.billingNote}</div>
                       <h3 className="header-s">{plan.name}</h3>
                       <div className="price-row">
-                        <span className="price-row_duration">{plan.priceLabel}</span>
+                        <span className="price-row_duration">
+                          {membershipPriceText(plan)}
+                        </span>
                         <span className="price-row_value">{plan.billingNote}</span>
                       </div>
                       <div className="body-m text-color-gray">{plan.summary}</div>
@@ -183,6 +194,7 @@ export default async function MembershipPage() {
                   </div>
                 ))}
               </div>
+              )}
             </div>
           </div>
         </Reveal>

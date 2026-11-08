@@ -75,6 +75,7 @@ async function CategoryContent({ params }: CategoryPageProps) {
           eyebrow="Treatments"
           title={category.name}
           description={category.description ?? undefined}
+          imageUrl={category.imageUrl}
         >
           <Link
             href="/treatments"

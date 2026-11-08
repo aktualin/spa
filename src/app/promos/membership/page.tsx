@@ -9,7 +9,7 @@ import {
   PublicPageHeader,
   PublicSectionHeader,
 } from "@/components/public/page-parts";
-import { getMembershipTiers } from "@/lib/content/membership";
+import { getMembershipTiers, membershipPriceText } from "@/lib/content/membership";
 import { withPageSeo } from "@/lib/content/seo";
 import { plainTextToHtml } from "@/lib/domain/rich-text";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
@@ -66,7 +66,7 @@ export default async function PromosMembershipPage() {
                       <span className="eyebrow text-cocoa/60">{tier.name}</span>
                       <div className="flex flex-wrap items-baseline gap-2">
                         <span className="font-display text-title md:text-[1.75rem]">
-                          {tier.priceLabel}
+                          {membershipPriceText(tier)}
                         </span>
                         {tier.billingNote ? (
                           <span className="caption-s text-cocoa/60">

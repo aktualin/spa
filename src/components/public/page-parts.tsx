@@ -11,26 +11,48 @@ export function PublicPageHeader({
   eyebrow,
   title,
   description,
+  imageUrl,
   children,
 }: {
   eyebrow: string;
   title: string;
   description?: string;
+  /** Gambar dari admin; tanpa nilai, header tampil seperti biasa. */
+  imageUrl?: string | null;
   children?: React.ReactNode;
 }) {
+  const text = (
+    <div className="flex max-w-[60ch] flex-col gap-4">
+      <span className="eyebrow text-cocoa/60">{eyebrow}</span>
+      <h1 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
+        {title}
+      </h1>
+      {description ? (
+        <p className="text-lead text-cocoa/70">{description}</p>
+      ) : null}
+      {children}
+    </div>
+  );
+
   return (
     <Reveal as="section" className="bg-cream-soft">
       <div className="container-kama py-14 md:py-20 lg:py-24">
-        <div className="flex max-w-[60ch] flex-col gap-4">
-          <span className="eyebrow text-cocoa/60">{eyebrow}</span>
-          <h1 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-            {title}
-          </h1>
-          {description ? (
-            <p className="text-lead text-cocoa/70">{description}</p>
-          ) : null}
-          {children}
-        </div>
+        {imageUrl ? (
+          <div className="grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-12">
+            {text}
+            <div className="aspect-[16/11] overflow-hidden bg-cream">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={imageUrl}
+                alt={title}
+                loading="lazy"
+                className="h-full w-full object-cover"
+              />
+            </div>
+          </div>
+        ) : (
+          text
+        )}
       </div>
     </Reveal>
   );
@@ -41,16 +63,30 @@ export function PublicSectionHeader({
   eyebrow,
   title,
   description,
+  imageUrl,
   action,
 }: {
   eyebrow?: string;
   title: string;
   description?: string;
+  /** Gambar dari admin; tanpa nilai, judul tampil seperti biasa. */
+  imageUrl?: string | null;
   action?: { label: string; href: string };
 }) {
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
       <div className="flex max-w-[56ch] flex-col gap-3">
+        {imageUrl ? (
+          <div className="aspect-[16/9] w-full max-w-[18rem] overflow-hidden bg-cream">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={imageUrl}
+              alt={title}
+              loading="lazy"
+              className="h-full w-full object-cover"
+            />
+          </div>
+        ) : null}
         {eyebrow ? <span className="eyebrow text-cocoa/60">{eyebrow}</span> : null}
         <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
           {title}
