@@ -31,7 +31,7 @@ Aturan kerja yang berlaku (dari user):
 | 20 | Homepage dinamis (hero, brand intro, signature, promo/event highlight, gallery, IG feed, reviews, footer) | ✅ | lihat `git log` |
 | 21 | Halaman publik yang belum ada (cek kelengkapan + slug DB + redirect 301) | ✅ semua halaman sudah ada; promo kini mencatat 301 saat slug diganti | lihat `git log` |
 | 22 | Integrasi WhatsApp, GA4, Google Maps, Instagram feed | ✅ (GA4 dipasang bila ID diisi; WA lacak klik; Maps di Kontak; IG dari admin) | lihat `git log` |
-| 23 | Hardening (responsif, browser, HTTPS, gambar, login limit, Zod, sanitasi, rate limit) | ⏳ | |
+| 23 | Hardening (responsif, browser, HTTPS, gambar, login limit, Zod, sanitasi, rate limit) | ✅ sebagian — header keamanan + HSTS, kompresi gambar saat unggah; audit sanitasi/Zod/limit OK. Responsif & lintas browser belum diuji (butuh E2E/manual) | lihat `git log` |
 | 24 | Testing sesuai PLAN-9 + perbaikan sampai DoD PLAN-8 | ⏳ | |
 | 25 | Serah terima sesuai PLAN-10 | ⏳ | |
 
@@ -49,3 +49,9 @@ Aturan kerja yang berlaku (dari user):
 - `alt` Instagram di `socials.tsx` / `gallery-teaser.tsx` perlu fallback.
 - Backup: perlu uji end-to-end setelah deploy (isi secret GitHub `BACKUP_DATABASE_URL`, `BACKUP_PASSPHRASE`, `BACKUP_REPORT_URL`, `BACKUP_REPORT_SECRET`; env Vercel `BACKUP_REPORT_SECRET`).
 - Ikon email footer kini ke `hello@kamaspa.id` (dari DB), sebelumnya marketing@.
+
+### Sisa dari BUILD-23
+- GIF hero 28 MB (`public/img/kama/incense_smoke_animated.gif`) masih dipakai — butuh persetujuan user untuk diganti/konversi; admin bisa mengganti gambar hero sendiri.
+- Rate limit login & inquiry tersimpan di memori per instance Vercel (tidak lintas instance).
+- CSP belum dipasang (perlu uji browser karena Leaflet/GA4/Maps).
+- Responsif desktop/tablet/mobile & kompatibilitas Chrome/Safari/Edge/Firefox belum diverifikasi ulang sejak BUILD-6 (masuk BUILD-24).

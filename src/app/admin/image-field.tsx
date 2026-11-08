@@ -2,6 +2,8 @@
 
 import { useId, useRef, useState } from "react";
 
+import { compressImageForUpload } from "@/lib/image-compress-client";
+
 import { ALLOWED_MEDIA_TYPES } from "@/lib/domain/media";
 
 import { MediaPicker } from "./media-picker";
@@ -35,7 +37,7 @@ export function ImageField({
 
     try {
       const body = new FormData();
-      body.append("file", file);
+      body.append("file", await compressImageForUpload(file));
       body.append("folder", folder);
 
       const response = await fetch("/api/admin/upload", { method: "POST", body });
