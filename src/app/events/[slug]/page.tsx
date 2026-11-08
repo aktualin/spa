@@ -87,7 +87,7 @@ async function EventContent({
       >
         <div className="button-group mt-4 flex flex-wrap gap-3">
           {/* Pendaftaran hanya untuk event yang belum lewat. */}
-          {event.phase !== "past" ? (
+          {event.phase !== "past" && registerHref ? (
             <a
               href={registerHref}
               data-wa-context="event"

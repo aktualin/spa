@@ -6,25 +6,19 @@
  *    `updateTag(CONTENT_TAGS.x)` setelah menulis.
  * 2. Prisma di-import dinamis di dalam `safeQueryWithMeta`, jadi env yang
  *    belum diset / DB down tidak pernah membuat halaman crash.
- * 3. DB kosong atau tidak terjangkau → data statis `src/data/*`, dan
- *    `cacheLife("minutes")` supaya fallback tidak tertahan lama di cache (profil
- *    `seconds` terlalu pendek: Next menolak mem-prerender halamannya).
+ * 3. Tabel kosong atau DB tidak terjangkau → daftar kosong (halaman memberi
+ *    empty state), dan `cacheLife("minutes")` supaya keadaan itu tidak
+ *    tertahan lama di cache (profil `seconds` terlalu pendek: Next menolak
+ *    mem-prerender halamannya).
  */
 import { cacheLife, cacheTag } from "next/cache";
 
-import {
-  additionalServices as staticAdditionalServices,
-  packages as staticPackages,
-  treatments as staticTreatments,
-  type AdditionalService,
-  type Package as StaticPackage,
-  type Treatment as StaticTreatment,
+import type {
+  AdditionalService,
+  Package as StaticPackage,
+  Treatment as StaticTreatment,
 } from "@/data/content";
-import {
-  buildStaticCatalogSeed,
-  type AddonSectionValue,
-  type CategoryKindValue,
-} from "@/lib/domain/catalog-seed";
+import type { AddonSectionValue, CategoryKindValue } from "@/lib/domain/catalog-seed";
 import { toMenuAddons, toMenuPackages, toMenuTreatments } from "@/lib/domain/menu-catalog";
 import { formatPriceLabel } from "@/lib/domain/pricing";
 import { safeQueryWithMeta } from "@/lib/safe-query";
@@ -94,70 +88,6 @@ export type CatalogPackage = {
 
 function itemLabel(name: string, minutes: number | null): string {
   return minutes ? `${name} (${minutes} min)` : name;
-}
-
-/* ---------- fallback statis (sama dengan scripts/seed.mts) ---------- */
-
-const staticSeed = buildStaticCatalogSeed({
-  treatments: staticTreatments,
-  packages: staticPackages,
-  additionalServices: staticAdditionalServices,
-});
-
-function staticCatalog(): CatalogCategory[] {
-  return staticSeed.categories.map((c) => ({
-    slug: c.slug,
-    name: c.name,
-    kind: c.kind,
-    description: null,
-    imageUrl: null,
-    seoTitle: null,
-    seoDescription: null,
-    treatments: staticSeed.treatments
-      .filter((t) => t.categorySlug === c.slug)
-      .map((t) => ({
-        slug: t.slug,
-        name: t.name,
-        tagline: t.tagline,
-        description: t.description,
-        note: t.note,
-        imageUrl: t.imageUrl,
-        addonSection: t.addonSection,
-        isNew: false,
-        isBestSeller: false,
-        categorySlug: c.slug,
-        categoryName: c.name,
-        options: t.options,
-        seoTitle: null,
-        seoDescription: t.tagline,
-        whatsappMessage: null,
-      })),
-  }));
-}
-
-function staticPackagesList(): CatalogPackage[] {
-  return staticSeed.packages.map((p) => ({
-    slug: p.slug,
-    name: p.name,
-    subtitle: p.subtitle,
-    quote: p.quote,
-    description: p.description,
-    imageUrl: p.imageUrl,
-    durationMin: p.durationMin,
-    durationLabel: p.durationLabel,
-    priceIdr: p.priceIdr,
-    isNew: false,
-    isBestSeller: false,
-    items: p.items.map((i) => ({
-      label: itemLabel(i.name, i.minutes),
-      name: i.name,
-      minutes: i.minutes,
-      treatmentSlug: null,
-    })),
-    seoTitle: null,
-    seoDescription: p.subtitle,
-    whatsappMessage: null,
-  }));
 }
 
 /* ---------- bacaan DB ---------- */
@@ -297,9 +227,8 @@ export async function getCatalog(): Promise<CatalogCategory[]> {
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
       include: CATEGORY_INCLUDE,
     });
-    if (rows.length === 0) throw new Error("katalog kosong");
     return rows.map(toCatalogCategory);
-  }, staticCatalog());
+  }, []);
 
   if (usedFallback) cacheLife("minutes");
   else cacheLife("hours");
@@ -325,7 +254,7 @@ export async function getCategory(slug: string): Promise<CatalogCategory | null>
       });
       return row ? toCatalogCategory(row) : null;
     },
-    staticCatalog().find((c) => c.slug === slug) ?? null,
+    null,
   );
 
   if (usedFallback) cacheLife("minutes");
@@ -361,9 +290,8 @@ export async function getPackages(): Promise<CatalogPackage[]> {
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
       include: PACKAGE_INCLUDE,
     });
-    if (rows.length === 0) throw new Error("package kosong");
     return rows.map(toCatalogPackage);
-  }, staticPackagesList());
+  }, []);
 
   if (usedFallback) cacheLife("minutes");
   else cacheLife("hours");
@@ -384,7 +312,7 @@ export async function getPackage(slug: string): Promise<CatalogPackage | null> {
       });
       return row ? toCatalogPackage(row) : null;
     },
-    staticPackagesList().find((p) => p.slug === slug) ?? null,
+    null,
   );
 
   if (usedFallback) cacheLife("minutes");
@@ -487,11 +415,6 @@ export async function getMenuEntry(
   "use cache";
   cacheTag(CONTENT_TAGS.catalog);
 
-  const fallback =
-    [...toMenuTreatments(staticCatalog()), ...toMenuPackages(staticPackagesList())].find(
-      (entry) => entry.slug === slug,
-    ) ?? null;
-
   const { data, usedFallback } = await safeQueryWithMeta<StaticTreatment | StaticPackage | null>(
     async () => {
       const { prisma } = await import("@/lib/prisma");
@@ -512,7 +435,7 @@ export async function getMenuEntry(
       });
       return pkg ? toMenuPackages([toCatalogPackage(pkg)])[0] : null;
     },
-    fallback,
+    null,
   );
 
   if (usedFallback) cacheLife("minutes");

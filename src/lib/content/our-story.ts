@@ -1,8 +1,10 @@
 /**
  * Bacaan publik konten "Our Story" (modul 10b).
  *
- * `OurStoryContent` singleton (id "singleton"). Fallback memakai deskripsi
- * situs + tagline footer yang sudah ada di `src/data/content.ts`.
+ * `OurStoryContent` singleton (id "singleton"). Belum diisi admin atau DB
+ * tidak terbaca → `null` (halaman menampilkan empty state). `staticOurStory()`
+ * tetap ada, tapi hanya untuk mengisi awal form admin — bukan untuk dirender
+ * ke pengunjung.
  */
 import { cacheLife, cacheTag } from "next/cache";
 
@@ -21,9 +23,8 @@ export type OurStory = {
 };
 
 /**
- * Fallback statis: deskripsi brand + nilai utama. Juga dipakai untuk mengisi
- * form admin bila konten belum pernah disimpan, supaya menyimpan tanpa
- * perubahan menghasilkan halaman yang sama.
+ * Isi awal form admin saat konten belum pernah disimpan, supaya menyimpan
+ * tanpa perubahan menghasilkan halaman yang masuk akal.
  */
 export function staticOurStory(): OurStory {
   return {
@@ -37,14 +38,14 @@ export function staticOurStory(): OurStory {
   };
 }
 
-export async function getOurStory(): Promise<OurStory> {
+export async function getOurStory(): Promise<OurStory | null> {
   "use cache";
   cacheTag(CONTENT_TAGS.ourStory);
 
-  const { data, usedFallback } = await safeQueryWithMeta(async () => {
+  const { data, usedFallback } = await safeQueryWithMeta<OurStory | null>(async () => {
     const { prisma } = await import("@/lib/prisma");
     const row = await prisma.ourStoryContent.findUnique({ where: { id: "singleton" } });
-    if (!row) throw new Error("our story belum diisi");
+    if (!row) return null;
     return {
       heroTitle: row.heroTitle,
       heroImageUrl: row.heroImageUrl,
@@ -53,7 +54,7 @@ export async function getOurStory(): Promise<OurStory> {
       seoTitle: row.seoTitle,
       seoDescription: row.seoDescription,
     };
-  }, staticOurStory());
+  }, null);
 
   if (usedFallback) cacheLife("minutes");
   else cacheLife("hours");

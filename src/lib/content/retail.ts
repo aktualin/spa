@@ -2,9 +2,8 @@
  * Bacaan publik katalog Retail (modul 8).
  *
  * Tidak ada keranjang/pembayaran online — pemesanan lewat WhatsApp.
- * Fallback statis (kosong → "Belum ada produk retail") hanya dipakai bila DB
- * tidak terbaca atau tabel produk benar-benar kosong. Kalau semua produk
- * sedang disembunyikan, hasilnya daftar kosong dari DB — bukan fallback.
+ * Tabel kosong atau semua produk disembunyikan → daftar kosong (empty state
+ * di halaman), bukan produk contoh.
  */
 import { cacheLife, cacheTag } from "next/cache";
 
@@ -28,11 +27,6 @@ export type RetailProduct = {
 /** Produk retail siap tampil, lengkap dengan link "Pesan via WhatsApp". */
 export type RetailCatalogItem = RetailProduct & { whatsappUrl: string };
 
-/** Fallback statis: belum ada produk retail yang dipublikasikan. */
-function staticRetailProducts(): RetailProduct[] {
-  return [];
-}
-
 /** Semua produk retail yang ditampilkan, Highlight/Kolaborasi lebih dulu. */
 export async function getRetailProducts(): Promise<RetailProduct[]> {
   "use cache";
@@ -50,9 +44,6 @@ export async function getRetailProducts(): Promise<RetailProduct[]> {
         { id: "asc" },
       ],
     });
-    if (rows.length === 0 && (await prisma.retailProduct.count()) === 0) {
-      throw new Error("tabel produk retail kosong");
-    }
     return rows.map<RetailProduct>((p) => ({
       slug: p.slug,
       name: p.name,
@@ -62,7 +53,7 @@ export async function getRetailProducts(): Promise<RetailProduct[]> {
       isHighlight: p.isHighlight,
       whatsappMessage: p.whatsappMessage,
     }));
-  }, staticRetailProducts());
+  }, []);
 
   if (usedFallback) cacheLife("minutes");
   else cacheLife("hours");

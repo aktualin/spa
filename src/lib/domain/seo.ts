@@ -313,8 +313,7 @@ export type SitemapStampKey =
   | "events"
   | "retail"
   | "giftCard"
-  | "contact"
-  | "legal";
+  | "contact";
 
 export type PublicStaticRoute = {
   path: string;
@@ -351,6 +350,4 @@ export const PUBLIC_STATIC_ROUTES: readonly PublicStaticRoute[] = [
   { path: "/retail", label: "KAMA Retail", priority: 0.5, changeFrequency: "monthly", group: "retail" },
   { path: "/gift-card", label: "Gift Card", priority: 0.5, changeFrequency: "monthly", group: "giftCard" },
   { path: "/contact", label: "Contact", priority: 0.7, changeFrequency: "monthly", group: "contact" },
-  { path: "/privacy-policy", label: "Privacy Policy", priority: 0.2, changeFrequency: "yearly", group: "legal" },
-  { path: "/terms-conditions", label: "Terms & Conditions", priority: 0.2, changeFrequency: "yearly", group: "legal" },
 ];

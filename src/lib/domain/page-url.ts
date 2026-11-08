@@ -28,10 +28,8 @@ export const RESERVED_ROOT_SEGMENTS: readonly string[] = [
   "membership",
   "menu",
   "our-story",
-  "privacy-policy",
   "promos",
   "retail",
-  "terms-conditions",
   "treatments",
   // Berkas metadata yang dibuat Next.js
   "sitemap",

@@ -1,16 +1,18 @@
 /**
- * Aturan modul Kontak & Umum (`SiteSettings`): nilai bawaan yang sama persis
- * dengan tampilan situs lama, penggabungan baris database + fallback statis,
+ * Aturan modul Kontak & Umum (`SiteSettings`): pembacaan baris database,
  * normalisasi & validasi isian admin, serta penerapan pengaturan ke kartu
  * lokasi dan ikon sosial di footer.
+ *
+ * Tanpa nilai bawaan statis: kolom yang belum diisi admin dikembalikan kosong
+ * supaya halaman publik menampilkan empty state, bukan alamat atau nomor
+ * hardcode yang diam-diam menimpa data admin.
  *
  * Modul murni (tanpa I/O, tanpa Next/Prisma) supaya bisa diuji langsung
  * dengan `node --test`.
  */
 import { z } from "zod";
 
-import { site as staticSite, type Location } from "../../data/content.ts";
-import { WHATSAPP_NUMBER } from "../whatsapp.ts";
+import { type Location } from "../../data/content.ts";
 
 /* ------------------------------------------------------------------ */
 /* Tipe data                                                           */
@@ -56,22 +58,23 @@ export type SiteSettingsRow = {
 export type SiteSettingsWrite = SiteSettingsRow;
 
 /* ------------------------------------------------------------------ */
-/* Nilai bawaan                                                        */
+/* Nilai kosong                                                        */
 /* ------------------------------------------------------------------ */
 
-export const STATIC_INSTAGRAM_USERNAME = "kama__spa";
-
-/** Nilai default — sama persis dengan data statis yang dipakai halaman lama. */
-export function staticSiteSettings(): SiteSettings {
+/**
+ * Pengaturan kosong — dipakai saat baris `SiteSettings` belum ada atau DB
+ * tidak terjangkau. Halaman publik menyembunyikan bagian yang nilainya kosong.
+ */
+export function emptySiteSettings(): SiteSettings {
   return {
-    address: staticSite.address,
-    openingHours: [staticSite.hours],
-    whatsappNumber: WHATSAPP_NUMBER,
-    email: staticSite.email,
-    phone: staticSite.phone,
-    instagramUrl: staticSite.instagram,
-    instagramUsername: STATIC_INSTAGRAM_USERNAME,
-    tiktokUrl: staticSite.tiktok,
+    address: "",
+    openingHours: [],
+    whatsappNumber: "",
+    email: "",
+    phone: "",
+    instagramUrl: "",
+    instagramUsername: "",
+    tiktokUrl: "",
     facebookUrl: "",
     freshaUrl: "",
     mapsEmbedUrl: "",
@@ -377,39 +380,33 @@ export function toSiteSettingsWrite(parsed: SiteSettingsParsed): SiteSettingsWri
 /* ------------------------------------------------------------------ */
 
 /**
- * Gabungkan baris database dengan nilai bawaan.
+ * Baris database → nilai yang dipakai halaman publik.
  *
- * Keputusan fallback:
- * - Tanpa baris (belum pernah disimpan / DB gagal) → seluruh nilai bawaan.
- * - Field inti yang wajib di form (alamat, jam, WhatsApp, email) → bila
- *   kosong/tidak valid tetap memakai bawaan, supaya situs tidak pernah
- *   kehilangan alamat atau tombol WhatsApp.
- * - Field opsional (telepon, Instagram, TikTok, Facebook, Fresha, Maps, GA4)
- *   → kosong berarti disembunyikan; admin sengaja mengosongkannya.
- * - Username Instagram kosong → diturunkan dari URL Instagram, lalu bawaan.
+ * Tanpa baris (belum pernah disimpan / DB gagal) → seluruh nilai kosong, dan
+ * halaman menampilkan empty state. Kolom yang kosong atau tidak valid juga
+ * tetap kosong: tidak ada nilai hardcode yang menimpa data admin.
+ * Username Instagram kosong masih boleh diturunkan dari URL Instagram karena
+ * keduanya data admin yang sama.
  */
 export function mergeSiteSettings(row: SiteSettingsRow | null): SiteSettings {
-  const fallback = staticSiteSettings();
-  if (!row) return fallback;
+  if (!row) return emptySiteSettings();
 
   const text = (value: string | null | undefined) => value?.trim() ?? "";
-  const openingHours = normalizeOpeningHours(row.openingHours ?? []);
   const optionalUrl = (value: string | null) =>
     isHttpsUrl(text(value)) ? text(value) : "";
   const instagramUrl = optionalUrl(row.instagramUrl);
 
   return {
-    address: text(row.address) || fallback.address,
-    openingHours: openingHours.length > 0 ? openingHours : fallback.openingHours,
-    whatsappNumber:
-      normalizeWhatsAppNumber(text(row.whatsappNumber)) ?? fallback.whatsappNumber,
-    email: text(row.email) || fallback.email,
+    address: text(row.address),
+    openingHours: normalizeOpeningHours(row.openingHours ?? []),
+    whatsappNumber: normalizeWhatsAppNumber(text(row.whatsappNumber)) ?? "",
+    email: text(row.email),
     phone: text(row.phone),
     instagramUrl,
     instagramUsername:
       normalizeInstagramUsername(text(row.instagramUsername)) ??
       instagramUsernameFromUrl(instagramUrl) ??
-      fallback.instagramUsername,
+      "",
     tiktokUrl: optionalUrl(row.tiktokUrl),
     facebookUrl: optionalUrl(row.facebookUrl),
     freshaUrl: optionalUrl(row.freshaUrl),
@@ -503,6 +500,8 @@ export function applySiteSettingsToLocations(
   return locations.map((loc) => {
     const base = { ...loc, phone: phone || loc.phone, hours: hours || loc.hours };
     if (loc.slug !== FLAGSHIP_LOCATION_SLUG) return base;
+    // Alamat kosong di pengaturan tidak boleh mengosongkan kartu cabang.
+    if (!settings.address) return { ...base, mapEmbed: settings.mapsEmbedUrl || loc.mapEmbed };
     return {
       ...base,
       address: settings.address,

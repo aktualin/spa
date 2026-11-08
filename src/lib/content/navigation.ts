@@ -1,11 +1,11 @@
 /**
  * Menu navigasi publik (modul Menu Navigasi) untuk header, menu mobile, dan
- * footer. Bila tabel kosong atau database tidak terbaca, mengembalikan menu
- * statis lama (`nav`, `footerLinks`) — tampilannya identik.
+ * footer. Tabel kosong atau database tidak terbaca → menu kosong; navigasi
+ * sepenuhnya mengikuti apa yang disusun admin.
  */
 import { cacheLife, cacheTag } from "next/cache";
 
-import { footerLinks as staticFooterLinks, nav as staticNav, type NavLink } from "@/data/content";
+import { nav as staticNav, type NavLink } from "@/data/content";
 import { buildMenuTree, type MenuRow } from "@/lib/domain/menu";
 import {
   menuTreeToFooter,
@@ -23,10 +23,10 @@ export type NavigationData = {
   footer: Record<string, NavLink[]>;
 };
 
-const STATIC_NAVIGATION: NavigationData = {
-  header: { primary: staticNav.primary, megaGroups: staticNav.megaGroups },
-  mobile: { primary: staticNav.primary, megaGroups: staticNav.megaGroups },
-  footer: staticFooterLinks,
+const EMPTY_NAVIGATION: NavigationData = {
+  header: { primary: [], megaGroups: {} },
+  mobile: { primary: [], megaGroups: {} },
+  footer: {},
 };
 
 export async function getNavigationData(): Promise<NavigationData> {
@@ -40,8 +40,6 @@ export async function getNavigationData(): Promise<NavigationData> {
     const items = await prisma.menuItem.findMany({
       include: { page: { select: { slug: true, status: true } } },
     });
-    if (items.length === 0) throw new Error("menu kosong");
-
     const rows: MenuRow[] = items.map((item) => ({
       id: item.id,
       parentId: item.parentId,
@@ -68,7 +66,7 @@ export async function getNavigationData(): Promise<NavigationData> {
       mobile: menuTreeToNav(buildMenuTree(rows, "MOBILE"), presets),
       footer: menuTreeToFooter(buildMenuTree(rows, "FOOTER")),
     };
-  }, STATIC_NAVIGATION);
+  }, EMPTY_NAVIGATION);
 
   if (usedFallback) cacheLife("minutes");
   else cacheLife("hours");

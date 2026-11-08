@@ -5,14 +5,14 @@ import { Suspense } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { ArrowRight, Check } from "@/components/icons";
-import { packages, priceDisclaimer, treatments } from "@/data/content";
-import { getMenuEntry } from "@/lib/content/catalog";
+import { priceDisclaimer } from "@/data/content";
+import { getCatalogSlugs, getMenuEntry } from "@/lib/content/catalog";
 import { withPageSeo } from "@/lib/content/seo";
 
-// Daftar statis hanya untuk prerender saat build (Next mensyaratkan minimal
-// satu slug); isi halaman selalu dibaca dari database lewat getMenuEntry.
-export function generateStaticParams() {
-  return [...treatments, ...packages].map((e) => ({ slug: e.slug }));
+// Slug untuk prerender saat build diambil dari database, bukan daftar statis.
+export async function generateStaticParams() {
+  const { treatments, packages } = await getCatalogSlugs();
+  return [...treatments.map((t) => t.treatmentSlug), ...packages].map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({

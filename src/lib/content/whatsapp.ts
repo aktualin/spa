@@ -15,14 +15,16 @@ import {
   resolveWhatsAppMessage,
   type WhatsAppContextKey,
 } from "@/lib/domain/whatsapp-template";
-import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
 
 import { getWhatsAppNumber, getWhatsAppTemplate } from "./site";
 
-/** Nomor WhatsApp situs dalam format `wa.me` (digit, awalan 62). */
-export async function getWaNumber(): Promise<string> {
+/**
+ * Nomor WhatsApp situs dalam format `wa.me` (digit, awalan 62), atau `null`
+ * bila admin belum mengisinya — pemanggil menyembunyikan tombolnya.
+ */
+export async function getWaNumber(): Promise<string | null> {
   const raw = await getWhatsAppNumber();
-  return normalizeWaNumber(raw) ?? WHATSAPP_NUMBER;
+  return normalizeWaNumber(raw);
 }
 
 export type WhatsAppHrefOptions = {
@@ -41,14 +43,17 @@ export async function getWhatsAppMessage(
   return resolveWhatsAppMessage({ context, custom, template, values });
 }
 
-/** Tautan `https://wa.me/<nomor>?text=…` untuk sebuah konteks. */
+/**
+ * Tautan `https://wa.me/<nomor>?text=…` untuk sebuah konteks, atau `null`
+ * bila nomor WhatsApp belum diatur di Kontak & Umum.
+ */
 export async function whatsAppHref(
   context: WhatsAppContextKey,
   options: WhatsAppHrefOptions = {},
-): Promise<string> {
+): Promise<string | null> {
   const [number, message] = await Promise.all([
     getWaNumber(),
     getWhatsAppMessage(context, options),
   ]);
-  return buildWhatsAppLink(message, number);
+  return number ? buildWhatsAppLink(message, number) : null;
 }

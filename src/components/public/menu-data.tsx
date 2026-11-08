@@ -2,13 +2,9 @@
  * Sumber data untuk halaman lama /menu.
  *
  * Pembacaan DB memakai helper di `@/lib/content/catalog` yang sudah cached.
- * Fallback-nya (saat DB kosong/down) identik dengan data statis, sehingga
- * markup halaman /menu tidak berubah.
+ * Suspense fallback-nya berupa skeleton netral, bukan konten statis, supaya
+ * tidak ada daftar treatment hardcode yang sempat tampil ke tamu.
  */
-import {
-  packages as staticPackages,
-  treatments as staticTreatments,
-} from "@/data/content";
 import { getMenuEntries, getMenuPackages, getMenuTreatments } from "@/lib/content/catalog";
 
 import { MassageGrid, PackagesGrid } from "./menu-grids";
@@ -19,11 +15,19 @@ export async function MenuTreatmentsGrid() {
   return <MassageGrid items={treatments.filter((t) => t.category === "Massage")} />;
 }
 
-/** Fallback grid treatment (dipakai sebagai Suspense fallback). */
-export function MenuTreatmentsGridFallback() {
+/** Baris abu-abu sebagai penanda muat; jumlahnya sekadar menjaga tinggi area. */
+function GridSkeleton({ rows }: { rows: number }) {
   return (
-    <MassageGrid items={staticTreatments.filter((t) => t.category === "Massage")} />
+    <div aria-hidden className="animate-pulse space-y-3">
+      {Array.from({ length: rows }, (_, i) => (
+        <div key={i} className="h-16 rounded bg-cocoa/5" />
+      ))}
+    </div>
   );
+}
+
+export function MenuTreatmentsGridFallback() {
+  return <GridSkeleton rows={6} />;
 }
 
 /** Grid package All Day Spa — versi dari DB. */
@@ -32,9 +36,8 @@ export async function MenuPackagesGrid() {
   return <PackagesGrid items={packages} />;
 }
 
-/** Fallback grid package (dipakai sebagai Suspense fallback). */
 export function MenuPackagesGridFallback() {
-  return <PackagesGrid items={staticPackages} />;
+  return <GridSkeleton rows={3} />;
 }
 
 export { getMenuEntries };

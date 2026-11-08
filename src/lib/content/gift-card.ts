@@ -3,6 +3,10 @@
  *
  * `GiftCardInfo` adalah singleton (id "singleton"). `bodyHtml` disimpan
  * ter-sanitasi; di halaman publik dirender ulang lewat `sanitizeHtml`.
+ *
+ * Belum diisi admin atau DB tidak terbaca → `null` (halaman menampilkan empty
+ * state). `staticGiftCard()` tetap ada, tapi hanya untuk mengisi awal form
+ * admin — bukan untuk dirender ke pengunjung.
  */
 import { cacheLife, cacheTag } from "next/cache";
 
@@ -20,7 +24,7 @@ export type GiftCard = {
   whatsappMessage: string;
 };
 
-/** Fallback statis: penjelasan singkat gift card (juga isi awal form admin). */
+/** Isi awal form admin saat gift card belum pernah disimpan. */
 export function staticGiftCard(): GiftCard {
   return {
     title: "KAMA Gift Card",
@@ -33,14 +37,14 @@ export function staticGiftCard(): GiftCard {
   };
 }
 
-export async function getGiftCard(): Promise<GiftCard> {
+export async function getGiftCard(): Promise<GiftCard | null> {
   "use cache";
   cacheTag(CONTENT_TAGS.giftCard);
 
-  const { data, usedFallback } = await safeQueryWithMeta(async () => {
+  const { data, usedFallback } = await safeQueryWithMeta<GiftCard | null>(async () => {
     const { prisma } = await import("@/lib/prisma");
     const row = await prisma.giftCardInfo.findUnique({ where: { id: "singleton" } });
-    if (!row) throw new Error("gift card belum diisi");
+    if (!row) return null;
     return {
       title: row.title,
       subtitle: row.subtitle || GIFT_CARD_DEFAULTS.subtitle,
@@ -49,7 +53,7 @@ export async function getGiftCard(): Promise<GiftCard> {
       termsHtml: row.termsHtml,
       whatsappMessage: row.whatsappMessage || GIFT_CARD_DEFAULTS.whatsappMessage,
     };
-  }, staticGiftCard());
+  }, null);
 
   if (usedFallback) cacheLife("minutes");
   else cacheLife("hours");

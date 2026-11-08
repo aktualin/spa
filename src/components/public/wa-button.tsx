@@ -29,6 +29,8 @@ export async function WaButton({
   className = "button is-secondary is-icon w-inline-block",
 }: WaButtonProps) {
   const href = await whatsAppHref(context, { custom, values });
+  // Nomor WhatsApp belum diatur admin → tombol disembunyikan, bukan tautan rusak.
+  if (!href) return null;
   return (
     <WaLink href={href} context={context} className={className}>
       <div>{label}</div>
@@ -39,6 +41,7 @@ export async function WaButton({
 /**
  * Anchor WhatsApp polos (target baru, `noopener`) dengan penanda konteks.
  * Markup-nya sama dengan `WhatsAppLink` di `page-parts` plus `data-wa-context`.
+ * `href` kosong (nomor belum diatur admin) → tidak dirender.
  */
 export function WaLink({
   href,
@@ -47,12 +50,13 @@ export function WaLink({
   children,
   ...rest
 }: {
-  href: string;
+  href: string | null;
   context: WhatsAppContextKey;
   className?: string;
   children: ReactNode;
   "aria-label"?: string;
 }) {
+  if (!href) return null;
   return (
     <a
       href={href}

@@ -85,15 +85,17 @@ async function PromoContent({
         description={promo.description ?? undefined}
       >
         <div className="button-group mt-4 flex flex-wrap gap-3">
-          <a
-            href={waHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-primary"
-            data-wa-context="promo"
-          >
-            Tanya Promo via WhatsApp
-          </a>
+          {waHref ? (
+            <a
+              href={waHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary"
+              data-wa-context="promo"
+            >
+              Tanya Promo via WhatsApp
+            </a>
+          ) : null}
           <Link href="/promos" className="btn btn-outline border-cocoa/40">
             Semua Promo
             <ArrowRight className="h-4 w-4" />

@@ -16,7 +16,7 @@ import {
   parseMapsEmbedInput,
   siteSettingsFormDefaults,
   siteSettingsInputSchema,
-  staticSiteSettings,
+  emptySiteSettings,
   toSiteSettingsWrite,
   type SiteSettingsInput,
   type SiteSettingsRow,
@@ -175,22 +175,21 @@ describe("siteSettingsInputSchema", () => {
 });
 
 describe("mergeSiteSettings & tampilan publik", () => {
-  it("tanpa baris → nilai bawaan statis", () => {
-    assert.deepEqual(mergeSiteSettings(null), staticSiteSettings());
+  it("tanpa baris → semua kosong (empty state, bukan konten hardcode)", () => {
+    assert.deepEqual(mergeSiteSettings(null), emptySiteSettings());
   });
-  it("baris DB saat ini menghasilkan tampilan identik dengan bawaan", () => {
+  it("baris DB diteruskan apa adanya ke tampilan publik", () => {
     const merged = mergeSiteSettings(CURRENT_ROW);
-    const fallback = staticSiteSettings();
     assert.equal(merged.address, site.address);
     assert.deepEqual(merged.openingHours, [site.hours]);
-    assert.equal(merged.whatsappNumber, fallback.whatsappNumber);
+    assert.equal(merged.whatsappNumber, CURRENT_ROW.whatsappNumber);
     assert.equal(merged.instagramUrl, site.instagram);
     assert.equal(merged.instagramUsername, "kama__spa");
     assert.equal(merged.tiktokUrl, site.tiktok);
     assert.equal(merged.mapsEmbedUrl, "");
     assert.equal(merged.freshaUrl, "");
   });
-  it("field wajib kosong → bawaan; field opsional kosong → disembunyikan", () => {
+  it("kolom kosong atau tidak valid tetap kosong — tanpa nilai bawaan", () => {
     const merged = mergeSiteSettings({
       ...CURRENT_ROW,
       address: " ",
@@ -199,14 +198,19 @@ describe("mergeSiteSettings & tampilan publik", () => {
       email: null,
       tiktokUrl: null,
       instagramUrl: "",
+      instagramUsername: null,
     });
-    assert.equal(merged.address, site.address);
-    assert.deepEqual(merged.openingHours, [site.hours]);
-    assert.equal(merged.whatsappNumber, "6281316052040");
-    assert.equal(merged.email, site.email);
+    assert.equal(merged.address, "");
+    assert.deepEqual(merged.openingHours, []);
+    assert.equal(merged.whatsappNumber, "");
+    assert.equal(merged.email, "");
     assert.equal(merged.tiktokUrl, "");
     assert.equal(merged.instagramUrl, "");
-    assert.equal(merged.instagramUsername, "kama__spa");
+    assert.equal(merged.instagramUsername, "");
+  });
+  it("alamat kosong tidak mengosongkan kartu cabang", () => {
+    const applied = applySiteSettingsToLocations(locations, emptySiteSettings());
+    assert.equal(applied[0].address, locations[0].address);
   });
   it("lokasi kontak identik dengan data statis untuk baris saat ini", () => {
     const applied = applySiteSettingsToLocations(locations, mergeSiteSettings(CURRENT_ROW));
@@ -250,10 +254,11 @@ describe("mergeSiteSettings & tampilan publik", () => {
 });
 
 describe("siteSettingsFormDefaults", () => {
-  it("tanpa baris → nilai bawaan + tanda noRow", () => {
+  it("tanpa baris → form kosong + tanda noRow", () => {
     const defaults = siteSettingsFormDefaults(null);
     assert.equal(defaults.noRow, true);
-    assert.equal(defaults.values.address, site.address);
+    assert.equal(defaults.values.address, "");
+    assert.deepEqual(defaults.prefilled, []);
   });
   it("kolom kosong diisi dari tampilan situs dan dicatat", () => {
     const defaults = siteSettingsFormDefaults(CURRENT_ROW);

@@ -22,8 +22,25 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function GiftCardPage() {
   const giftCard = await getGiftCard();
-  /* `getGiftCard` mengisi teks bawaan bila kolomnya kosong; teks bawaan itu
-     bukan pesan khusus, jadi template "gift" boleh menggantikannya. */
+
+  if (!giftCard) {
+    return (
+      <>
+        <Navigation />
+        <main className="flex-1">
+          <PublicPageHeader
+            eyebrow="Gift Card"
+            title="Gift Card"
+            description="Informasi gift card belum tersedia."
+          />
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  /* Teks bawaan yang mengisi kolom kosong bukan pesan khusus, jadi template
+     "gift" boleh menggantikannya. */
   const waHref = await whatsAppHref("gift", {
     custom:
       giftCard.whatsappMessage === GIFT_CARD_DEFAULTS.whatsappMessage

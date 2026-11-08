@@ -4,7 +4,6 @@ import { ArrowRight, Instagram } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
 import { getGalleryAlbums } from "@/lib/content/gallery";
 import { photoAltText } from "@/lib/domain/gallery";
-import { site as staticSite } from "@/data/content";
 import { getSiteSettings } from "@/lib/content/site";
 
 type InstagramPost = {
@@ -85,8 +84,9 @@ export async function GalleryTeaserSection() {
     )
     .slice(0, 12);
 
-  const instagramUrl = settings.instagramUrl || staticSite.instagram;
-  const items: { id: string; imageUrl: string; caption: string | null; href: string }[] =
+  // Kosong bila admin belum mengisi URL Instagram — tautannya disembunyikan.
+  const instagramUrl = settings.instagramUrl || null;
+  const items: { id: string; imageUrl: string; caption: string | null; href: string | null }[] =
     instagramPosts.length > 0
       ? instagramPosts.map((post) => ({
           id: post.id,
@@ -108,14 +108,16 @@ export async function GalleryTeaserSection() {
       <div className="container-kama py-14 md:py-16 lg:py-20">
         <div className="flex flex-col items-start gap-4 border-b border-cocoa/15 pb-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
-            <a
-              href={instagramUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-body text-cocoa/70 transition-colors hover:text-cocoa"
-            >
-              @{settings.instagramUsername}
-            </a>
+            {instagramUrl && settings.instagramUsername ? (
+              <a
+                href={instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-body text-cocoa/70 transition-colors hover:text-cocoa"
+              >
+                @{settings.instagramUsername}
+              </a>
+            ) : null}
             <a
               href="https://www.instagram.com/explore/search/keyword/?q=%23kamaspa"
               target="_blank"
@@ -126,27 +128,31 @@ export async function GalleryTeaserSection() {
             </a>
           </div>
 
-          <a
-            href={instagramUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-[0.9375rem] underline underline-offset-4 transition-opacity hover:opacity-70"
-          >
-            Follow Us
-            <ArrowRight className="h-4 w-4" />
-          </a>
+          {instagramUrl ? (
+            <a
+              href={instagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-[0.9375rem] underline underline-offset-4 transition-opacity hover:opacity-70"
+            >
+              Follow Us
+              <ArrowRight className="h-4 w-4" />
+            </a>
+          ) : null}
         </div>
 
         <ul className="mt-8 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6 lg:gap-3">
           {items.map((item, index) => (
             <li key={item.id} className="group relative aspect-square overflow-hidden bg-cream">
-              <a
-                href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Instagram post ${index + 1}`}
-                className="absolute inset-0 z-10"
-              />
+              {item.href ? (
+                <a
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Instagram post ${index + 1}`}
+                  className="absolute inset-0 z-10"
+                />
+              ) : null}
               <img
                 src={item.imageUrl}
                 alt={item.caption ?? ""}

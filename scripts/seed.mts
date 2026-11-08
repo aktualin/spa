@@ -20,8 +20,9 @@ import {
   treatments,
   journalPosts,
 } from "../src/data/content.ts";
-import { membership } from "../src/data/pages.ts";
+import { membership, privacyPolicy, termsConditions } from "../src/data/pages.ts";
 import { buildStaticCatalogSeed } from "../src/lib/domain/catalog-seed.ts";
+import { escapeHtml } from "../src/lib/domain/corporate.ts";
 import { buildStaticMenuSeed } from "../src/lib/domain/menu-seed.ts";
 import { slugify } from "../src/lib/domain/slug.ts";
 
@@ -372,6 +373,56 @@ async function seedMenu() {
   console.log(`✔ ${items.length} item menu`);
 }
 
+type PolicyPage = {
+  intro: string;
+  sections: { title: string; paragraphs: string[]; bullets?: string[] }[];
+};
+
+/**
+ * Bagian kebijakan → HTML yang lolos `sanitizeHtml`. Tag `<details>` tidak
+ * termasuk daftar tag yang diizinkan, jadi tiap bagian menjadi `h5` + isinya.
+ */
+function policyBodyHtml(page: PolicyPage): string {
+  return page.sections
+    .map((section) => {
+      const parts = [`<h5>${escapeHtml(section.title)}</h5>`];
+      for (const paragraph of section.paragraphs) {
+        parts.push(`<p>${escapeHtml(paragraph)}</p>`);
+      }
+      if (section.bullets?.length) {
+        const items = section.bullets.map((b) => `<li>${escapeHtml(b)}</li>`).join("");
+        parts.push(`<ul>${items}</ul>`);
+      }
+      return parts.join("");
+    })
+    .join("");
+}
+
+async function seedLegalPages() {
+  const pages = [
+    { slug: "privacy-policy", title: "Privacy Policy", source: privacyPolicy },
+    { slug: "terms-conditions", title: "Terms & Conditions", source: termsConditions },
+  ];
+
+  for (const page of pages) {
+    await prisma.staticPage.upsert({
+      where: { slug: page.slug },
+      create: {
+        slug: page.slug,
+        title: page.title,
+        template: "LEGAL",
+        bodyHtml: policyBodyHtml(page.source),
+        seoDescription: page.source.intro,
+        status: "PUBLISHED",
+        publishedAt: new Date(),
+      },
+      // `bodyHtml` dan `status` tidak ditimpa supaya suntingan admin bertahan.
+      update: { title: page.title, template: "LEGAL" },
+    });
+  }
+  console.log(`✔ ${pages.length} halaman legal`);
+}
+
 try {
   if (process.argv.includes("--menu-only")) {
     await seedMenu();
@@ -390,6 +441,7 @@ try {
     await seedSiteSettings();
     await seedWhatsAppTemplates();
     await seedHomepageSections();
+    await seedLegalPages();
     await seedMenu();
   }
   console.log("\n✅ Seed selesai.");

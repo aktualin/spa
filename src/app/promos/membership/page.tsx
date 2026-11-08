@@ -37,15 +37,17 @@ export default async function PromosMembershipPage() {
           description="Pastikan waktu me-time Anda selalu tercatat. Setiap bulan Anda mendapat kredit untuk satu essential service, harga yang lebih ringan, serta penawaran khusus untuk anggota KAMA."
         >
           <div className="button-group mt-4 flex flex-wrap gap-3">
-            <a
-              href={memberHref}
-              data-wa-context="membership"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-primary"
-            >
-              Join KAMA Now
-            </a>
+            {memberHref ? (
+              <a
+                href={memberHref}
+                data-wa-context="membership"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+              >
+                Join KAMA Now
+              </a>
+            ) : null}
             <Link href="/menu" className="btn btn-outline border-cocoa/40">
               Lihat Menu
             </Link>
@@ -99,16 +101,18 @@ export default async function PromosMembershipPage() {
                       />
                     ) : null}
 
-                    <a
-                      href={memberHref}
-              data-wa-context="membership"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-outline mt-6 border-cocoa/40"
-                    >
-                      Join Now
-                      <ArrowRight className="h-4 w-4" />
-                    </a>
+                    {memberHref ? (
+                      <a
+                        href={memberHref}
+                        data-wa-context="membership"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-outline mt-6 border-cocoa/40"
+                      >
+                        Join Now
+                        <ArrowRight className="h-4 w-4" />
+                      </a>
+                    ) : null}
                   </li>
                 ))}
               </ul>

@@ -8,13 +8,10 @@
  * umur cache dibuat pendek (`minutes`, revalidasi ±1 menit) sehingga artikel
  * terjadwal muncul sendiri tak lama setelah waktunya tiba.
  *
- * Fallback statis (`src/data/content.ts`) hanya dipakai bila database tidak
- * terbaca — bukan saat belum ada artikel terbit, supaya daftar tidak berisi
- * artikel contoh yang halaman detailnya 404.
+ * Belum ada artikel terbit, atau database tidak terbaca → daftar kosong.
  */
 import { cacheLife, cacheTag } from "next/cache";
 
-import { journalPosts as staticJournalPosts } from "@/data/content";
 import {
   collectJournalCategories,
   collectJournalTags,
@@ -39,23 +36,6 @@ export type JournalPost = {
   seoTitle: string | null;
   seoDescription: string | null;
 };
-
-/** Fallback statis: tiga artikel dari `src/data/content.ts` (tanpa body). */
-function staticJournalPostsList(): JournalPost[] {
-  return staticJournalPosts.map((p) => ({
-    slug: p.slug,
-    title: p.title,
-    excerpt: p.excerpt ?? null,
-    bodyHtml: null,
-    coverUrl: p.image,
-    category: p.tag ?? null,
-    tags: p.tag ? [p.tag.toLowerCase()] : [],
-    publishedAt: null,
-    updatedAt: null,
-    seoTitle: null,
-    seoDescription: null,
-  }));
-}
 
 type JournalRow = Omit<JournalPost, "bodyHtml"> & { bodyHtml: string };
 
@@ -98,7 +78,7 @@ async function getVisibleJournalPosts(): Promise<JournalPost[]> {
     });
     const visible = rows.filter((row) => isJournalVisible(row, now));
     return sortJournalByDate(visible).map(toJournalPost);
-  }, staticJournalPostsList());
+  }, []);
 
   return data;
 }
@@ -134,7 +114,7 @@ export async function getJournalPost(slug: string): Promise<JournalPost | null> 
       if (!row || !isJournalVisible(row, new Date())) return null;
       return toJournalPost(row);
     },
-    staticJournalPostsList().find((p) => p.slug === slug) ?? null,
+    null,
   );
 
   return data;

@@ -17,9 +17,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const story = await getOurStory();
 
   return withPageSeo("/our-story", {
-    title: story.seoTitle ?? "Our Story",
+    title: story?.seoTitle ?? "Our Story",
     description:
-      story.seoDescription ??
+      story?.seoDescription ??
       "Filosofi dan nilai KAMA Spa — perawatan tradisional yang dikerjakan tanpa terburu-buru.",
   });
 }
@@ -28,6 +28,22 @@ export default async function OurStoryPage() {
   const story = await getOurStory();
   const posts = await getJournalPosts();
   const latest = posts.slice(0, 3);
+
+  if (!story) {
+    return (
+      <>
+        <Navigation />
+        <main className="flex-1">
+          <PublicPageHeader
+            eyebrow="Our Story"
+            title="Our Story"
+            description="Konten halaman ini belum tersedia."
+          />
+        </main>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>

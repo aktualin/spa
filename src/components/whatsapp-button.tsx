@@ -11,6 +11,8 @@ import { whatsAppHref } from "@/lib/content/whatsapp";
  */
 export async function WhatsAppButton() {
   const href = await whatsAppHref("default");
+  // Nomor belum diatur admin → tombol mengambang tidak dirender.
+  if (!href) return null;
   return (
     <a
       href={href}

@@ -44,15 +44,17 @@ export default async function MembershipPage() {
                 <p className="body-l text-color-gray">{membership.intro}</p>
                 <div className="spacer-large" />
                 <div className="button-group">
-                  <a
-                    href={joinHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-wa-context="membership"
-                    className="button is-tertiary sizing-grow w-inline-block"
-                  >
-                    <div>Join KAMA Now</div>
-                  </a>
+                  {joinHref ? (
+                    <a
+                      href={joinHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-wa-context="membership"
+                      className="button is-tertiary sizing-grow w-inline-block"
+                    >
+                      <div>Join KAMA Now</div>
+                    </a>
+                  ) : null}
                   <a href="/menu" className="button is-secondary sizing-grow w-inline-block">
                     <div>Lihat Menu</div>
                   </a>
@@ -178,18 +180,20 @@ export default async function MembershipPage() {
                         />
                       ) : null}
                       <div className="spacer-small" />
-                      <a
-                        href={joinHref}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        data-wa-context="membership"
-                        className="button is-tertiary is-icon w-inline-block"
-                      >
-                        <div>Join Now</div>
-                        <div className="button_icon w-embed">
-                          <ArrowRight />
-                        </div>
-                      </a>
+                      {joinHref ? (
+                        <a
+                          href={joinHref}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          data-wa-context="membership"
+                          className="button is-tertiary is-icon w-inline-block"
+                        >
+                          <div>Join Now</div>
+                          <div className="button_icon w-embed">
+                            <ArrowRight />
+                          </div>
+                        </a>
+                      ) : null}
                     </div>
                   </div>
                 ))}

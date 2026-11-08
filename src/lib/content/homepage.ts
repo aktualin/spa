@@ -14,7 +14,6 @@
  */
 import { cacheLife, cacheTag } from "next/cache";
 
-import { heroStats, journalPosts, testimonials } from "@/data/content";
 import {
   selectHighlightCards,
   selectInstagramPosts,
@@ -96,7 +95,12 @@ const NEW_SECTION_KEYS: HomepageSectionKey[] = [
   "gallery-teaser",
 ];
 
-function fallbackSections(): HomepageSection[] {
+/**
+ * Kerangka section bawaan: section mana yang ADA dan urutannya — bukan isinya
+ * (semua teks/gambar tetap null sampai admin mengisinya). Dipertahankan supaya
+ * homepage tidak hilang total sebelum tabel section diisi.
+ */
+function defaultSectionLayout(): HomepageSection[] {
   const legacy = LEGACY_SECTIONS.map((section, index) => ({
     key: section.key,
     title: section.title,
@@ -131,8 +135,6 @@ export async function getHomepageSections(): Promise<
       const rows = await prisma.homepageSection.findMany({
         orderBy: [{ sortOrder: "asc" }, { key: "asc" }],
       });
-      if (rows.length === 0) throw new Error("section homepage kosong");
-
       const byKey = new Map<string, HomepageSection>();
       for (const row of rows) {
         byKey.set(row.key, {
@@ -152,7 +154,7 @@ export async function getHomepageSections(): Promise<
 
       // Section lama yang belum ada di DB tetap tampil dengan urutan bawaan.
       const merged: Record<string, HomepageSection> = {};
-      const fallback = fallbackSections();
+      const fallback = defaultSectionLayout();
       for (const section of fallback) {
         const fromDb = byKey.get(section.key);
         merged[section.key] = fromDb ?? section;
@@ -172,32 +174,17 @@ export async function getHomepageSections(): Promise<
       return merged;
     },
     Object.fromEntries(
-      fallbackSections().map((section) => [section.key, section]),
+      defaultSectionLayout().map((section) => [section.key, section]),
     ),
   );
 
-  if (usedFallback) cacheLife("minutes");
-  else cacheLife("minutes");
+  cacheLife("minutes");
   return data;
 }
 
-/** Kartu statis lama "What's New" — dipakai bila tabel highlight kosong. */
-function staticWhatsNewCards(): HighlightCard[] {
-  return journalPosts.map((post) => ({
-    key: post.slug,
-    href: post.href,
-    image: post.image,
-    imageAlt: "",
-    tag: post.tag,
-    title: post.title,
-    ctaLabel: "Learn More",
-  }));
-}
-
 /**
- * Kartu section "What's New". Tabel `HomepageHighlight` kosong (atau DB tidak
- * terbaca) → kartu statis lama. Ada baris → hanya highlight yang
- * dipublikasikan dan sedang dalam periodenya (bisa nol kartu).
+ * Kartu section "What's New": hanya highlight yang dipublikasikan dan sedang
+ * dalam periodenya. Tabel kosong atau DB tidak terbaca → daftar kosong.
  *
  * Periode dievaluasi DI DALAM fungsi cached dengan umur cache beberapa menit,
  * sehingga highlight terjadwal muncul/hilang sendiri tanpa perlu disimpan
@@ -213,21 +200,15 @@ export async function getWhatsNewCards(): Promise<HighlightCard[]> {
     const rows = await prisma.homepageHighlight.findMany({
       orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     });
-    return selectHighlightCards(rows, new Date()) ?? staticWhatsNewCards();
-  }, staticWhatsNewCards());
+    return selectHighlightCards(rows, new Date()) ?? [];
+  }, []);
 
   return data;
 }
 
-/** Statistik statis lama Brand Intro — dipakai bila tabel statistik kosong. */
-function staticStats(): StatItem[] {
-  return heroStats.map((stat) => ({ key: stat.label, value: stat.value, label: stat.label }));
-}
-
 /**
- * Statistik "KAMA at a glance" (Brand Intro). Tabel `HomepageStat` kosong
- * atau DB tidak terbaca → statistik statis lama. Ada baris → hanya yang
- * terbit (bisa nol).
+ * Statistik "KAMA at a glance" (Brand Intro). Hanya yang terbit; tabel kosong
+ * atau DB tidak terbaca → daftar kosong.
  */
 export async function getHomepageStats(): Promise<StatItem[]> {
   "use cache";
@@ -239,23 +220,12 @@ export async function getHomepageStats(): Promise<StatItem[]> {
     const rows = await prisma.homepageStat.findMany({
       orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     });
-    return selectStats(rows) ?? staticStats();
-  }, staticStats());
+    return selectStats(rows) ?? [];
+  }, []);
   return data;
 }
 
-/** Ulasan statis lama — dipakai bila tabel ulasan kosong. */
-function staticReviews(): ReviewItem[] {
-  return testimonials.map((t) => ({
-    key: t.name,
-    quote: t.quote,
-    name: t.name,
-    location: t.location,
-    role: t.role,
-  }));
-}
-
-/** Ulasan section Reviews; pola fallback sama dengan `getHomepageStats`. */
+/** Ulasan section Reviews; pola sama dengan `getHomepageStats`. */
 export async function getHomepageReviews(): Promise<ReviewItem[]> {
   "use cache";
   cacheTag(CONTENT_TAGS.homepage);
@@ -266,16 +236,12 @@ export async function getHomepageReviews(): Promise<ReviewItem[]> {
     const rows = await prisma.homepageReview.findMany({
       orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     });
-    return selectReviews(rows) ?? staticReviews();
-  }, staticReviews());
+    return selectReviews(rows) ?? [];
+  }, []);
   return data;
 }
 
-/**
- * Foto feed Instagram pilihan admin. `null` → tabel kosong / DB tidak
- * terbaca: komponen mempertahankan grid foto bawaan. Array (mungkin kosong)
- * → tampilkan foto admin.
- */
+/** Foto feed Instagram pilihan admin; tabel kosong → daftar kosong. */
 export async function getInstagramPosts(): Promise<InstagramItem[] | null> {
   "use cache";
   cacheTag(CONTENT_TAGS.homepage);

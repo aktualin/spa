@@ -223,7 +223,7 @@ export function NavigationClient({
   mobile: NavData;
   bookNow: string;
   /** Tautan wa.me (nomor + template "default") — dibangun di server. */
-  whatsappHref: string;
+  whatsappHref: string | null;
 }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
@@ -624,16 +624,18 @@ export function NavigationClient({
               >
                 {bookNow}
               </Link>
-              <a
-                href={whatsappHref}
-                data-wa-context="default"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Chat via WhatsApp"
-                className="inline-flex h-11 w-11 shrink-0 items-center justify-center border border-cocoa/50 text-cocoa transition-colors hover:bg-cocoa/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cocoa"
-              >
-                <WhatsApp className="h-5 w-5 text-[#25d366]" aria-hidden="true" />
-              </a>
+              {whatsappHref ? (
+                <a
+                  href={whatsappHref}
+                  data-wa-context="default"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Chat via WhatsApp"
+                  className="inline-flex h-11 w-11 shrink-0 items-center justify-center border border-cocoa/50 text-cocoa transition-colors hover:bg-cocoa/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cocoa"
+                >
+                  <WhatsApp className="h-5 w-5 text-[#25d366]" aria-hidden="true" />
+                </a>
+              ) : null}
             </div>
           </div>
         </div>
