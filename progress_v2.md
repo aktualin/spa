@@ -64,3 +64,35 @@ Aturan kerja yang berlaku (dari user):
 - Smoke test produksi lokal: `/` 200, event tak dikenal 404, `/corporate-wellness` 308, header keamanan aktif.
 - Butir PLAN-9 yang tercakup otomatis: regresi layout/nav/menu, WhatsApp link, auth admin, CRUD katalog & menu, slug → redirect 301, menu 3 level header/footer/mobile, pindah parent tanpa siklus (unit), hapus halaman yang dipakai menu → tautan rusak ditandai/disembunyikan (unit), 404 halaman.
 - BELUM tercakup otomatis (perlu uji manual/UAT): CRUD 19 modul di UI (selain katalog, menu, halaman, auth), GA4 (butuh Measurement ID), Maps embed, feed Instagram, form inquiry + email (butuh Turnstile & Resend), lintas browser Safari/Firefox/Edge, backup end-to-end.
+
+### API read-only konten publik (8 Nov 2026) — commit `e82a3f2`
+14 endpoint GET di `/api/content/*`: homepage, treatments, promos, membership, gallery, journal (+`/[slug]`), events, retail, corporate, our-story, settings, navigation, gift-card.
+- Memakai reader `src/lib/content/*` yang sama dengan website → aturan visibilitas (draft, `isVisible`, periode promo) dan revalidasi admin otomatis ikut.
+- Header `Cache-Control: public, s-maxage=60, stale-while-revalidate=300`.
+- Isi artikel (`bodyHtml`) hanya di endpoint detail; list memakai `excerpt`.
+- Tidak mengekspos CorporateInquiry, AdminUser, BackupRun, atau data draft. Verifikasi: tsc bersih, build lolos, 491/491 unit test, semua endpoint 200, slug tak dikenal 404.
+
+### Audit "semua konten admin tampil di web user" (8 Nov 2026)
+Hasil tiga audit paralel terhadap kontrak peta konten → tampilan.
+
+**OK (konten admin punya jalur render):** Navigasi (3 level, header/footer/mobile, external/anchor, `isVisible`), Halaman & URL (slug, meta, draft→404, redirect 301), Promos & Gift Card (periode, `isPublished`, terms, banner), Journal (draft/scheduled tersaring, semua field + meta + tags), Harga katalog (`formatIdr` pakai `Intl.NumberFormat("id-ID")`, retail `null` → "Hubungi kami"), Events (`isPublished`, partner), Corporate (programs/steps/clients dari DB), toggle & urutan section homepage, nomor WhatsApp dari settings.
+
+**Temuan — konten admin TIDAK tampil:**
+| # | Temuan | Lokasi |
+|---|---|---|
+| H-1 | **Harga membership dari modul Harga tidak pernah tampil.** Reader tidak membaca `priceIdr`; frontend hanya memakai `priceLabel` (teks bebas) sehingga admin harus mengetik ulang harga | `src/lib/content/membership.ts:60-69` |
+| H-2 | `TreatmentCategory.imageUrl` bisa diunggah admin tapi tidak dirender di halaman publik mana pun | `src/app/treatments/` |
+| H-3 | Badge New/Best Seller hanya tampil di halaman detail, tidak di kartu treatment/package | `treatment-card.tsx`, `package-card.tsx`, `signature-treatments.tsx` |
+| H-4 | 10 gambar scan menu + PDF hardcode, tidak lewat Media Library | `src/app/menu/page.tsx:52-58,240,253` |
+| H-5 | Deskripsi SEO membership hardcode "Rp 1,5jt per bulan" — basi saat harga berubah | `src/app/membership/page.tsx:17` |
+| H-6 | `plan.billingNote` dirender dua kali di kartu yang sama | `src/app/membership/page.tsx:144,148` |
+
+**Teks yang masih hardcode (butuh kolom DB baru bila ingin bisa diubah admin):**
+"What's New" + deskripsi, "Subscribe to Newsletter", "Reviews", label "KAMA Journal" (`src/components/home/sections.tsx:34,83-88,96,122`); "#kamaspa", "Follow Us" (`socials.tsx:57,69`); "Want to experience KAMA first?" (`src/app/contact/page.tsx:86`); "Main Benefits", "KAMA Essential Services", "Membership Plans", "Syarat & Ketentuan" (`src/app/membership/page.tsx:65,92,137-138,195`); kartu highlight & lebar panel mega-menu dari preset statis (`src/lib/content/navigation.ts:63-65`).
+
+**Field yang diminta kontrak tapi belum ada di schema:**
+- `CorporateClient` tidak punya `year` maupun `description`.
+- `RetailProduct` tidak punya `isCollaboration` (hanya `isHighlight`) — keputusan lama yang masih menggantung.
+
+**⚠️ Ketegangan aturan yang perlu keputusan user:**
+Prompt master meminta "JANGAN fallback hardcoded, pakai empty state". Proyek ini justru sengaja memakai pola fallback ke konten statis saat tabel kosong (`socials.tsx` 12 gambar, `homepage.ts`, `corporate.ts` via `usedFallback`) supaya situs tidak pernah tampak kosong. Dua aturan ini bertabrakan — perlu keputusan mana yang menang sebelum perilaku fallback diubah.
