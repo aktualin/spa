@@ -39,8 +39,9 @@ if (role !== "ADMIN" && role !== "EDITOR") {
   process.exit(1);
 }
 
-if (password.length < 10) {
-  console.error("Kata sandi minimal 10 karakter.");
+// Sama dengan MIN_PASSWORD_LENGTH di src/lib/domain/password-policy.ts.
+if (password.length < 12) {
+  console.error("Kata sandi minimal 12 karakter.");
   process.exit(1);
 }
 
@@ -65,15 +66,20 @@ try {
       name,
       passwordHash,
       role,
+      // Password ini diketahui orang yang menjalankan script: pemilik akun
+      // wajib menggantinya saat login pertama.
+      mustChangePassword: true,
     },
     // Reset kunci & hitungan gagal supaya script ini juga berguna sebagai
-    // "lupa password" darurat.
+    // "lupa password" darurat. sessionVersion dinaikkan agar sesi lama keluar.
     update: {
       passwordHash,
       role,
       isActive: true,
       failedLoginCount: 0,
       lockedUntil: null,
+      mustChangePassword: true,
+      sessionVersion: { increment: 1 },
     },
   });
 

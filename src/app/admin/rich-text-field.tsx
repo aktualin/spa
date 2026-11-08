@@ -49,7 +49,7 @@ export function RichTextField({
       const body = new FormData();
       body.append("file", file);
       body.append("folder", folder);
-      const response = await fetch("/api/upload", { method: "POST", body });
+      const response = await fetch("/api/admin/upload", { method: "POST", body });
       const data = await response.json();
       if (!response.ok) {
         setError(data.error ?? "Gagal mengunggah gambar.");

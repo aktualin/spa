@@ -9,6 +9,9 @@ export type SessionPayload = {
   userId: string;
   email: string;
   role: AdminRoleName;
+  /** Harus sama dengan `AdminUser.sessionVersion`; beda = sesi sudah dicabut. */
+  sessionVersion: number;
+  mustChangePassword: boolean;
 };
 
 function getSecret(): Uint8Array {
@@ -24,7 +27,12 @@ function getSecret(): Uint8Array {
 export async function createSessionToken(
   payload: SessionPayload,
 ): Promise<string> {
-  return new SignJWT({ email: payload.email, role: payload.role })
+  return new SignJWT({
+    email: payload.email,
+    role: payload.role,
+    sv: payload.sessionVersion,
+    mcp: payload.mustChangePassword,
+  })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(payload.userId)
     .setIssuedAt()
@@ -32,21 +40,35 @@ export async function createSessionToken(
     .sign(getSecret());
 }
 
-// Dipakai juga dari middleware (Edge runtime), jadi tidak boleh menyentuh Prisma.
+// Dipakai juga dari proxy (Edge runtime), jadi tidak boleh menyentuh Prisma.
+// Pencocokan sessionVersion dengan database dilakukan di src/lib/auth.ts.
 export async function verifySessionToken(
   token: string,
 ): Promise<SessionPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, getSecret());
+    const { payload } = await jwtVerify(token, getSecret(), {
+      algorithms: ["HS256"],
+    });
     const role = payload.role;
     if (!payload.sub || (role !== "ADMIN" && role !== "EDITOR")) return null;
+    if (typeof payload.sv !== "number") return null;
 
     return {
       userId: payload.sub,
       email: String(payload.email ?? ""),
       role,
+      sessionVersion: payload.sv,
+      mustChangePassword: payload.mcp === true,
     };
   } catch {
     return null;
   }
 }
+
+export const sessionCookieOptions = {
+  httpOnly: true,
+  sameSite: "lax" as const,
+  secure: process.env.NODE_ENV === "production",
+  path: "/",
+  maxAge: SESSION_MAX_AGE_SECONDS,
+};

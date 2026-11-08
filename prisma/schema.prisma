@@ -42,6 +42,13 @@ model AdminUser {
   lockedUntil      DateTime?
   lastLoginAt      DateTime?
 
+  // Disalin ke JWT; dinaikkan saat password/role/status berubah sehingga
+  // semua sesi lama otomatis tidak berlaku.
+  sessionVersion     Int       @default(0)
+  // Diset saat akun dibuat/di-reset oleh ADMIN: user wajib mengganti sendiri.
+  mustChangePassword Boolean   @default(false)
+  passwordChangedAt  DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

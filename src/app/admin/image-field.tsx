@@ -3,7 +3,7 @@
 import { useId, useRef, useState } from "react";
 
 /**
- * Field gambar untuk form admin. Mengunggah ke /api/upload lalu menyimpan
+ * Field gambar untuk form admin. Mengunggah ke /api/admin/upload lalu menyimpan
  * **URL-nya saja** ke hidden input, sehingga database hanya berisi URL.
  */
 export function ImageField({
@@ -32,7 +32,7 @@ export function ImageField({
       body.append("file", file);
       body.append("folder", folder);
 
-      const response = await fetch("/api/upload", { method: "POST", body });
+      const response = await fetch("/api/admin/upload", { method: "POST", body });
       const data = await response.json();
 
       if (!response.ok) {

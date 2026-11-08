@@ -14,9 +14,9 @@ export const instant = false;
 export default async function AdminLoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>;
+  searchParams: Promise<{ next?: string; expired?: string }>;
 }) {
-  const { next } = await searchParams;
+  const { next, expired } = await searchParams;
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-neutral-50 px-4 py-12">
@@ -29,6 +29,12 @@ export default async function AdminLoginPage({
             Dashboard Admin
           </h1>
         </div>
+        {expired ? (
+          <p className="mb-4 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+            Sesi Anda berakhir karena kata sandi, peran, atau status akun
+            berubah. Silakan masuk kembali.
+          </p>
+        ) : null}
         <LoginForm next={next} />
       </div>
     </main>

@@ -1,6 +1,9 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 
+import { CHANGE_PASSWORD_PATH } from "@/lib/domain/admin-redirect";
+import { prisma } from "@/lib/prisma";
 import {
   SESSION_COOKIE,
   verifySessionToken,
@@ -8,21 +11,65 @@ import {
   type SessionPayload,
 } from "@/lib/session";
 
-/** Mengembalikan sesi aktif, atau null kalau cookie tidak ada/invalid. */
-export async function getSession(): Promise<SessionPayload | null> {
+/** Login ulang setelah sesi dicabut; proxy menghapus cookie lama di URL ini. */
+export const EXPIRED_LOGIN_PATH = "/admin/login?reason=expired";
+
+/**
+ * Sesi aktif yang sudah dicocokkan dengan database, atau null. Token yang
+ * tanda tangannya sah tetap ditolak bila akun dinonaktifkan atau
+ * `sessionVersion`-nya sudah dinaikkan (password/role diganti). Role diambil
+ * dari database, bukan dari token. Di-cache per request supaya layout, halaman,
+ * dan Server Action dalam satu render hanya memicu satu query.
+ */
+export const getSession = cache(async (): Promise<SessionPayload | null> => {
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!token) return null;
-  return verifySessionToken(token);
+
+  const claims = await verifySessionToken(token);
+  if (!claims) return null;
+
+  const user = await prisma.adminUser.findUnique({
+    where: { id: claims.userId },
+    select: {
+      email: true,
+      role: true,
+      isActive: true,
+      sessionVersion: true,
+      mustChangePassword: true,
+    },
+  });
+  if (!user || !user.isActive) return null;
+  if (user.sessionVersion !== claims.sessionVersion) return null;
+
+  return {
+    userId: claims.userId,
+    email: user.email,
+    role: user.role,
+    sessionVersion: user.sessionVersion,
+    mustChangePassword: user.mustChangePassword,
+  };
+});
+
+/** True bila browser masih membawa cookie sesi (sah atau tidak). */
+export async function hasSessionCookie(): Promise<boolean> {
+  return Boolean((await cookies()).get(SESSION_COOKIE)?.value);
 }
 
 /**
- * Dipanggil di awal setiap Server Action admin. Middleware sudah menjaga
- * navigasi halaman, tapi Server Action bisa dipanggil langsung dari client —
- * jadi pengecekan di sini wajib, bukan sekadar pelengkap.
+ * Dipanggil di awal setiap Server Action dan halaman admin. Proxy sudah menjaga
+ * navigasi, tapi Server Action bisa dipanggil langsung dari client — jadi
+ * pengecekan di sini wajib, bukan sekadar pelengkap.
  */
-export async function requireSession(): Promise<SessionPayload> {
+export async function requireSession(
+  options: { allowMustChangePassword?: boolean } = {},
+): Promise<SessionPayload> {
   const session = await getSession();
-  if (!session) redirect("/admin/login");
+  if (!session) {
+    redirect((await hasSessionCookie()) ? EXPIRED_LOGIN_PATH : "/admin/login");
+  }
+  if (session.mustChangePassword && !options.allowMustChangePassword) {
+    redirect(CHANGE_PASSWORD_PATH);
+  }
   return session;
 }
 

@@ -67,3 +67,7 @@ AGENTS.md
 .cursor
 .devin
 opencode-mem.jsonc
+.claude
+docs/*md
+docs/user-guide/*md
+graphify-out

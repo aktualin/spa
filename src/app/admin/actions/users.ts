@@ -4,6 +4,10 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { requireRole } from "@/lib/auth";
+import {
+  MAX_PASSWORD_LENGTH,
+  MIN_PASSWORD_LENGTH,
+} from "@/lib/domain/password-policy";
 import { hashPassword } from "@/lib/password";
 import { prisma } from "@/lib/prisma";
 
@@ -11,18 +15,16 @@ export type ActionState = { error: string | null; ok?: boolean };
 
 const ADMIN_ONLY = ["ADMIN"] as const;
 
-const MIN_PASSWORD_LENGTH = 12;
+const passwordField = z
+  .string()
+  .min(MIN_PASSWORD_LENGTH, `Kata sandi minimal ${MIN_PASSWORD_LENGTH} karakter.`)
+  .max(MAX_PASSWORD_LENGTH, `Kata sandi maksimal ${MAX_PASSWORD_LENGTH} karakter.`);
 
 const createUserSchema = z.object({
   email: z.string().trim().toLowerCase().email("Format email tidak valid."),
   name: z.string().trim().min(1, "Nama wajib diisi."),
   role: z.enum(["ADMIN", "EDITOR"]),
-  password: z
-    .string()
-    .min(
-      MIN_PASSWORD_LENGTH,
-      `Kata sandi minimal ${MIN_PASSWORD_LENGTH} karakter.`,
-    ),
+  password: passwordField,
 });
 
 const updateUserSchema = z.object({
@@ -34,12 +36,7 @@ const updateUserSchema = z.object({
 
 const resetPasswordSchema = z.object({
   id: z.string().trim().min(1),
-  password: z
-    .string()
-    .min(
-      MIN_PASSWORD_LENGTH,
-      `Kata sandi minimal ${MIN_PASSWORD_LENGTH} karakter.`,
-    ),
+  password: passwordField,
 });
 
 function firstIssue(error: z.ZodError): string {
@@ -110,6 +107,8 @@ export async function createUserAction(
       role,
       isActive: true,
       passwordHash: await hashPassword(password),
+      // Password awal diketahui pembuatnya; pemilik akun wajib menggantinya.
+      mustChangePassword: true,
     },
   });
 
@@ -171,9 +170,17 @@ export async function updateUserAction(
     }
   }
 
+  // Role atau status berubah → sesi lama akun itu tidak boleh dipakai lagi.
+  const accessChanged = role !== target.role || isActive !== target.isActive;
+
   await prisma.adminUser.update({
     where: { id },
-    data: { name, role, isActive },
+    data: {
+      name,
+      role,
+      isActive,
+      ...(accessChanged ? { sessionVersion: { increment: 1 } } : {}),
+    },
   });
 
   redirect("/admin/users?saved=1");
@@ -183,7 +190,7 @@ export async function resetPasswordAction(
   _prevState: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  await requireRole(ADMIN_ONLY);
+  const session = await requireRole(ADMIN_ONLY);
 
   const parsed = resetPasswordSchema.safeParse({
     id: formData.get("id"),
@@ -194,6 +201,12 @@ export async function resetPasswordAction(
   }
 
   const { id, password } = parsed.data;
+
+  if (id === session.userId) {
+    return {
+      error: "Untuk akun sendiri, gunakan menu Ganti kata sandi (perlu kata sandi lama).",
+    };
+  }
 
   const target = await prisma.adminUser.findUnique({
     where: { id },
@@ -207,6 +220,9 @@ export async function resetPasswordAction(
       passwordHash: await hashPassword(password),
       failedLoginCount: 0,
       lockedUntil: null,
+      mustChangePassword: true,
+      // Keluarkan sesi yang mungkin dipakai orang yang mengetahui password lama.
+      sessionVersion: { increment: 1 },
     },
   });
 

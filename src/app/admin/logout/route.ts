@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { isSameOrigin } from "@/lib/domain/same-origin";
 import { SESSION_COOKIE } from "@/lib/session";
 
 /**
@@ -10,20 +11,9 @@ import { SESSION_COOKIE } from "@/lib/session";
  */
 export async function POST(request: NextRequest) {
   // Tolak POST lintas-situs. Cookie sesi sendiri sudah sameSite=lax, ini
-  // lapis kedua. Host dicek dari header `host` (bukan nextUrl.origin) supaya
-  // tidak salah saat aplikasi berjalan di belakang reverse proxy.
-  const origin = request.headers.get("origin");
-  const host = request.headers.get("host");
-  if (origin && host) {
-    let originHost: string | null = null;
-    try {
-      originHost = new URL(origin).host;
-    } catch {
-      originHost = null;
-    }
-    if (originHost && originHost !== host) {
-      return new NextResponse("Origin tidak diizinkan.", { status: 403 });
-    }
+  // lapis kedua.
+  if (!isSameOrigin(request.headers)) {
+    return new NextResponse("Origin tidak diizinkan.", { status: 403 });
   }
 
   // 303 supaya browser mengikuti redirect dengan GET.

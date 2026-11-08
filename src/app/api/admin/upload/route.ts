@@ -3,12 +3,19 @@ import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { uploadImage } from "@/lib/storage";
 
-// Upload hanya untuk admin yang sudah login. Middleware tidak mencakup
-// /api/*, jadi pengecekan sesi di sini wajib.
+// Proxy sudah menolak permintaan tanpa token dan POST lintas origin untuk
+// /api/admin/*. Pengecekan di sini tetap wajib karena proxy tidak menyentuh
+// database: akun yang sudah dinonaktifkan atau sesinya dicabut ditolak di sini.
 export async function POST(request: Request) {
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: "Tidak terautentikasi." }, { status: 401 });
+  }
+  if (session.mustChangePassword) {
+    return NextResponse.json(
+      { error: "Ganti kata sandi terlebih dahulu." },
+      { status: 403 },
+    );
   }
 
   let formData: FormData;
