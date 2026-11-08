@@ -33,7 +33,7 @@ Aturan kerja yang berlaku (dari user):
 | 22 | Integrasi WhatsApp, GA4, Google Maps, Instagram feed | ✅ (GA4 dipasang bila ID diisi; WA lacak klik; Maps di Kontak; IG dari admin) | lihat `git log` |
 | 23 | Hardening (responsif, browser, HTTPS, gambar, login limit, Zod, sanitasi, rate limit) | ✅ sebagian — header keamanan + HSTS, kompresi gambar saat unggah; audit sanitasi/Zod/limit OK. Responsif & lintas browser belum diuji (butuh E2E/manual) | lihat `git log` |
 | 24 | Testing sesuai PLAN-9 + perbaikan sampai DoD PLAN-8 | ✅ sebagian — lihat "Hasil BUILD-24" | lihat `git log` |
-| 25 | Serah terima sesuai PLAN-10 | ⏳ | |
+| 25 | Serah terima sesuai PLAN-10 | 🔄 subagent (dokumen di `docs/` — perhatikan `.gitignore` mengabaikan `docs/*md`) | |
 
 ## Catatan per butir
 
