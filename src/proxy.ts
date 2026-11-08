@@ -7,8 +7,17 @@ import {
   resolveRedirect,
   validatePageSlug,
 } from "@/lib/domain/page-url";
-import { getPublishedPageSlugs, getRedirectMap } from "@/lib/redirects";
+import { isPromoActive } from "@/lib/domain/visibility";
+import {
+  fetchPromoPeriod,
+  getPromoPeriods,
+  getPublishedPageSlugs,
+  getRedirectMap,
+} from "@/lib/redirects";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/session";
+
+// Segmen di bawah /promos yang punya route statis sendiri (bukan slug promo).
+const PROMO_STATIC_SEGMENTS = ["membership"];
 
 // Proxy (pengganti middleware di Next.js 16). Guard admin hanya verifikasi JWT;
 // pencocokan sesi dengan database (akun aktif, sessionVersion) dan role
@@ -24,6 +33,7 @@ export async function proxy(request: NextRequest) {
     return (
       (await applyRedirect(request)) ??
       (await notFoundForUnknownPage(request)) ??
+      (await notFoundForInactivePromo(request)) ??
       NextResponse.next()
     );
   }
@@ -122,6 +132,39 @@ async function notFoundForUnknownPage(
       return null;
     }
   }
+
+  return NextResponse.rewrite(new URL("/_not-found", request.url), {
+    status: 404,
+  });
+}
+
+/**
+ * `/promos/[slug]` juga merender notFound() di dalam Suspense (soft-404).
+ * Promo yang belum mulai, sudah berakhir, draf, atau tidak ada dijawab 404 di
+ * sini. Periode dievaluasi pada waktu request, jadi promo berhenti tampil
+ * tepat saat periodenya berakhir. Sebelum menjawab 404, status dibaca ulang
+ * langsung dari database supaya promo yang baru dipublikasikan tidak tertolak
+ * oleh cache proxy yang belum diperbarui.
+ */
+async function notFoundForInactivePromo(
+  request: NextRequest,
+): Promise<NextResponse | null> {
+  if (request.method !== "GET" && request.method !== "HEAD") return null;
+  const match = /^\/promos\/([^/]+)\/?$/.exec(request.nextUrl.pathname);
+  if (!match) return null;
+
+  const slug = decodeURIComponentSafe(match[1]);
+  // Route statis di bawah /promos.
+  if (PROMO_STATIC_SEGMENTS.includes(slug)) return null;
+
+  const now = new Date();
+  const cached = await getPromoPeriods();
+  const fromCache = cached.value.get(slug);
+  if (fromCache && isPromoActive(fromCache, now)) return null;
+
+  const fresh = await fetchPromoPeriod(slug);
+  if (fresh === undefined) return null; // database bermasalah: jangan menebak
+  if (fresh && isPromoActive(fresh, now)) return null;
 
   return NextResponse.rewrite(new URL("/_not-found", request.url), {
     status: 404,

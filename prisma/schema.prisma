@@ -249,8 +249,14 @@ model Promo {
 model GiftCardInfo {
   id        String   @id @default("singleton")
   title     String
+  // Kalimat di bawah judul halaman /gift-card. Kosong = teks bawaan.
+  subtitle  String?
   bodyHtml  String
   imageUrl  String?
+  // Syarat & ketentuan gift card (HTML tersanitasi).
+  termsHtml String?
+  // Teks awal chat WhatsApp tombol "Pesan via WhatsApp". Kosong = bawaan.
+  whatsappMessage String?
   updatedAt DateTime @updatedAt
 }
 

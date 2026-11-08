@@ -12,6 +12,7 @@ import {
 } from "@/components/public/page-parts";
 import { formatEventDate } from "@/components/public/events/event-parts";
 import { getActivePromo } from "@/lib/content/promos";
+import { plainTextToHtml } from "@/lib/domain/rich-text";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { waLink } from "@/lib/whatsapp";
 
@@ -136,7 +137,9 @@ async function PromoContent({
                 </h3>
                 <div
                   className="text-rich-text max-w-[70ch] text-body text-cocoa/80"
-                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(promo.terms) }}
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizeHtml(plainTextToHtml(promo.terms)),
+                  }}
                 />
               </div>
             ) : null}

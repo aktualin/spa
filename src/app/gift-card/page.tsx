@@ -10,8 +10,6 @@ import { withPageSeo } from "@/lib/content/seo";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { waLink } from "@/lib/whatsapp";
 
-const GIFT_CARD_MESSAGE = "Halo kak, saya mau beli KAMA Gift Card";
-
 export async function generateMetadata(): Promise<Metadata> {
   return withPageSeo("/gift-card", {
     title: "Gift Card",
@@ -30,11 +28,11 @@ export default async function GiftCardPage() {
         <PublicPageHeader
           eyebrow="Gift Card"
           title={giftCard.title}
-          description="Hadiah yang isinya waktu untuk benar-benar berhenti sejenak."
+          description={giftCard.subtitle}
         >
           <div>
             <WhatsAppLink
-              href={waLink(GIFT_CARD_MESSAGE)}
+              href={waLink(giftCard.whatsappMessage)}
               label="Pesan via WhatsApp"
             />
           </div>
@@ -60,6 +58,18 @@ export default async function GiftCardPage() {
                 </div>
               ) : null}
             </div>
+
+            {giftCard.termsHtml ? (
+              <div className="mt-10 flex flex-col gap-3 border-t border-cocoa/15 pt-6">
+                <h2 className="font-display text-title-sm md:text-[1.375rem]">
+                  Syarat & ketentuan
+                </h2>
+                <div
+                  className="text-rich-text max-w-[70ch] text-body text-cocoa/80"
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(giftCard.termsHtml) }}
+                />
+              </div>
+            ) : null}
           </div>
         </Reveal>
 

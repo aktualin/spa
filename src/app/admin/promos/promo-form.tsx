@@ -4,7 +4,10 @@ import Link from "next/link";
 import { useActionState } from "react";
 
 import { savePromoAction, deletePromoAction, type ActionState } from "../actions/promos";
+import { plainTextToHtml } from "@/lib/domain/rich-text";
+
 import { ImageField } from "../image-field";
+import { RichTextField } from "../rich-text-field";
 import {
   Checkbox,
   ConfirmDeleteButton,
@@ -91,19 +94,12 @@ export function PromoForm({ promo }: { promo: PromoFormData }) {
           defaultValue={promo.bannerUrl}
         />
 
-        <Field
+        <RichTextField
+          name="terms"
           label="Syarat & ketentuan"
-          htmlFor="terms"
-          hint="Ditampilkan di halaman detail promo."
-        >
-          <textarea
-            id="terms"
-            name="terms"
-            defaultValue={promo.terms}
-            rows={5}
-            className={inputClass}
-          />
-        </Field>
+          folder="promos"
+          defaultValue={plainTextToHtml(promo.terms)}
+        />
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Field
@@ -181,7 +177,7 @@ export function PromoForm({ promo }: { promo: PromoFormData }) {
       {promo.id ? (
         <form action={deletePromoAction} className="mt-8 border-t border-neutral-200 pt-4">
           <input type="hidden" name="id" value={promo.id} />
-          <ConfirmDeleteButton message="Hapus promo ini? Banner di storage juga dihapus.">
+          <ConfirmDeleteButton message="Hapus promo ini? Banner tetap tersimpan di Media Library.">
             Hapus promo ini
           </ConfirmDeleteButton>
         </form>

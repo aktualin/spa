@@ -7,7 +7,9 @@ import { z } from "zod";
 import { requireRole, requireSession } from "@/lib/auth";
 import { CONTENT_TAGS } from "@/lib/content/tags";
 import { prisma } from "@/lib/prisma";
+import { plainTextToHtml } from "@/lib/domain/rich-text";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
+import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { deleteImageByUrl } from "@/lib/storage";
 
 import {
@@ -37,6 +39,12 @@ const promoSchema = z.object({
   seoDescription: optionalText,
   whatsappMessage: optionalText,
 });
+
+function termsToHtml(terms: string | null | undefined): string | null {
+  if (!terms) return null;
+  const html = sanitizeHtml(plainTextToHtml(terms));
+  return /\S/.test(html.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ")) ? html : null;
+}
 
 function revalidatePromo(slug?: string | null) {
   updateTag(CONTENT_TAGS.promos);
@@ -82,7 +90,10 @@ export async function savePromoAction(
     return { error: firstIssue(parsed.error) };
   }
 
-  const data = parsed.data;
+  // S&K dari editor teks kaya (atau teks polos lama) disimpan sebagai HTML
+  // yang sudah disanitasi.
+  const termsHtml = termsToHtml(parsed.data.terms);
+  const data = { ...parsed.data, terms: termsHtml };
 
   if (data.startDate && data.endDate && data.endDate < data.startDate) {
     return { error: "Tanggal berakhir harus lebih besar dari tanggal mulai." };
