@@ -164,6 +164,18 @@ export const MEDIA_URL_COLUMNS = [
   { model: "homepageSection", field: "mobileImageUrl", label: "Homepage (mobile)" },
   { model: "ourStoryContent", field: "heroImageUrl", label: "Our Story" },
   { model: "pageSeo", field: "ogImageUrl", label: "Gambar SEO" },
+  { model: "eventItem", field: "partnerLogoUrl", label: "Logo mitra event" },
+  { model: "corporateProgram", field: "imageUrl", label: "Program corporate" },
+  { model: "corporateClient", field: "logoUrl", label: "Logo klien corporate" },
+  { model: "homepageHighlight", field: "imageUrl", label: "Highlight homepage" },
+] as const;
+
+/**
+ * Kolom berisi DAFTAR URL gambar (Postgres text[]). Pemakaian dicek dengan
+ * `has`, dan URL diganti dengan `array_replace` saat berkas media diganti.
+ */
+export const MEDIA_URL_ARRAY_COLUMNS = [
+  { model: "corporateClient", table: "CorporateClient", field: "photoUrls", label: "Dokumentasi klien corporate" },
 ] as const;
 
 export type MediaUrlColumn = (typeof MEDIA_URL_COLUMNS)[number];

@@ -347,6 +347,10 @@ model EventItem {
 
   // Memisahkan "upcoming events" dari "past collaborations" (Lampiran I Bagian B).
   isCollaboration Boolean @default(false)
+  // Mitra kolaborasi (past collaborations): nama, logo, dan tautan.
+  partnerName    String?
+  partnerLogoUrl String?
+  partnerUrl     String?
   isPublished     Boolean @default(true)
   sortOrder       Int     @default(0)
 
@@ -407,7 +411,53 @@ model CorporateContent {
   picName        String?
   picEmail       String?
   picPhone       String?
+  // Daftar benefit ("Higher employee engagement", dst.).
+  benefits       String[] @default([])
+  // [{ title, items: string[] }] — blok "solutions" halaman corporate.
+  solutions      Json?
+  // Daftar "Ideal For" bagian In-Spa.
+  inSpaItems     String[] @default([])
   updatedAt      DateTime @updatedAt
+}
+
+// Paket program corporate (Essential, Signature, Executive, ...).
+model CorporateProgram {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  features    String[] @default([])
+  imageUrl    String?
+  isPublished Boolean  @default(true)
+  sortOrder   Int      @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Langkah "collaboration process".
+model CorporateStep {
+  id        String @id @default(cuid())
+  title     String
+  body      String?
+  sortOrder Int    @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Klien corporate: logo + foto dokumentasi kegiatan.
+model CorporateClient {
+  id          String   @id @default(cuid())
+  name        String
+  logoUrl     String?
+  websiteUrl  String?
+  // Foto dokumentasi (URL Media Library), urut sesuai tampil.
+  photoUrls   String[] @default([])
+  isPublished Boolean  @default(true)
+  sortOrder   Int      @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Data pribadi (UU PDP, Pasal 11 ayat 7) — hanya dibaca lewat admin action ber-role.
@@ -420,6 +470,9 @@ model CorporateInquiry {
   message   String
   status    InquiryStatus @default(NEW)
   notes     String?
+  // Notifikasi email ke PIHAK PERTAMA: waktu terkirim, atau pesan galat.
+  emailSentAt DateTime?
+  emailError  String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -445,6 +498,26 @@ model HomepageSection {
   isEnabled Boolean @default(true)
   sortOrder Int     @default(0)
 
+  updatedAt DateTime @updatedAt
+}
+
+// Kartu highlight homepage (section "What's New" / konten sorotan).
+model HomepageHighlight {
+  id          String    @id @default(cuid())
+  eyebrow     String?
+  title       String
+  body        String?
+  imageUrl    String?
+  imageAlt    String?
+  href        String?
+  ctaLabel    String?
+  // Opsional: tampil hanya dalam periode ini.
+  startDate   DateTime?
+  endDate     DateTime?
+  isPublished Boolean   @default(true)
+  sortOrder   Int       @default(0)
+
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 

@@ -9,6 +9,7 @@ import { requireRole, requireSession } from "@/lib/auth";
 import { CONTENT_TAGS } from "@/lib/content/tags";
 import {
   MEDIA_HTML_COLUMNS,
+  MEDIA_URL_ARRAY_COLUMNS,
   MEDIA_URL_COLUMNS,
   extractImageUrls,
   mediaDisplayNameError,
@@ -76,7 +77,13 @@ const DESCRIBE: Record<string, { select: Record<string, true>; name: (r: Row) =>
   pageSeo: { select: { id: true, path: true }, name: (r) => str(r.path), href: (r) => `/admin/seo/${str(r.id)}` },
   corporateContent: { select: { id: true, heroTitle: true }, name: (r) => str(r.heroTitle) || "Corporate Wellness", href: () => "/admin/corporate" },
   staticPage: { select: { id: true, title: true }, name: (r) => str(r.title), href: (r) => `/admin/pages/${str(r.id)}` },
+  corporateProgram: { select: { id: true, name: true }, name: (r) => str(r.name), href: () => "/admin/corporate" },
+  corporateClient: { select: { id: true, name: true }, name: (r) => str(r.name), href: () => "/admin/corporate" },
+  homepageHighlight: { select: { id: true, title: true }, name: (r) => str(r.title), href: () => "/admin/homepage" },
 };
+
+const strList = (value: unknown) =>
+  Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
 
 /** Awalan URL publik bucket kita, mis. "https://…/storage/v1/object/public/bucket/". */
 function bucketPrefix(): string {
@@ -127,7 +134,20 @@ async function usageByUrl(urls: readonly string[]): Promise<Map<string, MediaUsa
     }
   });
 
-  await Promise.all([...columnQueries, ...htmlQueries]);
+  const arrayQueries = MEDIA_URL_ARRAY_COLUMNS.map(async (column) => {
+    const describe = DESCRIBE[column.model];
+    const rows = await delegateOf(prisma, column.model).findMany({
+      where: { [column.field]: { hasSome: urlList } },
+      select: { ...describe.select, [column.field]: true },
+    });
+    for (const row of rows) {
+      for (const url of strList(row[column.field])) {
+        add(url, { label: column.label, name: describe.name(row), href: describe.href(row) });
+      }
+    }
+  });
+
+  await Promise.all([...columnQueries, ...htmlQueries, ...arrayQueries]);
   return result;
 }
 
@@ -397,6 +417,12 @@ export async function replaceMediaAction(
         });
       }
 
+      for (const column of MEDIA_URL_ARRAY_COLUMNS) {
+        const table = Prisma.raw(`"${column.table}"`);
+        const field = Prisma.raw(`"${column.field}"`);
+        await tx.$executeRaw`UPDATE ${table} SET ${field} = array_replace(${field}, ${oldUrl}, ${newUrl}) WHERE ${oldUrl} = ANY(${field})`;
+      }
+
       // Identifier tabel/kolom berasal dari konstanta MEDIA_HTML_COLUMNS;
       // nilai URL dikirim sebagai parameter terikat.
       for (const column of MEDIA_HTML_COLUMNS) {
@@ -557,6 +583,17 @@ export async function syncMediaAction(): Promise<void> {
     });
     for (const row of rows) {
       for (const url of extractImageUrls(str(row[column.field]))) found.add(url);
+    }
+  }
+  for (const column of MEDIA_URL_ARRAY_COLUMNS) {
+    const rows = await delegateOf(prisma, column.model).findMany({
+      where: { NOT: { [column.field]: { isEmpty: true } } },
+      select: { [column.field]: true },
+    });
+    for (const row of rows) {
+      for (const url of strList(row[column.field])) {
+        if (url.startsWith(prefix)) found.add(url);
+      }
     }
   }
 
