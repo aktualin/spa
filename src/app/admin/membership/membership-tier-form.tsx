@@ -93,7 +93,7 @@ export function MembershipTierForm({ tier }: { tier: TierFormData }) {
         <Field
           label="Label harga"
           htmlFor="priceLabel"
-          hint="Teks bebas, contoh: Rp 2.500.000 / bulan."
+          hint='Contoh "Rp 1,5jt" atau "Custom". Kalimat harga di banner homepage diatur terpisah di Program membership — ubah juga bila harga berubah.'
         >
           <input
             id="priceLabel"

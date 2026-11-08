@@ -160,6 +160,14 @@ export default async function AdminPricesPage({
           <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
             Membership
           </h2>
+          <p className="mt-1 text-xs text-neutral-500">
+            Kalimat harga di banner membership homepage dan halaman /membership
+            (contoh &ldquo;Just Rp 1.5jt a month.&rdquo;) adalah teks terpisah — ubah juga di{" "}
+            <Link href="/admin/membership/program" className="underline">
+              Program membership
+            </Link>{" "}
+            bila harga berubah.
+          </p>
 
           {tiers.length === 0 ? (
             <p className="mt-2 text-sm text-neutral-500">Belum ada tier membership.</p>
