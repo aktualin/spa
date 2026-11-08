@@ -7,11 +7,9 @@ import {
   PublicPageHeader,
   WhatsAppLink,
 } from "@/components/public/page-parts";
-import { buyMessage } from "@/components/public/wa-button";
-import { getRetailProducts } from "@/lib/content/retail";
+import { getRetailCatalog } from "@/lib/content/retail";
 import { withPageSeo } from "@/lib/content/seo";
 import { formatIdr } from "@/lib/format";
-import { waLink } from "@/lib/whatsapp";
 
 export async function generateMetadata(): Promise<Metadata> {
   return withPageSeo("/retail", {
@@ -22,7 +20,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RetailPage() {
-  const products = await getRetailProducts();
+  // Katalog saja — tanpa keranjang/checkout; setiap produk dipesan via WhatsApp.
+  const products = await getRetailCatalog();
 
   return (
     <>
@@ -56,7 +55,7 @@ export default async function RetailPage() {
                     ) : null}
                     <h2 className="font-display text-title-sm">{product.name}</h2>
                     {product.description ? (
-                      <p className="text-body text-cocoa/70">
+                      <p className="whitespace-pre-line text-body text-cocoa/70">
                         {product.description}
                       </p>
                     ) : null}
@@ -64,12 +63,12 @@ export default async function RetailPage() {
                       <span className="font-display text-title-sm">
                         {formatIdr(product.priceIdr)}
                       </span>
-                    ) : null}
+                    ) : (
+                      <span className="text-body text-cocoa/60">Hubungi kami</span>
+                    )}
                     <div className="mt-auto pt-2">
                       <WhatsAppLink
-                        href={waLink(
-                          product.whatsappMessage ?? buyMessage(product.name),
-                        )}
+                        href={product.whatsappUrl}
                         label="Pesan via WhatsApp"
                         className="btn btn-outline border-cocoa/40"
                       />

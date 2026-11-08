@@ -27,7 +27,7 @@ export default async function EditRetailPage({
       imageUrl: "",
       priceIdr: "",
       whatsappMessage: "",
-      sortOrder: 0,
+      sortOrder: "",
       isHighlight: false,
       isPublished: true,
     };
@@ -42,7 +42,7 @@ export default async function EditRetailPage({
       imageUrl: product.imageUrl ?? "",
       priceIdr: product.priceIdr === null ? "" : String(product.priceIdr),
       whatsappMessage: product.whatsappMessage ?? "",
-      sortOrder: product.sortOrder,
+      sortOrder: String(product.sortOrder),
       isHighlight: product.isHighlight,
       isPublished: product.isPublished,
     };

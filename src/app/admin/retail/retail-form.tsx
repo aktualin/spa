@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useActionState } from "react";
 
+import { RETAIL_LIMITS } from "@/lib/domain/retail";
+
 import {
   deleteRetailAction,
   saveRetailAction,
@@ -26,7 +28,8 @@ export type RetailFormData = {
   imageUrl: string;
   priceIdr: string;
   whatsappMessage: string;
-  sortOrder: number;
+  /** String kosong = produk baru diletakkan di akhir daftar. */
+  sortOrder: string;
   isHighlight: boolean;
   isPublished: boolean;
 };
@@ -50,13 +53,20 @@ export function RetailForm({ product }: { product: RetailFormData }) {
         {product.id ? <input type="hidden" name="id" value={product.id} /> : null}
 
         <Field label="Nama" htmlFor="name">
-          <input id="name" name="name" defaultValue={product.name} required className={inputClass} />
+          <input
+            id="name"
+            name="name"
+            defaultValue={product.name}
+            required
+            maxLength={RETAIL_LIMITS.name}
+            className={inputClass}
+          />
         </Field>
 
         <Field
           label="Slug"
           htmlFor="slug"
-          hint="Dipakai di URL. Huruf kecil, angka, dan tanda hubung."
+          hint="Penanda unik produk. Huruf kecil, angka, dan tanda hubung, contoh: minyak-sukma-laya."
         >
           <input
             id="slug"
@@ -74,16 +84,17 @@ export function RetailForm({ product }: { product: RetailFormData }) {
             name="description"
             defaultValue={product.description}
             rows={5}
+            maxLength={RETAIL_LIMITS.description}
             className={inputClass}
           />
         </Field>
 
-        <ImageField name="imageUrl" label="Gambar" folder="retail" defaultValue={product.imageUrl} />
+        <ImageField name="imageUrl" label="Foto produk" folder="retail" defaultValue={product.imageUrl} />
 
         <Field
           label="Harga (opsional)"
           htmlFor="priceIdr"
-          hint="Rupiah penuh tanpa titik, contoh: 250000. Kosongkan bila harga ditanyakan via WhatsApp."
+          hint="Rupiah penuh, contoh: 250000 atau 250.000. Kosongkan bila harga ditanyakan via WhatsApp — website menampilkan “Hubungi kami”."
         >
           <input
             id="priceIdr"
@@ -98,22 +109,35 @@ export function RetailForm({ product }: { product: RetailFormData }) {
         <Field
           label="Pesan WhatsApp khusus"
           htmlFor="whatsappMessage"
-          hint="Kosongkan untuk memakai template default."
+          hint={
+            <>
+              Kosongkan untuk memakai template “retail” di Kontak &amp; Umum →
+              WhatsApp (bawaan: “Halo kak, saya mau pesan produk [nama]” plus
+              harga bila ada). Boleh memakai {"{{product}}"} dan {"{{harga}}"}.
+            </>
+          }
         >
-          <input
+          <textarea
             id="whatsappMessage"
             name="whatsappMessage"
             defaultValue={product.whatsappMessage}
+            rows={2}
+            maxLength={RETAIL_LIMITS.whatsappMessage}
             className={inputClass}
           />
         </Field>
 
-        <Field label="Urutan tampil" htmlFor="sortOrder">
+        <Field
+          label="Urutan tampil"
+          htmlFor="sortOrder"
+          hint="Makin kecil makin atas. Kosongkan untuk meletakkan produk baru di akhir; urutan juga bisa diatur dengan tombol ↑/↓ di daftar."
+        >
           <input
             id="sortOrder"
             name="sortOrder"
             type="number"
             min={0}
+            step={1}
             defaultValue={product.sortOrder}
             className={`${inputClass} w-28`}
           />
@@ -121,7 +145,8 @@ export function RetailForm({ product }: { product: RetailFormData }) {
 
         <div className="space-y-2">
           <Checkbox name="isHighlight" defaultChecked={product.isHighlight}>
-            Tandai sebagai <strong>Highlight / Kolaborasi</strong>
+            Tandai sebagai <strong>Highlight / Kolaborasi</strong> — tampil
+            paling atas dengan label “Highlight”
           </Checkbox>
           <Checkbox name="isPublished" defaultChecked={product.isPublished}>
             Tampilkan di website

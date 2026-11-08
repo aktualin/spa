@@ -6,48 +6,85 @@ import { z } from "zod";
 
 import { requireRole, requireSession } from "@/lib/auth";
 import { CONTENT_TAGS } from "@/lib/content/tags";
-import { InvalidPriceError, parsePriceIdr } from "@/lib/domain/pricing";
+import { InvalidPriceError, parseOptionalPriceIdr } from "@/lib/domain/pricing";
+import {
+  RETAIL_LIMITS,
+  nextRetailSortOrder,
+  planRetailMove,
+  sortRetailProducts,
+} from "@/lib/domain/retail";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
-import { SLUG_PATTERN } from "@/lib/domain/slug";
 import { prisma } from "@/lib/prisma";
 import { deleteImageByUrl } from "@/lib/storage";
+
+import { firstIssue, optionalImageUrl, slugSchema } from "../promos/_kit/schema";
 
 export type ActionState = { error: string | null; ok?: boolean };
 
 const retailSchema = z.object({
-  name: z.string().trim().min(1, "Nama produk wajib diisi."),
-  slug: z
+  name: z
     .string()
     .trim()
-    .min(1, "Slug wajib diisi.")
-    .regex(SLUG_PATTERN, "Slug hanya boleh huruf kecil, angka, dan tanda hubung."),
-  description: z.string().trim().optional(),
-  // Hanya URL yang disimpan; file-nya ada di Supabase Storage.
-  imageUrl: z.union([z.string().trim().url(), z.literal("")]).optional(),
-  // Harga opsional: kosong berarti "tanyakan via WhatsApp".
+    .min(1, "Nama produk wajib diisi.")
+    .max(RETAIL_LIMITS.name, `Nama produk maksimal ${RETAIL_LIMITS.name} karakter.`),
+  slug: slugSchema,
+  description: z
+    .string()
+    .trim()
+    .max(
+      RETAIL_LIMITS.description,
+      `Deskripsi maksimal ${RETAIL_LIMITS.description} karakter.`,
+    )
+    .optional(),
+  // Hanya URL yang disimpan; file-nya ada di Supabase Storage/Media Library.
+  imageUrl: optionalImageUrl,
+  // Harga opsional: kosong berarti "Hubungi kami" (tanya via WhatsApp).
   priceIdr: z.string().trim().optional(),
-  whatsappMessage: z.string().trim().optional(),
-  sortOrder: z.coerce.number().int().min(0).default(0),
+  whatsappMessage: z
+    .string()
+    .trim()
+    .max(
+      RETAIL_LIMITS.whatsappMessage,
+      `Pesan WhatsApp maksimal ${RETAIL_LIMITS.whatsappMessage} karakter.`,
+    )
+    .optional(),
+  // Kosong → produk baru diletakkan di akhir daftar.
+  sortOrder: z
+    .string()
+    .trim()
+    .optional()
+    .refine(
+      (value) => !value || /^\d+$/.test(value),
+      "Urutan harus bilangan bulat 0 atau lebih.",
+    )
+    .transform((value) => (value ? Number(value) : null)),
   isHighlight: z.boolean(),
   isPublished: z.boolean(),
 });
 
+function text(formData: FormData, name: string): string | undefined {
+  const value = formData.get(name);
+  return typeof value === "string" ? value : undefined;
+}
+
 function readForm(formData: FormData) {
   return {
-    name: formData.get("name"),
-    slug: formData.get("slug"),
-    description: formData.get("description") ?? undefined,
-    imageUrl: formData.get("imageUrl") ?? undefined,
-    priceIdr: formData.get("priceIdr") ?? undefined,
-    whatsappMessage: formData.get("whatsappMessage") ?? undefined,
-    sortOrder: formData.get("sortOrder") ?? 0,
+    name: text(formData, "name") ?? "",
+    slug: text(formData, "slug") ?? "",
+    description: text(formData, "description"),
+    imageUrl: text(formData, "imageUrl"),
+    priceIdr: text(formData, "priceIdr"),
+    whatsappMessage: text(formData, "whatsappMessage"),
+    sortOrder: text(formData, "sortOrder"),
     isHighlight: formData.get("isHighlight") === "on",
     isPublished: formData.get("isPublished") === "on",
   };
 }
 
-function firstIssue(error: z.ZodError): string {
-  return error.issues[0]?.message ?? "Input tidak valid.";
+function revalidateRetail() {
+  updateTag(CONTENT_TAGS.retail);
+  revalidatePath("/admin/retail");
+  revalidatePath("/retail");
 }
 
 export async function saveRetailAction(
@@ -62,23 +99,27 @@ export async function saveRetailAction(
     return { error: firstIssue(parsed.error) };
   }
 
-  const { priceIdr: rawPrice, imageUrl, description, whatsappMessage, ...rest } =
-    parsed.data;
+  const {
+    priceIdr: rawPrice,
+    imageUrl,
+    description,
+    whatsappMessage,
+    sortOrder,
+    ...rest
+  } = parsed.data;
 
-  let priceIdr: number | null = null;
-  if (rawPrice) {
-    try {
-      priceIdr = parsePriceIdr(rawPrice);
-    } catch (error) {
-      if (error instanceof InvalidPriceError) return { error: error.message };
-      throw error;
-    }
+  let priceIdr: number | null;
+  try {
+    priceIdr = parseOptionalPriceIdr(rawPrice ?? "");
+  } catch (error) {
+    if (error instanceof InvalidPriceError) return { error: error.message };
+    throw error;
   }
 
   const data = {
     ...rest,
     priceIdr,
-    imageUrl: imageUrl || null,
+    imageUrl,
     description: description || null,
     whatsappMessage: whatsappMessage || null,
   };
@@ -94,21 +135,27 @@ export async function saveRetailAction(
   if (id) {
     const previous = await prisma.retailProduct.findUnique({
       where: { id },
-      select: { imageUrl: true },
+      select: { imageUrl: true, sortOrder: true },
     });
     if (!previous) return { error: "Produk tidak ditemukan." };
+    await prisma.retailProduct.update({
+      where: { id },
+      data: { ...data, sortOrder: sortOrder ?? previous.sortOrder },
+    });
+    // Gambar lama baru dihapus setelah data tersimpan.
     if (previous.imageUrl && previous.imageUrl !== data.imageUrl) {
       await deleteImageByUrl(previous.imageUrl).catch(() => {});
     }
-    await prisma.retailProduct.update({ where: { id }, data });
   } else {
-    await prisma.retailProduct.create({ data });
+    let order = sortOrder;
+    if (order === null) {
+      const last = await prisma.retailProduct.aggregate({ _max: { sortOrder: true } });
+      order = nextRetailSortOrder(last._max.sortOrder);
+    }
+    await prisma.retailProduct.create({ data: { ...data, sortOrder: order } });
   }
 
-  updateTag(CONTENT_TAGS.retail);
-  revalidatePath("/admin/retail");
-  revalidatePath("/retail");
-
+  revalidateRetail();
   redirect("/admin/retail?saved=1");
 }
 
@@ -118,23 +165,83 @@ export async function deleteRetailAction(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   if (!id) return;
 
-  const product = await prisma.retailProduct.delete({ where: { id } });
+  const product = await prisma.retailProduct.findUnique({
+    where: { id },
+    select: { imageUrl: true },
+  });
+  if (!product) redirect("/admin/retail");
+
+  await prisma.retailProduct.delete({ where: { id } });
   if (product.imageUrl) {
     await deleteImageByUrl(product.imageUrl).catch(() => {});
   }
 
-  updateTag(CONTENT_TAGS.retail);
-  revalidatePath("/admin/retail");
-  revalidatePath("/retail");
+  revalidateRetail();
   redirect("/admin/retail?deleted=1");
 }
 
-/** Dipakai halaman list; read-only tapi tetap butuh sesi. */
+/**
+ * Naikkan/turunkan urutan produk (tombol ↑/↓ di daftar admin). Seluruh
+ * produk ditulis ulang menjadi 0..n-1 dalam satu transaksi, sehingga nilai
+ * sortOrder kembar dari data lama ikut dirapikan dan tombol selalu berpengaruh.
+ */
+export async function moveRetailAction(formData: FormData) {
+  await requireRole(CONTENT_ROLES);
+
+  const id = String(formData.get("id") ?? "");
+  const direction = String(formData.get("direction") ?? "");
+  if (!id || (direction !== "up" && direction !== "down")) return;
+
+  const rows = await prisma.retailProduct.findMany({
+    select: { id: true, name: true, isHighlight: true, sortOrder: true },
+  });
+  const updates = planRetailMove(rows, id, direction);
+
+  if (updates.length > 0) {
+    await prisma.$transaction(
+      updates.map((row) =>
+        prisma.retailProduct.update({
+          where: { id: row.id },
+          data: { sortOrder: row.sortOrder },
+        }),
+      ),
+    );
+  }
+
+  revalidateRetail();
+  redirect("/admin/retail?saved=1");
+}
+
+/** Tampilkan/sembunyikan produk langsung dari daftar admin. */
+export async function toggleRetailPublishedAction(formData: FormData) {
+  await requireRole(CONTENT_ROLES);
+
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+
+  const product = await prisma.retailProduct.findUnique({
+    where: { id },
+    select: { isPublished: true },
+  });
+  if (!product) return;
+
+  await prisma.retailProduct.update({
+    where: { id },
+    data: { isPublished: !product.isPublished },
+  });
+
+  revalidateRetail();
+  redirect("/admin/retail?saved=1");
+}
+
+/**
+ * Dipakai halaman list; read-only tapi tetap butuh sesi. Urutannya sama
+ * dengan halaman publik /retail (Highlight/Kolaborasi lebih dulu).
+ */
 export async function listRetailProducts() {
   await requireSession();
-  return prisma.retailProduct.findMany({
-    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-  });
+  const rows = await prisma.retailProduct.findMany();
+  return sortRetailProducts(rows);
 }
 
 export async function getRetailProduct(id: string) {
