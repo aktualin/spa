@@ -6,6 +6,8 @@ import { z } from "zod";
 
 import { requireRole, requireSession } from "@/lib/auth";
 import { CONTENT_TAGS } from "@/lib/content/tags";
+import { normalizePath } from "@/lib/domain/page-url";
+import { recordPathMoves } from "@/lib/path-moves";
 import { prisma } from "@/lib/prisma";
 import { plainTextToHtml } from "@/lib/domain/rich-text";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
@@ -45,6 +47,8 @@ function termsToHtml(terms: string | null | undefined): string | null {
   const html = sanitizeHtml(plainTextToHtml(terms));
   return /\S/.test(html.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ")) ? html : null;
 }
+
+const promoPath = (slug: string) => `/promos/${slug}`;
 
 function revalidatePromo(slug?: string | null) {
   updateTag(CONTENT_TAGS.promos);
@@ -107,22 +111,45 @@ export async function savePromoAction(
     return { error: `Slug "${data.slug}" sudah dipakai promo lain.` };
   }
 
-  if (id) {
-    const previous = await prisma.promo.findUnique({
-      where: { id },
-      select: { bannerUrl: true },
-    });
-    if (previous?.bannerUrl && previous.bannerUrl !== data.bannerUrl) {
-      await deleteImageByUrl(previous.bannerUrl).catch(() => {});
+  const previous = id
+    ? await prisma.promo.findUnique({
+        where: { id },
+        select: { bannerUrl: true, slug: true, isPublished: true },
+      })
+    : null;
+
+  const redirectsChanged = await prisma.$transaction(async (tx) => {
+    if (id) {
+      await tx.promo.update({ where: { id }, data });
+    } else {
+      await tx.promo.create({ data });
     }
+
+    // Ganti slug promo yang sedang tayang: alamat lama dialihkan (301).
+    let changed =
+      previous && previous.isPublished && previous.slug !== data.slug
+        ? await recordPathMoves(
+            tx,
+            [{ from: promoPath(previous.slug), to: promoPath(data.slug) }],
+            `Promo "${data.title}" pindah alamat`,
+          )
+        : false;
+    // Redirect otomatis lama yang menutupi alamat promo yang tayang ini.
+    if (data.isPublished) {
+      const stale = await tx.redirect.deleteMany({
+        where: { fromPath: normalizePath(promoPath(data.slug)), source: "auto" },
+      });
+      if (stale.count > 0) changed = true;
+    }
+    return changed;
+  });
+
+  // Banner lama dibuang setelah simpan berhasil.
+  if (previous?.bannerUrl && previous.bannerUrl !== data.bannerUrl) {
+    await deleteImageByUrl(previous.bannerUrl).catch(() => {});
   }
 
-  if (id) {
-    await prisma.promo.update({ where: { id }, data });
-  } else {
-    await prisma.promo.create({ data });
-  }
-
+  if (redirectsChanged) updateTag(CONTENT_TAGS.redirects);
   revalidatePromo(data.slug);
   redirect("/admin/promos?saved=1");
 }

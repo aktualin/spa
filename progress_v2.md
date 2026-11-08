@@ -29,7 +29,7 @@ Aturan kerja yang berlaku (dari user):
 | 18 | WhatsApp Templates (per konteks, nomor dari settings, click-to-chat, Book Now) | ✅ | commit "BUILD-15–19" |
 | 19 | Backup & Status (backup terakhir, SSL, domain, versi, backup manual/otomatis) | ✅ (perlu uji manual setelah deploy) | commit "BUILD-15–19" |
 | 20 | Homepage dinamis (hero, brand intro, signature, promo/event highlight, gallery, IG feed, reviews, footer) | ✅ | lihat `git log` |
-| 21 | Halaman publik yang belum ada (cek kelengkapan + slug DB + redirect 301) | ⏳ | |
+| 21 | Halaman publik yang belum ada (cek kelengkapan + slug DB + redirect 301) | ✅ semua halaman sudah ada; promo kini mencatat 301 saat slug diganti | lihat `git log` |
 | 22 | Integrasi WhatsApp, GA4, Google Maps, Instagram feed | ⏳ (bagian WhatsApp ikut dikerjakan di BUILD-18) | |
 | 23 | Hardening (responsif, browser, HTTPS, gambar, login limit, Zod, sanitasi, rate limit) | ⏳ | |
 | 24 | Testing sesuai PLAN-9 + perbaikan sampai DoD PLAN-8 | ⏳ | |
