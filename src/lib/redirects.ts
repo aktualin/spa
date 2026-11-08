@@ -13,6 +13,17 @@ type RedirectMap = ReadonlyMap<string, RedirectTarget>;
 
 const DEFAULT_TTL_MS = 30_000;
 const FAILURE_BACKOFF_MS = 10_000;
+// Semua request publik menunggu pemuatan yang sama (single-flight); tanpa batas
+// waktu, satu query database yang menggantung akan menahan seluruh situs.
+const LOAD_TIMEOUT_MS = 3_000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`melebihi ${ms} ms`)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
 
 function cacheTtlMs(): number {
   const raw = process.env.REDIRECT_CACHE_TTL_MS;
@@ -39,7 +50,7 @@ function createTtlLoader<T>(
 
   async function refresh(): Promise<Cached<T>> {
     try {
-      const value = await load();
+      const value = await withTimeout(load(), LOAD_TIMEOUT_MS);
       cached = { value, loaded: true, expiresAt: Date.now() + cacheTtlMs() };
       failing = false;
     } catch (error) {

@@ -41,7 +41,11 @@ const L = {
 
 let pageId = "";
 
-test.describe.configure({ mode: "serial" });
+// Server action menulis ke Supabase dalam transaksi; beri waktu lebih dari
+// batas bawaan expect (5 detik) sebelum redirect dianggap gagal.
+const SAVE_TIMEOUT = 15_000;
+
+test.describe.configure({ mode: "serial", timeout: 180_000 });
 
 // Berjalan di proyek "admin-menu" (lihat playwright.config.ts), setelah semua
 // test lain, karena mengubah menu yang juga dibaca test header/footer.
@@ -88,7 +92,7 @@ async function login(page: Page) {
   await page.getByLabel("Email").fill(EMAIL);
   await page.getByLabel("Kata Sandi").fill(PASSWORD);
   await page.getByRole("button", { name: "Masuk" }).click();
-  await expect(page).toHaveURL((url) => url.pathname === "/admin/menu");
+  await expect(page).toHaveURL((url) => url.pathname === "/admin/menu", { timeout: SAVE_TIMEOUT });
 }
 
 function row(page: Page, label: string) {
@@ -113,8 +117,10 @@ async function addItem(
     }
   }
   await page.getByRole("button", { name: "Tambah", exact: true }).click();
-  await expect(page).toHaveURL(/saved=1/);
-  await expect(row(page, fields.label)).toBeVisible();
+  await expect(page).toHaveURL(/saved=1/, { timeout: SAVE_TIMEOUT });
+  // URL bisa sudah berisi saved=1 dari simpan sebelumnya; baris baru yang
+  // muncul adalah tanda simpan ini selesai.
+  await expect(row(page, fields.label)).toBeVisible({ timeout: SAVE_TIMEOUT });
 }
 
 test("membuat menu 3 level lewat tombol, dengan validasi", async ({ page }) => {
@@ -174,7 +180,7 @@ test("slug halaman diubah → tautan menu ikut berubah", async ({ page }) => {
   await page.goto(`/admin/pages/${pageId}`);
   await page.getByLabel("Slug (alamat URL)").fill(PAGE_SLUG_NEW);
   await page.getByRole("button", { name: "Simpan", exact: true }).click();
-  await expect(page).toHaveURL(/\/admin\/pages\?saved=1/);
+  await expect(page).toHaveURL(/\/admin\/pages\?saved=1/, { timeout: SAVE_TIMEOUT });
 
   await page.goto("/");
   await page.getByRole("banner").getByRole("button", { name: L.induk }).hover();
@@ -236,7 +242,7 @@ test("footer dan visibilitas", async ({ page }) => {
   await row(page, L.footerLink).getByRole("button", { name: "Ubah" }).click();
   await page.getByLabel("Tampilkan di situs").uncheck();
   await page.getByRole("button", { name: "Simpan perubahan" }).click();
-  await expect(page).toHaveURL(/saved=1/);
+  await expect(page).toHaveURL(/saved=1/, { timeout: SAVE_TIMEOUT });
   await expect(row(page, L.footerLink)).toContainText("Tersembunyi");
 
   await page.goto("/");

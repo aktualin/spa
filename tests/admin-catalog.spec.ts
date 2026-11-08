@@ -36,7 +36,11 @@ const ITEM = {
   pack: { name: `${N} Ritual`, slug: `${S}-ritual`, subtitle: `${N} subjudul paket` },
 };
 
-test.describe.configure({ mode: "serial" });
+// Server action menulis ke Supabase dalam transaksi; beri waktu lebih dari
+// batas bawaan expect (5 detik) sebelum redirect dianggap gagal.
+const SAVE_TIMEOUT = 15_000;
+
+test.describe.configure({ mode: "serial", timeout: 180_000 });
 
 test.beforeEach(() => {
   test.skip(!connectionString, "DATABASE_URL tidak tersedia");
@@ -69,12 +73,12 @@ async function login(page: Page) {
   await page.getByLabel("Email").fill(EMAIL);
   await page.getByLabel("Kata Sandi").fill(PASSWORD);
   await page.getByRole("button", { name: "Masuk" }).click();
-  await expect(page).toHaveURL((url) => url.pathname === "/admin/treatments");
+  await expect(page).toHaveURL((url) => url.pathname === "/admin/treatments", { timeout: SAVE_TIMEOUT });
 }
 
 async function saveAndExpect(page: Page, button: string, urlPath: string) {
   await page.getByRole("button", { name: button, exact: true }).click();
-  await expect(page).toHaveURL((url) => url.pathname === urlPath && url.searchParams.has("saved"));
+  await expect(page).toHaveURL((url) => url.pathname === urlPath && url.searchParams.has("saved"), { timeout: SAVE_TIMEOUT });
 }
 
 test("CRUD kategori, treatment, add-on, dan package tampil di halaman Menu", async ({
