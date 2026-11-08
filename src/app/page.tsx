@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { BookingBanner, Hero, HeroStats, MembershipBanner } from "@/components/home/hero";
@@ -8,6 +9,17 @@ import { PromoHighlightSection } from "@/components/public/home/promo-highlight"
 import { GalleryTeaserSection } from "@/components/public/home/gallery-teaser";
 import { getHomepageSections, getWhatsNewCards } from "@/lib/content/homepage";
 import { getMembershipProgram } from "@/lib/content/membership";
+import { withPageSeo } from "@/lib/content/seo";
+import { DEFAULT_DESCRIPTION, DEFAULT_OG_DESCRIPTION, DEFAULT_TITLE } from "@/lib/domain/seo";
+
+/** Bawaan = metadata root; admin bisa menimpanya lewat entri SEO path "/". */
+export async function generateMetadata(): Promise<Metadata> {
+  return withPageSeo("/", {
+    title: { absolute: DEFAULT_TITLE },
+    description: DEFAULT_DESCRIPTION,
+    openGraph: { title: DEFAULT_TITLE, description: DEFAULT_OG_DESCRIPTION },
+  });
+}
 
 /**
  * Homepage.
@@ -60,6 +72,12 @@ export default async function Home() {
     <>
       <Navigation />
       <main className="flex-1">
+        {/* Satu <h1> per halaman: biasanya dari Hero. Bila admin mematikan
+            Hero, judul tetap ada untuk mesin pencari & pembaca layar tanpa
+            mengubah tampilan. */}
+        {visible.some(({ key }) => key === "hero") ? null : (
+          <h1 className="sr-only">{DEFAULT_TITLE}</h1>
+        )}
         {visible.map(({ key, section }) => {
           switch (key) {
             case "hero":

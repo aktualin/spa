@@ -5,6 +5,11 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 
 import {
+  MAX_PASSWORD_LENGTH,
+  MIN_PASSWORD_LENGTH,
+} from "@/lib/domain/password-policy";
+
+import {
   createUserAction,
   type ActionState,
 } from "../actions/users";
@@ -30,6 +35,24 @@ function SaveButton({ label }: { label: string }) {
 export function NewUserForm() {
   const [state, formAction] = useActionState(createUserAction, initialState);
 
+  if (state.ok && state.temporaryPassword) {
+    return (
+      <div className="mx-auto max-w-xl">
+        <h1 className="text-xl font-semibold text-neutral-900">Akun dibuat</h1>
+        <TemporaryPasswordNotice
+          email={state.email ?? ""}
+          password={state.temporaryPassword}
+        />
+        <Link
+          href="/admin/users?saved=1"
+          className="mt-6 inline-block rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
+        >
+          Selesai, kembali ke daftar akun
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-xl">
       <Link href="/admin/users" className="text-sm text-neutral-600 hover:underline">
@@ -47,32 +70,35 @@ export function NewUserForm() {
             name="email"
             type="email"
             required
+            maxLength={254}
+            autoComplete="off"
             className={inputClass}
           />
         </Field>
 
         <Field label="Nama lengkap" htmlFor="name">
-          <input id="name" name="name" required className={inputClass} />
+          <input id="name" name="name" required maxLength={100} className={inputClass} />
         </Field>
 
         <Field label="Role" htmlFor="role">
           <select id="role" name="role" className={inputClass} defaultValue="EDITOR">
-            <option value="EDITOR">EDITOR — manages konten</option>
-            <option value="ADMIN">ADMIN — akses penuh</option>
+            <option value="EDITOR">EDITOR — mengelola modul konten</option>
+            <option value="ADMIN">ADMIN — akses penuh, termasuk pengaturan sistem</option>
           </select>
         </Field>
 
         <Field
-          label="Kata sandi awal"
+          label="Kata sandi awal (opsional)"
           htmlFor="password"
-          hint="Minimal 12 karakter. Beri tahu pengguna secara terpisah."
+          hint={`Kosongkan agar sistem membuatkan kata sandi acak yang ditampilkan sekali. Bila diisi: minimal ${MIN_PASSWORD_LENGTH} karakter. Pemilik akun wajib menggantinya saat login pertama.`}
         >
           <input
             id="password"
             name="password"
             type="password"
-            required
-            minLength={12}
+            autoComplete="new-password"
+            minLength={MIN_PASSWORD_LENGTH}
+            maxLength={MAX_PASSWORD_LENGTH}
             className={inputClass}
           />
         </Field>
@@ -118,6 +144,38 @@ function Field({
       </label>
       {children}
       {hint ? <p className="text-xs text-neutral-500">{hint}</p> : null}
+    </div>
+  );
+}
+
+/**
+ * Kata sandi sementara yang dibuat sistem. Hanya ada di memori browser selama
+ * halaman ini terbuka; setelah pindah halaman tidak bisa ditampilkan lagi.
+ */
+export function TemporaryPasswordNotice({
+  email,
+  password,
+}: {
+  email: string;
+  password: string;
+}) {
+  return (
+    <div
+      role="status"
+      className="mt-4 space-y-3 rounded-md border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900"
+    >
+      <p>
+        Kata sandi sementara untuk <strong>{email}</strong>:
+      </p>
+      <p className="select-all rounded bg-white px-3 py-2 font-mono text-base tracking-wide text-neutral-900">
+        {password}
+      </p>
+      <p>
+        Salin dan sampaikan lewat jalur terpisah (misalnya pesan langsung).
+        Kata sandi ini <strong>hanya ditampilkan sekali</strong> dan tidak
+        disimpan dalam bentuk yang bisa dibaca. Pemilik akun wajib menggantinya
+        saat login pertama.
+      </p>
     </div>
   );
 }

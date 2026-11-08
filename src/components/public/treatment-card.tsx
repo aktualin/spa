@@ -10,7 +10,7 @@ import type { CatalogTreatment } from "@/lib/content/catalog";
 import { formatDuration } from "@/lib/domain/pricing";
 import { formatIdr } from "@/lib/format";
 
-import { WaButton, reserveMessage } from "./wa-button";
+import { WaButton } from "./wa-button";
 
 type TreatmentCardProps = {
   treatment: CatalogTreatment;
@@ -72,7 +72,9 @@ export function TreatmentCard({ treatment, withCta = false }: TreatmentCardProps
           <>
             <div className="spacer-small" />
             <WaButton
-              message={treatment.whatsappMessage ?? reserveMessage(treatment.name)}
+              context="treatment"
+              custom={treatment.whatsappMessage}
+              values={{ treatment: treatment.name, category: treatment.categoryName }}
               label="Book via WhatsApp"
               className="button is-secondary is-icon w-inline-block"
             />

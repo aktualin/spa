@@ -16,6 +16,7 @@ import {
   formatEventDate,
 } from "@/components/public/events/event-parts";
 import { getEvent } from "@/lib/content/events";
+import { withPageSeo } from "@/lib/content/seo";
 import { waLink } from "@/lib/whatsapp";
 
 export async function generateMetadata({
@@ -26,13 +27,13 @@ export async function generateMetadata({
   const { slug } = await params;
   const event = await getEvent(slug);
   if (!event) return { title: "Event Not Found" };
-  return {
+  return withPageSeo(`/events/${event.slug}`, {
     title: event.seoTitle ?? event.title,
     description: event.seoDescription ?? event.description ?? undefined,
     openGraph: event.coverUrl
-      ? { images: [{ url: event.coverUrl }] }
+      ? { images: [{ url: event.coverUrl, alt: event.title }] }
       : undefined,
-  };
+  });
 }
 
 export default function EventDetailPage({

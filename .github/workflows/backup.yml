@@ -1,0 +1,133 @@
+# Backup database KAMA Spa — mingguan, gratis (GitHub Actions).
+#
+# Alur: pg_dump (scripts/backup-db.sh) → gzip → enkripsi GPG AES-256 →
+# disimpan sebagai artifact GitHub (retensi 90 hari) → hasilnya dilaporkan ke
+# /api/backup/report agar tercatat di /admin/status.
+#
+# Secret repo yang wajib diisi (Settings → Secrets and variables → Actions):
+#   BACKUP_DATABASE_URL   connection string Supabase port 5432 (session pooler
+#                         aws-0-<region>.pooler.supabase.com — runner GitHub
+#                         tidak punya IPv6, jadi jangan pakai db.<ref>.supabase.co)
+#   BACKUP_PASSPHRASE     passphrase enkripsi (acak, ≥ 32 karakter). SIMPAN JUGA
+#                         di password manager klien — tanpa ini backup tidak
+#                         bisa dibuka.
+# Opsional (untuk pencatatan di dashboard):
+#   BACKUP_REPORT_URL     https://kamaspa.id/api/backup/report
+#   BACKUP_REPORT_SECRET  sama persis dengan env BACKUP_REPORT_SECRET di Vercel
+#
+# Data pribadi (UU PDP): dump TIDAK pernah keluar dari runner tanpa enkripsi,
+# dan tidak pernah diunggah ke bucket storage situs (publik).
+
+name: Backup database
+
+on:
+  schedule:
+    # Setiap Minggu 02.00 WIB (Sabtu 19.00 UTC).
+    - cron: "0 19 * * 6"
+  workflow_dispatch:
+    inputs:
+      requested_by:
+        description: "ID admin yang memicu dari dashboard (diisi otomatis; boleh kosong)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: database-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Ambil repo
+        uses: actions/checkout@v4
+
+      - name: Pasang PostgreSQL client 17
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-common gnupg
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y -qq postgresql-client-17
+          /usr/lib/postgresql/17/bin/pg_dump --version
+
+      - name: Backup + enkripsi
+        id: dump
+        env:
+          DIRECT_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+          PG_DUMP: /usr/lib/postgresql/17/bin/pg_dump
+        run: |
+          if [ -z "$DIRECT_URL" ] || [ -z "$BACKUP_PASSPHRASE" ]; then
+            echo "::error::Secret BACKUP_DATABASE_URL dan BACKUP_PASSPHRASE wajib diisi."
+            exit 1
+          fi
+          ./scripts/backup-db.sh "$RUNNER_TEMP/backup"
+          # Pastikan tidak ada dump tanpa enkripsi yang ikut terunggah.
+          if ls "$RUNNER_TEMP"/backup/*.sql.gz >/dev/null 2>&1; then
+            echo "::error::Ditemukan dump tanpa enkripsi."
+            exit 1
+          fi
+
+      - name: Simpan artifact (terenkripsi, 90 hari)
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: kamaspa-db-${{ github.run_number }}
+          path: |
+            ${{ runner.temp }}/backup/*.gpg
+            ${{ runner.temp }}/backup/*.sha256
+          retention-days: 90
+          if-no-files-found: error
+          # Sudah terenkripsi + terkompresi.
+          compression-level: 0
+
+      - name: Laporkan ke dashboard
+        if: always()
+        env:
+          REPORT_URL: ${{ secrets.BACKUP_REPORT_URL }}
+          REPORT_SECRET: ${{ secrets.BACKUP_REPORT_SECRET }}
+          DUMP_OUTCOME: ${{ steps.dump.outcome }}
+          UPLOAD_OUTCOME: ${{ steps.upload.outcome }}
+          SIZE_BYTES: ${{ steps.dump.outputs.size_bytes }}
+          SHA256: ${{ steps.dump.outputs.sha256 }}
+          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RUN_NUMBER: ${{ github.run_number }}
+          TRIGGER: ${{ github.event_name }}
+          REQUESTED_BY: ${{ inputs.requested_by }}
+        run: |
+          if [ -z "$REPORT_URL" ] || [ -z "$REPORT_SECRET" ]; then
+            echo "Secret BACKUP_REPORT_URL/BACKUP_REPORT_SECRET kosong — laporan ke dashboard dilewati."
+            exit 0
+          fi
+          if [ "$DUMP_OUTCOME" = "success" ] && [ "$UPLOAD_OUTCOME" = "success" ]; then
+            STATUS=success; NOTE=""
+          else
+            STATUS=failure; NOTE="Langkah gagal — backup: ${DUMP_OUTCOME:-skipped}, artifact: ${UPLOAD_OUTCOME:-skipped}. Cek log run."
+          fi
+          BODY="$(jq -n \
+            --arg status "$STATUS" \
+            --arg trigger "$TRIGGER" \
+            --arg size "$SIZE_BYTES" \
+            --arg sha "$SHA256" \
+            --arg artifact "$ARTIFACT_URL" \
+            --arg run "$RUN_URL" \
+            --arg num "$RUN_NUMBER" \
+            --arg by "$REQUESTED_BY" \
+            --arg note "$NOTE" \
+            '{status: $status, trigger: $trigger,
+              sizeBytes: (if $size == "" then null else ($size | tonumber) end),
+              sha256: (if $sha == "" then null else $sha end),
+              artifactUrl: $artifact, runUrl: $run, runNumber: ($num | tonumber),
+              requestedBy: $by, note: $note}')"
+          # Secret dikirim lewat header dari file konfigurasi curl, tidak lewat argumen.
+          printf 'header = "Authorization: Bearer %s"\n' "$REPORT_SECRET" > "$RUNNER_TEMP/curl-auth"
+          curl --fail-with-body -sS --max-time 20 \
+            -K "$RUNNER_TEMP/curl-auth" \
+            -H "Content-Type: application/json" \
+            -X POST --data "$BODY" "$REPORT_URL"
+          rm -f "$RUNNER_TEMP/curl-auth"

@@ -9,9 +9,9 @@ export const instant = false;
 export default async function AdminUsersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string; unlocked?: string }>;
+  searchParams: Promise<{ saved?: string; unlocked?: string; deleted?: string }>;
 }) {
-  await requireAdminPage();
+  const session = await requireAdminPage();
 
   const [users, params] = await Promise.all([listUsers(), searchParams]);
   const now = new Date();
@@ -44,6 +44,14 @@ export default async function AdminUsersPage({
           Perubahan akun tersimpan.
         </p>
       ) : null}
+      {params.deleted ? (
+        <p
+          role="status"
+          className="mt-4 rounded-md bg-green-50 px-3 py-2 text-sm text-green-800"
+        >
+          Akun berhasil dihapus.
+        </p>
+      ) : null}
       {params.unlocked ? (
         <p
           role="status"
@@ -72,6 +80,16 @@ export default async function AdminUsersPage({
                   <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-neutral-600">
                     {user.role}
                   </span>
+                  {user.id === session.userId ? (
+                    <span className="rounded bg-sky-100 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-sky-800">
+                      Anda
+                    </span>
+                  ) : null}
+                  {user.mustChangePassword ? (
+                    <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-neutral-600">
+                      Wajib ganti kata sandi
+                    </span>
+                  ) : null}
                   {!user.isActive ? (
                     <span className="rounded bg-neutral-900 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-white">
                       Nonaktif

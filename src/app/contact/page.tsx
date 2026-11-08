@@ -4,16 +4,28 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { LocationMap } from "@/components/contact/location-map";
 import { LocationInfo } from "@/components/contact/location-info";
-import { locations } from "@/data/content";
+import { locations as staticLocations } from "@/data/content";
 import { Reveal } from "@/components/reveal";
+import { withPageSeo } from "@/lib/content/seo";
+import { getSiteSettings } from "@/lib/content/site";
+import {
+  FLAGSHIP_LOCATION_SLUG,
+  applySiteSettingsToLocations,
+} from "@/lib/domain/site-settings";
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description:
-    "Hubungi KAMA Spa untuk reservasi treatment di South Jakarta. Booking via WhatsApp atau formulir reservasi.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return withPageSeo("/contact", {
+    title: "Contact",
+    description:
+      "Hubungi KAMA Spa untuk reservasi treatment di South Jakarta. Booking via WhatsApp atau formulir reservasi.",
+  });
+}
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  // Alamat, jam, nomor WhatsApp, peta & Fresha diatur di Kontak & Umum;
+  // tanpa perubahan admin hasilnya identik dengan data statis.
+  const settings = await getSiteSettings();
+  const locations = applySiteSettingsToLocations(staticLocations, settings);
   return (
     <>
       <Navigation />
@@ -44,10 +56,26 @@ export default function ContactPage() {
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-10">
                 {locations.map((loc) => (
                   <div key={loc.slug} className="contact-info-card">
-                    <LocationInfo loc={loc} />
+                    <LocationInfo
+                      loc={loc}
+                      waNumber={settings.whatsappNumber}
+                      freshaUrl={
+                        loc.slug === FLAGSHIP_LOCATION_SLUG ? settings.freshaUrl : undefined
+                      }
+                    />
                   </div>
                 ))}
               </div>
+              {settings.mapsEmbedUrl ? (
+                <iframe
+                  src={settings.mapsEmbedUrl}
+                  title="KAMA Spa — Google Maps"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  allowFullScreen
+                  className="mt-10 h-[400px] w-full rounded-sm border-0"
+                />
+              ) : null}
             </div>
           </div>
         </Reveal>

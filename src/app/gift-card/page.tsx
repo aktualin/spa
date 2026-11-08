@@ -4,11 +4,13 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { ArrowRight } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
-import { PublicPageHeader, WhatsAppLink } from "@/components/public/page-parts";
+import { PublicPageHeader } from "@/components/public/page-parts";
+import { WaLink } from "@/components/public/wa-button";
 import { getGiftCard } from "@/lib/content/gift-card";
 import { withPageSeo } from "@/lib/content/seo";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
-import { waLink } from "@/lib/whatsapp";
+import { whatsAppHref } from "@/lib/content/whatsapp";
+import { GIFT_CARD_DEFAULTS } from "@/lib/domain/gift-card";
 
 export async function generateMetadata(): Promise<Metadata> {
   return withPageSeo("/gift-card", {
@@ -20,6 +22,15 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function GiftCardPage() {
   const giftCard = await getGiftCard();
+  /* `getGiftCard` mengisi teks bawaan bila kolomnya kosong; teks bawaan itu
+     bukan pesan khusus, jadi template "gift" boleh menggantikannya. */
+  const waHref = await whatsAppHref("gift", {
+    custom:
+      giftCard.whatsappMessage === GIFT_CARD_DEFAULTS.whatsappMessage
+        ? null
+        : giftCard.whatsappMessage,
+    values: { giftCard: giftCard.title },
+  });
 
   return (
     <>
@@ -31,10 +42,9 @@ export default async function GiftCardPage() {
           description={giftCard.subtitle}
         >
           <div>
-            <WhatsAppLink
-              href={waLink(giftCard.whatsappMessage)}
-              label="Pesan via WhatsApp"
-            />
+            <WaLink href={waHref} context="gift">
+              Pesan via WhatsApp
+            </WaLink>
           </div>
         </PublicPageHeader>
 

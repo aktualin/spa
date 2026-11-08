@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
+import { withPageSeo } from "@/lib/content/seo";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { privacyPolicy } from "@/data/pages";
 import { Reveal } from "@/components/reveal";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description:
-    "Kebijakan privasi KAMA Spa — bagaimana kami mengumpulkan, menggunakan, dan melindungi data pribadi Anda.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return withPageSeo("/privacy-policy", {
+    title: "Privacy Policy",
+    description:
+      "Kebijakan privasi KAMA Spa — bagaimana kami mengumpulkan, menggunakan, dan melindungi data pribadi Anda.",
+  });
+}
 
 export default function PrivacyPolicyPage() {
   return (

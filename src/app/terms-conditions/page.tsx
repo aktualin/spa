@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
+import { withPageSeo } from "@/lib/content/seo";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { termsConditions } from "@/data/pages";
 import { Reveal } from "@/components/reveal";
 
-export const metadata: Metadata = {
-  title: "Terms & Conditions",
-  description:
-    "Ketentuan & syarat KAMA Spa — reservasi, kebijakan pembatalan, pembayaran, dan perlakuan yang diharapkan dari setiap tamu.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return withPageSeo("/terms-conditions", {
+    title: "Terms & Conditions",
+    description:
+      "Ketentuan & syarat KAMA Spa — reservasi, kebijakan pembatalan, pembayaran, dan perlakuan yang diharapkan dari setiap tamu.",
+  });
+}
 
 export default function TermsConditionsPage() {
   return (

@@ -1,8 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { requireRole } from "@/lib/auth";
-import { CONTENT_ROLES } from "@/lib/domain/roles";
-
+import { requirePageAccess } from "../../access";
 import { getPageSeo } from "../../actions/seo";
 import { PageSeoForm } from "../seo-form";
 
@@ -15,7 +13,7 @@ export default async function EditSeoPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ path?: string }>;
 }) {
-  await requireRole(CONTENT_ROLES);
+  await requirePageAccess("/admin/seo");
 
   const [{ id }, query] = await Promise.all([params, searchParams]);
 

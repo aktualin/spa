@@ -7,13 +7,12 @@ import { Footer } from "@/components/footer";
 import { ArrowLeft } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
 import { TreatmentCard } from "@/components/public/treatment-card";
-import { WhatsAppLink } from "@/components/public/page-parts";
-import { reserveMessage } from "@/components/public/wa-button";
+import { WaLink } from "@/components/public/wa-button";
 import { getCatalogSlugs, getCategory, getTreatment } from "@/lib/content/catalog";
 import { withPageSeo } from "@/lib/content/seo";
 import { formatDuration } from "@/lib/domain/pricing";
 import { formatIdr } from "@/lib/format";
-import { waLink } from "@/lib/whatsapp";
+import { whatsAppHref } from "@/lib/content/whatsapp";
 
 type TreatmentPageProps = {
   params: Promise<{ categorySlug: string; treatmentSlug: string }>;
@@ -80,6 +79,10 @@ async function TreatmentContent({ params }: TreatmentPageProps) {
   const related = (category?.treatments ?? [])
     .filter((t) => t.slug !== treatment.slug)
     .slice(0, 3);
+  const waHref = await whatsAppHref("treatment", {
+    custom: treatment.whatsappMessage,
+    values: { treatment: treatment.name, category: treatment.categoryName },
+  });
 
   return (
     <main className="flex-1">
@@ -118,12 +121,9 @@ async function TreatmentContent({ params }: TreatmentPageProps) {
                   </p>
                 ) : null}
                 <div>
-                  <WhatsAppLink
-                    href={waLink(
-                      treatment.whatsappMessage ?? reserveMessage(treatment.name),
-                    )}
-                    label="Reservasi via WhatsApp"
-                  />
+                  <WaLink href={waHref} context="treatment">
+                    Reservasi via WhatsApp
+                  </WaLink>
                 </div>
               </div>
 

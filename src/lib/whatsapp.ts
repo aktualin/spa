@@ -4,7 +4,17 @@
  * Every WhatsApp URL is built here — never hardcode a `wa.me` link in a
  * page or a component. The message wording is intentional: the guest reads
  * it inside WhatsApp.
+ *
+ * Halaman publik sebaiknya memakai `whatsAppHref()` dari
+ * `@/lib/content/whatsapp`, yang membaca nomor dari pengaturan situs dan
+ * template per konteks dari modul Kontak & Umum. Konstanta di bawah adalah
+ * fallback statis bila DB kosong/tidak terjangkau.
  */
+import {
+  buildWhatsAppLink,
+  builtInMessage,
+  normalizeWaNumber,
+} from "./domain/whatsapp-template.ts";
 
 /** KAMA Spa line — `wa.me` wants digits only (no `+`, no dashes). */
 export const WHATSAPP_NUMBER = "6281316052040";
@@ -13,10 +23,10 @@ export const WHATSAPP_NUMBER = "6281316052040";
 export const CORPORATE_NUMBER = "6281314856565";
 
 /** Generic booking — floating button, header CTA, corporate enquiries. */
-export const RESERVE_MESSAGE = "Halo kak, saya mau reservasi";
+export const RESERVE_MESSAGE = builtInMessage("default");
 
 /** Membership enquiries. */
-export const MEMBER_MESSAGE = "Halo kak, saya mau join member";
+export const MEMBER_MESSAGE = builtInMessage("membership");
 
 /** Per-branch message: "is this branch open, can I book?" */
 export function locationMessage(address: string): string {
@@ -25,7 +35,7 @@ export function locationMessage(address: string): string {
 
 /** Build a WhatsApp deep link for `message`. */
 export function waLink(message: string, number: string = WHATSAPP_NUMBER): string {
-  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+  return buildWhatsAppLink(message, number);
 }
 
 /** WhatsApp link for one specific branch (uses the branch address). */
@@ -41,17 +51,7 @@ export function locationWhatsApp(location: { address: string }): string {
  * supaya pemanggil bisa jatuh ke nomor default alih-alih membuat link rusak.
  */
 export function toWaNumber(raw: string | null | undefined): string | null {
-  if (!raw) return null;
-
-  let digits = raw.replace(/\D/g, "");
-  if (digits.startsWith("0")) digits = `62${digits.slice(1)}`;
-  else if (digits.startsWith("8")) digits = `62${digits}`;
-
-  if (!digits.startsWith("62")) return null;
-  // 62 + 9..13 digit nomor seluler Indonesia.
-  if (digits.length < 11 || digits.length > 15) return null;
-
-  return digits;
+  return normalizeWaNumber(raw);
 }
 
 /** WhatsApp link for the corporate wellness line. */

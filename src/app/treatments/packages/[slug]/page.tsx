@@ -6,14 +6,13 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { ArrowLeft, Check } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
-import { WhatsAppLink } from "@/components/public/page-parts";
 import { PackageCard } from "@/components/public/package-card";
-import { reserveMessage } from "@/components/public/wa-button";
+import { WaLink } from "@/components/public/wa-button";
 import { getCatalogSlugs, getPackage, getPackages } from "@/lib/content/catalog";
 import { withPageSeo } from "@/lib/content/seo";
 import { formatDuration } from "@/lib/domain/pricing";
 import { formatIdr } from "@/lib/format";
-import { waLink } from "@/lib/whatsapp";
+import { whatsAppHref } from "@/lib/content/whatsapp";
 
 type PackagePageProps = {
   params: Promise<{ slug: string }>;
@@ -77,6 +76,14 @@ async function PackageContent({ params }: PackagePageProps) {
   if (!pkg) notFound();
 
   const others = (await getPackages()).filter((p) => p.slug !== slug).slice(0, 3);
+  const waHref = await whatsAppHref("package", {
+    custom: pkg.whatsappMessage,
+    values: {
+      package: pkg.name,
+      price: formatIdr(pkg.priceIdr),
+      duration: pkg.durationMin ? formatDuration(pkg.durationMin) : null,
+    },
+  });
 
   return (
     <main className="flex-1">
@@ -111,10 +118,9 @@ async function PackageContent({ params }: PackagePageProps) {
                   </span>
                 </div>
                 <div>
-                  <WhatsAppLink
-                    href={waLink(pkg.whatsappMessage ?? reserveMessage(pkg.name))}
-                    label="Reservasi via WhatsApp"
-                  />
+                  <WaLink href={waHref} context="package">
+                    Reservasi via WhatsApp
+                  </WaLink>
                 </div>
               </div>
 

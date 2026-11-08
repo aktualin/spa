@@ -7,7 +7,7 @@ import type { CatalogPackage } from "@/lib/content/catalog";
 import { formatDuration } from "@/lib/domain/pricing";
 import { formatIdr } from "@/lib/format";
 
-import { WaButton, reserveMessage } from "./wa-button";
+import { WaButton } from "./wa-button";
 
 type PackageCardProps = {
   pkg: CatalogPackage;
@@ -58,7 +58,13 @@ export function PackageCard({ pkg, withCta = false }: PackageCardProps) {
           <>
             <div className="spacer-small" />
             <WaButton
-              message={pkg.whatsappMessage ?? reserveMessage(pkg.name)}
+              context="package"
+              custom={pkg.whatsappMessage}
+              values={{
+                package: pkg.name,
+                price: formatIdr(pkg.priceIdr),
+                duration: pkg.durationMin ? formatDuration(pkg.durationMin) : null,
+              }}
               label="Book via WhatsApp"
               className="button is-secondary is-icon w-inline-block"
             />

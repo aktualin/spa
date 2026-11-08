@@ -12,9 +12,10 @@ import {
 } from "@/components/public/page-parts";
 import { formatEventDate } from "@/components/public/events/event-parts";
 import { getActivePromo } from "@/lib/content/promos";
+import { withPageSeo } from "@/lib/content/seo";
 import { plainTextToHtml } from "@/lib/domain/rich-text";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
-import { waLink } from "@/lib/whatsapp";
+import { whatsAppHref } from "@/lib/content/whatsapp";
 
 export async function generateMetadata({
   params,
@@ -24,11 +25,13 @@ export async function generateMetadata({
   const { slug } = await params;
   const promo = await getActivePromo(slug);
   if (!promo) return { title: "Promo Not Found" };
-  return {
+  return withPageSeo(`/promos/${promo.slug}`, {
     title: promo.seoTitle ?? promo.title,
     description: promo.seoDescription ?? promo.description ?? undefined,
-    openGraph: promo.bannerUrl ? { images: [{ url: promo.bannerUrl }] } : undefined,
-  };
+    openGraph: promo.bannerUrl
+      ? { images: [{ url: promo.bannerUrl, alt: promo.title }] }
+      : undefined,
+  });
 }
 
 export default function PromoDetailPage({
@@ -69,9 +72,10 @@ async function PromoContent({
     notFound();
   }
 
-  const waMessage = promo.whatsappMessage
-    ? promo.whatsappMessage
-    : `Halo kak, saya mau tanya promo ${promo.title}`;
+  const waHref = await whatsAppHref("promo", {
+    custom: promo.whatsappMessage,
+    values: { promo: promo.title },
+  });
 
   return (
     <main className="flex-1">
@@ -82,10 +86,11 @@ async function PromoContent({
       >
         <div className="button-group mt-4 flex flex-wrap gap-3">
           <a
-            href={waLink(waMessage)}
+            href={waHref}
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-primary"
+            data-wa-context="promo"
           >
             Tanya Promo via WhatsApp
           </a>

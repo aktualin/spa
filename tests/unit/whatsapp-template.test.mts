@@ -2,9 +2,18 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
+  MAX_TEMPLATE_LENGTH,
+  WHATSAPP_CONTEXTS,
+  allowedPlaceholders,
   buildWhatsAppLink,
+  builtInMessage,
   extractPlaceholders,
+  fillTemplate,
+  isSystemTemplateKey,
+  normalizeWaNumber,
   renderTemplate,
+  resolveWhatsAppMessage,
+  validateTemplate,
 } from "../../src/lib/domain/whatsapp-template.ts";
 
 /** U7 — templating pesan WhatsApp. */
@@ -100,5 +109,127 @@ describe("U7 extractPlaceholders", () => {
 
   it("template tanpa placeholder menghasilkan daftar kosong", () => {
     assert.deepEqual(extractPlaceholders("Halo kak"), []);
+  });
+});
+
+describe("BUILD-18 fillTemplate", () => {
+  it("mengisi placeholder yang dikenal", () => {
+    assert.equal(
+      fillTemplate("Halo kak, saya mau reservasi {{treatment}}", { treatment: "Sukma Laya" }),
+      "Halo kak, saya mau reservasi Sukma Laya",
+    );
+  });
+
+  it("menghapus placeholder kosong/tak dikenal dan merapikan spasi", () => {
+    assert.equal(
+      fillTemplate("Reservasi {{package}} {{duration}} ({{price}}) ya", {
+        package: "All Day Spa",
+        duration: null,
+        price: "",
+      }),
+      "Reservasi All Day Spa ya",
+    );
+    assert.equal(fillTemplate("Tanya promo {{promo}}?", {}), "Tanya promo?");
+    assert.equal(fillTemplate("  Halo   {{x}}  kak  "), "Halo kak");
+  });
+
+  it("mempertahankan baris baru", () => {
+    assert.equal(fillTemplate("Halo kak\n{{treatment}}  ya", { treatment: "A" }), "Halo kak\nA ya");
+  });
+});
+
+describe("BUILD-18 normalizeWaNumber", () => {
+  it("menormalkan ke awalan 62", () => {
+    assert.equal(normalizeWaNumber("0813-1605-2040"), "6281316052040");
+    assert.equal(normalizeWaNumber("+62 813 1605 2040"), "6281316052040");
+    assert.equal(normalizeWaNumber("81316052040"), "6281316052040");
+  });
+
+  it("menolak nomor yang tidak masuk akal", () => {
+    assert.equal(normalizeWaNumber(""), null);
+    assert.equal(normalizeWaNumber("123"), null);
+    assert.equal(normalizeWaNumber("+1 555 0100 222"), null);
+  });
+});
+
+describe("BUILD-18 konteks & teks bawaan", () => {
+  it("tujuh konteks sistem tersedia", () => {
+    assert.deepEqual(
+      WHATSAPP_CONTEXTS.map((c) => c.key),
+      ["default", "treatment", "package", "promo", "gift", "membership", "retail"],
+    );
+    assert.ok(isSystemTemplateKey("promo"));
+    assert.ok(!isSystemTemplateKey("lainnya"));
+  });
+
+  it("teks bawaan sama dengan pesan hardcode sebelumnya", () => {
+    assert.equal(builtInMessage("default"), "Halo kak, saya mau reservasi");
+    assert.equal(builtInMessage("membership"), "Halo kak, saya mau join member");
+    assert.equal(builtInMessage("gift"), "Halo kak, saya mau beli KAMA Gift Card");
+    assert.equal(builtInMessage("retail"), "Halo kak, saya mau pesan produk {{product}}");
+  });
+
+  it("placeholder retail menerima alias lama", () => {
+    assert.ok(allowedPlaceholders("retail").includes("harga"));
+  });
+});
+
+describe("BUILD-18 validateTemplate", () => {
+  it("menerima template valid", () => {
+    assert.deepEqual(validateTemplate("treatment", "Halo, reservasi {{treatment}}"), {
+      errors: [],
+      warnings: [],
+    });
+  });
+
+  it("menolak placeholder tak dikenal, pesan kosong, dan terlalu panjang", () => {
+    assert.equal(validateTemplate("promo", "Promo {{harga}}").errors.length, 1);
+    assert.equal(validateTemplate("default", "Halo {{treatment}}").errors.length, 1);
+    assert.ok(validateTemplate("default", "   ").errors.length > 0);
+    assert.ok(
+      validateTemplate("default", "a".repeat(MAX_TEMPLATE_LENGTH + 1)).errors.length > 0,
+    );
+  });
+
+  it("menolak kurung kurawal tidak lengkap", () => {
+    assert.equal(validateTemplate("treatment", "Halo {{treatment}").errors.length, 1);
+  });
+
+  it("memperingatkan bila placeholder utama tidak dipakai", () => {
+    const result = validateTemplate("treatment", "Halo kak, saya mau reservasi");
+    assert.equal(result.errors.length, 0);
+    assert.equal(result.warnings.length, 1);
+  });
+});
+
+describe("BUILD-18 resolveWhatsAppMessage", () => {
+  const values = { promo: "Promo Akhir Pekan" };
+
+  it("pesan khusus konten menang", () => {
+    assert.equal(
+      resolveWhatsAppMessage({ context: "promo", custom: "Info {{promo}} dong", template: "X", values }),
+      "Info Promo Akhir Pekan dong",
+    );
+  });
+
+  it("lalu template konteks", () => {
+    assert.equal(
+      resolveWhatsAppMessage({ context: "promo", custom: "  ", template: "Promo {{promo}}?", values }),
+      "Promo Promo Akhir Pekan?",
+    );
+  });
+
+  it("lalu teks bawaan konteks", () => {
+    assert.equal(
+      resolveWhatsAppMessage({ context: "promo", template: null, values }),
+      "Halo kak, saya mau tanya promo Promo Akhir Pekan",
+    );
+  });
+
+  it("kandidat yang kosong setelah diisi dilewati", () => {
+    assert.equal(
+      resolveWhatsAppMessage({ context: "default", template: "{{x}}" }),
+      "Halo kak, saya mau reservasi",
+    );
   });
 });

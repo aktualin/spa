@@ -5,60 +5,42 @@ import { getEventSlugs } from "@/lib/content/events";
 import { getJournalPosts } from "@/lib/content/journal";
 import { getPublishedPageSlugs } from "@/lib/content/pages";
 import { getActivePromos } from "@/lib/content/promos";
+import { getSitemapTimestamps } from "@/lib/content/seo";
+import { PUBLIC_STATIC_ROUTES } from "@/lib/domain/seo";
 import { getSiteUrl } from "@/lib/site-url";
 
 /**
- * `/sitemap.xml`.
+ * `/sitemap.xml`, di-generate dari database.
  *
- * Route publik statis ditulis manual (urutannya mencerminkan prioritas), lalu
- * halaman dinamis diambil dari database. Route admin dan API sengaja tidak
- * dimasukkan — lihat `robots.ts`.
+ * Route publik tetap berasal dari `PUBLIC_STATIC_ROUTES` (urutan = prioritas),
+ * lalu halaman dinamis diambil dari bacaan publik tiap modul — sehingga hanya
+ * konten terbit/aktif yang masuk. `lastModified` diambil dari `updatedAt`.
+ * Route admin dan API sengaja tidak dimasukkan — lihat `robots.ts`.
  */
-
-/** Route publik yang selalu ada, beserta bobot prioritasnya. */
-const STATIC_ROUTES: { path: string; priority: number }[] = [
-  { path: "", priority: 1 },
-  { path: "treatments", priority: 0.9 },
-  { path: "treatments/packages", priority: 0.8 },
-  { path: "menu", priority: 0.8 },
-  { path: "promos", priority: 0.8 },
-  { path: "membership", priority: 0.7 },
-  { path: "promos/membership", priority: 0.7 },
-  // /corporate-wellness kini redirect permanen ke /corporate.
-  { path: "corporate", priority: 0.7 },
-  { path: "our-story", priority: 0.6 },
-  { path: "our-story/journal", priority: 0.6 },
-  { path: "gallery", priority: 0.6 },
-  { path: "events", priority: 0.6 },
-  { path: "events/collaborations", priority: 0.5 },
-  { path: "retail", priority: 0.5 },
-  { path: "gift-card", priority: 0.5 },
-  { path: "contact", priority: 0.7 },
-  { path: "privacy-policy", priority: 0.2 },
-  { path: "terms-conditions", priority: 0.2 },
-];
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = getSiteUrl();
-  const url = (path: string) => (path ? `${siteUrl}/${path}` : siteUrl);
+  const url = (path: string) => (path === "/" ? siteUrl : `${siteUrl}${path}`);
 
-  const entries: MetadataRoute.Sitemap = STATIC_ROUTES.map((route) => ({
-    url: url(route.path),
-    changeFrequency: "monthly",
-    priority: route.priority,
-  }));
-
-  const [catalog, posts, eventSlugs, promos, pages] = await Promise.all([
+  const [catalog, posts, eventSlugs, promos, pages, stamps] = await Promise.all([
     getCatalogSlugs(),
     getJournalPosts(),
     getEventSlugs(),
     getActivePromos(),
     getPublishedPageSlugs(),
+    getSitemapTimestamps(),
   ]);
+
+  const entries: MetadataRoute.Sitemap = PUBLIC_STATIC_ROUTES.map((route) => ({
+    url: url(route.path),
+    lastModified: stamps.sections[route.group],
+    changeFrequency: route.changeFrequency,
+    priority: route.priority,
+  }));
 
   for (const slug of catalog.categories) {
     entries.push({
-      url: url(`treatments/${slug}`),
+      url: url(`/treatments/${slug}`),
+      lastModified: stamps.categories[slug],
       changeFrequency: "monthly",
       priority: 0.7,
     });
@@ -66,7 +48,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   for (const { categorySlug, treatmentSlug } of catalog.treatments) {
     entries.push({
-      url: url(`treatments/${categorySlug}/${treatmentSlug}`),
+      url: url(`/treatments/${categorySlug}/${treatmentSlug}`),
+      lastModified: stamps.treatments[treatmentSlug],
       changeFrequency: "monthly",
       priority: 0.6,
     });
@@ -74,7 +57,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   for (const slug of catalog.packages) {
     entries.push({
-      url: url(`treatments/packages/${slug}`),
+      url: url(`/treatments/packages/${slug}`),
+      lastModified: stamps.packages[slug],
       changeFrequency: "monthly",
       priority: 0.6,
     });
@@ -82,7 +66,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   for (const post of posts) {
     entries.push({
-      url: url(`our-story/journal/${post.slug}`),
+      url: url(`/our-story/journal/${post.slug}`),
       lastModified: post.updatedAt ?? post.publishedAt ?? undefined,
       changeFrequency: "yearly",
       priority: 0.5,
@@ -91,7 +75,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   for (const slug of eventSlugs) {
     entries.push({
-      url: url(`events/${slug}`),
+      url: url(`/events/${slug}`),
+      lastModified: stamps.events[slug],
       changeFrequency: "weekly",
       priority: 0.5,
     });
@@ -99,7 +84,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   for (const promo of promos) {
     entries.push({
-      url: url(`promos/${promo.slug}`),
+      url: url(`/promos/${promo.slug}`),
+      lastModified: stamps.promos[promo.slug],
       changeFrequency: "weekly",
       priority: 0.6,
     });
@@ -107,7 +93,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   for (const page of pages) {
     entries.push({
-      url: url(page.slug),
+      url: url(`/${page.slug}`),
       lastModified: page.updatedAt,
       changeFrequency: "monthly",
       priority: 0.5,

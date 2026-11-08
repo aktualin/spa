@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withPageSeo } from "@/lib/content/seo";
 import Link from "next/link";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
@@ -6,19 +7,22 @@ import { ArrowRight, Check, ChevronDown } from "@/components/icons";
 import { getMembershipProgram, getMembershipTiers } from "@/lib/content/membership";
 import { plainTextToHtml } from "@/lib/domain/rich-text";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
-import { MEMBER_MESSAGE, waLink } from "@/lib/whatsapp";
+import { whatsAppHref } from "@/lib/content/whatsapp";
 import { Reveal } from "@/components/reveal";
 
-export const metadata: Metadata = {
-  title: "Membership",
-  description:
-    "KAMA Membership — Rp 1,5jt per bulan. Satu essential service setiap bulan, harga anggota untuk semua treatment, diskon retail, dan benefit khusus.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return withPageSeo("/membership", {
+    title: "Membership",
+    description:
+      "KAMA Membership — Rp 1,5jt per bulan. Satu essential service setiap bulan, harga anggota untuk semua treatment, diskon retail, dan benefit khusus.",
+  });
+}
 
 export default async function MembershipPage() {
-  const [membership, tiers] = await Promise.all([
+  const [membership, tiers, joinHref] = await Promise.all([
     getMembershipProgram(),
     getMembershipTiers(),
+    whatsAppHref("membership"),
   ]);
 
   return (
@@ -36,9 +40,10 @@ export default async function MembershipPage() {
                 <div className="spacer-large" />
                 <div className="button-group">
                   <a
-                    href={waLink(MEMBER_MESSAGE)}
+                    href={joinHref}
                     target="_blank"
                     rel="noopener noreferrer"
+                    data-wa-context="membership"
                     className="button is-tertiary sizing-grow w-inline-block"
                   >
                     <div>Join KAMA Now</div>
@@ -163,9 +168,10 @@ export default async function MembershipPage() {
                       ) : null}
                       <div className="spacer-small" />
                       <a
-                        href={waLink(MEMBER_MESSAGE)}
+                        href={joinHref}
                         target="_blank"
                         rel="noopener noreferrer"
+                        data-wa-context="membership"
                         className="button is-tertiary is-icon w-inline-block"
                       >
                         <div>Join Now</div>

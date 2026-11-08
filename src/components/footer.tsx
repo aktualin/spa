@@ -1,19 +1,28 @@
 import Link from "next/link";
-import { ArrowRight, Email, Instagram, TikTok } from "./icons";
+import { ArrowRight, Email, Facebook, Instagram, TikTok } from "./icons";
 import { CopyrightYear } from "./copyright-year";
-import { footerTagline, socials } from "@/data/content";
+import { footerTagline } from "@/data/content";
 import { getNavigationData } from "@/lib/content/navigation";
+import { getSiteSettings, getWhatsAppTemplate } from "@/lib/content/site";
+import { footerSocials } from "@/lib/domain/site-settings";
 import { MEMBER_MESSAGE, waLink } from "@/lib/whatsapp";
 
 /* One icon per social platform — never a generic link glyph. */
 const socialIcons = {
   instagram: Instagram,
   tiktok: TikTok,
+  facebook: Facebook,
   email: Email,
 } as const;
 
 export async function Footer() {
-  const { footer: footerLinks } = await getNavigationData();
+  const [{ footer: footerLinks }, settings, memberTemplate] = await Promise.all([
+    getNavigationData(),
+    getSiteSettings(),
+    getWhatsAppTemplate("membership"),
+  ]);
+  // Ikon sosial dari Kontak & Umum; field kosong tidak ditampilkan.
+  const socials = footerSocials(settings);
   return (
     <footer id="footer" className="mt-auto">
       {/* Membership call-to-action */}
@@ -31,7 +40,7 @@ export async function Footer() {
                 Learn More
               </Link>
               <a
-                href={waLink(MEMBER_MESSAGE)}
+                href={waLink(memberTemplate ?? MEMBER_MESSAGE, settings.whatsappNumber)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-primary whitespace-nowrap"

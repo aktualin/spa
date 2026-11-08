@@ -7,6 +7,7 @@ import { Footer } from "@/components/footer";
 import { ArrowRight, Check } from "@/components/icons";
 import { packages, priceDisclaimer, treatments } from "@/data/content";
 import { getMenuEntry } from "@/lib/content/catalog";
+import { withPageSeo } from "@/lib/content/seo";
 
 // Daftar statis hanya untuk prerender saat build (Next mensyaratkan minimal
 // satu slug); isi halaman selalu dibaca dari database lewat getMenuEntry.
@@ -26,13 +27,13 @@ export async function generateMetadata({
     return { title: "Treatment Not Found" };
   }
 
-  return {
+  return withPageSeo(`/menu/${slug}`, {
     title: entry.name,
     description:
       entry.kind === "package"
         ? `${entry.subtitle}. ${entry.description}`
         : [entry.tagline, entry.description].filter(Boolean).join(". "),
-  };
+  });
 }
 
 export default function TreatmentPage({

@@ -114,7 +114,7 @@ export async function GalleryTeaserSection() {
               rel="noopener noreferrer"
               className="text-body text-cocoa/70 transition-colors hover:text-cocoa"
             >
-              @kama__spa
+              @{settings.instagramUsername}
             </a>
             <a
               href="https://www.instagram.com/explore/search/keyword/?q=%23kamaspa"

@@ -1,43 +1,68 @@
 /**
  * Tombol WhatsApp untuk halaman publik.
  *
- * Semua link `wa.me` dibangun lewat `@/lib/whatsapp` — satu-satunya tempat
- * yang boleh membentuk URL WhatsApp.
+ * Semua link `wa.me` dibangun lewat `@/lib/content/whatsapp` (nomor dari
+ * pengaturan situs + template per konteks) — jangan menulis URL WhatsApp
+ * langsung di halaman. Atribut `data-wa-context` menandai konteks tombol
+ * untuk pelacakan klik (GA4) tanpa mengubah tampilan.
  */
-import { waLink } from "@/lib/whatsapp";
+import type { ReactNode } from "react";
 
-type WaButtonProps = {
-  /** Pesan yang dilihat tamu di WhatsApp. */
-  message: string;
+import { whatsAppHref, type WhatsAppHrefOptions } from "@/lib/content/whatsapp";
+import type { WhatsAppContextKey } from "@/lib/domain/whatsapp-template";
+
+type WaButtonProps = WhatsAppHrefOptions & {
+  /** Konteks template WhatsApp (treatment, package, promo, …). */
+  context: WhatsAppContextKey;
   /** Label tombol. */
   label: string;
   /** Gaya tombol; default mengikuti `.button` gaya halaman lama. */
   className?: string;
 };
 
-/** Pesan default pemesanan treatment. */
-export function reserveMessage(name: string): string {
-  return `Halo kak, saya mau reservasi ${name}`;
-}
-
-/** Pesan default pembelian produk retail. */
-export function buyMessage(name: string): string {
-  return `Halo kak, saya mau beli ${name}`;
-}
-
-export function WaButton({
-  message,
+/** Tombol WhatsApp bergaya `.button` lama; href dibaca di server. */
+export async function WaButton({
+  context,
+  custom,
+  values,
   label,
   className = "button is-secondary is-icon w-inline-block",
 }: WaButtonProps) {
+  const href = await whatsAppHref(context, { custom, values });
+  return (
+    <WaLink href={href} context={context} className={className}>
+      <div>{label}</div>
+    </WaLink>
+  );
+}
+
+/**
+ * Anchor WhatsApp polos (target baru, `noopener`) dengan penanda konteks.
+ * Markup-nya sama dengan `WhatsAppLink` di `page-parts` plus `data-wa-context`.
+ */
+export function WaLink({
+  href,
+  context,
+  className = "btn btn-primary",
+  children,
+  ...rest
+}: {
+  href: string;
+  context: WhatsAppContextKey;
+  className?: string;
+  children: ReactNode;
+  "aria-label"?: string;
+}) {
   return (
     <a
-      href={waLink(message)}
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
       className={className}
+      data-wa-context={context}
+      {...rest}
     >
-      <div>{label}</div>
+      {children}
     </a>
   );
 }

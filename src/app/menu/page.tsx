@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { withPageSeo } from "@/lib/content/seo";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Navigation } from "@/components/navigation";
@@ -14,11 +15,13 @@ import {
 } from "@/components/public/menu-data";
 import { Reveal } from "@/components/reveal";
 
-export const metadata: Metadata = {
-  title: "Menu Treatments",
-  description:
-    "KAMA Spa menu — massage, body scrub, face ritual, head & scalp treatment, bath ritual, dan paket All Day Spa.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return withPageSeo("/menu", {
+    title: "Menu Treatments",
+    description:
+      "KAMA Spa menu — massage, body scrub, face ritual, head & scalp treatment, bath ritual, dan paket All Day Spa.",
+  });
+}
 
 const categoryLabels: Record<string, string> = {
   Massage: "Massage",

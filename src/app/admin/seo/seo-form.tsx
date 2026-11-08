@@ -9,6 +9,7 @@ import {
   type ActionState,
 } from "../actions/seo";
 import { ImageField } from "../image-field";
+import { assessSeoText, formatPageTitle } from "@/lib/domain/seo";
 import {
   ConfirmSubmit,
   ErrorMessage,
@@ -32,8 +33,11 @@ export function PageSeoForm({ entry }: { entry: PageSeoFormData }) {
   const [title, setTitle] = useState(entry.title);
   const [description, setDescription] = useState(entry.description);
 
-  const titleLength = title.length;
-  const descriptionLength = description.length;
+  const renderedTitle = title.trim() ? formatPageTitle(title) : "";
+  const titleCheck = assessSeoText(renderedTitle, "title");
+  const descriptionCheck = assessSeoText(description, "description");
+  const toneOf = (status: string) =>
+    status === "long" ? "text-xs text-amber-700" : "text-xs text-neutral-500";
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -51,7 +55,7 @@ export function PageSeoForm({ entry }: { entry: PageSeoFormData }) {
         <Field
           label="Path"
           htmlFor="path"
-          hint={'Harus diawali "/", contoh: /contact'}
+          hint={'Alamat halaman di situs ini, diawali "/", contoh: /contact. Untuk treatment, artikel, event, promo, dan halaman, gunakan field SEO di modulnya.'}
         >
           <input
             id="path"
@@ -66,7 +70,7 @@ export function PageSeoForm({ entry }: { entry: PageSeoFormData }) {
         <Field
           label="Meta title"
           htmlFor="title"
-          hint="Idealnya 60 karakter atau kurang."
+          hint="Akhiran “ • KAMA Spa” ditambahkan otomatis (kecuali judul sudah memuat “KAMA Spa”). Idealnya total ≤ 60 karakter."
         >
           <input
             id="title"
@@ -76,20 +80,16 @@ export function PageSeoForm({ entry }: { entry: PageSeoFormData }) {
             className={inputClass}
           />
         </Field>
-        <p
-          className={
-            titleLength > 60
-              ? "text-xs text-amber-700"
-              : "text-xs text-neutral-500"
-          }
-        >
-          {titleLength} karakter{titleLength > 60 ? " — terlalu panjang." : "."}
+        <p className={toneOf(titleCheck.status)}>
+          {titleCheck.status === "empty"
+            ? "Kosong — halaman memakai judul bawaannya."
+            : `Tampil sebagai “${renderedTitle}”. ${titleCheck.message}`}
         </p>
 
         <Field
           label="Meta description"
           htmlFor="description"
-          hint="Idealnya 160 karakter atau kurang."
+          hint="Ringkasan di hasil pencarian. Idealnya 70–160 karakter."
         >
           <textarea
             id="description"
@@ -100,16 +100,21 @@ export function PageSeoForm({ entry }: { entry: PageSeoFormData }) {
             className={inputClass}
           />
         </Field>
-        <p
-          className={
-            descriptionLength > 160
-              ? "text-xs text-amber-700"
-              : "text-xs text-neutral-500"
-          }
-        >
-          {descriptionLength} karakter
-          {descriptionLength > 160 ? " — terlalu panjang." : "."}
-        </p>
+        <p className={toneOf(descriptionCheck.status)}>{descriptionCheck.message}</p>
+
+        {renderedTitle || description.trim() ? (
+          <div className="rounded-md border border-neutral-200 bg-white px-4 py-3">
+            <p className="text-[11px] uppercase tracking-wide text-neutral-400">
+              Pratinjau hasil pencarian
+            </p>
+            <p className="mt-1 truncate text-base text-blue-800">
+              {renderedTitle || "(judul bawaan halaman)"}
+            </p>
+            <p className="line-clamp-2 text-sm text-neutral-600">
+              {description.trim() || "(description bawaan halaman)"}
+            </p>
+          </div>
+        ) : null}
 
         <ImageField
           name="ogImageUrl"
@@ -117,6 +122,10 @@ export function PageSeoForm({ entry }: { entry: PageSeoFormData }) {
           folder="seo"
           defaultValue={entry.ogImageUrl}
         />
+        <p className="text-xs text-neutral-500">
+          Gambar saat tautan halaman ini dibagikan (ideal 1200×630). Kosong =
+          gambar halaman itu sendiri, atau gambar OG bawaan dari pengaturan.
+        </p>
 
         <ErrorMessage error={state.error} />
 

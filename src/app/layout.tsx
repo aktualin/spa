@@ -1,37 +1,72 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { WhatsAppButton } from "@/components/whatsapp-button";
+import { getSeoSettings } from "@/lib/content/seo";
+import {
+  DEFAULT_DESCRIPTION,
+  DEFAULT_OG_DESCRIPTION,
+  DEFAULT_TITLE,
+  OG_LOCALE,
+  SITE_NAME,
+  TITLE_TEMPLATE,
+  faviconIcons,
+  indexingDisabled,
+} from "@/lib/domain/seo";
 import { getSiteUrl } from "@/lib/site-url";
 
-export const metadata: Metadata = {
-  // Tanpa ini, URL Open Graph dan canonical dirender relatif dan ditolak
-  // sebagian crawler.
-  metadataBase: new URL(getSiteUrl()),
-  alternates: { canonical: "/" },
-  title: {
-    default: "KAMA Spa • Wellness Sanctuary di South Jakarta",
-    template: "%s • KAMA Spa",
-  },
-  description:
-    "KAMA Spa adalah wellness sanctuary di jantung South Jakarta. Memadukan teknik penyembuhan tradisional dengan pendekatan wellness modern untuk treatments, massage, dan corporate wellness.",
-  keywords: [
-    "KAMA Spa",
-    "massage Jakarta",
-    "spa South Jakarta",
-    "day spa",
-    "corporate wellness",
-    "Sukma Laya",
-    "Urip Padma",
-  ],
-  openGraph: {
-    title: "KAMA Spa • Wellness Sanctuary di South Jakarta",
-    description:
-      "Combining traditional healing techniques and modern wellness approaches, KAMA Spa offers thoughtfully curated treatments designed to restore balance, relaxation, and mindful presence.",
-    type: "website",
-    locale: "id_ID",
-    siteName: "KAMA Spa",
-  },
-};
+/**
+ * Metadata root. Favicon, gambar OG bawaan, dan verifikasi Google Search
+ * Console dibaca dari `/admin/seo/settings` lewat fungsi `"use cache"`, jadi
+ * perubahan tampil tanpa redeploy dan situs tetap bisa di-prerender.
+ *
+ * Canonical SENGAJA tidak diset di sini: nilai root diwarisi semua halaman
+ * yang tidak mengisinya sendiri, dan canonical "/" di halaman lain menyuruh
+ * Google mengabaikan halaman tersebut. Canonical diisi per halaman oleh
+ * `withPageSeo`.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSeoSettings();
+  const ogImages = settings.defaultOgImageUrl
+    ? [{ url: settings.defaultOgImageUrl }]
+    : undefined;
+
+  return {
+    // Tanpa ini, URL Open Graph dan canonical dirender relatif dan ditolak
+    // sebagian crawler.
+    metadataBase: new URL(getSiteUrl()),
+    applicationName: SITE_NAME,
+    title: {
+      default: DEFAULT_TITLE,
+      template: TITLE_TEMPLATE,
+    },
+    description: DEFAULT_DESCRIPTION,
+    keywords: [
+      "KAMA Spa",
+      "massage Jakarta",
+      "spa South Jakarta",
+      "day spa",
+      "corporate wellness",
+      "Sukma Laya",
+      "Urip Padma",
+    ],
+    openGraph: {
+      title: DEFAULT_TITLE,
+      description: DEFAULT_OG_DESCRIPTION,
+      type: "website",
+      locale: OG_LOCALE,
+      siteName: SITE_NAME,
+      ...(ogImages ? { images: ogImages } : {}),
+    },
+    twitter: { card: ogImages ? "summary_large_image" : "summary" },
+    icons: faviconIcons(settings.faviconUrl),
+    ...(settings.gscVerification
+      ? { verification: { google: settings.gscVerification } }
+      : {}),
+    ...(indexingDisabled(process.env)
+      ? { robots: { index: false, follow: false } }
+      : {}),
+  };
+}
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

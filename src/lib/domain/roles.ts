@@ -1,14 +1,18 @@
 /**
  * Pemeriksaan role admin.
  *
- * Rule yang berlaku (Lampiran I Bagian D):
- * - ADMIN   → seluruh 14 modul, termasuk "Pengguna Admin".
- * - EDITOR  → 13 modul konten; tidak boleh mengelola akun admin lain.
+ * Dua role yang berlaku:
+ * - ADMIN   → seluruh modul, termasuk modul pengaturan sistem (Pengguna Admin,
+ *             Kontak & Umum, Backup & Status).
+ * - EDITOR  → modul konten saja.
+ *
+ * Matriks role → modul lengkap (sumber tunggal) ada di
+ * src/app/admin/modules.ts; pencocokan path-nya di ./admin-access.ts.
  */
 
 export type AdminRoleName = "ADMIN" | "EDITOR";
 
-/** Role yang boleh mengelola modul "Pengguna Admin" (nomor 14). */
+/** Role untuk modul pengaturan sistem (Pengguna Admin, Kontak & Umum, Backup & Status). */
 export const ADMIN_ONLY_ROLES: readonly AdminRoleName[] = ["ADMIN"];
 
 /** Role yang boleh mengelola modul konten. */

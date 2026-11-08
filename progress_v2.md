@@ -17,19 +17,20 @@ Aturan kerja yang berlaku (dari user):
 |---|---|---|---|
 | 1–9 | DB, auth, Halaman & URL, Menu, Treatments, Harga, Media Library, Promos & Gift Card, Membership | ✅ | lihat `git log` |
 | — | Fondasi schema Events/Corporate/Highlight | ✅ | `8248006` |
+| — | Fondasi schema SiteSettings (IG/GA4/GSC/favicon/OG) + BackupRun | ✅ | `ea2a28f` |
 | 10 | Journal | ✅ | `d71603c` |
 | 11 | Events | ✅ | `7b700d2`, `473bfa7` |
 | 12 | KAMA Retail | ✅ | `85a336d` |
 | 13 | Corporate Wellness | ✅ | `65c5f9b`, `c86df3d` |
 | 14 | Homepage & Our Story | ✅ | `c7b18fe` |
-| 15 | Kontak & Umum (alamat, jam, WA, email, sosmed, Maps, Fresha, IG username, GA4 ID) | ⏳ | |
-| 16 | SEO (meta per halaman/artikel, OG image, favicon, sitemap/robots dari DB, GSC) | ⏳ | |
-| 17 | Pengguna Admin (CRUD, role, ganti password, batas akses per role) | ⏳ | |
-| 18 | WhatsApp Templates (per konteks, nomor dari settings, click-to-chat, Book Now) | ⏳ | |
-| 19 | Backup & Status (backup terakhir, SSL, domain, versi, backup manual/otomatis) | ⏳ | |
+| 15 | Kontak & Umum (alamat, jam, WA, email, sosmed, Maps, Fresha, IG username, GA4 ID) | ✅ | commit "BUILD-15–19" |
+| 16 | SEO (meta per halaman/artikel, OG image, favicon, sitemap/robots dari DB, GSC) | ✅ | commit "BUILD-15–19" |
+| 17 | Pengguna Admin (CRUD, role, ganti password, batas akses per role) | ✅ | commit "BUILD-15–19" |
+| 18 | WhatsApp Templates (per konteks, nomor dari settings, click-to-chat, Book Now) | ✅ | commit "BUILD-15–19" |
+| 19 | Backup & Status (backup terakhir, SSL, domain, versi, backup manual/otomatis) | ✅ (perlu uji manual setelah deploy) | commit "BUILD-15–19" |
 | 20 | Homepage dinamis (hero, brand intro, signature, promo/event highlight, gallery, IG feed, reviews, footer) | ⏳ | |
 | 21 | Halaman publik yang belum ada (cek kelengkapan + slug DB + redirect 301) | ⏳ | |
-| 22 | Integrasi WhatsApp, GA4, Google Maps, Instagram feed | ⏳ | |
+| 22 | Integrasi WhatsApp, GA4, Google Maps, Instagram feed | ⏳ (bagian WhatsApp ikut dikerjakan di BUILD-18) | |
 | 23 | Hardening (responsif, browser, HTTPS, gambar, login limit, Zod, sanitasi, rate limit) | ⏳ | |
 | 24 | Testing sesuai PLAN-9 + perbaikan sampai DoD PLAN-8 | ⏳ | |
 | 25 | Serah terima sesuai PLAN-10 | ⏳ | |
@@ -40,3 +41,11 @@ Aturan kerja yang berlaku (dari user):
 - Retail: produk kolaborasi masih memakai `isHighlight` (label "Highlight / Kolaborasi"). Field terpisah butuh kolom DB baru.
 - Homepage: teks Reviews, Brand Intro, Socials, judul bagian Our Story masih hardcode (butuh kolom baru) — akan ditinjau di BUILD-20.
 - Env produksi: `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` (wajib, fail-closed), `RESEND_API_KEY`, `EMAIL_FROM`, opsional `CORPORATE_INQUIRY_TO`.
+
+### Sisa dari BUILD-15–19 (masuk daftar kerja berikutnya)
+- Book Now header desktop & tombol membership masih ke `/contact` (keputusan produk: ke WhatsApp?).
+- Footer, `/promos/membership`, `events/[slug]`, `location-info`, corporate masih memakai nomor WA hardcode via `waLink` (BUILD-22).
+- Duplikasi konten `/menu/[slug]` vs `/treatments/...`: tentukan URL utama + canonical (BUILD-21/23).
+- `alt` Instagram di `socials.tsx` / `gallery-teaser.tsx` perlu fallback.
+- Backup: perlu uji end-to-end setelah deploy (isi secret GitHub `BACKUP_DATABASE_URL`, `BACKUP_PASSPHRASE`, `BACKUP_REPORT_URL`, `BACKUP_REPORT_SECRET`; env Vercel `BACKUP_REPORT_SECRET`).
+- Ikon email footer kini ke `hello@kamaspa.id` (dari DB), sebelumnya marketing@.

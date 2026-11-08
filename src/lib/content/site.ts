@@ -4,49 +4,25 @@
  *
  * Fallback memakai konstanta statis (`src/data/content.ts` + `src/lib/whatsapp.ts`)
  * sehingga halaman tetap utuh ketika DB kosong atau tidak terjangkau.
+ * Baris `SiteSettings` yang belum ada → seluruh nilai bawaan (bukan error).
  */
 import { cacheLife, cacheTag } from "next/cache";
 
-import { site as staticSite } from "@/data/content";
 import {
-  MEMBER_MESSAGE,
-  RESERVE_MESSAGE,
-  WHATSAPP_NUMBER,
-} from "@/lib/whatsapp";
+  mergeSiteSettings,
+  type SiteSettings,
+} from "@/lib/domain/site-settings";
+import { MEMBER_MESSAGE, RESERVE_MESSAGE } from "@/lib/whatsapp";
 import { safeQueryWithMeta } from "@/lib/safe-query";
 
 import { CONTENT_TAGS } from "./tags";
 
-export type SiteSettings = {
-  address: string;
-  openingHours: string[];
-  whatsappNumber: string;
-  email: string;
-  phone: string;
-  instagramUrl: string;
-  tiktokUrl: string;
-  facebookUrl: string;
-  freshaUrl: string;
-  mapsEmbedUrl: string;
-};
+export type { SiteSettings };
 
-/** Nilai default — sama persis dengan data statis yang dipakai halaman lama. */
-function staticSettings(): SiteSettings {
-  return {
-    address: staticSite.address,
-    openingHours: [staticSite.hours],
-    whatsappNumber: WHATSAPP_NUMBER,
-    email: staticSite.email,
-    phone: staticSite.phone,
-    instagramUrl: staticSite.instagram,
-    tiktokUrl: staticSite.tiktok,
-    facebookUrl: "",
-    freshaUrl: "",
-    mapsEmbedUrl: "",
-  };
-}
-
-/** Pengaturan situs (alamat, jam, WA, email, sosial, maps). */
+/**
+ * Pengaturan situs (alamat, jam, WA, email, sosial, maps, username IG, GA4).
+ * Aturan fallback per field ada di `mergeSiteSettings` (domain/site-settings).
+ */
 export async function getSiteSettings(): Promise<SiteSettings> {
   "use cache";
   cacheTag(CONTENT_TAGS.settings);
@@ -56,26 +32,24 @@ export async function getSiteSettings(): Promise<SiteSettings> {
       const { prisma } = await import("@/lib/prisma");
       const row = await prisma.siteSettings.findUnique({
         where: { id: "singleton" },
+        select: {
+          address: true,
+          mapsEmbedUrl: true,
+          openingHours: true,
+          whatsappNumber: true,
+          email: true,
+          phone: true,
+          instagramUrl: true,
+          instagramUsername: true,
+          tiktokUrl: true,
+          facebookUrl: true,
+          freshaUrl: true,
+          ga4MeasurementId: true,
+        },
       });
-      if (!row) throw new Error("pengaturan situs kosong");
-      const fallback = staticSettings();
-      return {
-        address: row.address?.trim() || fallback.address,
-        openingHours:
-          row.openingHours && row.openingHours.length > 0
-            ? row.openingHours
-            : fallback.openingHours,
-        whatsappNumber: (row.whatsappNumber || "").replace(/\D/g, "") || fallback.whatsappNumber,
-        email: row.email?.trim() || fallback.email,
-        phone: row.phone?.trim() || fallback.phone,
-        instagramUrl: row.instagramUrl?.trim() || fallback.instagramUrl,
-        tiktokUrl: row.tiktokUrl?.trim() || fallback.tiktokUrl,
-        facebookUrl: row.facebookUrl?.trim() || fallback.facebookUrl,
-        freshaUrl: row.freshaUrl?.trim() || fallback.freshaUrl,
-        mapsEmbedUrl: row.mapsEmbedUrl?.trim() || fallback.mapsEmbedUrl,
-      };
+      return mergeSiteSettings(row);
     },
-    staticSettings(),
+    mergeSiteSettings(null),
   );
 
   if (usedFallback) cacheLife("minutes");

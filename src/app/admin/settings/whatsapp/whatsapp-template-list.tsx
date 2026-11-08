@@ -5,12 +5,16 @@ import { useActionState, useState } from "react";
 import {
   deleteWhatsAppTemplateAction,
   saveWhatsAppTemplateAction,
-  type ActionState,
-} from "../../actions/settings";
+  type WhatsAppTemplateActionState,
+} from "../../actions/whatsapp-templates";
 import {
-  extractPlaceholders,
+  MAX_TEMPLATE_LENGTH,
   buildWhatsAppLink,
-  renderTemplate,
+  fillTemplate,
+  getContextDefinition,
+  sampleValues,
+  validateTemplate,
+  type WhatsAppContextKey,
 } from "@/lib/domain/whatsapp-template";
 import {
   ConfirmSubmit,
@@ -20,62 +24,57 @@ import {
   inputClass,
 } from "../_components/form-ui";
 
-export type WhatsAppTemplateRow = {
+export type WhatsAppContextRow = {
+  key: WhatsAppContextKey;
+  /** Isi template di DB; `null` = belum tersimpan (website memakai teks bawaan). */
+  message: string | null;
+};
+
+export type OtherTemplateRow = {
   id: string;
   key: string;
   label: string;
   message: string;
 };
 
-const initialState: ActionState = { error: null };
-
-/** Nilai contoh untuk preview placeholder. */
-const SAMPLE_VALUES: Record<string, string> = {
-  name: "Budi",
-  customerName: "Budi",
-  treatmentName: "Sukma Laya",
-  treatment: "Sukma Laya",
-  price: "Rp 145.000",
-  priceIdr: "145000",
-  duration: "60 menit",
-  promoName: "Promo Ramadan",
-  branch: "KAMA Spa Grand Indonesia",
-  date: "Sabtu, 10 Mei 2026",
-  time: "14.00",
-};
+const initialState: WhatsAppTemplateActionState = { error: null };
 
 export function WhatsAppTemplateList({
   templates,
+  others,
   number,
 }: {
-  templates: WhatsAppTemplateRow[];
+  templates: WhatsAppContextRow[];
+  others: OtherTemplateRow[];
   number: string;
 }) {
-  const [adding, setAdding] = useState(false);
-
   return (
     <div className="space-y-4">
       {templates.map((template) => (
-        <WhatsAppTemplateForm key={template.id} template={template} number={number} />
+        <WhatsAppTemplateForm key={template.key} template={template} number={number} />
       ))}
 
-      {adding ? (
-        <div className="rounded-lg border border-dashed border-neutral-300 bg-neutral-50 p-4">
-          <WhatsAppTemplateForm
-            template={null}
-            number={number}
-            onDone={() => setAdding(false)}
-          />
+      {others.length > 0 ? (
+        <div className="space-y-3 rounded-lg border border-neutral-200 bg-white p-4">
+          <h2 className="text-sm font-semibold text-neutral-900">
+            Template lain (tidak dipakai website)
+          </h2>
+          {others.map((row) => (
+            <div key={row.id} className="border-t border-neutral-100 pt-3 text-sm">
+              <p className="font-medium text-neutral-800">
+                {row.label} <code className="text-xs text-neutral-500">{row.key}</code>
+              </p>
+              <p className="mt-1 whitespace-pre-wrap text-neutral-600">{row.message}</p>
+              <form action={deleteWhatsAppTemplateAction} className="mt-2">
+                <input type="hidden" name="id" value={row.id} />
+                <ConfirmSubmit message={`Hapus template "${row.label}"?`}>
+                  Hapus template
+                </ConfirmSubmit>
+              </form>
+            </div>
+          ))}
         </div>
-      ) : (
-        <button
-          type="button"
-          onClick={() => setAdding(true)}
-          className="rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-800 hover:bg-neutral-50"
-        >
-          + Tambah template
-        </button>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -83,134 +82,115 @@ export function WhatsAppTemplateList({
 function WhatsAppTemplateForm({
   template,
   number,
-  onDone,
 }: {
-  template: WhatsAppTemplateRow | null;
+  template: WhatsAppContextRow;
   number: string;
-  onDone?: () => void;
 }) {
-  const [state, formAction] = useActionState(
-    saveWhatsAppTemplateAction,
-    initialState,
-  );
-  const [message, setMessage] = useState(template?.message ?? "");
+  const context = getContextDefinition(template.key);
+  const [state, formAction] = useActionState(saveWhatsAppTemplateAction, initialState);
+  const [message, setMessage] = useState(template.message ?? context.builtIn);
 
-  const placeholders = extractPlaceholders(message);
-  const preview = renderTemplate(message, SAMPLE_VALUES);
-  const link = number ? buildWhatsAppLink(preview, number) : null;
+  const { errors, warnings } = validateTemplate(template.key, message);
+  const preview = fillTemplate(message, sampleValues(template.key));
+  const link = buildWhatsAppLink(preview, number);
+  const fieldId = `message-${template.key}`;
 
   return (
-    <>
-      <form
-        action={formAction}
-        className="space-y-3 rounded-lg border border-neutral-200 bg-white p-4"
-      >
-      {template ? <input type="hidden" name="id" value={template.id} /> : null}
+    <form
+      action={formAction}
+      className="space-y-3 rounded-lg border border-neutral-200 bg-white p-4"
+    >
+      <input type="hidden" name="key" value={template.key} />
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Field
-          label="Key"
-          htmlFor={`key-${template?.id ?? "new"}`}
-          hint="Huruf kecil, angka, dan tanda hubung."
-        >
-          <input
-            id={`key-${template?.id ?? "new"}`}
-            name="key"
-            defaultValue={template?.key ?? ""}
-            required
-            pattern="[a-z0-9]+(-[a-z0-9]+)*"
-            className={inputClass}
-          />
-        </Field>
-
-        <Field label="Label" htmlFor={`label-${template?.id ?? "new"}`}>
-          <input
-            id={`label-${template?.id ?? "new"}`}
-            name="label"
-            defaultValue={template?.label ?? ""}
-            required
-            className={inputClass}
-          />
-        </Field>
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="text-sm font-semibold text-neutral-900">
+          {context.label}{" "}
+          <code className="text-xs font-normal text-neutral-500">{context.key}</code>
+        </h2>
+        {template.message === null ? (
+          <span className="rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-800">
+            Belum tersimpan — memakai teks bawaan
+          </span>
+        ) : null}
       </div>
+      <p className="text-xs text-neutral-500">Dipakai di: {context.usedOn}</p>
 
       <Field
         label="Pesan"
-        htmlFor={`message-${template?.id ?? "new"}`}
-        hint="Placeholder ditulis seperti {{nama}}."
+        htmlFor={fieldId}
+        hint={`${message.trim().length}/${MAX_TEMPLATE_LENGTH} karakter.`}
       >
         <textarea
-          id={`message-${template?.id ?? "new"}`}
+          id={fieldId}
           name="message"
           value={message}
           onChange={(event) => setMessage(event.target.value)}
-          rows={4}
+          rows={3}
           required
+          maxLength={MAX_TEMPLATE_LENGTH + 200}
           className={inputClass}
         />
       </Field>
 
       <div className="space-y-2 rounded-md bg-neutral-50 p-3 text-xs text-neutral-600">
         <p>
-          Placeholder terdeteksi:{" "}
-          {placeholders.length > 0 ? (
-            placeholders.map((name) => (
-              <code
-                key={name}
-                className="mr-1 rounded bg-neutral-200 px-1 py-0.5 text-[11px]"
-              >
-                {`{{${name}}}`}
-              </code>
-            ))
-          ) : (
-            "tidak ada"
-          )}
+          Placeholder tersedia:{" "}
+          {context.placeholders.length > 0
+            ? context.placeholders.map((placeholder) => (
+                <button
+                  key={placeholder.name}
+                  type="button"
+                  title={placeholder.description}
+                  onClick={() => setMessage((current) => `${current} {{${placeholder.name}}}`)}
+                  className="mr-1 rounded bg-neutral-200 px-1 py-0.5 font-mono text-[11px] hover:bg-neutral-300"
+                >
+                  {`{{${placeholder.name}}}`}
+                </button>
+              ))
+            : "tidak ada (pesan dipakai apa adanya)"}
         </p>
-        <p className="whitespace-pre-wrap text-neutral-700">Preview: {preview}</p>
-        {link ? (
-          <p className="truncate">
-            Link:{" "}
-            <a
-              href={link}
-              target="_blank"
-              rel="noreferrer"
-              className="text-neutral-800 underline"
-            >
-              {link}
-            </a>
+        {context.placeholders.length > 0 ? (
+          <ul className="list-inside list-disc">
+            {context.placeholders.map((placeholder) => (
+              <li key={placeholder.name}>
+                <code>{`{{${placeholder.name}}}`}</code> — {placeholder.description}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        <p className="whitespace-pre-wrap text-neutral-700">Pratinjau: {preview}</p>
+        <p className="truncate">
+          Tautan:{" "}
+          <a href={link} target="_blank" rel="noreferrer" className="text-neutral-800 underline">
+            {link}
+          </a>
+        </p>
+        {errors.map((error) => (
+          <p key={error} className="text-red-700">
+            {error}
           </p>
-        ) : (
-          <p>
-            Isi nomor WhatsApp di modul Kontak &amp; Umum agar preview link
-            tersedia.
+        ))}
+        {warnings.map((warning) => (
+          <p key={warning} className="text-amber-700">
+            Perhatian: {warning}
           </p>
-        )}
+        ))}
       </div>
 
       <ErrorMessage error={state.error} />
 
       <div className="flex flex-wrap items-center gap-3 border-t border-neutral-100 pt-3">
-        <SaveButton label={template ? "Simpan template" : "Tambah template"} />
-        {onDone ? (
+        <SaveButton label="Simpan template" />
+        {message !== context.builtIn ? (
           <button
             type="button"
-            onClick={onDone}
+            onClick={() => setMessage(context.builtIn)}
             className="text-sm text-neutral-600 hover:underline"
           >
-            Batal
+            Kembalikan teks bawaan
           </button>
         ) : null}
       </div>
-      </form>
-
-      {template ? (
-        <form action={deleteWhatsAppTemplateAction} className="mt-2">
-          <input type="hidden" name="id" value={template.id} />
-          <ConfirmSubmit message={`Hapus template "${template.label}"?`}>
-            Hapus template
-          </ConfirmSubmit>
-        </form>
-      ) : null}
-    </>
+    </form>
   );
 }

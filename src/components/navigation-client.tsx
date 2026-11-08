@@ -7,7 +7,6 @@ import { Logo } from "./logo";
 import { ChevronDown, Close, ExternalLink, WhatsApp } from "./icons";
 import type { NavLink, NavMegaGroup } from "@/data/content";
 import type { NavData } from "@/lib/domain/menu-nav";
-import { RESERVE_MESSAGE, waLink } from "@/lib/whatsapp";
 
 /* Owner of the page scroll lock — only one navigation may hold it. */
 let bodyLockToken: object | null = null;
@@ -218,10 +217,13 @@ export function NavigationClient({
   header,
   mobile,
   bookNow,
+  whatsappHref,
 }: {
   header: NavData;
   mobile: NavData;
   bookNow: string;
+  /** Tautan wa.me (nomor + template "default") — dibangun di server. */
+  whatsappHref: string;
 }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
@@ -623,7 +625,8 @@ export function NavigationClient({
                 {bookNow}
               </Link>
               <a
-                href={waLink(RESERVE_MESSAGE)}
+                href={whatsappHref}
+                data-wa-context="default"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Chat via WhatsApp"

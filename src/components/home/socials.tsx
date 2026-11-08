@@ -1,6 +1,7 @@
 import { ArrowRight, Instagram } from "@/components/icons";
-import { site } from "@/data/content";
+import { site as staticSite } from "@/data/content";
 import { Reveal } from "@/components/reveal";
+import { getSiteSettings } from "@/lib/content/site";
 
 const galleryImages = [
   "/img/kama/01-incense.jpg",
@@ -17,7 +18,10 @@ const galleryImages = [
   "/img/kama/corporate/12-guest-lounge.jpg",
 ];
 
-export function SocialsSection() {
+export async function SocialsSection() {
+  // URL & username Instagram dari Kontak & Umum; kosong → tautan bawaan.
+  const settings = await getSiteSettings();
+  const site = { instagram: settings.instagramUrl || staticSite.instagram };
   return (
     <Reveal as="section" className="bg-cream-soft">
       <div className="container-kama py-14 md:py-16 lg:py-20">
@@ -28,7 +32,7 @@ export function SocialsSection() {
               href={site.instagram}
               className="text-body text-cocoa/70 transition-colors hover:text-cocoa"
             >
-              @kama__spa
+              @{settings.instagramUsername}
             </a>
             <a
               href="https://www.instagram.com/explore/search/keyword/?q=%23kamaspa"
