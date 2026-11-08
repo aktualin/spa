@@ -9,6 +9,7 @@ import { CONTENT_TAGS } from "@/lib/content/tags";
 import {
   BANNER_LIMITS,
   isBannerKey,
+  isSafeCtaHref,
   validateBannerInput,
 } from "@/lib/domain/homepage-banner";
 import {
@@ -34,6 +35,8 @@ const sectionSchema = z.object({
   subtitle: z.string().trim().optional(),
   bodyHtml: z.string().optional(),
   imageUrl: z.union([z.string().trim().url(), z.literal("")]).optional(),
+  ctaLabel: z.string().trim().optional(),
+  ctaHref: z.string().trim().optional(),
 });
 
 /**
@@ -196,12 +199,29 @@ export async function saveHomepageSectionAction(
     subtitle: formData.get("subtitle") ?? undefined,
     bodyHtml: formData.get("bodyHtml") ?? undefined,
     imageUrl: formData.get("imageUrl") ?? undefined,
+    ctaLabel: formData.get("ctaLabel") ?? undefined,
+    ctaHref: formData.get("ctaHref") ?? undefined,
   });
   if (!parsed.success) {
     return { error: firstIssue(parsed.error) };
   }
 
-  const { title, subtitle, bodyHtml, imageUrl } = parsed.data;
+  const { title, subtitle, bodyHtml, imageUrl, ctaLabel, ctaHref } = parsed.data;
+
+  // Tombol hanya berarti bila label dan tujuannya lengkap; aturan tujuan aman
+  // dipakai ulang dari modul banner supaya validasinya satu sumber.
+  if (Boolean(ctaLabel) !== Boolean(ctaHref)) {
+    return {
+      error:
+        "Label tombol dan tujuan tombol harus diisi berpasangan (atau dikosongkan keduanya).",
+    };
+  }
+  if (ctaHref && !isSafeCtaHref(ctaHref)) {
+    return {
+      error:
+        "Tujuan tombol harus berupa path internal (mis. /menu), anchor (mis. #footer), atau alamat https://….",
+    };
+  }
 
   await prisma.homepageSection.update({
     where: { id },
@@ -210,6 +230,8 @@ export async function saveHomepageSectionAction(
       subtitle: subtitle || null,
       bodyHtml: bodyHtml ? sanitizeHtml(bodyHtml) : null,
       imageUrl: imageUrl || null,
+      ctaLabel: ctaLabel || null,
+      ctaHref: ctaHref || null,
     },
   });
 

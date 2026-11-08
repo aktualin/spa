@@ -47,6 +47,22 @@ export function sectionKeyLabel(key: string): string {
 }
 
 /**
+ * Section non-banner yang judul/teksnya memang dirender di homepage, jadi
+ * tetap diberi form isian walau kartunya diatur di modul lain.
+ * `whats-new` juga memakai tombol ajakan (label + tujuan).
+ */
+export const TEXT_EDITABLE_SECTION_KEYS = ["whats-new", "reviews"] as const;
+
+export function hasEditableText(key: string): boolean {
+  return (TEXT_EDITABLE_SECTION_KEYS as readonly string[]).includes(key);
+}
+
+/** Section yang memakai tombol ajakan pada form umum. */
+export function hasEditableCta(key: string): boolean {
+  return key === "whats-new";
+}
+
+/**
  * Asal konten section non-banner. Section ini tidak memakai isian teks/gambar
  * `HomepageSection` (hanya tampil/sembunyi & urutan), jadi admin diarahkan
  * ke tempat kontennya diatur.
@@ -56,11 +72,11 @@ export const SECTION_SOURCE: Record<
   { text: string; link?: { href: string; label: string } }
 > = {
   "whats-new": {
-    text: "Kartu “What’s New” diatur di Highlight Homepage (gambar, label, judul, tautan, periode tampil).",
+    text: "Kartu “What’s New” diatur di Highlight Homepage (gambar, label, judul, tautan, periode tampil). Judul section, deskripsi, dan tombol diisi di bawah ini — bagian yang dikosongkan tidak tampil di homepage.",
     link: { href: "/admin/homepage/highlights", label: "Kelola highlight" },
   },
   reviews: {
-    text: "Kartu ulasan pelanggan diatur di Ulasan Pelanggan (isi, nama, lokasi, urutan, tampil/sembunyi). Judul section “Reviews” bersifat tetap.",
+    text: "Kartu ulasan pelanggan diatur di Ulasan Pelanggan (isi, nama, lokasi, urutan, tampil/sembunyi). Judul section diisi di bawah ini.",
     link: { href: "/admin/homepage/reviews", label: "Kelola ulasan" },
   },
   "brand-intro": {

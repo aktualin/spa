@@ -30,7 +30,12 @@ import {
   isDefaultVisibleSection,
   isFixedPositionSection,
 } from "@/lib/domain/homepage";
-import { SECTION_SOURCE, sectionKeyLabel } from "./homepage-sections";
+import {
+  SECTION_SOURCE,
+  hasEditableCta,
+  hasEditableText,
+  sectionKeyLabel,
+} from "./homepage-sections";
 
 export type HomepageSectionRow = {
   id: string;
@@ -225,10 +230,18 @@ function HomepageSectionCard({
             <SaveButton label="Simpan section" />
           </div>
         </form>
-      ) : SECTION_SOURCE[section.key] ? (
-        <SectionSourceNote source={SECTION_SOURCE[section.key]} />
       ) : (
-        <GenericSectionForm section={section} />
+        <>
+          {SECTION_SOURCE[section.key] ? (
+            <SectionSourceNote source={SECTION_SOURCE[section.key]} />
+          ) : null}
+          {!SECTION_SOURCE[section.key] || hasEditableText(section.key) ? (
+            <GenericSectionForm
+              section={section}
+              withCta={hasEditableCta(section.key)}
+            />
+          ) : null}
+        </>
       )}
     </section>
   );
@@ -257,10 +270,16 @@ function SectionSourceNote({
 
 /**
  * Form umum (judul, subjudul, isi, gambar) untuk section yang dibuat di luar
- * daftar key bawaan. Section bawaan non-banner memakai `SectionSourceNote`
- * karena isian ini tidak ditampilkan di homepage.
+ * daftar key bawaan, dan untuk section bawaan yang teksnya memang dirender di
+ * homepage (lihat `hasEditableText`). `withCta` menambah tombol ajakan.
  */
-function GenericSectionForm({ section }: { section: HomepageSectionRow }) {
+function GenericSectionForm({
+  section,
+  withCta = false,
+}: {
+  section: HomepageSectionRow;
+  withCta?: boolean;
+}) {
   const [state, formAction] = useActionState(
     saveHomepageSectionAction,
     initialState,
@@ -302,6 +321,33 @@ function GenericSectionForm({ section }: { section: HomepageSectionRow }) {
         folder="homepage"
         defaultValue={section.imageUrl}
       />
+
+      {withCta ? (
+        <>
+          <Field label="Label tombol" htmlFor={`ctaLabel-${section.id}`}>
+            <input
+              id={`ctaLabel-${section.id}`}
+              name="ctaLabel"
+              defaultValue={section.ctaLabel ?? ""}
+              className={inputClass}
+            />
+          </Field>
+
+          <Field label="Tujuan tombol" htmlFor={`ctaHref-${section.id}`}>
+            <input
+              id={`ctaHref-${section.id}`}
+              name="ctaHref"
+              defaultValue={section.ctaHref ?? ""}
+              placeholder="#footer"
+              className={inputClass}
+            />
+            <p className="mt-1 text-xs text-neutral-500">
+              Path internal (mis. /menu), anchor (mis. #footer), atau alamat
+              https://…. Kosongkan keduanya untuk menyembunyikan tombol.
+            </p>
+          </Field>
+        </>
+      ) : null}
 
       <ErrorMessage error={state.error} />
 

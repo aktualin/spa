@@ -171,6 +171,8 @@ export const MEDIA_URL_COLUMNS = [
   { model: "instagramPost", field: "imageUrl", label: "Feed Instagram" },
   { model: "siteSettings", field: "faviconUrl", label: "Favicon" },
   { model: "siteSettings", field: "defaultOgImageUrl", label: "Gambar OG bawaan" },
+  { model: "siteSettings", field: "menuPdfUrl", label: "PDF menu" },
+  { model: "menuItem", field: "highlightImageUrl", label: "Kartu highlight menu" },
 ] as const;
 
 /**
@@ -179,6 +181,7 @@ export const MEDIA_URL_COLUMNS = [
  */
 export const MEDIA_URL_ARRAY_COLUMNS = [
   { model: "corporateClient", table: "CorporateClient", field: "photoUrls", label: "Dokumentasi klien corporate" },
+  { model: "siteSettings", table: "SiteSettings", field: "menuScanUrls", label: "Halaman scan menu" },
 ] as const;
 
 export type MediaUrlColumn = (typeof MEDIA_URL_COLUMNS)[number];

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ArrowRight } from "@/components/icons";
 import { ReviewsCarousel } from "@/components/home/reviews-carousel";
 import { Reveal } from "@/components/reveal";
+import type { HomepageSection } from "@/lib/content/homepage";
+import { displayTitle, isSafeCtaHref } from "@/lib/domain/homepage-banner";
 import type { HighlightCard, ReviewItem } from "@/lib/domain/homepage";
 
 /**
@@ -57,18 +59,32 @@ function WhatsNewCardBody({ card }: { card: HighlightCard }) {
 }
 
 /**
- * Section "What's New". `cards` berasal dari `getWhatsNewCards()`: kartu
- * highlight admin, atau kartu statis lama bila tabel highlight kosong.
- * Tombol newsletter menuju `#footer`, jadi disembunyikan bila footer
+ * Section "What's New". Judul, deskripsi, dan tombol diambil dari
+ * `HomepageSection` (modul Homepage); bagian yang belum diisi admin tidak
+ * dirender, bukan diganti teks bawaan.
+ *
+ * `cards` berasal dari `getWhatsNewCards()` (modul Highlight Homepage).
+ * Tombol ajakan biasanya menuju `#footer`, jadi disembunyikan bila footer
  * homepage dimatikan admin (`showNewsletterLink = false`).
  */
 export function WhatsNewSection({
   cards,
+  section,
   showNewsletterLink = true,
 }: {
   cards: HighlightCard[];
+  section?: HomepageSection | null;
   showNewsletterLink?: boolean;
 }) {
+  const heading = section ? displayTitle(section.key, section.title) : null;
+  const description = section?.subtitle?.trim() || null;
+  const ctaLabel = section?.ctaLabel?.trim() || null;
+  const ctaHref = section?.ctaHref?.trim() || null;
+  // Tautan hanya dipakai bila tujuannya aman (pertahanan bila DB diisi di
+  // luar admin), dan tombolnya ikut disembunyikan saat footer dimatikan.
+  const showCta =
+    showNewsletterLink && ctaLabel && ctaHref && isSafeCtaHref(ctaHref);
+
   return (
     <Reveal
       as="section"
@@ -79,21 +95,19 @@ export function WhatsNewSection({
         {/* Section header */}
         <div className="flex flex-col items-start gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-10">
           <div className="flex flex-col gap-3">
-            <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-              What’s New
-            </h2>
-            <p className="max-w-[52ch] text-body text-cocoa/70">
-              We believe authentic beauty reaches far beyond the superficial, through
-              consistent self-care you let the beauty shine both externally and internally.
-            </p>
+            {heading ? (
+              <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
+                {heading}
+              </h2>
+            ) : null}
+            {description ? (
+              <p className="max-w-[52ch] text-body text-cocoa/70">{description}</p>
+            ) : null}
           </div>
 
-          {showNewsletterLink ? (
-            <Link
-              href="#footer"
-              className="btn btn-outline shrink-0 border-cocoa/40"
-            >
-              Subscribe to Newsletter
+          {showCta ? (
+            <Link href={ctaHref} className="btn btn-outline shrink-0 border-cocoa/40">
+              {ctaLabel}
               <ArrowRight className="h-4 w-4" />
             </Link>
           ) : null}
@@ -114,13 +128,26 @@ export function WhatsNewSection({
   );
 }
 
-export function TestimonialsSection({ reviews }: { reviews: ReviewItem[] }) {
+/**
+ * Section Reviews. Judul diambil dari `HomepageSection`; label admin bawaan
+ * ("Reviews") kebetulan sama dengan judul tampil, jadi dipakai apa adanya.
+ */
+export function TestimonialsSection({
+  reviews,
+  section,
+}: {
+  reviews: ReviewItem[];
+  section?: HomepageSection | null;
+}) {
+  const heading = section?.title?.trim() || null;
   return (
     <Reveal as="section" className="bg-cream">
       <div className="container-kama py-14 md:py-16 lg:py-20">
-        <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-          Reviews
-        </h2>
+        {heading ? (
+          <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
+            {heading}
+          </h2>
+        ) : null}
 
         <ReviewsCarousel reviews={reviews} />
       </div>

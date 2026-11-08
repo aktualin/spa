@@ -273,8 +273,10 @@ model MembershipProgram {
   // Kalimat harga, contoh "Just Rp 1.5jt a month." — dipakai di homepage
   // dan di bagian Main Benefits halaman /membership.
   priceHeadline String
-  // Deskripsi singkat di banner membership homepage.
-  bannerBody    String
+  // Deskripsi singkat di banner membership homepage, beserta tombolnya.
+  bannerBody     String
+  bannerCtaLabel String?
+  bannerCtaHref  String?
   // [{ title, body }] — benefit utama program.
   benefits      Json
   servicesIntro String
@@ -389,6 +391,8 @@ model RetailProduct {
   priceIdr    Int?
 
   isHighlight Boolean @default(false)
+  // Produk hasil kolaborasi, tampil di bagian terpisah dari highlight.
+  isCollaboration Boolean @default(false)
   isPublished Boolean @default(true)
   sortOrder   Int     @default(0)
 
@@ -450,6 +454,9 @@ model CorporateStep {
 model CorporateClient {
   id          String   @id @default(cuid())
   name        String
+  description String?
+  // Tahun kerja sama, tampil di bagian past collaborations.
+  year        Int?
   logoUrl     String?
   websiteUrl  String?
   // Foto dokumentasi (URL Media Library), urut sesuai tampil.
@@ -567,10 +574,17 @@ model MenuItem {
   pageId String?
   page   StaticPage? @relation(fields: [pageId], references: [id], onDelete: SetNull)
 
-  // Khusus level 1 di header: kunci panel (ID DOM + preset kartu highlight)
-  // dan teks tautan "lihat semua" di bawah mega menu.
+  // Khusus level 1 di header: kunci panel (ID DOM) dan teks tautan
+  // "lihat semua" di bawah mega menu.
   panelKey       String?
   panelLinkLabel String?
+
+  // Kartu highlight di mega menu dan lebar panelnya (piksel); sebelumnya
+  // preset statis per panelKey, kini bisa diatur admin.
+  highlightImageUrl String?
+  highlightLabel    String?
+  highlightHref     String?
+  panelWidth        Int?
 
   parentId String?
   parent   MenuItem?  @relation("MenuTree", fields: [parentId], references: [id], onDelete: Cascade)
@@ -583,6 +597,39 @@ model MenuItem {
 }
 
 /* ---------- Modul 12: Informasi Kontak & Umum ---------- */
+
+// Cabang: kartu di halaman kontak, penanda peta, dan pilihan di form
+// reservasi/newsletter. `tag` dipakai sebagai label kecil ("Flagship",
+// "Coming Soon"); koordinat dipakai penanda Leaflet.
+model Branch {
+  id      String @id @default(cuid())
+  slug    String @unique
+  name    String
+  // Nama area, tampil di samping nama cabang: "South Jakarta | Kramat Pela".
+  area    String
+  tag     String?
+  address String?
+
+  // Jam operasional disimpan per baris, sama seperti SiteSettings.
+  openingHours String[] @default([])
+
+  whatsappNumber String?
+  phone          String?
+  email          String?
+
+  // Embed peta di kartu cabang, dan tautan "get directions".
+  mapsEmbedUrl String?
+  mapsUrl      String?
+
+  latitude  Float?
+  longitude Float?
+
+  isPublished Boolean @default(true)
+  sortOrder   Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
 // Singleton: dipakai footer, halaman kontak, dan embed maps.
 model SiteSettings {
@@ -611,6 +658,18 @@ model SiteSettings {
   // Favicon & gambar Open Graph bawaan (dipakai bila halaman tidak punya).
   faviconUrl        String?
   defaultOgImageUrl String?
+
+  // Catatan harga di halaman menu, contoh "Harga belum termasuk pajak".
+  priceDisclaimer String?
+  // Tagline di footer.
+  footerTagline   String?
+  // Tombol Book Now di header: teks dan tujuannya.
+  bookNowLabel String?
+  bookNowHref  String?
+
+  // Halaman scan menu (URL Media Library), urut sesuai tampil, dan berkas PDF-nya.
+  menuScanUrls String[] @default([])
+  menuPdfUrl   String?
 
   updatedAt DateTime @updatedAt
 }

@@ -318,11 +318,32 @@ async function seedWhatsAppTemplates() {
 }
 
 // Urutan mengikuti komposisi nyata src/app/page.tsx.
-const HOMEPAGE_SECTIONS = [
+//
+// `title` section banner tetap berupa LABEL ADMIN — frontend menyaringnya
+// lewat `isPlaceholderTitle` dan memakai teks bawaannya sendiri. Section yang
+// judulnya benar-benar dirender di homepage (whats-new, reviews) diisi teks
+// tampil, dan `keepText` menandai bahwa isinya tidak boleh ditimpa saat seed
+// dijalankan ulang supaya suntingan admin bertahan.
+const HOMEPAGE_SECTIONS: {
+  key: string;
+  title: string;
+  subtitle?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+  keepText?: boolean;
+}[] = [
   { key: "hero", title: "Hero" },
   { key: "membership-banner", title: "Membership Banner" },
-  { key: "whats-new", title: "Promo / Event Highlight" },
-  { key: "reviews", title: "Reviews" },
+  {
+    key: "whats-new",
+    title: "What’s New",
+    subtitle:
+      "We believe authentic beauty reaches far beyond the superficial, through consistent self-care you let the beauty shine both externally and internally.",
+    ctaLabel: "Subscribe to Newsletter",
+    ctaHref: "#footer",
+    keepText: true,
+  },
+  { key: "reviews", title: "Reviews", keepText: true },
   { key: "brand-intro", title: "Brand Intro" },
   { key: "socials", title: "Gallery Teaser & Instagram" },
   { key: "booking-banner", title: "Booking Banner" },
@@ -330,10 +351,12 @@ const HOMEPAGE_SECTIONS = [
 
 async function seedHomepageSections() {
   for (const [index, section] of HOMEPAGE_SECTIONS.entries()) {
+    const { keepText, ...data } = section;
     await prisma.homepageSection.upsert({
       where: { key: section.key },
-      create: { ...section, sortOrder: index },
-      update: { title: section.title, sortOrder: index },
+      create: { ...data, sortOrder: index },
+      // Section teks: hanya urutannya yang disinkronkan ulang.
+      update: keepText ? { sortOrder: index } : { title: section.title, sortOrder: index },
     });
   }
   console.log(`✔ ${HOMEPAGE_SECTIONS.length} section homepage`);

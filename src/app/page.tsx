@@ -100,11 +100,14 @@ export default async function Home() {
                 <WhatsNewSection
                   key={key}
                   cards={whatsNewCards}
+                  section={section}
                   showNewsletterLink={showFooter}
                 />
               );
             case "reviews":
-              return <TestimonialsSection key={key} reviews={reviews} />;
+              return (
+                <TestimonialsSection key={key} reviews={reviews} section={section} />
+              );
             case "brand-intro":
               return <HeroStats key={key} stats={stats} />;
             case "socials":
