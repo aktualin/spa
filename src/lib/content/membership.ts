@@ -8,6 +8,12 @@
 import { cacheLife, cacheTag } from "next/cache";
 
 import { membership as staticMembership } from "@/data/pages";
+import {
+  type MembershipProgramData,
+  readBenefits,
+  readServices,
+  staticMembershipProgram,
+} from "@/lib/domain/membership";
 import { safeQueryWithMeta } from "@/lib/safe-query";
 
 import { CONTENT_TAGS } from "./tags";
@@ -44,11 +50,13 @@ export async function getMembershipTiers(): Promise<MembershipTier[]> {
   const { data, usedFallback } = await safeQueryWithMeta<MembershipTier[]>(
     async () => {
       const { prisma } = await import("@/lib/prisma");
-      const rows = await prisma.membershipTier.findMany({
-        where: { isPublished: true },
+      // Fallback statis hanya bila tabel benar-benar kosong. Bila semua tier
+      // berstatus draf, halaman publik memang tidak menampilkan tier.
+      const all = await prisma.membershipTier.findMany({
         orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
       });
-      if (rows.length === 0) throw new Error("tier membership kosong");
+      if (all.length === 0) throw new Error("tier membership kosong");
+      const rows = all.filter((row) => row.isPublished);
       return rows.map((row) => ({
         id: row.id,
         slug: row.slug,
@@ -61,6 +69,43 @@ export async function getMembershipTiers(): Promise<MembershipTier[]> {
       }));
     },
     staticTiers(),
+  );
+
+  if (usedFallback) cacheLife("minutes");
+  else cacheLife("hours");
+  return data;
+}
+
+export type MembershipProgram = MembershipProgramData;
+
+/**
+ * Informasi program membership (singleton). Belum pernah disimpan admin /
+ * database bermasalah → isi statis lama, sehingga tampilan tidak berubah.
+ */
+export async function getMembershipProgram(): Promise<MembershipProgram> {
+  "use cache";
+  cacheTag(CONTENT_TAGS.membership);
+
+  const { data, usedFallback } = await safeQueryWithMeta<MembershipProgram>(
+    async () => {
+      const { prisma } = await import("@/lib/prisma");
+      const row = await prisma.membershipProgram.findUnique({
+        where: { id: "singleton" },
+      });
+      if (!row) throw new Error("program membership belum diisi");
+      return {
+        eyebrow: row.eyebrow,
+        title: row.title,
+        intro: row.intro,
+        priceHeadline: row.priceHeadline,
+        bannerBody: row.bannerBody,
+        benefits: readBenefits(row.benefits),
+        servicesIntro: row.servicesIntro,
+        services: readServices(row.services),
+        termsHtml: row.termsHtml,
+      };
+    },
+    staticMembershipProgram(),
   );
 
   if (usedFallback) cacheLife("minutes");

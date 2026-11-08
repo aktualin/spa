@@ -7,6 +7,7 @@ import { SignatureTreatmentsSection } from "@/components/public/home/signature-t
 import { PromoHighlightSection } from "@/components/public/home/promo-highlight";
 import { GalleryTeaserSection } from "@/components/public/home/gallery-teaser";
 import { getHomepageSections } from "@/lib/content/homepage";
+import { getMembershipProgram } from "@/lib/content/membership";
 
 /**
  * Homepage.
@@ -20,7 +21,10 @@ import { getHomepageSections } from "@/lib/content/homepage";
  * (gambar, teks, tombol); isian kosong memakai teks/gambar bawaan.
  */
 export default async function Home() {
-  const sections = await getHomepageSections();
+  const [sections, membershipProgram] = await Promise.all([
+    getHomepageSections(),
+    getMembershipProgram(),
+  ]);
 
   const order = [
     "hero",
@@ -52,7 +56,7 @@ export default async function Home() {
             case "hero":
               return <Hero key={key} section={section} />;
             case "membership-banner":
-              return <MembershipBanner key={key} section={section} />;
+              return <MembershipBanner key={key} section={section} program={membershipProgram} />;
             case "whats-new":
               return <WhatsNewSection key={key} />;
             case "reviews":

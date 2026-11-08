@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { listTiers } from "../actions/membership";
+import { getProgram, listTiers } from "../actions/membership";
 import { Badge, PageHeader, StatusBanners, primaryLinkClass } from "../promos/_kit/list-ui";
 
 export const instant = false;
@@ -10,7 +10,11 @@ export default async function AdminMembershipPage({
 }: {
   searchParams: Promise<{ saved?: string; deleted?: string }>;
 }) {
-  const [tiers, params] = await Promise.all([listTiers(), searchParams]);
+  const [tiers, program, params] = await Promise.all([
+    listTiers(),
+    getProgram(),
+    searchParams,
+  ]);
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -30,7 +34,26 @@ export default async function AdminMembershipPage({
         deletedLabel="Tier membership dihapus."
       />
 
-      <div className="mt-6">
+      <Link
+        href="/admin/membership/program"
+        className="mt-6 flex items-center justify-between gap-3 rounded-lg border border-neutral-200 bg-white px-4 py-3 hover:bg-neutral-50"
+      >
+        <div>
+          <p className="font-medium text-neutral-900">Program membership</p>
+          <p className="mt-0.5 text-xs text-neutral-500">
+            Judul, intro, kalimat harga, main benefits, essential services, dan S&amp;K
+            halaman /membership — termasuk teks banner membership di homepage.
+            {program ? "" : " Belum pernah disimpan (memakai teks bawaan)."}
+          </p>
+        </div>
+        <span className="text-sm text-neutral-600">Ubah →</span>
+      </Link>
+
+      <h2 className="mt-8 text-sm font-semibold uppercase tracking-wide text-neutral-500">
+        Tier / paket
+      </h2>
+
+      <div className="mt-3">
         {tiers.length === 0 ? (
           <p className="text-sm text-neutral-500">Belum ada tier membership.</p>
         ) : (

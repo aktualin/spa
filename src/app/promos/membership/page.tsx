@@ -11,6 +11,7 @@ import {
 } from "@/components/public/page-parts";
 import { getMembershipTiers } from "@/lib/content/membership";
 import { withPageSeo } from "@/lib/content/seo";
+import { plainTextToHtml } from "@/lib/domain/rich-text";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { MEMBER_MESSAGE, waLink } from "@/lib/whatsapp";
 
@@ -92,7 +93,7 @@ export default async function PromosMembershipPage() {
                     {tier.terms ? (
                       <div
                         className="mt-5 border-t border-cocoa/15 pt-4 text-body text-cocoa/70"
-                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(tier.terms) }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(plainTextToHtml(tier.terms)) }}
                       />
                     ) : null}
 

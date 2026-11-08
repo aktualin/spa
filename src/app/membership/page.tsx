@@ -3,7 +3,9 @@ import Link from "next/link";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { ArrowRight, Check, ChevronDown } from "@/components/icons";
-import { membership } from "@/data/pages";
+import { getMembershipProgram, getMembershipTiers } from "@/lib/content/membership";
+import { plainTextToHtml } from "@/lib/domain/rich-text";
+import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { MEMBER_MESSAGE, waLink } from "@/lib/whatsapp";
 import { Reveal } from "@/components/reveal";
 
@@ -13,7 +15,12 @@ export const metadata: Metadata = {
     "KAMA Membership — Rp 1,5jt per bulan. Satu essential service setiap bulan, harga anggota untuk semua treatment, diskon retail, dan benefit khusus.",
 };
 
-export default function MembershipPage() {
+export default async function MembershipPage() {
+  const [membership, tiers] = await Promise.all([
+    getMembershipProgram(),
+    getMembershipTiers(),
+  ]);
+
   return (
     <>
       <Navigation />
@@ -53,7 +60,7 @@ export default function MembershipPage() {
                 <h2 className="header-l">Main Benefits</h2>
                 <div className="spacer-medium" />
                 <p className="body-m text-color-gray">
-                  {membership.price} Anda mendapatkan seluruh manfaat berikut, tanpa
+                  {membership.priceHeadline} Anda mendapatkan seluruh manfaat berikut, tanpa
                   komitmen jangka panjang.
                 </p>
               </div>
@@ -126,18 +133,18 @@ export default function MembershipPage() {
                 <h2 className="header-l">Pilih yang paling sesuai dengan ritme Anda.</h2>
               </div>
               <div className="w-layout-grid whats-new_list">
-                {membership.plans.map((plan) => (
-                  <div key={plan.name} className="package-card w-dyn-item">
+                {tiers.map((plan) => (
+                  <div key={plan.id} className="package-card w-dyn-item">
                     <div className="package-card_body">
-                      <div className="eyebrow-s text-style-allcaps">{plan.billed}</div>
+                      <div className="eyebrow-s text-style-allcaps">{plan.billingNote}</div>
                       <h3 className="header-s">{plan.name}</h3>
                       <div className="price-row">
-                        <span className="price-row_duration">{plan.price}</span>
-                        <span className="price-row_value">{plan.billed}</span>
+                        <span className="price-row_duration">{plan.priceLabel}</span>
+                        <span className="price-row_value">{plan.billingNote}</span>
                       </div>
-                      <div className="body-m text-color-gray">{plan.note}</div>
+                      <div className="body-m text-color-gray">{plan.summary}</div>
                       <ul className="benefit-list">
-                        {plan.features.map((feature) => (
+                        {plan.benefits.map((feature) => (
                           <li key={feature} className="benefit-list_item">
                             <span className="benefit-list_icon">
                               <Check />
@@ -146,6 +153,14 @@ export default function MembershipPage() {
                           </li>
                         ))}
                       </ul>
+                      {plan.terms ? (
+                        <div
+                          className="caption-s text-color-gray text-rich-text"
+                          dangerouslySetInnerHTML={{
+                            __html: sanitizeHtml(plainTextToHtml(plan.terms)),
+                          }}
+                        />
+                      ) : null}
                       <div className="spacer-small" />
                       <a
                         href={waLink(MEMBER_MESSAGE)}
@@ -166,6 +181,22 @@ export default function MembershipPage() {
           </div>
         </Reveal>
 
+        {membership.termsHtml ? (
+          <Reveal as="section" className="padding-section-global">
+            <div className="padding-global">
+              <div className="container-large">
+                <div className="section-header">
+                  <h2 className="header-l">Syarat & Ketentuan</h2>
+                  <div className="spacer-medium" />
+                  <div
+                    className="body-m text-color-gray text-rich-text"
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(membership.termsHtml) }}
+                  />
+                </div>
+              </div>
+            </div>
+          </Reveal>
+        ) : null}
 
         <Reveal as="section" className="section_get-in-touch is-top-off">
           <div className="get-in-touch_container">

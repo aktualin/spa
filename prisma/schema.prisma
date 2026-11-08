@@ -262,6 +262,29 @@ model GiftCardInfo {
 
 /* ---------- Modul 5: Membership ---------- */
 
+// Singleton: informasi program membership (halaman /membership dan banner
+// membership di homepage). Tier/paket ada di MembershipTier.
+model MembershipProgram {
+  id            String  @id @default("singleton")
+  eyebrow       String
+  title         String
+  intro         String
+  // Kalimat harga, contoh "Just Rp 1.5jt a month." — dipakai di homepage
+  // dan di bagian Main Benefits halaman /membership.
+  priceHeadline String
+  // Deskripsi singkat di banner membership homepage.
+  bannerBody    String
+  // [{ title, body }] — benefit utama program.
+  benefits      Json
+  servicesIntro String
+  // [{ name, description }] — essential services yang bisa dipakai kredit.
+  services      Json
+  // Syarat & ketentuan program (HTML tersanitasi).
+  termsHtml     String?
+
+  updatedAt DateTime @updatedAt
+}
+
 model MembershipTier {
   id          String  @id @default(cuid())
   slug        String  @unique

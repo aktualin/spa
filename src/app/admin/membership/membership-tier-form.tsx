@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 
+import { plainTextToHtml } from "@/lib/domain/rich-text";
+
 import { deleteTierAction, saveTierAction, type ActionState } from "../actions/membership";
+import { RichTextField } from "../rich-text-field";
 import {
   Checkbox,
   ConfirmDeleteButton,
@@ -179,15 +182,12 @@ export function MembershipTierForm({ tier }: { tier: TierFormData }) {
           </button>
         </fieldset>
 
-        <Field label="Syarat & ketentuan" htmlFor="terms">
-          <textarea
-            id="terms"
-            name="terms"
-            defaultValue={tier.terms}
-            rows={5}
-            className={inputClass}
-          />
-        </Field>
+        <RichTextField
+          name="terms"
+          label="Syarat & ketentuan tier (opsional)"
+          folder="membership"
+          defaultValue={plainTextToHtml(tier.terms)}
+        />
 
         <Field label="Urutan tampil" htmlFor="sortOrder">
           <input

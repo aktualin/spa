@@ -173,8 +173,21 @@ export const MEMBERSHIP_BANNER_DEFAULTS: BannerDefaults = {
   ctaHref: membership.href,
 };
 
-export function MembershipBanner({ section }: BannerProps = {}) {
-  const banner = resolveBanner(section, MEMBERSHIP_BANNER_DEFAULTS);
+/**
+ * Kalimat harga dan deskripsi bawaan diambil dari program membership (modul
+ * Membership); isian banner di modul Homepage tetap menang bila diisi.
+ */
+export function MembershipBanner({
+  section,
+  program,
+}: BannerProps & {
+  program?: { priceHeadline: string; bannerBody: string } | null;
+} = {}) {
+  const banner = resolveBanner(section, {
+    ...MEMBERSHIP_BANNER_DEFAULTS,
+    subtitle: program?.bannerBody || MEMBERSHIP_BANNER_DEFAULTS.subtitle,
+  });
+  const priceHeadline = program?.priceHeadline || membership.price;
   return (
     <Reveal as="section" className="bg-cream-soft">
       <div className="container-kama py-12 md:py-16 lg:py-20">
@@ -193,7 +206,7 @@ export function MembershipBanner({ section }: BannerProps = {}) {
             <h2 className="font-display text-title md:text-[2rem] md:leading-[1.3]">
               <em>{banner.title}</em>
               <br />
-              {membership.price}
+              {priceHeadline}
             </h2>
             <p className="max-w-[42ch] text-body text-cocoa/75">{banner.subtitle}</p>
             <Link href={banner.ctaHref} className="btn btn-primary w-full max-w-xs">
