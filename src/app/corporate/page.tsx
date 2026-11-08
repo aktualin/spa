@@ -1,45 +1,40 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { ArrowRight, Check } from "@/components/icons";
-import {
-  corporateBenefits,
-  corporatePrograms,
-  corporateSolutions,
-} from "@/data/content";
+import { CorporateInquiryForm } from "@/components/public/corporate-inquiry-form";
+import { CorporateClientLogos } from "@/components/public/corporate/corporate-client-logos";
+import { isCaptchaConfigured } from "@/lib/captcha";
+import { getCorporatePageData } from "@/lib/content/corporate";
+import { withPageSeo } from "@/lib/content/seo";
+import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { corporateWhatsApp } from "@/lib/whatsapp";
 import { Reveal } from "@/components/reveal";
 
-const corporateInSpa = [
-  "Private Group Experiences",
-  "Employee Rewards",
-  "Appreciation Events",
-  "Team Wellness Days",
-  "Leadership Retreats",
-  "Company Celebrations",
-];
+/*
+ * Halaman Corporate Wellness (desain asli). Isi dibaca dari database lewat
+ * `getCorporatePageData()` dengan fallback statis identik — tampilan tidak
+ * berubah sebelum admin mengubah apa pun. `/corporate-wellness` dialihkan ke
+ * sini, jadi override SEO lama untuk path itu tetap dipakai bila `/corporate`
+ * belum punya override sendiri.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const defaults: Metadata = {
+    title: "Corporate Wellness",
+    description:
+      "KAMA Corporate Wellness Solutions — program wellness di kantor, pengalaman wellness tim, dan benefit kesehatan karyawan.",
+  };
+  return withPageSeo("/corporate", await withPageSeo("/corporate-wellness", defaults));
+}
 
-const corporateSteps = [
-  { title: "Discovery & Consultation", body: "Understand your goals" },
-  { title: "Tailored Proposal", body: "Program and benefits designed for your company" },
-  { title: "Program Activation", body: "Coordinated and delivered by KAMA" },
-  { title: "Review & Optimization", body: "Tracking feedback and improving future programs" },
-];
+export default async function CorporatePage() {
+  const { content, programs, steps, clients, collabPhotos } = await getCorporatePageData();
+  const picWhatsApp = corporateWhatsApp(content.pic.phone);
+  // Captcha wajib di production: tanpa key lengkap formulir diganti kontak langsung
+  // (server juga menolak kiriman — fail-closed).
+  const captchaSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() || null;
+  const formAvailable = process.env.NODE_ENV !== "production" || isCaptchaConfigured();
 
-const corporateCollabs = [
-  "/img/kama/corporate/06-collab-1.jpg",
-  "/img/kama/corporate/07-collab-2.jpg",
-  "/img/kama/corporate/08-collab-3.jpg",
-];
-
-export const metadata: Metadata = {
-  title: "Corporate Wellness",
-  description:
-    "KAMA Corporate Wellness Solutions — program wellness di kantor, pengalaman wellness tim, dan benefit kesehatan karyawan.",
-};
-
-export default function CorporatePage() {
   return (
     <>
       <Navigation />
@@ -49,9 +44,7 @@ export default function CorporatePage() {
             <div className="container-large">
               <div className="section-header">
                 <div className="eyebrow-s text-style-allcaps">Corporate Wellness Solutions</div>
-                <h1 className="header-xxl">
-                  Empowering healthier teams through meaningful wellness experiences.
-                </h1>
+                <h1 className="header-xxl">{content.heroTitle}</h1>
               </div>
             </div>
           </div>
@@ -114,15 +107,12 @@ export default function CorporatePage() {
                 <h2 className="header-l">
                   Healthy Employees Build Stronger Companies
                 </h2>
-                <p className="body-m text-color-gray">
-                  Employee wellness is no longer just a benefit—it has become an essential
-                  investment in building a healthier, happier, and more productive workplace.
-                </p>
+                <p className="body-m text-color-gray">{content.intro}</p>
               </div>
               <div className="layout-row gap-large">
                 <ul className="benefit-list sizing-grow">
-                  {corporateBenefits.map((b) => (
-                    <li key={b} className="benefit-list_item">
+                  {content.benefits.map((b, bi) => (
+                    <li key={`${bi}-${b}`} className="benefit-list_item">
                       <span className="benefit-list_icon">
                         <Check />
                       </span>
@@ -159,13 +149,13 @@ export default function CorporatePage() {
               </div>
 
               <div className="w-layout-grid whats-new_list">
-                {corporateSolutions.map((sol) => (
-                  <div key={sol.title} className="package-card w-dyn-item">
+                {content.solutions.map((sol, si) => (
+                  <div key={`${si}-${sol.title}`} className="package-card w-dyn-item">
                     <div className="package-card_body">
                       <h3 className="header-s">{sol.title}</h3>
                       <ul className="benefit-list">
-                        {sol.items.map((item) => (
-                          <li key={item} className="benefit-list_item">
+                        {sol.items.map((item, ii) => (
+                          <li key={`${ii}-${item}`} className="benefit-list_item">
                             <span className="benefit-list_icon">
                               <Check />
                             </span>
@@ -192,15 +182,28 @@ export default function CorporatePage() {
                 <p className="body-m text-color-gray">Sample Programs*</p>
               </div>
 
+              {programs.length > 0 ? (
               <div className="w-layout-grid whats-new_list">
-                {corporatePrograms.map((prog) => (
-                  <div key={prog.name} className="package-card w-dyn-item">
+                {programs.map((prog) => (
+                  <div key={prog.id} className="package-card w-dyn-item">
+                    {prog.imageUrl ? (
+                      <div className="package-card_image image-container">
+                        <img
+                          src={prog.imageUrl}
+                          alt={prog.name}
+                          className="image-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    ) : null}
                     <div className="package-card_body">
                       <div className="eyebrow-s text-style-allcaps">{prog.name}</div>
-                      <div className="body-m text-color-gray">{prog.description}</div>
+                      {prog.description ? (
+                        <div className="body-m text-color-gray">{prog.description}</div>
+                      ) : null}
                       <ul className="benefit-list">
-                        {prog.features.map((f) => (
-                          <li key={f} className="benefit-list_item">
+                        {prog.features.map((f, fi) => (
+                          <li key={`${fi}-${f}`} className="benefit-list_item">
                             <span className="benefit-list_icon">
                               <Check />
                             </span>
@@ -212,6 +215,16 @@ export default function CorporatePage() {
                   </div>
                 ))}
               </div>
+              ) : null}
+              {content.inOfficeHtml ? (
+                <>
+                  <div className="spacer-medium" />
+                  <div
+                    className="text-rich-text body-m text-color-gray w-richtext"
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(content.inOfficeHtml) }}
+                  />
+                </>
+              ) : null}
             </div>
           </div>
         </Reveal>
@@ -225,16 +238,23 @@ export default function CorporatePage() {
                   <h2 className="header-l">
                     Bring Your Team Together Through Wellness
                   </h2>
-                  <p className="body-m text-color-gray">
-                    Treat your employees to a private wellness experience at KAMA
-                    Spa—designed to reward, reconnect, and recharge your team in a calm
-                    and premium environment.
-                  </p>
+                  {content.inSpaHtml ? (
+                    <div
+                      className="text-rich-text body-m text-color-gray w-richtext"
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(content.inSpaHtml) }}
+                    />
+                  ) : (
+                    <p className="body-m text-color-gray">
+                      Treat your employees to a private wellness experience at KAMA
+                      Spa—designed to reward, reconnect, and recharge your team in a calm
+                      and premium environment.
+                    </p>
+                  )}
                   <div className="spacer-small" />
                   <h3 className="header-s">Ideal For:</h3>
                   <ul className="benefit-list">
-                    {corporateInSpa.map((i) => (
-                      <li key={i} className="benefit-list_item">
+                    {content.inSpaItems.map((i, ii) => (
+                      <li key={`${ii}-${i}`} className="benefit-list_item">
                         <span className="benefit-list_icon">
                           <Check />
                         </span>
@@ -258,28 +278,42 @@ export default function CorporatePage() {
           </div>
         </Reveal>
 
+        {steps.length > 0 ? (
         <Reveal as="section" className="padding-section-global">
           <div className="padding-global">
             <div className="container-large">
               <div className="section-header">
                 <div className="eyebrow-s text-style-allcaps">From Consultation to Partnership</div>
-                <h2 className="header-l">A Simple 4-Step Collaboration Process</h2>
+                <h2 className="header-l">A Simple {steps.length}-Step Collaboration Process</h2>
               </div>
               <div className="w-layout-grid whats-new_list">
-                {corporateSteps.map((step, idx) => (
-                  <div key={step.title} className="package-card w-dyn-item">
+                {steps.map((step, idx) => (
+                  <div key={step.id} className="package-card w-dyn-item">
                     <div className="package-card_body">
                       <div className="eyebrow-s text-style-allcaps">Step {idx + 1}</div>
                       <h3 className="header-s">{step.title}</h3>
-                      <div className="body-m text-color-gray">{step.body}</div>
+                      {step.body ? (
+                        <div className="body-m text-color-gray">{step.body}</div>
+                      ) : null}
                     </div>
                   </div>
                 ))}
               </div>
+              {content.stepsHtml ? (
+                <>
+                  <div className="spacer-medium" />
+                  <div
+                    className="text-rich-text body-m text-color-gray w-richtext"
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(content.stepsHtml) }}
+                  />
+                </>
+              ) : null}
             </div>
           </div>
         </Reveal>
+        ) : null}
 
+        {collabPhotos.length > 0 || clients.length > 0 ? (
         <Reveal as="section" className="padding-section-global home-locations">
           <div className="padding-global">
             <div className="container-large">
@@ -287,19 +321,49 @@ export default function CorporatePage() {
                 <div className="eyebrow-s text-style-allcaps">Past Collaborations</div>
                 <h2 className="header-l">Wellness in action — on location</h2>
               </div>
+              {clients.length > 0 ? <CorporateClientLogos clients={clients} /> : null}
+              {collabPhotos.length > 0 ? (
               <div className="corporate-split split-3">
-                {corporateCollabs.map((src) => (
-                  <div key={src}>
+                {collabPhotos.map((photo, pi) => (
+                  <div key={`${pi}-${photo.src}`}>
                     <div className="image-container" style={{ aspectRatio: "3 / 5" }}>
                       <img
-                        src={src}
-                        alt="KAMA corporate wellness collaboration"
+                        src={photo.src}
+                        alt={photo.alt}
                         className="image-cover"
                         loading="lazy"
                       />
                     </div>
                   </div>
                 ))}
+              </div>
+              ) : null}
+            </div>
+          </div>
+        </Reveal>
+        ) : null}
+
+        <Reveal as="section" id="inquiry" className="padding-section-global">
+          <div className="padding-global">
+            <div className="container-large">
+              <div className="corporate-split">
+                <div style={{ maxWidth: "34rem" }}>
+                  <div className="eyebrow-s text-style-allcaps">Corporate Inquiry</div>
+                  <h2 className="header-l">Tell us about your team.</h2>
+                  <div className="spacer-small" />
+                  <p className="body-m text-color-gray">
+                    Share a few details and our corporate team will get back to you with a
+                    program tailored to your company.
+                  </p>
+                </div>
+                <div className="min-w-0">
+                  <CorporateInquiryForm
+                    captchaSiteKey={captchaSiteKey}
+                    available={formAvailable}
+                    whatsappHref={picWhatsApp}
+                    contactEmail={content.pic.email}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -310,21 +374,23 @@ export default function CorporatePage() {
             <div className="get-in-touch_banner">
               <h4 className="header-l">Let&apos;s build your wellness program.</h4>
               <a
-                href={corporateWhatsApp()}
+                href={picWhatsApp}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="button is-tertiary is-icon margin-left-auto-desktop w-inline-block"
               >
-                <div>Talk to Roy · +62 813-1485-6565</div>
+                <div>
+                  Talk to {content.pic.name} · {content.pic.phone}
+                </div>
                 <div className="button_icon w-embed">
                   <ArrowRight />
                 </div>
               </a>
               <a
-                href="mailto:marketing@kamaspa.id"
+                href={`mailto:${content.pic.email}`}
                 className="button is-tertiary is-icon margin-left-auto-desktop w-inline-block"
               >
-                <div>marketing@kamaspa.id</div>
+                <div>{content.pic.email}</div>
                 <div className="button_icon w-embed">
                   <ArrowRight />
                 </div>

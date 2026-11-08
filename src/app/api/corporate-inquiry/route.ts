@@ -1,239 +1,154 @@
-import { NextResponse } from "next/server";
+import { createHash } from "node:crypto";
 
+import { NextResponse, after } from "next/server";
+
+import { verifyCaptcha } from "@/lib/captcha";
+import { MAX_INQUIRY_BODY, checkFillTime } from "@/lib/domain/corporate";
 import {
-  describeTurnstileError,
   extractClientIp,
-  isFilledTooFast,
   isHoneypotFilled,
   validateInquiry,
-  type InquiryInput,
 } from "@/lib/domain/inquiry";
 import { corporateInquiryLimiter } from "@/lib/domain/rate-limit";
+import { isSameOrigin } from "@/lib/domain/same-origin";
 import { stripTags } from "@/lib/domain/sanitize";
+import { notifyCorporateInquiry } from "@/lib/email";
 
 /**
- * Endpoint submit form inquiry Corporate Wellness.
+ * Endpoint submit formulir inquiry Corporate Wellness (`/corporate#inquiry`).
  *
  * Lapis pertahanan (urutan penting):
- * 1. Rate limit per IP (5 permintaan / 10 menit).
- * 2. Honeypot `website` — kalau terisi, balas 200 palsu tanpa menyimpan.
- * 3. Validasi zod.
- * 4. Cek waktu isi form minimal 3 detik.
- * 5. Cloudflare Turnstile (hanya bila `TURNSTILE_SECRET_KEY` diset).
- * 6. Simpan ke tabel `CorporateInquiry` (status NEW) + kirim email ke PIC.
+ * 1. Origin harus situs ini bila header Origin ada (tolak kiriman lintas situs).
+ * 2. Rate limit per IP (5 permintaan / 10 menit). IP hanya dipakai sebagai
+ *    kunci hash di memori — tidak pernah disimpan ke database atau log.
+ * 3. Batas ukuran body.
+ * 4. Honeypot `website` — terisi → balas sukses palsu tanpa menyimpan.
+ * 5. Lama pengisian (`elapsedMs`, dihitung browser): tidak ada → bot (sukses
+ *    palsu); < 3 detik → ditolak dengan pesan agar manusia bisa mengirim ulang.
+ * 6. Validasi zod + persetujuan pemrosesan data (UU PDP).
+ * 7. Cloudflare Turnstile. Secret kosong di production → fail-closed (503).
+ * 8. Simpan ke `CorporateInquiry` (status NEW), lalu — setelah respons
+ *    terkirim — email ke pihak pertama dan catat `emailSentAt`/`emailError`.
  *
- * Kegagalan pengiriman email tidak menggagalkan respons — inquiry sudah
- * tersimpan dan tetap terlihat di dashboard admin.
+ * Data pribadi pengirim tidak pernah ditulis ke log.
  */
 
 // Tanpa `runtime`/`dynamic`: `cacheComponents` menolak route segment config,
 // dan handler POST memang selalu dijalankan per-request.
 
-type TurnstileResponse = {
-  success?: boolean;
-  "error-codes"?: string[];
-};
-
-async function verifyTurnstile(
-  token: string,
-  secret: string,
-): Promise<{ ok: true } | { ok: false; error: string }> {
-  try {
-    const response = await fetch(
-      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-      {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ secret, response: token }),
-      },
-    );
-
-    if (!response.ok) {
-      return { ok: false, error: "Verifikasi captcha gagal. Silakan coba lagi." };
-    }
-
-    const data = (await response.json()) as TurnstileResponse;
-    if (!data.success) {
-      return { ok: false, error: describeTurnstileError(data["error-codes"]) };
-    }
-    return { ok: true };
-  } catch {
-    return {
-      ok: false,
-      error: "Verifikasi captcha gagal. Silakan coba lagi.",
-    };
-  }
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-async function sendNotificationEmail(input: {
-  to: string;
-  inquiry: InquiryInput;
-}): Promise<void> {
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.EMAIL_FROM;
-  if (!apiKey || !from) return;
-
-  const { inquiry } = input;
-  const lines = [
-    `Nama: ${inquiry.name}`,
-    `Email: ${inquiry.email}`,
-    inquiry.company ? `Perusahaan: ${inquiry.company}` : null,
-    inquiry.phone ? `Telepon: ${inquiry.phone}` : null,
-    "",
-    inquiry.message,
-  ].filter((line): line is string => line !== null);
-
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      authorization: `Bearer ${apiKey}`,
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      from,
-      to: [input.to],
-      subject: `Inquiry Corporate Wellness — ${inquiry.name}`,
-      text: lines.join("\n"),
-      html: `<p><strong>Inquiry Corporate Wellness baru</strong></p><ul>${[
-        `Nama: ${escapeHtml(inquiry.name)}`,
-        `Email: ${escapeHtml(inquiry.email)}`,
-        inquiry.company ? `Perusahaan: ${escapeHtml(inquiry.company)}` : null,
-        inquiry.phone ? `Telepon: ${escapeHtml(inquiry.phone)}` : null,
-      ]
-        .filter((line): line is string => line !== null)
-        .map((line) => `<li>${line}</li>`)
-        .join("")}</ul><p>${escapeHtml(inquiry.message).replace(/\n/g, "<br />")}</p>`,
-    }),
+function json(body: Record<string, unknown>, status = 200, headers?: HeadersInit) {
+  return NextResponse.json(body, {
+    status,
+    headers: { "cache-control": "no-store", ...(headers ?? {}) },
   });
+}
 
-  if (!response.ok) {
-    console.error(
-      "[corporate-inquiry] email notifikasi gagal:",
-      response.status,
-      await response.text().catch(() => ""),
-    );
+/** Kunci rate limit: hash IP (IP mentah tidak disimpan di memori sekalipun). */
+function rateLimitKey(ip: string): string {
+  return createHash("sha256").update(`corporate-inquiry:${ip}`).digest("hex").slice(0, 32);
+}
+
+/** Kode galat ringkas untuk log — tanpa pesan/argumen yang bisa memuat PII. */
+function errorCode(error: unknown): string {
+  if (error && typeof error === "object" && "code" in error) {
+    return String((error as { code?: unknown }).code);
   }
+  return error instanceof Error ? error.name : "unknown";
 }
 
 export async function POST(request: Request) {
-  const ip = extractClientIp(request.headers);
+  if (!isSameOrigin(request.headers)) {
+    return json({ error: "Permintaan tidak diizinkan." }, 403);
+  }
 
-  const limit = corporateInquiryLimiter.check(ip);
+  const limit = corporateInquiryLimiter.check(rateLimitKey(extractClientIp(request.headers)));
   if (!limit.allowed) {
-    const retryAfterSeconds = Math.max(
-      1,
-      Math.ceil(limit.retryAfterMs / 1000),
-    );
-    return NextResponse.json(
-      {
-        error:
-          "Terlalu banyak permintaan. Silakan coba lagi dalam beberapa menit.",
-      },
-      { status: 429, headers: { "retry-after": String(retryAfterSeconds) } },
+    const retryAfterSeconds = Math.max(1, Math.ceil(limit.retryAfterMs / 1000));
+    return json(
+      { error: "Terlalu banyak permintaan. Silakan coba lagi dalam beberapa menit." },
+      429,
+      { "retry-after": String(retryAfterSeconds) },
     );
   }
 
-  let raw: unknown;
+  let body: Record<string, unknown>;
   try {
-    raw = await request.json();
+    const raw = await request.text();
+    if (raw.length > MAX_INQUIRY_BODY) {
+      return json({ error: "Isian terlalu panjang." }, 413);
+    }
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("bukan objek");
+    body = parsed as Record<string, unknown>;
   } catch {
-    return NextResponse.json(
-      { error: "Body permintaan tidak valid." },
-      { status: 400 },
-    );
+    return json({ error: "Body permintaan tidak valid." }, 400);
   }
 
-  const body = (raw ?? {}) as Record<string, unknown>;
-
-  // Honeypot: balas 200 supaya bot thinks it's accepted, tapi jangan simpan.
+  // Honeypot: balas sukses supaya bot mengira terkirim, tapi jangan simpan.
   if (isHoneypotFilled(body.website)) {
-    return NextResponse.json({ ok: true });
+    return json({ ok: true });
   }
 
-  const validation = validateInquiry(body);
-  if (!validation.ok) {
-    return NextResponse.json({ error: validation.error }, { status: 400 });
-  }
-  const inquiry = validation.data;
-
-  // Terlalu cepat diisi (< 3 detik) → perlakukan sebagai bot.
-  if (isFilledTooFast(inquiry.startedAt)) {
-    return NextResponse.json({ ok: true });
-  }
-
-  const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
-  if (turnstileSecret) {
-    if (!inquiry.captchaToken) {
-      return NextResponse.json(
-        { error: "Verifikasi captcha wajib diisi." },
-        { status: 400 },
-      );
-    }
-    const captcha = await verifyTurnstile(
-      inquiry.captchaToken,
-      turnstileSecret,
+  const fill = checkFillTime(body.elapsedMs);
+  if (fill === "missing") return json({ ok: true });
+  if (fill === "too-fast") {
+    return json(
+      { error: "Formulir terkirim terlalu cepat. Mohon periksa isian Anda lalu kirim ulang." },
+      400,
     );
-    if (!captcha.ok) {
-      return NextResponse.json({ error: captcha.error }, { status: 400 });
-    }
   }
 
-  const name = stripTags(inquiry.name);
-  const company = inquiry.company ? stripTags(inquiry.company) : null;
-  const email = stripTags(inquiry.email);
-  const phone = inquiry.phone ? stripTags(inquiry.phone) : null;
-  const message = stripTags(inquiry.message);
+  const validation = validateInquiry({
+    name: body.name,
+    company: body.company,
+    email: body.email,
+    phone: body.phone,
+    message: body.message,
+    captchaToken: body.captchaToken,
+  });
+  if (!validation.ok) {
+    return json({ error: validation.error }, 400);
+  }
+  if (body.consent !== true) {
+    return json(
+      { error: "Mohon setujui pemrosesan data untuk menindaklanjuti inquiry ini." },
+      400,
+    );
+  }
 
+  const captcha = await verifyCaptcha(validation.data.captchaToken);
+  if (!captcha.ok) {
+    return json({ error: captcha.error }, captcha.status);
+  }
+
+  const inquiry = {
+    name: stripTags(validation.data.name).trim(),
+    company: validation.data.company ? stripTags(validation.data.company).trim() || null : null,
+    email: stripTags(validation.data.email).trim(),
+    phone: validation.data.phone ? stripTags(validation.data.phone).trim() || null : null,
+    message: stripTags(validation.data.message).trim(),
+  };
+  if (!inquiry.name || !inquiry.message) {
+    return json({ error: "Mohon lengkapi nama dan pesan." }, 400);
+  }
+
+  let id: string;
   try {
     const { prisma } = await import("@/lib/prisma");
-
-    await prisma.corporateInquiry.create({
-      data: {
-        name,
-        company: company || null,
-        email,
-        phone: phone || null,
-        message,
-        status: "NEW",
-      },
+    const created = await prisma.corporateInquiry.create({
+      data: { ...inquiry, status: "NEW" },
+      select: { id: true },
     });
-
-    // Email notifikasi — hanya bila kredensial Resend tersedia.
-    try {
-      const [corporate, settings] = await Promise.all([
-        prisma.corporateContent.findUnique({ where: { id: "singleton" } }),
-        prisma.siteSettings.findUnique({ where: { id: "singleton" } }),
-      ]);
-
-      const recipient =
-        corporate?.picEmail?.trim() ||
-        settings?.email?.trim() ||
-        process.env.CORPORATE_INQUIRY_TO?.trim() ||
-        "";
-
-      if (recipient && process.env.RESEND_API_KEY && process.env.EMAIL_FROM) {
-        await sendNotificationEmail({ to: recipient, inquiry });
-      }
-    } catch (error) {
-      // Kegagalan email tidak boleh menggagalkan respons ke pengunjung.
-      console.error("[corporate-inquiry] notifikasi email gagal:", error);
-    }
+    id = created.id;
   } catch (error) {
-    console.error("[corporate-inquiry] gagal menyimpan inquiry:", error);
-    return NextResponse.json(
-      { error: "Terjadi kesalahan pada server. Silakan coba lagi." },
-      { status: 500 },
-    );
+    console.error("[corporate-inquiry] gagal menyimpan inquiry:", errorCode(error));
+    return json({ error: "Terjadi kesalahan pada server. Silakan coba lagi." }, 500);
   }
 
-  return NextResponse.json({ ok: true });
+  // Email ke pihak pertama dikirim setelah respons — kegagalannya tidak
+  // pernah menggagalkan penyimpanan; hasilnya dicatat di baris inquiry
+  // (`emailSentAt` / `emailError`) dan terlihat di dashboard.
+  after(() => notifyCorporateInquiry(id));
+
+  return json({ ok: true });
 }

@@ -1,137 +1,130 @@
 /**
- * Bacaan publik Corporate Wellness.
+ * Bacaan publik Corporate Wellness untuk halaman `/corporate`.
  *
- * HANYA `CorporateContent` (singleton) yang dibaca. `CorporateInquiry` berisi
- * PII dan tidak boleh diakses dari kode publik.
+ * Yang dibaca HANYA konten: `CorporateContent` (singleton), `CorporateProgram`,
+ * `CorporateStep`, dan `CorporateClient` yang tayang. `CorporateInquiry` berisi
+ * data pribadi (UU PDP) dan TIDAK BOLEH diakses dari kode publik/cache publik.
  *
- * Fallback: data statis `corporateBenefits/Solutions/Programs` dari
- * `src/data/content.ts`.
+ * Fallback per bagian (DB kosong/bermasalah) = isi desain asli, sehingga
+ * tampilan tidak berubah sebelum admin mengisi apa pun:
+ * - konten belum disimpan / kolom kosong → teks & daftar bawaan;
+ * - tabel program/langkah kosong → program/langkah bawaan;
+ * - tabel klien kosong → 3 foto "Past Collaborations" bawaan.
  */
 import { cacheLife, cacheTag } from "next/cache";
 
 import {
-  corporateBenefits,
-  corporatePrograms,
-  corporateSolutions,
-} from "@/data/content";
+  type CollabPhoto,
+  type CorporateClientItem,
+  type CorporatePageContent,
+  type CorporateProgramItem,
+  type CorporateStepItem,
+  collabPhotosFor,
+  resolveCorporateContent,
+  staticCollabPhotos,
+  staticCorporateContent,
+  staticCorporatePrograms,
+  staticCorporateSteps,
+} from "@/lib/domain/corporate";
 import { safeQueryWithMeta } from "@/lib/safe-query";
 
 import { CONTENT_TAGS } from "./tags";
 
-export type CorporateSolution = {
-  title: string;
-  items: string[];
+export type {
+  CollabPhoto,
+  CorporateClientItem,
+  CorporatePageContent,
+  CorporateProgramItem,
+  CorporateStepItem,
 };
 
-export type CorporateProgram = {
-  name: string;
-  description: string;
-  features: string[];
+export type CorporatePageData = {
+  content: CorporatePageContent;
+  programs: CorporateProgramItem[];
+  steps: CorporateStepItem[];
+  /** Klien tayang (logo/nama). Kosong bila belum ada klien. */
+  clients: CorporateClientItem[];
+  /** Foto dokumentasi "Past Collaborations". */
+  collabPhotos: CollabPhoto[];
 };
 
-export type CorporateContentData = {
-  heroTitle: string;
-  intro: string | null;
-  inOfficeHtml: string | null;
-  inSpaHtml: string | null;
-  stepsHtml: string | null;
-  picName: string | null;
-  picEmail: string | null;
-  picPhone: string | null;
-  benefits: string[];
-  solutions: CorporateSolution[];
-  programs: CorporateProgram[];
-};
+const ORDER = [{ sortOrder: "asc" as const }, { createdAt: "asc" as const }, { id: "asc" as const }];
 
-/** Dilengkapi dari corporateSolutions/corporatePrograms statis. */
-const STATIC_IN_SPA_ITEMS = [
-  "Private Group Experiences",
-  "Employee Rewards",
-  "Appreciation Events",
-  "Team Wellness Days",
-  "Leadership Retreats",
-  "Company Celebrations",
-];
-
-const STATIC_STEPS: { title: string; body: string }[] = [
-  { title: "Discovery & Consultation", body: "Understand your goals" },
-  {
-    title: "Tailored Proposal",
-    body: "Program and benefits designed for your company",
-  },
-  {
-    title: "Program Activation",
-    body: "Coordinated and delivered by KAMA",
-  },
-  {
-    title: "Review & Optimization",
-    body: "Tracking feedback and improving future programs",
-  },
-];
-
-function staticContent(): CorporateContentData {
-  return {
-    heroTitle:
-      "Empowering healthier teams through meaningful wellness experiences.",
-    intro:
-      "Employee wellness is no longer just a benefit—it has become an essential investment in building a healthier, happier, and more productive workplace.",
-    inOfficeHtml: null,
-    inSpaHtml: null,
-    stepsHtml: null,
-    picName: null,
-    picEmail: null,
-    picPhone: null,
-    benefits: corporateBenefits,
-    solutions: corporateSolutions.map((s) => ({ title: s.title, items: s.items })),
-    programs: corporatePrograms.map((p) => ({
-      name: p.name,
-      description: p.description,
-      features: p.features,
-    })),
-  };
-}
-
-/** Konten corporate wellness (program in-office, in-spa, steps, PIC). */
-export async function getCorporateContent(): Promise<CorporateContentData> {
+export async function getCorporatePageData(): Promise<CorporatePageData> {
   "use cache";
   cacheTag(CONTENT_TAGS.corporate);
 
-  const { data, usedFallback } = await safeQueryWithMeta<CorporateContentData>(
-    async () => {
-      const { prisma } = await import("@/lib/prisma");
-      const row = await prisma.corporateContent.findUnique({
-        where: { id: "singleton" },
-      });
-      if (!row) throw new Error("konten corporate kosong");
-      const fallback = staticContent();
-      return {
-        heroTitle: row.heroTitle,
-        intro: row.intro ?? fallback.intro,
-        inOfficeHtml: row.inOfficeHtml,
-        inSpaHtml: row.inSpaHtml,
-        stepsHtml: row.stepsHtml,
-        picName: row.picName,
-        picEmail: row.picEmail,
-        picPhone: row.picPhone,
-        benefits: fallback.benefits,
-        solutions: fallback.solutions,
-        programs: fallback.programs,
-      };
-    },
-    staticContent(),
-  );
+  // Impor di dalam tiap query: kegagalan inisialisasi Prisma ikut tertangkap
+  // safeQuery dan halaman jatuh ke isi bawaan, bukan error.
+  const db = async () => (await import("@/lib/prisma")).prisma;
 
+  const [content, programs, steps, clients] = await Promise.all([
+    safeQueryWithMeta<CorporatePageContent>(async () => {
+      const row = await (await db()).corporateContent.findUnique({
+        where: { id: "singleton" },
+        select: {
+          heroTitle: true,
+          intro: true,
+          inOfficeHtml: true,
+          inSpaHtml: true,
+          stepsHtml: true,
+          picName: true,
+          picEmail: true,
+          picPhone: true,
+          benefits: true,
+          solutions: true,
+          inSpaItems: true,
+        },
+      });
+      return resolveCorporateContent(row);
+    }, staticCorporateContent()),
+
+    safeQueryWithMeta<CorporateProgramItem[]>(async () => {
+      const rows = await (await db()).corporateProgram.findMany({ orderBy: ORDER });
+      // Bawaan hanya bila tabel benar-benar kosong; semua draf = tidak tampil.
+      if (rows.length === 0) return staticCorporatePrograms();
+      return rows
+        .filter((row) => row.isPublished)
+        .map((row) => ({
+          id: row.id,
+          name: row.name,
+          description: row.description ?? "",
+          features: row.features ?? [],
+          imageUrl: row.imageUrl,
+        }));
+    }, staticCorporatePrograms()),
+
+    safeQueryWithMeta<CorporateStepItem[]>(async () => {
+      const rows = await (await db()).corporateStep.findMany({ orderBy: ORDER });
+      if (rows.length === 0) return staticCorporateSteps();
+      return rows.map((row) => ({ id: row.id, title: row.title, body: row.body ?? "" }));
+    }, staticCorporateSteps()),
+
+    safeQueryWithMeta<CorporateClientItem[] | null>(async () => {
+      const rows = await (await db()).corporateClient.findMany({ orderBy: ORDER });
+      if (rows.length === 0) return null;
+      return rows
+        .filter((row) => row.isPublished)
+        .map((row) => ({
+          id: row.id,
+          name: row.name,
+          logoUrl: row.logoUrl,
+          websiteUrl: row.websiteUrl,
+          photoUrls: row.photoUrls ?? [],
+        }));
+    }, null),
+  ]);
+
+  const usedFallback =
+    content.usedFallback || programs.usedFallback || steps.usedFallback || clients.usedFallback;
   if (usedFallback) cacheLife("minutes");
   else cacheLife("hours");
-  return data;
-}
 
-/** Item "Ideal For" In-Spa — dipakai bila DB belum punya `inSpaHtml`. */
-export function getCorporateInSpaItems(): string[] {
-  return STATIC_IN_SPA_ITEMS;
-}
-
-/** Langkah kolaborasi — dipakai bila DB belum punya `stepsHtml`. */
-export function getCorporateSteps(): { title: string; body: string }[] {
-  return STATIC_STEPS;
+  return {
+    content: content.data,
+    programs: programs.data,
+    steps: steps.data,
+    clients: clients.data ?? [],
+    collabPhotos: clients.data === null ? staticCollabPhotos() : collabPhotosFor(clients.data),
+  };
 }
