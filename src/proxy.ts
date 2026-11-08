@@ -10,10 +10,12 @@ import {
 import { isValidSlug } from "@/lib/domain/slug";
 import { isJournalVisible, isPromoActive } from "@/lib/domain/visibility";
 import {
+  fetchEventPublished,
   fetchJournalVisibility,
   fetchPromoPeriod,
   getJournalVisibility,
   getPromoPeriods,
+  getPublishedEventSlugs,
   getPublishedPageSlugs,
   getRedirectMap,
 } from "@/lib/redirects";
@@ -21,6 +23,8 @@ import { SESSION_COOKIE, verifySessionToken } from "@/lib/session";
 
 // Segmen di bawah /promos yang punya route statis sendiri (bukan slug promo).
 const PROMO_STATIC_SEGMENTS = ["membership"];
+// Segmen di bawah /events yang punya route statis sendiri (bukan slug event).
+const EVENT_STATIC_SEGMENTS = ["collaborations"];
 
 // Proxy (pengganti middleware di Next.js 16). Guard admin hanya verifikasi JWT;
 // pencocokan sesi dengan database (akun aktif, sessionVersion) dan role
@@ -38,6 +42,7 @@ export async function proxy(request: NextRequest) {
       (await notFoundForUnknownPage(request)) ??
       (await notFoundForInactivePromo(request)) ??
       (await notFoundForHiddenJournalPost(request)) ??
+      (await notFoundForUnpublishedEvent(request)) ??
       NextResponse.next()
     );
   }
@@ -201,6 +206,36 @@ async function notFoundForHiddenJournalPost(
     const fresh = await fetchJournalVisibility(slug);
     if (fresh === undefined) return null; // database bermasalah: jangan menebak
     if (fresh && isJournalVisible(fresh, now)) return null;
+  }
+
+  return NextResponse.rewrite(new URL("/_not-found", request.url), {
+    status: 404,
+  });
+}
+
+/**
+ * `/events/[slug]` juga merender notFound() di dalam Suspense (soft-404).
+ * Event draf atau tidak ada dijawab 404 di sini. Sebelum menjawab 404, status
+ * dibaca ulang langsung dari database supaya event yang baru diterbitkan tidak
+ * tertolak oleh cache proxy yang belum diperbarui.
+ */
+async function notFoundForUnpublishedEvent(
+  request: NextRequest,
+): Promise<NextResponse | null> {
+  if (request.method !== "GET" && request.method !== "HEAD") return null;
+  const match = /^\/events\/([^/]+)\/?$/.exec(request.nextUrl.pathname);
+  if (!match) return null;
+
+  const slug = decodeURIComponentSafe(match[1]);
+  // Route statis di bawah /events.
+  if (EVENT_STATIC_SEGMENTS.includes(slug)) return null;
+
+  if (isValidSlug(slug)) {
+    const cached = await getPublishedEventSlugs();
+    if (cached.value.has(slug)) return null;
+
+    const published = await fetchEventPublished(slug);
+    if (published !== false) return null; // terbit, atau database bermasalah
   }
 
   return NextResponse.rewrite(new URL("/_not-found", request.url), {

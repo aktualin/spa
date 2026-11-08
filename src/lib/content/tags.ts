@@ -14,8 +14,8 @@ export const CONTENT_TAGS = {
   journal: "content:journal", // JournalPost
   events: "content:events", // EventItem, EventPhoto
   retail: "content:retail", // RetailProduct
-  corporate: "content:corporate", // CorporateContent (BUKAN CorporateInquiry — PII)
-  homepage: "content:homepage", // HomepageSection
+  corporate: "content:corporate", // CorporateContent, CorporateProgram, CorporateStep, CorporateClient (BUKAN CorporateInquiry — PII)
+  homepage: "content:homepage", // HomepageSection, HomepageHighlight
   ourStory: "content:our-story", // OurStoryContent
   menu: "content:menu", // MenuItem
   settings: "content:settings", // SiteSettings, WhatsAppTemplate

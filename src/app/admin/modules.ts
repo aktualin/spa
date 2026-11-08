@@ -102,7 +102,10 @@ export const ADMIN_MODULES: readonly AdminModule[] = [
     href: "/admin/homepage",
     roles: ["ADMIN", "EDITOR"],
     ready: true,
-    children: [{ label: "Our Story", href: "/admin/our-story" }],
+    children: [
+      { label: "Highlight", href: "/admin/homepage/highlights" },
+      { label: "Our Story", href: "/admin/our-story" },
+    ],
   },
   {
     // Modul tambahan di luar 14 modul Lampiran I; nomor 15 hanya penanda unik.
