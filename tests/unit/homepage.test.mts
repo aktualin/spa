@@ -198,3 +198,79 @@ describe("reorderIds", () => {
     assert.equal(reorderIds(["a", "b"], "z", "up"), null);
   });
 });
+
+import {
+  INSTAGRAM_LIMITS,
+  selectInstagramPosts,
+  selectReviews,
+  selectStats,
+  validateInstagramInput,
+  validateReviewInput,
+  validateStatInput,
+} from "../../src/lib/domain/homepage.ts";
+
+describe("statistik, ulasan, feed Instagram", () => {
+  it("tabel kosong → null (pakai fallback statis)", () => {
+    assert.equal(selectStats([]), null);
+    assert.equal(selectReviews([]), null);
+    assert.equal(selectInstagramPosts([]), null);
+  });
+
+  it("ada baris tapi tak ada yang terbit → daftar kosong, bukan null", () => {
+    assert.deepEqual(selectStats([{ id: "a", value: "1", label: "x", isPublished: false, sortOrder: 0 }]), []);
+  });
+
+  it("hanya baris terbit, urut sortOrder", () => {
+    const out = selectStats([
+      { id: "b", value: "2", label: "dua", isPublished: true, sortOrder: 1 },
+      { id: "a", value: "1", label: "satu", isPublished: true, sortOrder: 0 },
+      { id: "c", value: "3", label: "tiga", isPublished: false, sortOrder: 2 },
+    ]);
+    assert.deepEqual(out?.map((s) => s.key), ["a", "b"]);
+  });
+
+  it("ulasan: lokasi/peran kosong menjadi string kosong", () => {
+    const out = selectReviews([
+      { id: "a", quote: " q ", name: " N ", location: null, role: undefined, isPublished: true, sortOrder: 0 },
+    ]);
+    assert.deepEqual(out, [{ key: "a", quote: "q", name: "N", location: "", role: "" }]);
+  });
+
+  it("Instagram: gambar tak aman dibuang, tautan tak aman jadi profil, maks 12", () => {
+    const rows = Array.from({ length: 14 }, (_, i) => ({
+      id: String(i),
+      imageUrl: "/img/a.jpg",
+      isPublished: true,
+      sortOrder: i,
+    }));
+    assert.equal(selectInstagramPosts(rows)?.length, INSTAGRAM_LIMITS.max);
+    const out = selectInstagramPosts([
+      { id: "x", imageUrl: "javascript:alert(1)", isPublished: true, sortOrder: 0 },
+      { id: "y", imageUrl: "/img/a.jpg", href: "javascript:alert(1)", isPublished: true, sortOrder: 1 },
+    ]);
+    assert.equal(out?.length, 1);
+    assert.equal(out?.[0].href, null);
+  });
+
+  it("validasi statistik", () => {
+    assert.equal(validateStatInput({ value: "", label: "x" }).ok, false);
+    assert.equal(validateStatInput({ value: "12", label: "" }).ok, false);
+    assert.equal(validateStatInput({ value: "1".repeat(21), label: "x" }).ok, false);
+    assert.equal(validateStatInput({ value: "12", label: "years" }).ok, true);
+  });
+
+  it("validasi ulasan", () => {
+    assert.equal(validateReviewInput({ quote: "", name: "A" }).ok, false);
+    assert.equal(validateReviewInput({ quote: "q", name: "" }).ok, false);
+    assert.equal(validateReviewInput({ quote: "q".repeat(601), name: "A" }).ok, false);
+    const ok = validateReviewInput({ quote: "q", name: "A", location: " ", isPublished: true });
+    assert.ok(ok.ok && ok.data.location === null && ok.data.isPublished);
+  });
+
+  it("validasi Instagram", () => {
+    assert.equal(validateInstagramInput({ imageUrl: "" }).ok, false);
+    assert.equal(validateInstagramInput({ imageUrl: "javascript:x" }).ok, false);
+    assert.equal(validateInstagramInput({ imageUrl: "/img/a.jpg", href: "javascript:x" }).ok, false);
+    assert.equal(validateInstagramInput({ imageUrl: "/img/a.jpg", href: "https://instagram.com/p/1" }).ok, true);
+  });
+});

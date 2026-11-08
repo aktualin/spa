@@ -52,6 +52,24 @@ export default async function AdminHomepagePage({
           Kelola highlight “What’s New” →
         </Link>
         <Link
+          href="/admin/homepage/stats"
+          className="font-medium text-neutral-900 underline underline-offset-2"
+        >
+          Statistik Brand Intro →
+        </Link>
+        <Link
+          href="/admin/homepage/reviews"
+          className="font-medium text-neutral-900 underline underline-offset-2"
+        >
+          Ulasan →
+        </Link>
+        <Link
+          href="/admin/homepage/instagram"
+          className="font-medium text-neutral-900 underline underline-offset-2"
+        >
+          Feed Instagram →
+        </Link>
+        <Link
           href="/admin/our-story"
           className="font-medium text-neutral-900 underline underline-offset-2"
         >

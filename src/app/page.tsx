@@ -7,7 +7,12 @@ import { SocialsSection } from "@/components/home/socials";
 import { SignatureTreatmentsSection } from "@/components/public/home/signature-treatments";
 import { PromoHighlightSection } from "@/components/public/home/promo-highlight";
 import { GalleryTeaserSection } from "@/components/public/home/gallery-teaser";
-import { getHomepageSections, getWhatsNewCards } from "@/lib/content/homepage";
+import {
+  getHomepageReviews,
+  getHomepageSections,
+  getHomepageStats,
+  getWhatsNewCards,
+} from "@/lib/content/homepage";
 import { getMembershipProgram } from "@/lib/content/membership";
 import { withPageSeo } from "@/lib/content/seo";
 import { DEFAULT_DESCRIPTION, DEFAULT_OG_DESCRIPTION, DEFAULT_TITLE } from "@/lib/domain/seo";
@@ -35,14 +40,20 @@ export async function generateMetadata(): Promise<Metadata> {
  * "What's New" menampilkan kartu highlight dari admin (`HomepageHighlight`),
  * atau kartu statis lama bila tabel highlight kosong.
  *
+ * Statistik Brand Intro, ulasan, dan feed Instagram dibaca dari tabel
+ * `HomepageStat`, `HomepageReview`, `InstagramPost`; tabel kosong → teks/foto
+ * statis lama (tampilan identik).
+ *
  * Section `footer` hanya mengatur tampil/sembunyi footer di homepage; posisinya
  * tetap di paling bawah (tidak ikut urutan). Tanpa baris DB → tampil.
  */
 export default async function Home() {
-  const [sections, membershipProgram, whatsNewCards] = await Promise.all([
+  const [sections, membershipProgram, whatsNewCards, stats, reviews] = await Promise.all([
     getHomepageSections(),
     getMembershipProgram(),
     getWhatsNewCards(),
+    getHomepageStats(),
+    getHomepageReviews(),
   ]);
 
   const showFooter = sections.footer?.isEnabled ?? true;
@@ -93,9 +104,9 @@ export default async function Home() {
                 />
               );
             case "reviews":
-              return <TestimonialsSection key={key} />;
+              return <TestimonialsSection key={key} reviews={reviews} />;
             case "brand-intro":
-              return <HeroStats key={key} />;
+              return <HeroStats key={key} stats={stats} />;
             case "socials":
               return <SocialsSection key={key} />;
             case "booking-banner":

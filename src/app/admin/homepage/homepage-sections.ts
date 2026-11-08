@@ -60,14 +60,16 @@ export const SECTION_SOURCE: Record<
     link: { href: "/admin/homepage/highlights", label: "Kelola highlight" },
   },
   reviews: {
-    text: "Ulasan pelanggan memakai teks bawaan situs dan belum bisa diubah dari admin.",
+    text: "Kartu ulasan pelanggan diatur di Ulasan Pelanggan (isi, nama, lokasi, urutan, tampil/sembunyi). Judul section “Reviews” bersifat tetap.",
+    link: { href: "/admin/homepage/reviews", label: "Kelola ulasan" },
   },
   "brand-intro": {
-    text: "Teks & gambar brand intro memakai konten bawaan situs. Cerita lengkap brand diatur di halaman Our Story.",
-    link: { href: "/admin/our-story", label: "Buka Our Story" },
+    text: "Kotak angka “KAMA at a glance” diatur di Statistik Brand Intro. Cerita lengkap brand diatur di halaman Our Story.",
+    link: { href: "/admin/homepage/stats", label: "Kelola statistik" },
   },
   socials: {
-    text: "Foto & tautan Instagram memakai konten bawaan situs dan belum bisa diubah dari admin.",
+    text: "Foto grid Instagram diatur di Feed Instagram (foto, teks alt, tautan, urutan). Username dan tautan profil diatur di Kontak & Umum.",
+    link: { href: "/admin/homepage/instagram", label: "Kelola feed Instagram" },
   },
   "signature-treatments": {
     text: "Menampilkan hingga 6 treatment yang ditandai best seller di modul Treatments. Section tidak tampil bila belum ada.",

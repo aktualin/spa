@@ -14,8 +14,17 @@
  */
 import { cacheLife, cacheTag } from "next/cache";
 
-import { journalPosts } from "@/data/content";
-import { selectHighlightCards, type HighlightCard } from "@/lib/domain/homepage";
+import { heroStats, journalPosts, testimonials } from "@/data/content";
+import {
+  selectHighlightCards,
+  selectInstagramPosts,
+  selectReviews,
+  selectStats,
+  type HighlightCard,
+  type InstagramItem,
+  type ReviewItem,
+  type StatItem,
+} from "@/lib/domain/homepage";
 import { safeQueryWithMeta } from "@/lib/safe-query";
 
 import { CONTENT_TAGS } from "./tags";
@@ -207,5 +216,77 @@ export async function getWhatsNewCards(): Promise<HighlightCard[]> {
     return selectHighlightCards(rows, new Date()) ?? staticWhatsNewCards();
   }, staticWhatsNewCards());
 
+  return data;
+}
+
+/** Statistik statis lama Brand Intro — dipakai bila tabel statistik kosong. */
+function staticStats(): StatItem[] {
+  return heroStats.map((stat) => ({ key: stat.label, value: stat.value, label: stat.label }));
+}
+
+/**
+ * Statistik "KAMA at a glance" (Brand Intro). Tabel `HomepageStat` kosong
+ * atau DB tidak terbaca → statistik statis lama. Ada baris → hanya yang
+ * terbit (bisa nol).
+ */
+export async function getHomepageStats(): Promise<StatItem[]> {
+  "use cache";
+  cacheTag(CONTENT_TAGS.homepage);
+  cacheLife("minutes");
+
+  const { data } = await safeQueryWithMeta<StatItem[]>(async () => {
+    const { prisma } = await import("@/lib/prisma");
+    const rows = await prisma.homepageStat.findMany({
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    });
+    return selectStats(rows) ?? staticStats();
+  }, staticStats());
+  return data;
+}
+
+/** Ulasan statis lama — dipakai bila tabel ulasan kosong. */
+function staticReviews(): ReviewItem[] {
+  return testimonials.map((t) => ({
+    key: t.name,
+    quote: t.quote,
+    name: t.name,
+    location: t.location,
+    role: t.role,
+  }));
+}
+
+/** Ulasan section Reviews; pola fallback sama dengan `getHomepageStats`. */
+export async function getHomepageReviews(): Promise<ReviewItem[]> {
+  "use cache";
+  cacheTag(CONTENT_TAGS.homepage);
+  cacheLife("minutes");
+
+  const { data } = await safeQueryWithMeta<ReviewItem[]>(async () => {
+    const { prisma } = await import("@/lib/prisma");
+    const rows = await prisma.homepageReview.findMany({
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    });
+    return selectReviews(rows) ?? staticReviews();
+  }, staticReviews());
+  return data;
+}
+
+/**
+ * Foto feed Instagram pilihan admin. `null` → tabel kosong / DB tidak
+ * terbaca: komponen mempertahankan grid foto bawaan. Array (mungkin kosong)
+ * → tampilkan foto admin.
+ */
+export async function getInstagramPosts(): Promise<InstagramItem[] | null> {
+  "use cache";
+  cacheTag(CONTENT_TAGS.homepage);
+  cacheLife("minutes");
+
+  const { data } = await safeQueryWithMeta<InstagramItem[] | null>(async () => {
+    const { prisma } = await import("@/lib/prisma");
+    const rows = await prisma.instagramPost.findMany({
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    });
+    return selectInstagramPosts(rows);
+  }, null);
   return data;
 }

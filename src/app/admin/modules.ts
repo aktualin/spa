@@ -141,6 +141,9 @@ export const ADMIN_MODULES: readonly AdminModule[] = [
     ready: true,
     children: [
       { label: "Highlight", href: "/admin/homepage/highlights" },
+      { label: "Statistik", href: "/admin/homepage/stats" },
+      { label: "Ulasan", href: "/admin/homepage/reviews" },
+      { label: "Feed Instagram", href: "/admin/homepage/instagram" },
       { label: "Our Story", href: "/admin/our-story" },
     ],
   },

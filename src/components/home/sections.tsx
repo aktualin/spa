@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { ArrowRight } from "@/components/icons";
 import { ReviewsCarousel } from "@/components/home/reviews-carousel";
-import { testimonials } from "@/data/content";
 import { Reveal } from "@/components/reveal";
-import type { HighlightCard } from "@/lib/domain/homepage";
+import type { HighlightCard, ReviewItem } from "@/lib/domain/homepage";
 
 /**
  * Isi satu kartu "What's New". Kartu statis lama dan kartu highlight dari
@@ -115,7 +114,7 @@ export function WhatsNewSection({
   );
 }
 
-export function TestimonialsSection() {
+export function TestimonialsSection({ reviews }: { reviews: ReviewItem[] }) {
   return (
     <Reveal as="section" className="bg-cream">
       <div className="container-kama py-14 md:py-16 lg:py-20">
@@ -123,7 +122,7 @@ export function TestimonialsSection() {
           Reviews
         </h2>
 
-        <ReviewsCarousel reviews={testimonials} />
+        <ReviewsCarousel reviews={reviews} />
       </div>
     </Reveal>
   );

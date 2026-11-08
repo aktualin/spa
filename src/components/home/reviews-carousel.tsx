@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight } from "@/components/icons";
 
 export type Review = {
+  /** Kunci unik (id baris DB); bila kosong memakai nama. */
+  key?: string;
   quote: string;
   name: string;
   location: string;
@@ -100,15 +102,15 @@ export function ReviewsCarousel({ reviews }: { reviews: Review[] }) {
       >
         {reviews.map((t) => (
           <li
-            key={t.name}
+            key={t.key ?? t.name}
             className="w-[85%] shrink-0 snap-start md:w-[48%] lg:w-[31.5%]"
           >
             <article className="flex h-full flex-col bg-cream-soft p-6 md:p-8">
               <blockquote className="text-lead text-cocoa/80">“{t.quote}”</blockquote>
               <div className="mt-6 flex flex-col gap-1">
                 <span className="text-[0.9375rem] font-bold">{t.name}</span>
-                <span className="text-caption text-cocoa/60">{t.location}</span>
-                <span className="eyebrow mt-1 text-cocoa/50">{t.role}</span>
+                {t.location ? <span className="text-caption text-cocoa/60">{t.location}</span> : null}
+                {t.role ? <span className="eyebrow mt-1 text-cocoa/50">{t.role}</span> : null}
               </div>
             </article>
           </li>
@@ -119,7 +121,7 @@ export function ReviewsCarousel({ reviews }: { reviews: Review[] }) {
       <div className="mt-5 flex items-center justify-center gap-2">
         {reviews.map((t, i) => (
           <button
-            key={t.name}
+            key={t.key ?? t.name}
             type="button"
             onClick={() => scrollToIndex(i)}
             aria-label={`Ke ulasan ${t.name}`}

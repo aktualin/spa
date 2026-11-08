@@ -272,3 +272,213 @@ export function reorderIds(
   [next[index], next[target]] = [next[target], next[index]];
   return next;
 }
+
+// ---------------------------------------------------------------------------
+// Statistik Brand Intro, ulasan, dan feed Instagram
+// ---------------------------------------------------------------------------
+//
+// Ketiganya memakai pola fallback yang sama dengan highlight: tabel KOSONG
+// (belum pernah diisi) → pemanggil memakai data statis lama; ada baris tetapi
+// tak satu pun terbit → section tampil tanpa item (draf tidak diam-diam
+// memunculkan konten lama).
+
+/** Batas isian statistik, ulasan, dan feed Instagram (karakter / jumlah). */
+export const STAT_LIMITS = { value: 20, label: 60, max: 6 } as const;
+export const REVIEW_LIMITS = { quote: 600, name: 80, location: 80, role: 60 } as const;
+export const INSTAGRAM_LIMITS = { imageAlt: 200, href: 500, max: 12 } as const;
+
+export type StatItem = { key: string; value: string; label: string };
+export type ReviewItem = {
+  key: string;
+  quote: string;
+  name: string;
+  location: string;
+  role: string;
+};
+export type InstagramItem = {
+  key: string;
+  imageUrl: string;
+  imageAlt: string;
+  /** null → tautan profil Instagram. */
+  href: string | null;
+};
+
+type OrderedRow = { isPublished: boolean; sortOrder: number };
+
+/** Hanya baris terbit, urut `sortOrder` naik (stabil). */
+function publishedInOrder<T extends OrderedRow>(rows: T[]): T[] {
+  return rows
+    .map((row, index) => ({ row, index }))
+    .filter(({ row }) => row.isPublished)
+    .sort((a, b) => a.row.sortOrder - b.row.sortOrder || a.index - b.index)
+    .map(({ row }) => row);
+}
+
+export type StatRowLike = OrderedRow & { id: string; value: string; label: string };
+export type ReviewRowLike = OrderedRow & {
+  id: string;
+  quote: string;
+  name: string;
+  location?: string | null;
+  role?: string | null;
+};
+export type InstagramRowLike = OrderedRow & {
+  id: string;
+  imageUrl: string;
+  imageAlt?: string | null;
+  href?: string | null;
+};
+
+/** `null` = tabel kosong → pakai statistik statis lama. */
+export function selectStats(rows: StatRowLike[]): StatItem[] | null {
+  if (rows.length === 0) return null;
+  return publishedInOrder(rows).map((row) => ({
+    key: row.id,
+    value: row.value.trim(),
+    label: row.label.trim(),
+  }));
+}
+
+/** `null` = tabel kosong → pakai ulasan statis lama. */
+export function selectReviews(rows: ReviewRowLike[]): ReviewItem[] | null {
+  if (rows.length === 0) return null;
+  return publishedInOrder(rows).map((row) => ({
+    key: row.id,
+    quote: row.quote.trim(),
+    name: row.name.trim(),
+    location: clean(row.location),
+    role: clean(row.role),
+  }));
+}
+
+/**
+ * `null` = tabel kosong → pertahankan grid foto bawaan. Foto dengan alamat
+ * gambar tidak aman dibuang; tautan tidak aman jatuh ke tautan profil.
+ */
+export function selectInstagramPosts(rows: InstagramRowLike[]): InstagramItem[] | null {
+  if (rows.length === 0) return null;
+  return publishedInOrder(rows)
+    .filter((row) => isSafeImageUrl(clean(row.imageUrl)))
+    .slice(0, INSTAGRAM_LIMITS.max)
+    .map((row) => {
+      const href = clean(row.href);
+      return {
+        key: row.id,
+        imageUrl: clean(row.imageUrl),
+        imageAlt: clean(row.imageAlt),
+        href: href && isSafeCtaHref(href) ? href : null,
+      };
+    });
+}
+
+/** Jumlah baris terbit (untuk peringatan admin "tidak ada yang tayang"). */
+export function countPublished(rows: { isPublished: boolean }[]): number {
+  return rows.filter((row) => row.isPublished).length;
+}
+
+export type SimpleValidation<T> = { ok: true; data: T } | { ok: false; error: string };
+
+export type StatRawInput = { value?: string | null; label?: string | null; isPublished?: boolean };
+export type StatData = { value: string; label: string; isPublished: boolean };
+
+export function validateStatInput(raw: StatRawInput): SimpleValidation<StatData> {
+  const value = clean(raw.value);
+  const label = clean(raw.label);
+  if (!value) return { ok: false, error: "Angka/nilai wajib diisi." };
+  if (value.length > STAT_LIMITS.value) {
+    return { ok: false, error: `Angka/nilai maksimal ${STAT_LIMITS.value} karakter.` };
+  }
+  if (!label) return { ok: false, error: "Label wajib diisi." };
+  if (label.length > STAT_LIMITS.label) {
+    return { ok: false, error: `Label maksimal ${STAT_LIMITS.label} karakter.` };
+  }
+  return { ok: true, data: { value, label, isPublished: raw.isPublished ?? false } };
+}
+
+export type ReviewRawInput = {
+  quote?: string | null;
+  name?: string | null;
+  location?: string | null;
+  role?: string | null;
+  isPublished?: boolean;
+};
+export type ReviewData = {
+  quote: string;
+  name: string;
+  location: string | null;
+  role: string | null;
+  isPublished: boolean;
+};
+
+export function validateReviewInput(raw: ReviewRawInput): SimpleValidation<ReviewData> {
+  const quote = clean(raw.quote);
+  const name = clean(raw.name);
+  const location = clean(raw.location);
+  const role = clean(raw.role);
+  if (!quote) return { ok: false, error: "Isi ulasan wajib diisi." };
+  if (quote.length > REVIEW_LIMITS.quote) {
+    return { ok: false, error: `Isi ulasan maksimal ${REVIEW_LIMITS.quote} karakter.` };
+  }
+  if (!name) return { ok: false, error: "Nama pemberi ulasan wajib diisi." };
+  if (name.length > REVIEW_LIMITS.name) {
+    return { ok: false, error: `Nama maksimal ${REVIEW_LIMITS.name} karakter.` };
+  }
+  if (location.length > REVIEW_LIMITS.location) {
+    return { ok: false, error: `Lokasi maksimal ${REVIEW_LIMITS.location} karakter.` };
+  }
+  if (role.length > REVIEW_LIMITS.role) {
+    return { ok: false, error: `Keterangan maksimal ${REVIEW_LIMITS.role} karakter.` };
+  }
+  return {
+    ok: true,
+    data: {
+      quote,
+      name,
+      location: location || null,
+      role: role || null,
+      isPublished: raw.isPublished ?? false,
+    },
+  };
+}
+
+export type InstagramRawInput = {
+  imageUrl?: string | null;
+  imageAlt?: string | null;
+  href?: string | null;
+  isPublished?: boolean;
+};
+export type InstagramData = {
+  imageUrl: string;
+  imageAlt: string | null;
+  href: string | null;
+  isPublished: boolean;
+};
+
+export function validateInstagramInput(raw: InstagramRawInput): SimpleValidation<InstagramData> {
+  const imageUrl = clean(raw.imageUrl);
+  const imageAlt = clean(raw.imageAlt);
+  const href = clean(raw.href);
+  if (!imageUrl) return { ok: false, error: "Foto wajib diunggah atau dipilih." };
+  if (!isSafeImageUrl(imageUrl)) return { ok: false, error: "Alamat gambar tidak valid." };
+  if (imageAlt.length > INSTAGRAM_LIMITS.imageAlt) {
+    return { ok: false, error: `Teks alt maksimal ${INSTAGRAM_LIMITS.imageAlt} karakter.` };
+  }
+  if (href.length > INSTAGRAM_LIMITS.href) {
+    return { ok: false, error: `Tautan maksimal ${INSTAGRAM_LIMITS.href} karakter.` };
+  }
+  if (href && !isSafeCtaHref(href)) {
+    return {
+      ok: false,
+      error: "Tautan harus berupa path internal (mis. /menu) atau alamat https://….",
+    };
+  }
+  return {
+    ok: true,
+    data: {
+      imageUrl,
+      imageAlt: imageAlt || null,
+      href: href || null,
+      isPublished: raw.isPublished ?? false,
+    },
+  };
+}

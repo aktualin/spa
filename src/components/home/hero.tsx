@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { ArrowRight, ArrowRightThin } from "@/components/icons";
-import { heroStats, membership } from "@/data/content";
+import { membership } from "@/data/content";
 import { Reveal } from "@/components/reveal";
 import type { HomepageSection } from "@/lib/content/homepage";
+import type { StatItem } from "@/lib/domain/homepage";
 import {
   BOOKING_BANNER_DEFAULTS,
   HERO_DEFAULTS,
@@ -124,7 +125,8 @@ export function Hero({ section }: BannerProps = {}) {
   );
 }
 
-export function HeroStats() {
+/** `stats` dari `getHomepageStats()` (statistik admin, atau bawaan bila kosong). */
+export function HeroStats({ stats }: { stats: StatItem[] }) {
   return (
     <Reveal as="section" className="bg-gradient-to-r from-cream via-cream-soft to-cocoa/70 text-cocoa">
       <div className="container-kama">
@@ -144,9 +146,9 @@ export function HeroStats() {
           <div className="flex flex-col gap-6 lg:items-end">
             <p className="text-lead">KAMA at a glance</p>
             <dl className="grid w-full grid-cols-3 gap-3 sm:gap-4 lg:justify-items-end">
-              {heroStats.map((stat) => (
+              {stats.map((stat) => (
                 <div
-                  key={stat.label}
+                  key={stat.key}
                   className="flex w-full flex-col items-center gap-3 text-center"
                 >
                   <dd className="flex h-20 w-full items-center justify-center bg-white font-display text-[1.75rem] leading-none sm:h-24 sm:text-[2.5rem]">
