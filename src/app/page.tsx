@@ -15,6 +15,9 @@ import { getHomepageSections } from "@/lib/content/homepage";
  * Section yang dinonaktifkan TIDAK dirender sama sekali — bukan disembunyikan
  * dengan CSS. Section baru (signature-treatments, promo-highlight,
  * gallery-teaser) hanya muncul bila barisnya ada di DB dan aktif.
+ *
+ * Hero, banner membership, dan banner booking menerima data section-nya
+ * (gambar, teks, tombol); isian kosong memakai teks/gambar bawaan.
  */
 export default async function Home() {
   const sections = await getHomepageSections();
@@ -44,12 +47,12 @@ export default async function Home() {
     <>
       <Navigation />
       <main className="flex-1">
-        {visible.map(({ key }) => {
+        {visible.map(({ key, section }) => {
           switch (key) {
             case "hero":
-              return <Hero key={key} />;
+              return <Hero key={key} section={section} />;
             case "membership-banner":
-              return <MembershipBanner key={key} />;
+              return <MembershipBanner key={key} section={section} />;
             case "whats-new":
               return <WhatsNewSection key={key} />;
             case "reviews":
@@ -59,7 +62,7 @@ export default async function Home() {
             case "socials":
               return <SocialsSection key={key} />;
             case "booking-banner":
-              return <BookingBanner key={key} />;
+              return <BookingBanner key={key} section={section} />;
             case "signature-treatments":
               return <SignatureTreatmentsSection key={key} />;
             case "promo-highlight":

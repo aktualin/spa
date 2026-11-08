@@ -8,6 +8,20 @@
 export class InvalidPriceError extends Error {}
 
 /**
+ * Batas atas harga. Kolom harga bertipe Int (32-bit), jadi nilai di atas
+ * ~2,1 miliar gagal disimpan; 1 miliar sudah jauh di atas harga mana pun.
+ */
+export const MAX_PRICE_IDR = 1_000_000_000;
+
+function checkRange(value: number): number {
+  if (value < 0) throw new InvalidPriceError("Harga tidak boleh negatif.");
+  if (value > MAX_PRICE_IDR) {
+    throw new InvalidPriceError("Harga terlalu besar (maksimal Rp 1.000.000.000).");
+  }
+  return value;
+}
+
+/**
  * Mengubah input form menjadi rupiah penuh.
  * Menerima "145000", "145000", 145000, dan "145.000".
  * Menolak nilai negatif, pecahan, dan teks non-numerik.
@@ -20,10 +34,7 @@ export function parsePriceIdr(input: string | number): number {
     if (!Number.isInteger(input)) {
       throw new InvalidPriceError("Harga harus bilangan bulat tanpa desimal.");
     }
-    if (input < 0) {
-      throw new InvalidPriceError("Harga tidak boleh negatif.");
-    }
-    return input;
+    return checkRange(input);
   }
 
   const trimmed = input.trim();
@@ -47,10 +58,12 @@ export function parsePriceIdr(input: string | number): number {
   if (!Number.isInteger(value)) {
     throw new InvalidPriceError("Harga harus bilangan bulat tanpa desimal.");
   }
-  if (value < 0) {
-    throw new InvalidPriceError("Harga tidak boleh negatif.");
-  }
-  return value;
+  return checkRange(value);
+}
+
+/** Seperti `parsePriceIdr`, tetapi isian kosong berarti "tanpa harga" (null). */
+export function parseOptionalPriceIdr(input: string): number | null {
+  return input.trim() === "" ? null : parsePriceIdr(input);
 }
 
 /** Sama seperti `parsePriceIdr` tetapi mengembalikan null bila tidak valid. */
@@ -128,6 +141,22 @@ export function parseDurationLabel(raw: string): number {
     (hours ? Number.parseFloat(hours[1]) * 60 : 0) +
     (mins ? Number.parseFloat(mins[1]) : 0);
   return Number.isFinite(total) ? Math.round(total) : 0;
+}
+
+/**
+ * Rupiah penuh → label harga gaya halaman Membership:
+ * 1500000 → "Rp 1,5jt", 750000 → "Rp 750rb", 1250 → "Rp 1.250".
+ */
+export function formatMembershipPriceLabel(priceIdr: number): string {
+  const short = (amount: number) =>
+    String(Math.round(amount * 100) / 100).replace(".", ",");
+  if (priceIdr >= 1_000_000 && priceIdr % 10_000 === 0) {
+    return `Rp ${short(priceIdr / 1_000_000)}jt`;
+  }
+  if (priceIdr >= 1_000 && priceIdr % 1_000 === 0) {
+    return `Rp ${priceIdr / 1_000}rb`;
+  }
+  return `Rp ${priceIdr.toLocaleString("id-ID")}`;
 }
 
 /** Rupiah penuh → label harga gaya halaman /menu: 145000 → "145k". */

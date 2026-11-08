@@ -6,6 +6,7 @@ import {
   addPhotoAction,
   deletePhotoAction,
   movePhotoAction,
+  replacePhotoAction,
   updatePhotoMetaAction,
   type ActionState,
 } from "../actions/gallery";
@@ -19,6 +20,7 @@ import {
   inputClass,
   secondaryButtonClass,
 } from "../promos/_kit/form-ui";
+import { BulkUploader } from "./bulk-uploader";
 
 export type PhotoRow = {
   id: string;
@@ -29,6 +31,33 @@ export type PhotoRow = {
 };
 
 const initialState: ActionState = { error: null };
+
+/** Ganti berkas satu foto; caption, alt text, dan urutan tetap. */
+function ReplacePhotoForm({ photo, label }: { photo: PhotoRow; label: string }) {
+  const [state, formAction] = useActionState(replacePhotoAction, initialState);
+
+  return (
+    <details className="rounded-md border border-neutral-200 px-3 py-2">
+      <summary className="cursor-pointer text-sm text-neutral-700">
+        Ganti foto
+      </summary>
+      <form action={formAction} className="mt-3 space-y-3">
+        <input type="hidden" name="id" value={photo.id} />
+        <ImageField
+          name="imageUrl"
+          label={`Foto pengganti untuk ${label}`}
+          folder="gallery"
+          defaultValue={photo.imageUrl}
+        />
+        <p className="text-xs text-neutral-500">
+          Caption, alt text, dan urutan foto tidak berubah.
+        </p>
+        <ErrorAlert message={state.error} />
+        <SmallSubmit title="Simpan foto pengganti">Simpan foto pengganti</SmallSubmit>
+      </form>
+    </details>
+  );
+}
 
 export function PhotoManager({
   albumId,
@@ -43,8 +72,19 @@ export function PhotoManager({
     <div className="space-y-8">
       <section className="space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
-          Tambah foto
+          Unggah banyak foto
         </h2>
+        <BulkUploader albumId={albumId} />
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
+          Tambah satu foto
+        </h2>
+        <p className="text-sm text-neutral-600">
+          Untuk satu foto dengan caption & alt text sekaligus, atau foto yang sudah
+          ada di Media Library.
+        </p>
 
         <form action={formAction} className="space-y-4">
           <input type="hidden" name="albumId" value={albumId} />
@@ -100,6 +140,9 @@ export function PhotoManager({
                 key={photo.id}
                 className="flex flex-wrap items-start gap-4 rounded-lg border border-neutral-200 bg-white p-3"
               >
+                <span className="w-6 shrink-0 pt-1 text-right text-xs tabular-nums text-neutral-400">
+                  {index + 1}
+                </span>
                 <div className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded border border-neutral-200 bg-neutral-50">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -140,24 +183,36 @@ export function PhotoManager({
                     <form action={movePhotoAction}>
                       <input type="hidden" name="id" value={photo.id} />
                       <input type="hidden" name="direction" value="up" />
-                      <SmallSubmit title="Naikkan urutan">↑ Naikkan</SmallSubmit>
+                      <SmallSubmit
+                        title={`Naikkan urutan foto ${index + 1}`}
+                        disabled={index === 0}
+                      >
+                        ↑ Naikkan
+                      </SmallSubmit>
                     </form>
                     <form action={movePhotoAction}>
                       <input type="hidden" name="id" value={photo.id} />
                       <input type="hidden" name="direction" value="down" />
-                      <SmallSubmit title="Turunkan urutan">↓ Turunkan</SmallSubmit>
+                      <SmallSubmit
+                        title={`Turunkan urutan foto ${index + 1}`}
+                        disabled={index === photos.length - 1}
+                      >
+                        ↓ Turunkan
+                      </SmallSubmit>
                     </form>
                     <form action={deletePhotoAction}>
                       <input type="hidden" name="id" value={photo.id} />
                       <input type="hidden" name="albumId" value={albumId} />
                       <ConfirmDeleteButton
-                        message="Hapus foto ini? File gambarnya juga dihapus dari storage."
+                        message="Hapus foto ini dari album? File gambarnya ikut dihapus dari storage, kecuali tersimpan di Media Library."
                         className={`${secondaryButtonClass} text-red-700`}
                       >
                         Hapus foto
                       </ConfirmDeleteButton>
                     </form>
                   </div>
+
+                  <ReplacePhotoForm photo={photo} label={`foto ${index + 1}`} />
                 </div>
               </li>
             ))}

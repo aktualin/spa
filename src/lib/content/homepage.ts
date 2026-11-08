@@ -30,6 +30,11 @@ export type HomepageSection = {
   subtitle: string | null;
   bodyHtml: string | null;
   imageUrl: string | null;
+  /** Banner/hero: gambar khusus layar kecil, teks alt, dan tombol ajakan. */
+  mobileImageUrl: string | null;
+  imageAlt: string | null;
+  ctaLabel: string | null;
+  ctaHref: string | null;
   isEnabled: boolean;
   sortOrder: number;
 };
@@ -62,6 +67,10 @@ function fallbackSections(): HomepageSection[] {
     subtitle: null,
     bodyHtml: null,
     imageUrl: null,
+    mobileImageUrl: null,
+    imageAlt: null,
+    ctaLabel: null,
+    ctaHref: null,
     isEnabled: true,
     sortOrder: index,
   }));
@@ -95,6 +104,10 @@ export async function getHomepageSections(): Promise<
           subtitle: row.subtitle,
           bodyHtml: row.bodyHtml,
           imageUrl: row.imageUrl,
+          mobileImageUrl: row.mobileImageUrl,
+          imageAlt: row.imageAlt,
+          ctaLabel: row.ctaLabel,
+          ctaHref: row.ctaHref,
           isEnabled: row.isEnabled,
           sortOrder: row.sortOrder,
         });

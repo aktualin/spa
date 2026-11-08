@@ -49,6 +49,8 @@ model AdminUser {
   mustChangePassword Boolean   @default(false)
   passwordChangedAt  DateTime?
 
+  mediaUploads MediaAsset[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -259,6 +261,9 @@ model MembershipTier {
   slug        String  @unique
   name        String
   priceLabel  String
+  // Harga angka (rupiah penuh) yang diubah dari modul Harga; priceLabel lalu
+  // ditulis ulang dari angka ini. Null = harga non-angka, contoh "Custom".
+  priceIdr    Int?
   billingNote String?
   summary     String?
 
@@ -403,6 +408,11 @@ model HomepageSection {
   subtitle  String?
   bodyHtml  String?
   imageUrl  String?
+  // Banner/hero: gambar khusus layar kecil, teks alt, dan tombol ajakan.
+  mobileImageUrl String?
+  imageAlt       String?
+  ctaLabel       String?
+  ctaHref        String?
   isEnabled Boolean @default(true)
   sortOrder Int     @default(0)
 
@@ -564,4 +574,31 @@ model Redirect {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+/* ---------- Media Library ---------- */
+
+// Satu baris per berkas di Supabase Storage. Konten lain tetap menyimpan URL
+// (bukan relasi), jadi pemakaian dihitung dengan mencocokkan URL.
+model MediaAsset {
+  id         String  @id @default(cuid())
+  url        String  @unique
+  storageKey String  @unique
+  fileName   String
+  title      String?
+  altText    String?
+  mimeType   String
+  sizeBytes  Int
+  width      Int?
+  height     Int?
+  folder     String  @default("misc")
+  sortOrder  Int     @default(0)
+
+  uploadedById String?
+  uploadedBy   AdminUser? @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([folder, sortOrder])
 }

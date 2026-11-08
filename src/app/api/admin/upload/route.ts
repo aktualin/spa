@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 
 import { getSession } from "@/lib/auth";
-import { uploadImage } from "@/lib/storage";
+import { MediaValidationError } from "@/lib/domain/media";
+import { storeMedia } from "@/lib/media";
 
 // Proxy sudah menolak permintaan tanpa token dan POST lintas origin untuk
 // /api/admin/*. Pengecekan di sini tetap wajib karena proxy tidak menyentuh
@@ -33,12 +34,14 @@ export async function POST(request: Request) {
   const folder = String(formData.get("folder") ?? "misc");
 
   try {
-    const { url, key } = await uploadImage(file, folder);
-    return NextResponse.json({ url, key });
+    const media = await storeMedia(file, folder, session.userId);
+    return NextResponse.json({ id: media.id, url: media.url, fileName: media.fileName });
   } catch (error) {
-    // Pesan validasi (tipe/ukuran) aman ditampilkan ke admin.
-    const message =
-      error instanceof Error ? error.message : "Gagal mengunggah file.";
-    return NextResponse.json({ error: message }, { status: 400 });
+    // Pesan validasi (tipe/ukuran/nama/isi) aman ditampilkan ke admin.
+    if (error instanceof MediaValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+    console.error("[upload] gagal mengunggah", error);
+    return NextResponse.json({ error: "Gagal mengunggah file. Coba lagi." }, { status: 500 });
   }
 }

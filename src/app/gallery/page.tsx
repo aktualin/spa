@@ -9,6 +9,7 @@ import {
 } from "@/components/public/page-parts";
 import { GalleryGrid } from "@/components/public/gallery-grid";
 import { getGalleryAlbums } from "@/lib/content/gallery";
+import { photoAltText } from "@/lib/domain/gallery";
 import { withPageSeo } from "@/lib/content/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -61,7 +62,8 @@ export default async function GalleryPage() {
                     photos={album.photos.map((photo) => ({
                       imageUrl: photo.imageUrl,
                       caption: photo.caption,
-                      altText: photo.altText,
+                      // Alt kosong → caption → nama album.
+                      altText: photoAltText(photo, album.name),
                     }))}
                   />
                 </div>

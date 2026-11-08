@@ -1,4 +1,11 @@
 import { requireRole } from "@/lib/auth";
+import { MEMBERSHIP_BANNER_DEFAULTS } from "@/components/home/hero";
+import {
+  BOOKING_BANNER_DEFAULTS,
+  HERO_DEFAULTS,
+  type BannerDefaults,
+  type BannerKey,
+} from "@/lib/domain/homepage-banner";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 
 import { listHomepageSections } from "../actions/homepage";
@@ -6,6 +13,13 @@ import { StatusBanner } from "../settings/_components/form-ui";
 import { HomepageSectionList } from "./homepage-section-list";
 
 export const instant = false;
+
+/** Teks/gambar bawaan banner — ditampilkan sebagai placeholder di form. */
+const BANNER_DEFAULTS: Record<BannerKey, BannerDefaults> = {
+  hero: HERO_DEFAULTS,
+  "membership-banner": MEMBERSHIP_BANNER_DEFAULTS,
+  "booking-banner": BOOKING_BANNER_DEFAULTS,
+};
 
 export default async function AdminHomepagePage({
   searchParams,
@@ -47,10 +61,15 @@ export default async function AdminHomepagePage({
               subtitle: section.subtitle ?? "",
               bodyHtml: section.bodyHtml ?? "",
               imageUrl: section.imageUrl ?? "",
+              mobileImageUrl: section.mobileImageUrl ?? "",
+              imageAlt: section.imageAlt ?? "",
+              ctaLabel: section.ctaLabel ?? "",
+              ctaHref: section.ctaHref ?? "",
               isEnabled: section.isEnabled,
               sortOrder: section.sortOrder,
             }))}
             missing={missing}
+            bannerDefaults={BANNER_DEFAULTS}
           />
       </div>
     </div>

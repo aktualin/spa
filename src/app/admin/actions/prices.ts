@@ -7,8 +7,10 @@ import { z } from "zod";
 import { requireRole } from "@/lib/auth";
 import { CONTENT_TAGS } from "@/lib/content/tags";
 import {
+  formatMembershipPriceLabel,
   InvalidPriceError,
   parseDurationMin,
+  parseOptionalPriceIdr,
   parsePriceIdr,
 } from "@/lib/domain/pricing";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
@@ -121,6 +123,83 @@ export async function updatePackagePriceAction(
   revalidatePath("/admin/treatments/prices");
   revalidatePath("/admin/treatments/packages");
   revalidatePath("/treatments/packages");
+  revalidatePath("/menu");
+
+  redirect("/admin/treatments/prices?saved=1");
+}
+
+/**
+ * Simpan harga tier membership. Angka ditulis ke `priceIdr` dan label tampil
+ * ("Rp 1,5jt") dibentuk ulang dari angka itu. Isian kosong = harga non-angka:
+ * label lama (contoh "Custom") dipertahankan.
+ */
+export async function updateMembershipPriceAction(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  await requireRole(CONTENT_ROLES);
+
+  const id = String(formData.get("id") ?? "");
+  let priceIdr: number | null;
+  try {
+    priceIdr = parseOptionalPriceIdr(String(formData.get("priceIdr") ?? ""));
+  } catch (error) {
+    if (error instanceof InvalidPriceError) return { error: error.message };
+    throw error;
+  }
+
+  const tier = id
+    ? await prisma.membershipTier.findUnique({
+        where: { id },
+        select: { slug: true, priceLabel: true },
+      })
+    : null;
+  if (!tier) return { error: "Tier membership tidak ditemukan." };
+
+  await prisma.membershipTier.update({
+    where: { id },
+    data: {
+      priceIdr,
+      priceLabel:
+        priceIdr === null ? tier.priceLabel : formatMembershipPriceLabel(priceIdr),
+    },
+  });
+
+  updateTag(CONTENT_TAGS.membership);
+  revalidatePath("/admin/membership");
+  revalidatePath("/membership");
+  revalidatePath("/promos/membership");
+  revalidatePath(`/promos/membership/${tier.slug}`);
+
+  redirect("/admin/treatments/prices?saved=1");
+}
+
+/** Simpan harga produk retail. Kosong = harga tidak ditampilkan. */
+export async function updateRetailPriceAction(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  await requireRole(CONTENT_ROLES);
+
+  const id = String(formData.get("id") ?? "");
+  let priceIdr: number | null;
+  try {
+    priceIdr = parseOptionalPriceIdr(String(formData.get("priceIdr") ?? ""));
+  } catch (error) {
+    if (error instanceof InvalidPriceError) return { error: error.message };
+    throw error;
+  }
+
+  const existing = id
+    ? await prisma.retailProduct.findUnique({ where: { id }, select: { id: true } })
+    : null;
+  if (!existing) return { error: "Produk retail tidak ditemukan." };
+
+  await prisma.retailProduct.update({ where: { id }, data: { priceIdr } });
+
+  updateTag(CONTENT_TAGS.retail);
+  revalidatePath("/admin/retail");
+  revalidatePath("/retail");
 
   redirect("/admin/treatments/prices?saved=1");
 }

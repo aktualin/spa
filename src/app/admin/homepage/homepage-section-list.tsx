@@ -17,6 +17,14 @@ import {
   SaveButton,
   inputClass,
 } from "../settings/_components/form-ui";
+import {
+  BANNER_FIELDS,
+  BANNER_LIMITS,
+  displayTitle,
+  isBannerKey,
+  type BannerDefaults,
+  type BannerKey,
+} from "@/lib/domain/homepage-banner";
 import { sectionKeyLabel } from "./homepage-sections";
 
 export type HomepageSectionRow = {
@@ -26,6 +34,10 @@ export type HomepageSectionRow = {
   subtitle: string;
   bodyHtml: string;
   imageUrl: string;
+  mobileImageUrl: string;
+  imageAlt: string;
+  ctaLabel: string;
+  ctaHref: string;
   isEnabled: boolean;
   sortOrder: number;
 };
@@ -35,9 +47,11 @@ const initialState: ActionState = { error: null };
 export function HomepageSectionList({
   sections,
   missing,
+  bannerDefaults,
 }: {
   sections: HomepageSectionRow[];
   missing: string[];
+  bannerDefaults: Record<BannerKey, BannerDefaults>;
 }) {
   return (
     <div className="space-y-6">
@@ -45,6 +59,7 @@ export function HomepageSectionList({
         <HomepageSectionCard
           key={section.id}
           section={section}
+          bannerDefaults={bannerDefaults}
           isFirst={index === 0}
           isLast={index === sections.length - 1}
         />
@@ -82,10 +97,12 @@ export function HomepageSectionList({
 
 function HomepageSectionCard({
   section,
+  bannerDefaults,
   isFirst,
   isLast,
 }: {
   section: HomepageSectionRow;
+  bannerDefaults: Record<BannerKey, BannerDefaults>;
   isFirst: boolean;
   isLast: boolean;
 }) {
@@ -164,38 +181,48 @@ function HomepageSectionCard({
       <form action={formAction} className="mt-4 space-y-4">
         <input type="hidden" name="id" value={section.id} />
 
-        <Field label="Judul" htmlFor={`title-${section.id}`}>
-          <input
-            id={`title-${section.id}`}
-            name="title"
-            defaultValue={section.title}
-            required
-            className={inputClass}
+        {isBannerKey(section.key) ? (
+          <BannerFields
+            section={section}
+            bannerKey={section.key}
+            defaults={bannerDefaults[section.key]}
           />
-        </Field>
+        ) : (
+          <>
+            <Field label="Judul" htmlFor={`title-${section.id}`}>
+              <input
+                id={`title-${section.id}`}
+                name="title"
+                defaultValue={section.title}
+                required
+                className={inputClass}
+              />
+            </Field>
 
-        <Field label="Subjudul" htmlFor={`subtitle-${section.id}`}>
-          <input
-            id={`subtitle-${section.id}`}
-            name="subtitle"
-            defaultValue={section.subtitle}
-            className={inputClass}
-          />
-        </Field>
+            <Field label="Subjudul" htmlFor={`subtitle-${section.id}`}>
+              <input
+                id={`subtitle-${section.id}`}
+                name="subtitle"
+                defaultValue={section.subtitle}
+                className={inputClass}
+              />
+            </Field>
 
-        <RichTextField
-          name="bodyHtml"
-          label="Isi"
-          defaultValue={section.bodyHtml}
-          folder="homepage"
-        />
+            <RichTextField
+              name="bodyHtml"
+              label="Isi"
+              defaultValue={section.bodyHtml}
+              folder="homepage"
+            />
 
-        <ImageField
-          name="imageUrl"
-          label="Gambar"
-          folder="homepage"
-          defaultValue={section.imageUrl}
-        />
+            <ImageField
+              name="imageUrl"
+              label="Gambar"
+              folder="homepage"
+              defaultValue={section.imageUrl}
+            />
+          </>
+        )}
 
         <ErrorMessage error={state.error} />
 
@@ -204,5 +231,157 @@ function HomepageSectionCard({
         </div>
       </form>
     </section>
+  );
+}
+
+/**
+ * Field khusus banner (hero, membership-banner, booking-banner). Hanya field
+ * yang relevan per section yang ditampilkan; isian kosong = teks/gambar
+ * bawaan (ditampilkan sebagai placeholder).
+ */
+function BannerFields({
+  section,
+  bannerKey,
+  defaults,
+}: {
+  section: HomepageSectionRow;
+  bannerKey: BannerKey;
+  defaults: BannerDefaults;
+}) {
+  const config = BANNER_FIELDS[bannerKey];
+  const id = section.id;
+  // Kolom `title` lama berisi label admin ("Hero", dst.) — jangan tampilkan
+  // sebagai isian; kosong berarti memakai judul bawaan.
+  const title = displayTitle(section.key, section.title) ?? "";
+
+  return (
+    <>
+      <p className="rounded-md bg-neutral-50 px-3 py-2 text-xs text-neutral-600">
+        Kosongkan field untuk memakai teks/gambar bawaan (ditampilkan samar
+        sebagai contoh di dalam kotak isian).
+      </p>
+
+      {config.image ? (
+        <fieldset className="space-y-4 rounded-md border border-neutral-200 p-3">
+          <legend className="px-1 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+            Gambar
+          </legend>
+
+          <ImageField
+            name="imageUrl"
+            label="Gambar utama"
+            folder="homepage"
+            defaultValue={section.imageUrl}
+          />
+          <p className="text-xs text-neutral-500">
+            Kosong = gambar bawaan ({defaults.imageUrl}).{" "}
+            {bannerKey === "hero"
+              ? "Disarankan lanskap minimal 1920×1080 px, JPG/WebP di bawah 1 MB."
+              : "Disarankan rasio 4:3, minimal 1200×900 px, JPG/WebP di bawah 1 MB."}
+          </p>
+
+          <ImageField
+            name="mobileImageUrl"
+            label="Gambar khusus mobile (opsional)"
+            folder="homepage"
+            defaultValue={section.mobileImageUrl}
+          />
+          <p className="text-xs text-neutral-500">
+            Dipakai pada layar di bawah 768 px. Kosong = gambar utama juga
+            dipakai di mobile. Disarankan potret, mis. 1080×1350 px.
+          </p>
+
+          <Field
+            label={config.decorativeImage ? "Teks alt (opsional)" : "Teks alt"}
+            htmlFor={`imageAlt-${id}`}
+            hint={
+              config.decorativeImage
+                ? "Gambar hero adalah latar dekoratif di balik judul, jadi boleh dikosongkan (pembaca layar melewatinya). Isi hanya bila gambarnya membawa informasi penting."
+                : "Wajib bila gambar diganti: jelaskan isi gambar secara singkat untuk pembaca layar dan mesin pencari."
+            }
+          >
+            <input
+              id={`imageAlt-${id}`}
+              name="imageAlt"
+              defaultValue={section.imageAlt}
+              maxLength={BANNER_LIMITS.imageAlt}
+              placeholder={defaults.imageAlt || undefined}
+              className={inputClass}
+            />
+          </Field>
+        </fieldset>
+      ) : null}
+
+      <Field label={config.titleLabel} htmlFor={`title-${id}`}>
+        <input
+          id={`title-${id}`}
+          name="title"
+          defaultValue={title}
+          maxLength={BANNER_LIMITS.title}
+          placeholder={defaults.title}
+          className={inputClass}
+        />
+      </Field>
+
+      {config.subtitle ? (
+        <Field label={config.subtitleLabel} htmlFor={`subtitle-${id}`}>
+          {bannerKey === "hero" ? (
+            <input
+              id={`subtitle-${id}`}
+              name="subtitle"
+              defaultValue={section.subtitle}
+              maxLength={BANNER_LIMITS.subtitle}
+              placeholder={defaults.subtitle}
+              className={inputClass}
+            />
+          ) : (
+            <textarea
+              id={`subtitle-${id}`}
+              name="subtitle"
+              rows={3}
+              defaultValue={section.subtitle}
+              maxLength={BANNER_LIMITS.subtitle}
+              placeholder={defaults.subtitle}
+              className={inputClass}
+            />
+          )}
+        </Field>
+      ) : null}
+
+      <fieldset className="space-y-4 rounded-md border border-neutral-200 p-3">
+        <legend className="px-1 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+          Tombol (CTA)
+        </legend>
+        <p className="text-xs text-neutral-500">
+          {config.ctaHint} Isi keduanya atau kosongkan keduanya.
+        </p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Label tombol" htmlFor={`ctaLabel-${id}`}>
+            <input
+              id={`ctaLabel-${id}`}
+              name="ctaLabel"
+              defaultValue={section.ctaLabel}
+              maxLength={BANNER_LIMITS.ctaLabel}
+              placeholder={defaults.ctaLabel}
+              className={inputClass}
+            />
+          </Field>
+          <Field
+            label="Tujuan tombol"
+            htmlFor={`ctaHref-${id}`}
+            hint="Path internal (/menu), anchor (#home_whats_new), atau https://…"
+          >
+            <input
+              id={`ctaHref-${id}`}
+              name="ctaHref"
+              defaultValue={section.ctaHref}
+              maxLength={BANNER_LIMITS.ctaHref}
+              placeholder={defaults.ctaHref}
+              className={inputClass}
+            />
+          </Field>
+        </div>
+      </fieldset>
+    </>
   );
 }

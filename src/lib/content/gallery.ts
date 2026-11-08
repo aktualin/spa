@@ -1,8 +1,11 @@
 /**
  * Bacaan publik galeri foto (modul 3).
  *
- * Album published + foto urut `sortOrder`. DB kosong/down → album statis
- * "KAMA Spa" berisi foto yang sudah ada di `public/img/kama`.
+ * Album published + foto urut `sortOrder` (urutan sama dengan admin). Album
+ * draf tidak pernah tampil. Tabel album benar-benar kosong (belum diisi) atau
+ * DB down → album statis "KAMA Spa" berisi foto yang sudah ada di
+ * `public/img/kama`. Bila admin sudah punya album tetapi semuanya draf,
+ * hasilnya kosong — fallback tidak menimpa keputusan admin.
  */
 import { cacheLife, cacheTag } from "next/cache";
 
@@ -75,6 +78,7 @@ function mapAlbum(row: {
     name: row.name,
     description: row.description,
     coverUrl: row.coverUrl,
+    // Sort stabil: urutan sekunder dari query (createdAt, id) tetap terjaga.
     photos: [...row.photos].sort((a, b) => a.sortOrder - b.sortOrder),
   };
 }
@@ -91,11 +95,13 @@ export async function getGalleryAlbums(): Promise<GalleryAlbum[]> {
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
       include: {
         photos: {
-          orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
+          orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }, { id: "asc" }],
         },
       },
     });
-    if (rows.length === 0) throw new Error("belum ada album galeri");
+    if (rows.length === 0 && (await prisma.galleryAlbum.count()) === 0) {
+      throw new Error("belum ada album galeri");
+    }
     return rows.map(mapAlbum);
   }, staticAlbums());
 

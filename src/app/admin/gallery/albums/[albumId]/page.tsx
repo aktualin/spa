@@ -21,6 +21,11 @@ export default async function GalleryAlbumFormPage({
   let data: AlbumFormData;
 
   if (isNew) {
+    // Album baru diletakkan di urutan paling akhir.
+    const last = await prisma.galleryAlbum.findFirst({
+      orderBy: { sortOrder: "desc" },
+      select: { sortOrder: true },
+    });
     data = {
       id: null,
       slug: "",
@@ -28,7 +33,7 @@ export default async function GalleryAlbumFormPage({
       description: "",
       coverUrl: "",
       isPublished: true,
-      sortOrder: 0,
+      sortOrder: last ? last.sortOrder + 1 : 0,
     };
   } else {
     const album = await prisma.galleryAlbum.findUnique({

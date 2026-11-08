@@ -3,6 +3,7 @@ import { cacheLife } from "next/cache";
 import { ArrowRight, Instagram } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
 import { getGalleryAlbums } from "@/lib/content/gallery";
+import { photoAltText } from "@/lib/domain/gallery";
 import { site as staticSite } from "@/data/content";
 import { getSiteSettings } from "@/lib/content/site";
 
@@ -73,14 +74,16 @@ export async function GalleryTeaserSection() {
     getInstagramFeed(),
   ]);
 
+  // Urutan album & foto mengikuti admin; `caption` di sini dipakai sebagai alt.
   const galleryPhotos = albums
-    .flatMap((album) => album.photos)
-    .slice(0, 12)
-    .map((photo) => ({
-      id: photo.id,
-      imageUrl: photo.imageUrl,
-      caption: photo.caption ?? photo.altText,
-    }));
+    .flatMap((album) =>
+      album.photos.map((photo) => ({
+        id: photo.id,
+        imageUrl: photo.imageUrl,
+        caption: photoAltText(photo, album.name),
+      })),
+    )
+    .slice(0, 12);
 
   const instagramUrl = settings.instagramUrl || staticSite.instagram;
   const items: { id: string; imageUrl: string; caption: string | null; href: string }[] =

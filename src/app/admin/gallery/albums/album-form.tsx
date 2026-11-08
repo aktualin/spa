@@ -88,7 +88,11 @@ export function AlbumForm({ album }: { album: AlbumFormData }) {
           defaultValue={album.coverUrl}
         />
 
-        <Field label="Urutan tampil" htmlFor="sortOrder">
+        <Field
+          label="Urutan tampil"
+          htmlFor="sortOrder"
+          hint="Makin kecil makin atas. Lebih mudah diatur dengan tombol naik/turun di daftar album."
+        >
           <input
             id="sortOrder"
             name="sortOrder"

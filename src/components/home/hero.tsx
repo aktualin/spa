@@ -2,15 +2,62 @@ import Link from "next/link";
 import { ArrowRight, ArrowRightThin } from "@/components/icons";
 import { heroStats, membership } from "@/data/content";
 import { Reveal } from "@/components/reveal";
+import type { HomepageSection } from "@/lib/content/homepage";
+import {
+  BOOKING_BANNER_DEFAULTS,
+  HERO_DEFAULTS,
+  MOBILE_MEDIA_QUERY,
+  resolveBanner,
+  type BannerDefaults,
+} from "@/lib/domain/homepage-banner";
 
-export function Hero() {
+/**
+ * Hero & banner homepage. Teks/gambar/tombol bisa diatur admin
+ * (`/admin/homepage`); field kosong memakai nilai bawaan lewat `resolveBanner`
+ * sehingga tanpa isian admin markup-nya identik dengan versi hardcode lama.
+ * Judul section di DB yang masih berupa label admin ("Hero", dsb.) TIDAK
+ * ditampilkan — lihat `isPlaceholderTitle` di `@/lib/domain/homepage-banner`.
+ */
+
+type BannerProps = { section?: HomepageSection | null };
+
+/**
+ * `<img>` biasa, atau `<picture>` dengan `<source>` mobile bila admin mengisi
+ * gambar khusus mobile. Tanpa gambar mobile markup-nya tetap satu `<img>`.
+ */
+function BannerImage({
+  src,
+  mobileSrc,
+  alt,
+  className,
+  loading,
+}: {
+  src: string;
+  mobileSrc: string | null;
+  alt: string;
+  className: string;
+  loading?: "lazy";
+}) {
+  const img = <img src={src} loading={loading} alt={alt} className={className} />;
+  if (!mobileSrc) return img;
+  return (
+    <picture>
+      <source media={MOBILE_MEDIA_QUERY} srcSet={mobileSrc} />
+      {img}
+    </picture>
+  );
+}
+
+export function Hero({ section }: BannerProps = {}) {
+  const hero = resolveBanner(section, HERO_DEFAULTS);
   return (
     <Reveal as="header" className="relative isolate overflow-hidden bg-espresso text-white">
       {/* Background image + overlays */}
       <div className="absolute inset-0 -z-10">
-        <img
-          src="/img/kama/incense_smoke_animated.gif"
-          alt=""
+        <BannerImage
+          src={hero.imageUrl}
+          mobileSrc={hero.mobileImageUrl}
+          alt={hero.imageAlt}
           className="h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-espresso/45" />
@@ -29,12 +76,12 @@ export function Hero() {
           <div className="flex max-w-[52rem] flex-col items-center">
             <h2 className="eyebrow text-white/85">
               <Link href="/menu" className="transition-opacity hover:opacity-70">
-                Massage • Spa • Corporate Wellness
+                {hero.subtitle}
               </Link>
             </h2>
 
             <h1 className="mt-6 font-display text-display font-normal md:text-[2.75rem] lg:text-[4.1875rem] lg:leading-[1.1]">
-              Relax. Refresh. (Repeat).
+              {hero.title}
             </h1>
 
             <a
@@ -63,10 +110,10 @@ export function Hero() {
                 </p>
               </div>
               <Link
-                href="/contact"
+                href={hero.ctaHref}
                 className="mt-5 inline-flex items-center gap-2 text-[0.9375rem] transition-opacity hover:opacity-70"
               >
-                Book Now
+                {hero.ctaLabel}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -116,29 +163,41 @@ export function HeroStats() {
   );
 }
 
-export function MembershipBanner() {
+/** Dipakai juga sebagai placeholder di form admin. */
+export const MEMBERSHIP_BANNER_DEFAULTS: BannerDefaults = {
+  title: membership.title,
+  subtitle: membership.body,
+  imageUrl: "/img/kama/07-flower-bowl.jpg",
+  imageAlt: "KAMA Spa treatment room",
+  ctaLabel: membership.cta,
+  ctaHref: membership.href,
+};
+
+export function MembershipBanner({ section }: BannerProps = {}) {
+  const banner = resolveBanner(section, MEMBERSHIP_BANNER_DEFAULTS);
   return (
     <Reveal as="section" className="bg-cream-soft">
       <div className="container-kama py-12 md:py-16 lg:py-20">
         <div className="grid overflow-hidden bg-cream lg:grid-cols-2">
           <div className="relative aspect-[4/3] w-full lg:aspect-auto lg:min-h-[30rem]">
-            <img
-              src="/img/kama/07-flower-bowl.jpg"
+            <BannerImage
+              src={banner.imageUrl}
+              mobileSrc={banner.mobileImageUrl}
               loading="lazy"
-              alt="KAMA Spa treatment room"
+              alt={banner.imageAlt}
               className="absolute inset-0 h-full w-full object-cover"
             />
           </div>
 
           <div className="flex flex-col items-center justify-center gap-6 p-8 text-center md:p-12 lg:p-16">
             <h2 className="font-display text-title md:text-[2rem] md:leading-[1.3]">
-              <em>KAMA Membership.</em>
+              <em>{banner.title}</em>
               <br />
               {membership.price}
             </h2>
-            <p className="max-w-[42ch] text-body text-cocoa/75">{membership.body}</p>
-            <Link href={membership.href} className="btn btn-primary w-full max-w-xs">
-              {membership.cta}
+            <p className="max-w-[42ch] text-body text-cocoa/75">{banner.subtitle}</p>
+            <Link href={banner.ctaHref} className="btn btn-primary w-full max-w-xs">
+              {banner.ctaLabel}
             </Link>
           </div>
         </div>
@@ -147,19 +206,20 @@ export function MembershipBanner() {
   );
 }
 
-export function BookingBanner() {
+export function BookingBanner({ section }: BannerProps = {}) {
+  const banner = resolveBanner(section, BOOKING_BANNER_DEFAULTS);
   return (
     <Reveal as="section" className="bg-cream-soft">
       <div className="container-kama py-12 md:py-16">
         <div className="flex flex-col items-center gap-6 bg-cream-card px-6 py-10 text-center md:flex-row md:justify-between md:gap-8 md:px-12 md:py-14 md:text-left">
           <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-            Have any questions? Drop us a line.
+            {banner.title}
           </h2>
           <Link
-            href="/contact"
+            href={banner.ctaHref}
             className="btn btn-outline w-full shrink-0 border-cocoa/40 md:w-auto"
           >
-            Get In Touch
+            {banner.ctaLabel}
             <ArrowRightThin className="h-4 w-4" />
           </Link>
         </div>

@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 import { Badge, PageHeader, StatusBanners, Thumb, primaryLinkClass } from "../promos/_kit/list-ui";
-import { listAlbums } from "../actions/gallery";
+import { SmallSubmit } from "../promos/_kit/form-ui";
+import { listAlbums, moveAlbumAction } from "../actions/gallery";
 
 export const instant = false;
 
@@ -16,7 +17,7 @@ export default async function AdminGalleryPage({
     <div className="mx-auto max-w-4xl">
       <PageHeader
         title="Foto & Gallery"
-        subtitle={`${albums.length} album foto.`}
+        subtitle={`${albums.length} album foto. Urutan di daftar ini sama dengan urutan di halaman /gallery.`}
         action={
           <Link href="/admin/gallery/albums/new" className={primaryLinkClass}>
             Tambah album
@@ -37,7 +38,7 @@ export default async function AdminGalleryPage({
           </p>
         ) : (
           <ul className="divide-y divide-neutral-200 overflow-hidden rounded-lg border border-neutral-200 bg-white">
-            {albums.map((album) => (
+            {albums.map((album, index) => (
               <li
                 key={album.id}
                 className="flex flex-wrap items-center justify-between gap-3 px-4 py-3"
@@ -62,6 +63,28 @@ export default async function AdminGalleryPage({
                 </div>
 
                 <div className="flex shrink-0 items-center gap-3 text-sm">
+                  <div className="flex items-center gap-1">
+                    <form action={moveAlbumAction}>
+                      <input type="hidden" name="id" value={album.id} />
+                      <input type="hidden" name="direction" value="up" />
+                      <SmallSubmit
+                        title={`Naikkan urutan album ${album.name}`}
+                        disabled={index === 0}
+                      >
+                        ↑
+                      </SmallSubmit>
+                    </form>
+                    <form action={moveAlbumAction}>
+                      <input type="hidden" name="id" value={album.id} />
+                      <input type="hidden" name="direction" value="down" />
+                      <SmallSubmit
+                        title={`Turunkan urutan album ${album.name}`}
+                        disabled={index === albums.length - 1}
+                      >
+                        ↓
+                      </SmallSubmit>
+                    </form>
+                  </div>
                   <Link
                     href={`/admin/gallery/${album.id}`}
                     className="text-neutral-800 underline"

@@ -24,7 +24,8 @@ export default async function GalleryAlbumPhotosPage({
   const album = await prisma.galleryAlbum.findUnique({
     where: { id: albumId },
     include: {
-      photos: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
+      // Urutan sama dengan getGalleryAlbums (halaman publik).
+      photos: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }, { id: "asc" }] },
     },
   });
   if (!album) notFound();

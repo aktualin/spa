@@ -7,6 +7,13 @@ import { z } from "zod";
 import { requireRole, requireSession } from "@/lib/auth";
 import { CONTENT_TAGS } from "@/lib/content/tags";
 import { prisma } from "@/lib/prisma";
+import {
+  appendSortOrders,
+  isPhotoUrl,
+  parseBatchPhotoUrls,
+  sequentialSortOrders,
+} from "@/lib/domain/gallery";
+import { moveInList } from "@/lib/domain/media";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 import { deleteImageByUrl } from "@/lib/storage";
 
@@ -22,6 +29,12 @@ import {
 
 export type ActionState = { error: string | null; ok?: boolean };
 
+const photoUrlSchema = z
+  .string()
+  .trim()
+  .min(1, "Foto wajib diunggah.")
+  .refine(isPhotoUrl, "URL foto tidak valid.");
+
 const albumSchema = z.object({
   slug: slugSchema,
   name: z.string().trim().min(1, "Nama album wajib diisi."),
@@ -33,14 +46,7 @@ const albumSchema = z.object({
 
 const photoSchema = z.object({
   albumId: z.string().trim().min(1, "Album wajib diisi."),
-  imageUrl: z
-    .string()
-    .trim()
-    .min(1, "Foto wajib diunggah.")
-    .refine(
-      (value) => /^https?:\/\//.test(value) || value.startsWith("/"),
-      "URL foto tidak valid.",
-    ),
+  imageUrl: photoUrlSchema,
   caption: optionalText,
   altText: optionalText,
   sortOrder: z.coerce.number().int().min(0).default(0),
@@ -198,50 +204,180 @@ export async function deletePhotoAction(formData: FormData) {
   redirect(`/admin/gallery/${photo.album.id}?deleted=1`);
 }
 
-/** Naikkan turun urutan foto (tukar posisi dengan tetangga). */
+function readDirection(formData: FormData): "up" | "down" | null {
+  const direction = String(formData.get("direction") ?? "");
+  return direction === "up" || direction === "down" ? direction : null;
+}
+
+/**
+ * Naikkan/turunkan urutan foto. Seluruh foto album ditulis ulang menjadi
+ * 0..n-1 dalam satu transaksi, sehingga nilai sortOrder kembar (mis. data
+ * lama yang semuanya 0) ikut dirapikan dan tombol selalu berpengaruh.
+ */
 export async function movePhotoAction(formData: FormData) {
   await requireRole(CONTENT_ROLES);
 
   const id = String(formData.get("id") ?? "");
-  const direction = String(formData.get("direction") ?? "");
-  if (!id || (direction !== "up" && direction !== "down")) return;
+  const direction = readDirection(formData);
+  if (!id || !direction) return;
 
   const photo = await prisma.galleryPhoto.findUnique({
     where: { id },
-    select: { id: true, albumId: true, sortOrder: true },
+    select: { albumId: true },
   });
   if (!photo) return;
 
-  const neighbour = await prisma.galleryPhoto.findFirst({
-    where: {
-      albumId: photo.albumId,
-      ...(direction === "up"
-        ? { sortOrder: { lt: photo.sortOrder } }
-        : { sortOrder: { gt: photo.sortOrder } }),
-    },
-    orderBy: direction === "up" ? { sortOrder: "desc" } : { sortOrder: "asc" },
+  // Urutan sama persis dengan yang tampil di admin & /gallery.
+  const siblings = await prisma.galleryPhoto.findMany({
+    where: { albumId: photo.albumId },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }, { id: "asc" }],
     select: { id: true, sortOrder: true },
   });
+  const current = new Map(siblings.map((row) => [row.id, row.sortOrder]));
+  const ordered = moveInList(
+    siblings.map((row) => row.id),
+    id,
+    direction,
+  );
+  const updates = sequentialSortOrders(ordered).filter(
+    (row) => current.get(row.id) !== row.sortOrder,
+  );
 
-  if (neighbour) {
-    await prisma.$transaction([
-      prisma.galleryPhoto.update({
-        where: { id: photo.id },
-        data: { sortOrder: neighbour.sortOrder },
-      }),
-      prisma.galleryPhoto.update({
-        where: { id: neighbour.id },
-        data: { sortOrder: photo.sortOrder },
-      }),
-    ]);
+  if (updates.length > 0) {
+    await prisma.$transaction(
+      updates.map((row) =>
+        prisma.galleryPhoto.update({
+          where: { id: row.id },
+          data: { sortOrder: row.sortOrder },
+        }),
+      ),
+    );
   }
 
-  const album = await prisma.galleryAlbum.findUnique({
-    where: { id: photo.albumId },
-    select: { slug: true },
-  });
   revalidateGallery();
   redirect(`/admin/gallery/${photo.albumId}?saved=1`);
+}
+
+/**
+ * Naikkan/turunkan urutan album di /gallery. Sama seperti foto: semua album
+ * ditulis ulang menjadi 0..n-1 dalam satu transaksi.
+ */
+export async function moveAlbumAction(formData: FormData) {
+  await requireRole(CONTENT_ROLES);
+
+  const id = String(formData.get("id") ?? "");
+  const direction = readDirection(formData);
+  if (!id || !direction) return;
+
+  // Urutan sama dengan getGalleryAlbums (sortOrder, lalu nama).
+  const albums = await prisma.galleryAlbum.findMany({
+    orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    select: { id: true, sortOrder: true },
+  });
+  if (!albums.some((album) => album.id === id)) return;
+
+  const current = new Map(albums.map((row) => [row.id, row.sortOrder]));
+  const ordered = moveInList(
+    albums.map((row) => row.id),
+    id,
+    direction,
+  );
+  const updates = sequentialSortOrders(ordered).filter(
+    (row) => current.get(row.id) !== row.sortOrder,
+  );
+
+  if (updates.length > 0) {
+    await prisma.$transaction(
+      updates.map((row) =>
+        prisma.galleryAlbum.update({
+          where: { id: row.id },
+          data: { sortOrder: row.sortOrder },
+        }),
+      ),
+    );
+  }
+
+  revalidateGallery();
+  redirect("/admin/gallery?saved=1");
+}
+
+/**
+ * Ganti berkas satu foto. Caption, alt text, dan urutan tidak berubah.
+ * Berkas lama dihapus dari storage setelah berhasil (kecuali tercatat di
+ * Media Library — `deleteImageByUrl` melewatinya).
+ */
+export async function replacePhotoAction(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  await requireRole(CONTENT_ROLES);
+
+  const id = String(formData.get("id") ?? "");
+  if (!id) return { error: "Foto tidak ditemukan." };
+
+  const parsed = photoUrlSchema.safeParse(text(formData, "imageUrl") ?? "");
+  if (!parsed.success) return { error: firstIssue(parsed.error) };
+  const imageUrl = parsed.data;
+
+  const photo = await prisma.galleryPhoto.findUnique({
+    where: { id },
+    select: { albumId: true, imageUrl: true },
+  });
+  if (!photo) return { error: "Foto tidak ditemukan." };
+
+  if (photo.imageUrl === imageUrl) {
+    return { error: "Pilih atau unggah foto pengganti terlebih dahulu." };
+  }
+
+  await prisma.galleryPhoto.update({ where: { id }, data: { imageUrl } });
+  if (photo.imageUrl) {
+    await deleteImageByUrl(photo.imageUrl).catch(() => {});
+  }
+
+  revalidateGallery();
+  redirect(`/admin/gallery/${photo.albumId}?saved=1`);
+}
+
+/**
+ * Tambah banyak foto sekaligus (berkas sudah diunggah satu per satu oleh
+ * klien ke /api/admin/upload). Foto diletakkan berurutan di akhir album.
+ */
+export async function addPhotosAction(
+  albumId: string,
+  urls: string[],
+): Promise<ActionState & { count?: number }> {
+  await requireRole(CONTENT_ROLES);
+
+  if (typeof albumId !== "string" || !albumId) {
+    return { error: "Album tidak ditemukan." };
+  }
+  const parsed = parseBatchPhotoUrls(urls);
+  if (!parsed.ok) return { error: parsed.error };
+
+  const album = await prisma.galleryAlbum.findUnique({
+    where: { id: albumId },
+    select: { id: true },
+  });
+  if (!album) return { error: "Album tidak ditemukan." };
+
+  await prisma.$transaction(async (tx) => {
+    const last = await tx.galleryPhoto.findFirst({
+      where: { albumId },
+      orderBy: { sortOrder: "desc" },
+      select: { sortOrder: true },
+    });
+    const orders = appendSortOrders(last?.sortOrder ?? null, parsed.urls.length);
+    await tx.galleryPhoto.createMany({
+      data: parsed.urls.map((imageUrl, index) => ({
+        albumId,
+        imageUrl,
+        sortOrder: orders[index],
+      })),
+    });
+  });
+
+  revalidateGallery();
+  return { error: null, ok: true, count: parsed.urls.length };
 }
 
 /** Ubah caption/alt text satu foto. */
@@ -264,7 +400,7 @@ export async function updatePhotoMetaAction(formData: FormData): Promise<void> {
 
   const photo = await prisma.galleryPhoto.findUnique({
     where: { id },
-    select: { albumId: true, album: { select: { slug: true } } },
+    select: { albumId: true },
   });
   if (!photo) return;
 
@@ -292,6 +428,8 @@ export async function getAlbumWithPhotos(albumId: string) {
 
   return prisma.galleryAlbum.findUnique({
     where: { id: albumId },
-    include: { photos: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] } },
+    include: {
+      photos: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }, { id: "asc" }] },
+    },
   });
 }

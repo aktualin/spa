@@ -6,6 +6,11 @@ import { z } from "zod";
 
 import { requireRole, requireSession } from "@/lib/auth";
 import { CONTENT_TAGS } from "@/lib/content/tags";
+import {
+  BANNER_LIMITS,
+  isBannerKey,
+  validateBannerInput,
+} from "@/lib/domain/homepage-banner";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { prisma } from "@/lib/prisma";
@@ -24,6 +29,30 @@ const sectionSchema = z.object({
   bodyHtml: z.string().optional(),
   imageUrl: z.union([z.string().trim().url(), z.literal("")]).optional(),
 });
+
+/**
+ * Bentuk isian form banner (hero, membership-banner, booking-banner). Zod
+ * hanya memastikan tipe & batas panjang kasar; aturan isi (CTA berpasangan,
+ * href aman, alt wajib) ada di `validateBannerInput` supaya bisa diuji.
+ */
+const optionalText = (max: number) =>
+  z.string().max(max * 2, "Isian terlalu panjang.").optional();
+
+const bannerSchema = z.object({
+  id: z.string().trim().min(1, "Section tidak valid."),
+  title: optionalText(BANNER_LIMITS.title),
+  subtitle: optionalText(BANNER_LIMITS.subtitle),
+  imageUrl: optionalText(BANNER_LIMITS.imageUrl),
+  mobileImageUrl: optionalText(BANNER_LIMITS.imageUrl),
+  imageAlt: optionalText(BANNER_LIMITS.imageAlt),
+  ctaLabel: optionalText(BANNER_LIMITS.ctaLabel),
+  ctaHref: optionalText(BANNER_LIMITS.ctaHref),
+});
+
+function formText(formData: FormData, name: string): string | undefined {
+  const value = formData.get(name);
+  return typeof value === "string" ? value : undefined;
+}
 
 function firstIssue(error: z.ZodError): string {
   return error.issues[0]?.message ?? "Input tidak valid.";
@@ -100,12 +129,54 @@ export async function moveHomepageSectionAction(formData: FormData) {
   redirect("/admin/homepage?saved=1");
 }
 
-/** Simpan isi teks/gambar sebuah section. */
+/**
+ * Simpan isi teks/gambar sebuah section. Section banner (hero,
+ * membership-banner, booking-banner) memakai form & validasi khusus; key
+ * diambil dari DB, bukan dari form.
+ */
 export async function saveHomepageSectionAction(
   _prevState: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
   await requireRole(CONTENT_ROLES);
+
+  const id = formText(formData, "id")?.trim() ?? "";
+  if (!id) return { error: "Section tidak valid." };
+
+  const existing = await prisma.homepageSection.findUnique({
+    where: { id },
+    select: { key: true },
+  });
+  if (!existing) return { error: "Section tidak ditemukan." };
+
+  if (isBannerKey(existing.key)) {
+    const shape = bannerSchema.safeParse({
+      id,
+      title: formText(formData, "title"),
+      subtitle: formText(formData, "subtitle"),
+      imageUrl: formText(formData, "imageUrl"),
+      mobileImageUrl: formText(formData, "mobileImageUrl"),
+      imageAlt: formText(formData, "imageAlt"),
+      ctaLabel: formText(formData, "ctaLabel"),
+      ctaHref: formText(formData, "ctaHref"),
+    });
+    if (!shape.success) {
+      return { error: firstIssue(shape.error) };
+    }
+
+    const result = validateBannerInput(existing.key, shape.data);
+    if (!result.ok) {
+      return { error: result.error };
+    }
+
+    // `bodyHtml` tidak dipakai banner, jadi tidak ikut diubah.
+    await prisma.homepageSection.update({ where: { id }, data: result.data });
+
+    updateTag(CONTENT_TAGS.homepage);
+    revalidatePath("/admin/homepage");
+    revalidatePath("/");
+    redirect("/admin/homepage?saved=1");
+  }
 
   const parsed = sectionSchema.safeParse({
     id: formData.get("id"),
@@ -118,7 +189,7 @@ export async function saveHomepageSectionAction(
     return { error: firstIssue(parsed.error) };
   }
 
-  const { id, title, subtitle, bodyHtml, imageUrl } = parsed.data;
+  const { title, subtitle, bodyHtml, imageUrl } = parsed.data;
 
   await prisma.homepageSection.update({
     where: { id },

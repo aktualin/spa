@@ -1,10 +1,11 @@
 import Link from "next/link";
 
 import { requireRole } from "@/lib/auth";
+import { parsePriceLabel } from "@/lib/domain/pricing";
 import { prisma } from "@/lib/prisma";
 
 import { CatalogTabs } from "../catalog-tabs";
-import { OptionPriceRow, PackagePriceRow } from "./price-forms";
+import { OptionPriceRow, PackagePriceRow, SinglePriceRow } from "./price-forms";
 
 export const instant = false;
 
@@ -16,12 +17,14 @@ export default async function AdminPricesPage({
   await requireRole(["ADMIN", "EDITOR"]);
   const params = await searchParams;
 
-  const [categories, packages] = await Promise.all([
+  const [categories, packages, tiers, products] = await Promise.all([
     prisma.treatmentCategory.findMany({
-      orderBy: { sortOrder: "asc" },
+      // Urutan enum CategoryKind: TREATMENT lalu ADDON.
+      orderBy: [{ kind: "asc" }, { sortOrder: "asc" }],
       select: {
         id: true,
         name: true,
+        kind: true,
         treatments: {
           orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
           select: {
@@ -44,6 +47,14 @@ export default async function AdminPricesPage({
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
       select: { id: true, name: true, durationMin: true, priceIdr: true },
     }),
+    prisma.membershipTier.findMany({
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      select: { id: true, name: true, priceIdr: true, priceLabel: true },
+    }),
+    prisma.retailProduct.findMany({
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      select: { id: true, name: true, priceIdr: true },
+    }),
   ]);
 
   return (
@@ -53,8 +64,9 @@ export default async function AdminPricesPage({
         <div>
           <h1 className="text-xl font-semibold text-neutral-900">Harga</h1>
           <p className="mt-1 text-sm text-neutral-600">
-            Ubah harga &amp; durasi setiap pilihan durasi treatment, serta harga
-            package. Harga dalam rupiah penuh tanpa titik, contoh: 145000.
+            Ubah harga treatment, add-on, package, membership, dan produk
+            retail. Harga dalam rupiah penuh tanpa titik, contoh: 145000.
+            Perubahan langsung tampil di situs setelah disimpan.
           </p>
         </div>
       </div>
@@ -73,6 +85,7 @@ export default async function AdminPricesPage({
           <section key={category.id}>
             <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
               {category.name}
+              {category.kind === "ADDON" ? " (add-on)" : ""}
             </h2>
 
             {category.treatments.length === 0 ? (
@@ -136,6 +149,69 @@ export default async function AdminPricesPage({
                     name={pkg.name}
                     durationMin={pkg.durationMin ? String(pkg.durationMin) : ""}
                     priceIdr={String(pkg.priceIdr)}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
+            Membership
+          </h2>
+
+          {tiers.length === 0 ? (
+            <p className="mt-2 text-sm text-neutral-500">Belum ada tier membership.</p>
+          ) : (
+            <div className="mt-2 space-y-3">
+              {tiers.map((tier) => {
+                // Tier lama belum punya angka: isi awal dibaca dari labelnya.
+                const price = tier.priceIdr ?? (parsePriceLabel(tier.priceLabel) || null);
+                return (
+                  <div
+                    key={tier.id}
+                    className="rounded-lg border border-neutral-200 bg-white p-3"
+                  >
+                    <SinglePriceRow
+                      kind="membership"
+                      id={tier.id}
+                      name={tier.name}
+                      priceIdr={price === null ? "" : String(price)}
+                      emptyHint={`Tampil di situs: "${tier.priceLabel}". Kosongkan untuk harga non-angka (ubah teksnya di modul Membership).`}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+        <section>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
+            Produk retail
+          </h2>
+
+          {products.length === 0 ? (
+            <p className="mt-2 text-sm text-neutral-500">
+              Belum ada produk retail.{" "}
+              <Link href="/admin/retail" className="underline">
+                Tambah produk
+              </Link>
+            </p>
+          ) : (
+            <div className="mt-2 space-y-3">
+              {products.map((product) => (
+                <div
+                  key={product.id}
+                  className="rounded-lg border border-neutral-200 bg-white p-3"
+                >
+                  <SinglePriceRow
+                    kind="retail"
+                    id={product.id}
+                    name={product.name}
+                    priceIdr={product.priceIdr === null ? "" : String(product.priceIdr)}
+                    emptyHint="Kosongkan bila harga tidak ingin ditampilkan."
                   />
                 </div>
               ))}

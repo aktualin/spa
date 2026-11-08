@@ -7,6 +7,7 @@ import { z } from "zod";
 import { requireRole, requireSession } from "@/lib/auth";
 import { CONTENT_TAGS } from "@/lib/content/tags";
 import { prisma } from "@/lib/prisma";
+import { parsePriceLabel } from "@/lib/domain/pricing";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 
 import {
@@ -71,7 +72,12 @@ export async function saveTierAction(
     return { error: firstIssue(parsed.error) };
   }
 
-  const data = parsed.data;
+  // Label diketik bebas di form ini; angkanya ikut diselaraskan agar modul
+  // Harga menampilkan nilai yang sama. Label non-angka ("Custom") → null.
+  const data = {
+    ...parsed.data,
+    priceIdr: parsePriceLabel(parsed.data.priceLabel) || null,
+  };
 
   const clash = await prisma.membershipTier.findFirst({
     where: { slug: data.slug, ...(id ? { NOT: { id } } : {}) },

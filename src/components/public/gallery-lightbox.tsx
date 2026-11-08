@@ -96,7 +96,7 @@ export function GalleryLightbox({ photos, initialIndex = null }: GalleryLightbox
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={photo.imageUrl}
-          alt={photo.altText ?? photo.caption ?? "Foto galeri KAMA Spa"}
+          alt={photo.altText || photo.caption || "Foto galeri KAMA Spa"}
           className="max-h-[70vh] w-auto max-w-full object-contain"
         />
         {photo.caption ? (

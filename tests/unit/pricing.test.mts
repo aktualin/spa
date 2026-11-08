@@ -3,7 +3,10 @@ import { describe, it } from "node:test";
 
 import {
   InvalidPriceError,
+  MAX_PRICE_IDR,
   formatDuration,
+  formatMembershipPriceLabel,
+  parseOptionalPriceIdr,
   parseDurationLabel,
   parseDurationMin,
   parsePriceIdr,
@@ -135,5 +138,37 @@ describe("U2 parseDurationLabel (label gaya konten statis)", () => {
   it("mengembalikan 0 untuk label yang tidak dikenali", () => {
     assert.equal(parseDurationLabel("sepanjang hari"), 0);
     assert.equal(parseDurationLabel(""), 0);
+  });
+});
+
+describe("U1 batas & harga opsional (modul Harga)", () => {
+  it("menolak harga di atas batas kolom", () => {
+    assert.equal(parsePriceIdr(MAX_PRICE_IDR), MAX_PRICE_IDR);
+    assert.throws(() => parsePriceIdr(MAX_PRICE_IDR + 1), InvalidPriceError);
+    assert.throws(() => parsePriceIdr("99999999999"), InvalidPriceError);
+  });
+
+  it("isian kosong berarti tanpa harga", () => {
+    assert.equal(parseOptionalPriceIdr(""), null);
+    assert.equal(parseOptionalPriceIdr("   "), null);
+    assert.equal(parseOptionalPriceIdr("250.000"), 250000);
+    assert.throws(() => parseOptionalPriceIdr("abc"), InvalidPriceError);
+    assert.throws(() => parseOptionalPriceIdr("-5"), InvalidPriceError);
+  });
+});
+
+describe("U1 formatMembershipPriceLabel", () => {
+  it("memakai gaya label halaman Membership", () => {
+    assert.equal(formatMembershipPriceLabel(1500000), "Rp 1,5jt");
+    assert.equal(formatMembershipPriceLabel(2000000), "Rp 2jt");
+    assert.equal(formatMembershipPriceLabel(1250000), "Rp 1,25jt");
+    assert.equal(formatMembershipPriceLabel(750000), "Rp 750rb");
+    assert.equal(formatMembershipPriceLabel(1250), "Rp 1.250");
+  });
+
+  it("bolak-balik dengan parsePriceLabel", () => {
+    for (const price of [1500000, 750000, 2000000, 1250000]) {
+      assert.equal(parsePriceLabel(formatMembershipPriceLabel(price)), price);
+    }
   });
 });

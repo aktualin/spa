@@ -45,6 +45,14 @@ export const ADMIN_MODULES: readonly AdminModule[] = [
     ready: true,
   },
   {
+    // Modul tambahan di luar 14 modul Lampiran I; nomor 16 hanya penanda unik.
+    no: 16,
+    label: "Media Library",
+    href: "/admin/media",
+    roles: ["ADMIN", "EDITOR"],
+    ready: true,
+  },
+  {
     no: 4,
     label: "Promos & Gift Card",
     href: "/admin/promos",

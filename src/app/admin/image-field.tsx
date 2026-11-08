@@ -2,9 +2,14 @@
 
 import { useId, useRef, useState } from "react";
 
+import { ALLOWED_MEDIA_TYPES } from "@/lib/domain/media";
+
+import { MediaPicker } from "./media-picker";
+
 /**
  * Field gambar untuk form admin. Mengunggah ke /api/admin/upload lalu menyimpan
  * **URL-nya saja** ke hidden input, sehingga database hanya berisi URL.
+ * Gambar yang sudah ada bisa dipilih ulang lewat "Pilih dari Media Library".
  */
 export function ImageField({
   name,
@@ -22,6 +27,7 @@ export function ImageField({
   const [url, setUrl] = useState(defaultValue);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   async function handleFile(file: File) {
     setBusy(true);
@@ -77,7 +83,7 @@ export function ImageField({
             id={inputId}
             ref={fileRef}
             type="file"
-            accept="image/jpeg,image/png,image/webp,image/avif"
+            accept={ALLOWED_MEDIA_TYPES.join(",")}
             disabled={busy}
             onChange={(event) => {
               const file = event.target.files?.[0];
@@ -86,8 +92,17 @@ export function ImageField({
             className="block w-full text-sm text-neutral-700 file:mr-3 file:rounded-md file:border-0 file:bg-neutral-900 file:px-3 file:py-1.5 file:text-sm file:text-white hover:file:bg-neutral-700 disabled:opacity-60"
           />
 
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => setPickerOpen(true)}
+            className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-50 disabled:opacity-50"
+          >
+            Pilih dari Media Library
+          </button>
+
           <p className="text-xs text-neutral-500">
-            {busy ? "Mengunggah…" : "JPG, PNG, WebP, atau AVIF. Maksimal 5 MB."}
+            {busy ? "Mengunggah…" : "JPG, PNG, WebP, AVIF, atau GIF. Maksimal 4 MB."}
           </p>
 
           {url ? (
@@ -112,6 +127,16 @@ export function ImageField({
           ) : null}
         </div>
       </div>
+
+      <MediaPicker
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        onSelect={(asset) => {
+          setUrl(asset.url);
+          setError(null);
+          setPickerOpen(false);
+        }}
+      />
     </div>
   );
 }
