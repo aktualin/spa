@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { Check } from "@/components/icons";
-import { locations, site } from "@/data/content";
 
-export function ReservationForm() {
+/** Pilihan lokasi untuk form; diisi halaman server dari modul Cabang. */
+export type BranchOption = { slug: string; name: string; area: string };
+
+export function ReservationForm({ branches }: { branches: readonly BranchOption[] }) {
   const [sent, setSent] = useState(false);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -62,9 +64,9 @@ export function ReservationForm() {
           <option value="" disabled>
             Select location
           </option>
-          {locations.map((loc) => (
-            <option key={loc.slug} value={loc.slug}>
-              {loc.name} | {loc.area}
+          {branches.map((branch) => (
+            <option key={branch.slug} value={branch.slug}>
+              {branch.name} | {branch.area}
             </option>
           ))}
         </select>

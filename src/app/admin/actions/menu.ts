@@ -17,6 +17,7 @@ import {
   type MenuLinkType,
   type MenuLocation,
 } from "@/lib/domain/menu";
+import { isSafeCtaHref, isSafeImageUrl } from "@/lib/domain/homepage-banner";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 import { SLUG_PATTERN } from "@/lib/domain/slug";
 import { prisma } from "@/lib/prisma";
@@ -37,6 +38,10 @@ export type MenuAdminRow = {
   locations: MenuLocation[];
   panelKey: string | null;
   panelLinkLabel: string | null;
+  panelWidth: number | null;
+  highlightImageUrl: string | null;
+  highlightLabel: string | null;
+  highlightHref: string | null;
 };
 
 export type MenuPageOption = {
@@ -77,6 +82,10 @@ export async function listMenuAdmin(): Promise<MenuAdminRow[]> {
     locations: item.locations,
     panelKey: item.panelKey,
     panelLinkLabel: item.panelLinkLabel,
+    panelWidth: item.panelWidth,
+    highlightImageUrl: item.highlightImageUrl,
+    highlightLabel: item.highlightLabel,
+    highlightHref: item.highlightHref,
   }));
 }
 
@@ -106,6 +115,10 @@ const itemSchema = z.object({
   locations: z.array(z.enum(MENU_LOCATIONS)),
   panelKey: z.string().trim().max(40).optional(),
   panelLinkLabel: z.string().trim().max(60).optional(),
+  panelWidth: z.enum(["", "narrow", "wide"]),
+  highlightImageUrl: z.string().trim().max(500).optional(),
+  highlightLabel: z.string().trim().max(60).optional(),
+  highlightHref: z.string().trim().max(500).optional(),
 });
 
 export async function saveMenuItemAction(
@@ -126,6 +139,10 @@ export async function saveMenuItemAction(
     locations: formData.getAll("locations").map(String),
     panelKey: String(formData.get("panelKey") ?? ""),
     panelLinkLabel: String(formData.get("panelLinkLabel") ?? ""),
+    panelWidth: String(formData.get("panelWidth") ?? ""),
+    highlightImageUrl: String(formData.get("highlightImageUrl") ?? ""),
+    highlightLabel: String(formData.get("highlightLabel") ?? ""),
+    highlightHref: String(formData.get("highlightHref") ?? ""),
   });
   if (!parsed.success) return { error: "Isian menu tidak valid." };
   const input = parsed.data;
@@ -166,6 +183,22 @@ export async function saveMenuItemAction(
     return { error: "Kunci panel hanya boleh huruf kecil, angka, dan tanda hubung." };
   }
 
+  const highlightImageUrl = isRoot ? input.highlightImageUrl || null : null;
+  const highlightLabel = isRoot ? input.highlightLabel || null : null;
+  const highlightHref = isRoot ? input.highlightHref || null : null;
+
+  if (highlightImageUrl && !isSafeImageUrl(highlightImageUrl)) {
+    return { error: "Gambar kartu promo harus berupa alamat https:// atau path /img/…" };
+  }
+  if (highlightHref && !isSafeCtaHref(highlightHref)) {
+    return { error: "Tujuan kartu promo harus berupa path internal (/menu), anchor (#promo), atau https://…" };
+  }
+  // Kartu hanya tampil bila lengkap; cegah admin mengira kartunya sudah jadi.
+  const filled = [highlightImageUrl, highlightLabel, highlightHref].filter(Boolean).length;
+  if (filled > 0 && filled < 3) {
+    return { error: "Kartu promo panel perlu gambar, label, dan tujuan — lengkapi ketiganya atau kosongkan semua." };
+  }
+
   const data = {
     label: input.label.trim(),
     linkType: input.linkType,
@@ -177,6 +210,11 @@ export async function saveMenuItemAction(
     locations: isRoot ? input.locations : [],
     panelKey: isRoot ? input.panelKey || null : null,
     panelLinkLabel: isRoot ? input.panelLinkLabel || null : null,
+    // Kosong = lebar panel mengikuti jumlah kolom sub-menu.
+    panelWidth: isRoot && input.panelWidth ? (input.panelWidth === "wide" ? 2 : 1) : null,
+    highlightImageUrl,
+    highlightLabel,
+    highlightHref,
   };
 
   if (input.id) {

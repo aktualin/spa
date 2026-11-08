@@ -21,6 +21,7 @@ export type RetailProduct = {
   imageUrl: string | null;
   priceIdr: number | null;
   isHighlight: boolean;
+  isCollaboration: boolean;
   whatsappMessage: string | null;
 };
 
@@ -51,6 +52,7 @@ export async function getRetailProducts(): Promise<RetailProduct[]> {
       imageUrl: p.imageUrl,
       priceIdr: p.priceIdr,
       isHighlight: p.isHighlight,
+      isCollaboration: p.isCollaboration,
       whatsappMessage: p.whatsappMessage,
     }));
   }, []);
@@ -78,9 +80,17 @@ export async function getRetailCatalog(): Promise<RetailCatalogItem[]> {
   }));
 }
 
-/** Produk retail yang ditandai highlight (dipakai bagian atas halaman). */
+/**
+ * Produk yang ditandai highlight. Tidak ada yang ditandai → kosong, bukan
+ * produk sembarang, supaya bagian highlight benar-benar pilihan admin.
+ */
 export async function getHighlightedRetailProducts(): Promise<RetailProduct[]> {
   const all = await getRetailProducts();
-  const highlighted = all.filter((p) => p.isHighlight);
-  return highlighted.length > 0 ? highlighted : all.slice(0, 3);
+  return all.filter((p) => p.isHighlight);
+}
+
+/** Produk hasil kolaborasi, ditandai terpisah dari highlight. */
+export async function getCollaborationRetailProducts(): Promise<RetailProduct[]> {
+  const all = await getRetailProducts();
+  return all.filter((p) => p.isCollaboration);
 }

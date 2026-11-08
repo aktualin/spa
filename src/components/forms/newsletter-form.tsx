@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { locations } from "@/data/content";
+import type { BranchOption } from "./reservation-form";
 
-export function NewsletterForm() {
+export function NewsletterForm({ branches }: { branches: readonly BranchOption[] }) {
   const [sent, setSent] = useState(false);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -51,9 +51,9 @@ export function NewsletterForm() {
           <option disabled value="">
             Locations
           </option>
-          {locations.map((loc) => (
-            <option key={loc.slug} value={`${loc.name} | ${loc.area}`}>
-              {loc.name} | {loc.area}
+          {branches.map((branch) => (
+            <option key={branch.slug} value={`${branch.name} | ${branch.area}`}>
+              {branch.name} | {branch.area}
             </option>
           ))}
         </select>

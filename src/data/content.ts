@@ -22,8 +22,9 @@ export type NavLink = {
 
 export type NavHighlight = {
   image: string;
-  badge: string;
-  eyebrow: string;
+  /** Belum punya kolom di MenuItem; tidak dirender bila kosong. */
+  badge?: string;
+  eyebrow?: string;
   label: string;
   href: string;
 };

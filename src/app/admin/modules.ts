@@ -157,6 +157,14 @@ export const ADMIN_MODULES: readonly AdminModule[] = [
     children: [{ label: "Redirect 301", href: "/admin/redirects" }],
   },
   {
+    // Modul tambahan di luar 14 modul Lampiran I; nomor 17 hanya penanda unik.
+    no: 17,
+    label: "Cabang",
+    href: "/admin/branches",
+    roles: CONTENT_ROLES,
+    ready: true,
+  },
+  {
     no: 11,
     label: "Menu Navigasi",
     href: "/admin/menu",

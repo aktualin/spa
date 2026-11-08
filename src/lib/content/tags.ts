@@ -18,6 +18,7 @@ export const CONTENT_TAGS = {
   homepage: "content:homepage", // HomepageSection, HomepageHighlight
   ourStory: "content:our-story", // OurStoryContent
   menu: "content:menu", // MenuItem
+  branches: "content:branches", // Branch
   settings: "content:settings", // SiteSettings, WhatsAppTemplate
   seo: "content:seo", // PageSeo
   pages: "content:pages", // StaticPage

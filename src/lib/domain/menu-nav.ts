@@ -21,11 +21,62 @@ export type NavData = {
   megaGroups: Record<string, NavMegaGroup>;
 };
 
-/** Preset tampilan mega panel per `panelKey` (lebar panel + kartu highlight). */
+/**
+ * Tampilan mega panel per `panelKey` (lebar panel + kartu highlight), diisi
+ * admin lewat modul Menu. `panel` kosong → lebar ditentukan dari jumlah kolom.
+ */
 export type PanelPresets = Record<
   string,
-  { panel: NavMegaGroup["panel"]; highlights: NavHighlight[] }
+  { panel?: NavMegaGroup["panel"]; highlights: NavHighlight[] }
 >;
+
+/** Baris menu level 1 yang menyimpan tampilan panelnya. */
+export type PanelPresetRow = {
+  id: string;
+  parentId: string | null;
+  panelKey: string | null;
+  panelWidth: number | null;
+  highlightImageUrl: string | null;
+  highlightLabel: string | null;
+  highlightHref: string | null;
+};
+
+/**
+ * Kunci panel yang dipakai `menuTreeToNav` untuk sebuah item level 1.
+ * Disamakan di dua tempat supaya preset selalu ketemu grupnya.
+ */
+function panelKeyOf(row: { id: string; panelKey: string | null }): string {
+  return row.panelKey || `menu-${row.id}`;
+}
+
+/**
+ * Preset panel dari baris menu. Kartu highlight hanya dibuat bila gambar,
+ * label, dan tujuannya terisi — sebagian terisi dianggap belum siap tampil.
+ */
+export function panelPresetsFromRows(rows: readonly PanelPresetRow[]): PanelPresets {
+  const presets: PanelPresets = {};
+  for (const row of rows) {
+    if (row.parentId !== null) continue;
+
+    const highlights: NavHighlight[] =
+      row.highlightImageUrl && row.highlightLabel && row.highlightHref
+        ? [
+            {
+              image: row.highlightImageUrl,
+              label: row.highlightLabel,
+              href: row.highlightHref,
+            },
+          ]
+        : [];
+
+    const panel =
+      row.panelWidth === null ? undefined : row.panelWidth >= 2 ? "wide" : "narrow";
+
+    if (highlights.length === 0 && panel === undefined) continue;
+    presets[panelKeyOf(row)] = { panel, highlights };
+  }
+  return presets;
+}
 
 function toLink(node: MenuNode): NavLink | null {
   if (!node.href) return null;
@@ -70,7 +121,7 @@ export function menuTreeToNav(tree: MenuNode[], presets: PanelPresets): NavData 
       }
     }
 
-    const key = root.panelKey || `menu-${root.id}`;
+    const key = panelKeyOf(root);
     const preset = presets[key];
     const group: NavMegaGroup = {
       id: key,
@@ -103,6 +154,10 @@ export function menuTreeToFooter(tree: MenuNode[]): Record<string, NavLink[]> {
   return groups;
 }
 
+/**
+ * Preset dari bentuk nav lama. Hanya dipakai pengujian untuk memastikan
+ * `menuTreeToNav` masih menghasilkan struktur yang sama seperti desain awal.
+ */
 export function presetsFromMegaGroups(groups: Record<string, NavMegaGroup>): PanelPresets {
   return Object.fromEntries(
     Object.entries(groups).map(([key, group]) => [

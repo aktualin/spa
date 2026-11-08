@@ -1,0 +1,1401 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panduan Admin KAMA Spa</title>
+<style>
+@page { size: A4; margin: 18mm 16mm 20mm; @bottom-center { content: counter(page); font-size: 9pt; color: #777; } }
+* { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { margin: 0 auto; max-width: 820px; padding: 24px; font: 11pt/1.55 "Segoe UI", "Helvetica Neue", Arial, sans-serif; color: #222; background: #fff; }
+h1, h2, h3, h4 { color: #3b2f2a; line-height: 1.25; break-after: avoid; page-break-after: avoid; }
+h1 { font-size: 22pt; margin: 0 0 14px; padding-bottom: 6px; border-bottom: 2px solid #b08d57; }
+h2 { font-size: 15pt; margin: 22px 0 8px; }
+h3 { font-size: 12.5pt; margin: 18px 0 6px; }
+h4 { font-size: 11pt; margin: 14px 0 4px; }
+p { margin: 0 0 9px; }
+a { color: #7a5a2b; text-decoration: none; }
+code { font-family: "SFMono-Regular", Consolas, Menlo, monospace; font-size: 9.5pt; background: #f4efe8; padding: 1px 4px; border-radius: 3px; word-break: break-word; }
+pre { background: #f4efe8; padding: 10px 12px; border-radius: 4px; overflow-x: auto; break-inside: avoid; }
+pre code { background: none; padding: 0; }
+table { width: 100%; border-collapse: collapse; margin: 8px 0 14px; font-size: 9.5pt; }
+th, td { border: 1px solid #d8cfc4; padding: 5px 7px; vertical-align: top; text-align: left; }
+th { background: #efe7dc; }
+tr { break-inside: avoid; page-break-inside: avoid; }
+ul, ol { margin: 0 0 10px; padding-left: 22px; }
+li { margin: 2px 0; }
+blockquote { margin: 8px 0; padding: 6px 12px; border-left: 3px solid #b08d57; background: #faf6f0; }
+hr { border: 0; border-top: 1px solid #d8cfc4; margin: 18px 0; }
+.cover { min-height: 92vh; display: flex; flex-direction: column; justify-content: center; text-align: center; }
+.cover h1 { border: 0; font-size: 30pt; margin-bottom: 8px; }
+.cover .sub { font-size: 14pt; color: #6b5a4e; }
+.cover .meta { margin-top: 40px; font-size: 10pt; color: #777; }
+.toc ul { list-style: none; padding-left: 0; }
+.toc > ul > li { margin: 6px 0; font-weight: 600; }
+.toc ul ul { padding-left: 18px; font-weight: 400; font-size: 9.5pt; columns: 2; }
+.chapter, .toc { break-before: page; page-break-before: always; }
+@media screen { body { box-shadow: 0 0 0 1px #eee; } .chapter, .toc { margin-top: 48px; } }
+@media print { body { max-width: none; padding: 0; } a { color: inherit; } }
+</style>
+</head>
+<body>
+<section class="cover">
+  <h1>Panduan Pengguna Dashboard Admin</h1>
+  <p class="sub">KAMA Spa — kamaspa.id</p>
+  <p class="meta">Kontrak 01/PKS/XI/KAMA/2026 · Dokumentasi serah terima<br>Dibuat 8 November 2026</p>
+</section>
+<nav class="toc">
+  <h1 id="daftar-isi">Daftar Isi</h1>
+  <ul>
+<li><a href="#bab-README">Pendahuluan</a><ul><li><a href="#bab-README-daftar-isi">Daftar isi</a></li><li><a href="#bab-README-video-tutorial">Video tutorial</a></li><li><a href="#bab-README-dua-jenis-peran-role">Dua jenis peran (role)</a></li><li><a href="#bab-README-aturan-umum-yang-berlaku-di-semua-modul">Aturan umum yang berlaku di semua modul</a></li></ul></li>
+<li><a href="#bab-login">Bab 1. Login dan Ganti Kata Sandi</a><ul><li><a href="#bab-login-masuk-ke-dashboard">Masuk ke dashboard</a></li><li><a href="#bab-login-login-pertama-wajib-mengganti-kata-sandi">Login pertama: wajib mengganti kata sandi</a></li><li><a href="#bab-login-aturan-kata-sandi">Aturan kata sandi</a></li><li><a href="#bab-login-mengganti-kata-sandi-kapan-saja">Mengganti kata sandi kapan saja</a></li><li><a href="#bab-login-keluar-logout">Keluar (logout)</a></li><li><a href="#bab-login-peran-role">Peran (role)</a></li></ul></li>
+<li><a href="#bab-treatments">Bab 2. Treatments, Packages, dan Harga</a><ul><li><a href="#bab-treatments-kategori">Kategori</a></li><li><a href="#bab-treatments-add-on">Add-on</a></li><li><a href="#bab-treatments-menambah-treatment">Menambah treatment</a></li><li><a href="#bab-treatments-mengubah-atau-menghapus-treatment">Mengubah atau menghapus treatment</a></li><li><a href="#bab-treatments-packages">Packages</a></li><li><a href="#bab-treatments-halaman-harga">Halaman Harga</a></li></ul></li>
+<li><a href="#bab-gallery">Bab 3. Foto &amp; Gallery</a><ul><li><a href="#bab-gallery-menambah-album">Menambah album</a></li><li><a href="#bab-gallery-mengurutkan-album">Mengurutkan album</a></li><li><a href="#bab-gallery-aturan-berkas-foto">Aturan berkas foto</a></li><li><a href="#bab-gallery-menambah-foto">Menambah foto</a></li><li><a href="#bab-gallery-mengatur-foto">Mengatur foto</a></li><li><a href="#bab-gallery-mengubah-atau-menghapus-album">Mengubah atau menghapus album</a></li></ul></li>
+<li><a href="#bab-media">Bab 4. Media Library</a><ul><li><a href="#bab-media-melihat-dan-mencari-berkas">Melihat dan mencari berkas</a></li><li><a href="#bab-media-mengunggah-berkas">Mengunggah berkas</a></li><li><a href="#bab-media-memakai-gambar-dari-media-library-di-modul-lain">Memakai gambar dari Media Library di modul lain</a></li><li><a href="#bab-media-mengubah-informasi-berkas">Mengubah informasi berkas</a></li><li><a href="#bab-media-mengganti-berkas">Mengganti berkas</a></li><li><a href="#bab-media-menghapus-berkas">Menghapus berkas</a></li><li><a href="#bab-media-mengurutkan-berkas">Mengurutkan berkas</a></li><li><a href="#bab-media-sinkronkan-berkas-lama">Sinkronkan berkas lama</a></li><li><a href="#bab-media-perubahan-perilaku-form-lain">Perubahan perilaku form lain</a></li></ul></li>
+<li><a href="#bab-promos">Bab 5. Promos</a><ul><li><a href="#bab-promos-status-promo">Status promo</a></li><li><a href="#bab-promos-menambah-promo">Menambah promo</a></li><li><a href="#bab-promos-mengubah-atau-menghapus-promo">Mengubah atau menghapus promo</a></li></ul></li>
+<li><a href="#bab-gift-card">Bab 6. Gift Card</a><ul><li><a href="#bab-gift-card-cara-mengubah">Cara mengubah</a></li></ul></li>
+<li><a href="#bab-membership">Bab 7. Membership</a><ul><li><a href="#bab-membership-program-membership">Program membership</a></li><li><a href="#bab-membership-menambah-tier">Menambah tier</a></li><li><a href="#bab-membership-mengubah-atau-menghapus-tier">Mengubah atau menghapus tier</a></li></ul></li>
+<li><a href="#bab-journal">Bab 8. Journal</a><ul><li><a href="#bab-journal-tiga-status-artikel">Tiga status artikel</a></li><li><a href="#bab-journal-menulis-artikel-baru">Menulis artikel baru</a></li><li><a href="#bab-journal-pratinjau-sebelum-terbit">Pratinjau sebelum terbit</a></li><li><a href="#bab-journal-mengubah-atau-menghapus-artikel">Mengubah atau menghapus artikel</a></li><li><a href="#bab-journal-halaman-publik">Halaman publik</a></li></ul></li>
+<li><a href="#bab-events">Bab 9. Events</a><ul><li><a href="#bab-events-status-event-upcoming-past-past-collaborations">Status event (Upcoming / Past / Past Collaborations)</a></li><li><a href="#bab-events-menambah-event">Menambah event</a></li><li><a href="#bab-events-past-collaborations">Past collaborations</a></li><li><a href="#bab-events-foto-event">Foto event</a></li><li><a href="#bab-events-mengganti-slug">Mengganti slug</a></li><li><a href="#bab-events-mengubah-atau-menghapus-event">Mengubah atau menghapus event</a></li></ul></li>
+<li><a href="#bab-retail">Bab 10. KAMA Retail</a><ul><li><a href="#bab-retail-menambah-produk">Menambah produk</a></li><li><a href="#bab-retail-pesan-whatsapp">Pesan WhatsApp</a></li><li><a href="#bab-retail-mengatur-urutan-dan-menyembunyikan-produk">Mengatur urutan dan menyembunyikan produk</a></li><li><a href="#bab-retail-mengubah-atau-menghapus-produk">Mengubah atau menghapus produk</a></li></ul></li>
+<li><a href="#bab-corporate">Bab 11. Corporate Wellness dan Inquiry</a><ul><li><a href="#bab-corporate-1-konten-halaman">1. Konten halaman</a></li><li><a href="#bab-corporate-2-pic-kontak-pihak-pertama">2. PIC (kontak pihak pertama)</a></li><li><a href="#bab-corporate-3-program-in-office">3. Program In-Office</a></li><li><a href="#bab-corporate-4-langkah-kolaborasi">4. Langkah kolaborasi</a></li><li><a href="#bab-corporate-5-klien-dokumentasi">5. Klien &amp; dokumentasi</a></li><li><a href="#bab-corporate-6-inquiry-permintaan-masuk">6. Inquiry (permintaan masuk)</a></li></ul></li>
+<li><a href="#bab-homepage">Bab 12. Homepage</a><ul><li><a href="#bab-homepage-cara-kerja-section">Cara kerja section</a></li><li><a href="#bab-homepage-asal-isi-tiap-section">Asal isi tiap section</a></li><li><a href="#bab-homepage-hero-dan-banner">Hero dan banner</a></li><li><a href="#bab-homepage-highlight-whats-new">Highlight “What's New”</a></li><li><a href="#bab-homepage-statistik-ulasan-dan-feed-instagram">Statistik, ulasan, dan feed Instagram</a></li><li><a href="#bab-homepage-footer-homepage">Footer homepage</a></li><li><a href="#bab-homepage-menyalakan-mematikan-dan-mengurutkan">Menyalakan, mematikan, dan mengurutkan</a></li></ul></li>
+<li><a href="#bab-our-story">Bab 13. Our Story</a></li>
+<li><a href="#bab-pages">Bab 14. Halaman &amp; URL</a><ul><li><a href="#bab-pages-membuat-halaman-baru">Membuat halaman baru</a></li><li><a href="#bab-pages-arti-setiap-kolom">Arti setiap kolom</a></li><li><a href="#bab-pages-aturan-slug">Aturan slug</a></li><li><a href="#bab-pages-draf-dan-terbit">Draf dan terbit</a></li><li><a href="#bab-pages-mengubah-slug-halaman-yang-sudah-terbit">Mengubah slug halaman yang sudah terbit</a></li><li><a href="#bab-pages-menghapus-halaman">Menghapus halaman</a></li><li><a href="#bab-pages-mengelola-redirect-manual">Mengelola redirect manual</a></li><li><a href="#bab-pages-mengatasi-masalah">Mengatasi masalah</a></li></ul></li>
+<li><a href="#bab-menu">Bab 15. Menu Navigasi</a><ul><li><a href="#bab-menu-tata-letak-halaman">Tata letak halaman</a></li><li><a href="#bab-menu-menambah-menu-utama">Menambah menu utama</a></li><li><a href="#bab-menu-menambah-sub-menu">Menambah sub-menu</a></li><li><a href="#bab-menu-mengubah-susunan-seret-lepas">Mengubah susunan (seret &amp; lepas)</a></li><li><a href="#bab-menu-mengubah-item">Mengubah item</a></li><li><a href="#bab-menu-menghapus-item-menu">Menghapus item menu</a></li></ul></li>
+<li><a href="#bab-settings">Bab 16. Kontak, Jam Buka, dan Template WhatsApp</a><ul><li><a href="#bab-settings-bagian-1-informasi-kontak-dan-umum">Bagian 1 — Informasi kontak dan umum</a></li><li><a href="#bab-settings-bagian-2-template-whatsapp">Bagian 2 — Template WhatsApp</a></li></ul></li>
+<li><a href="#bab-whatsapp">Bab 17. Template Pesan WhatsApp</a><ul><li><a href="#bab-whatsapp-nomor-tujuan">Nomor tujuan</a></li><li><a href="#bab-whatsapp-konteks-dan-placeholder">Konteks dan placeholder</a></li><li><a href="#bab-whatsapp-urutan-prioritas-pesan">Urutan prioritas pesan</a></li><li><a href="#bab-whatsapp-pratinjau">Pratinjau</a></li></ul></li>
+<li><a href="#bab-seo">Bab 18. SEO</a><ul><li><a href="#bab-seo-daftar-halaman">Daftar halaman</a></li><li><a href="#bab-seo-halaman-tetap-mengatur-meta-gambar-og">Halaman tetap: mengatur meta &amp; gambar OG</a></li><li><a href="#bab-seo-konten-treatment-artikel-event-promo-halaman">Konten: treatment, artikel, event, promo, halaman</a></li><li><a href="#bab-seo-favicon-gambar-og-bawaan-search-console">Favicon, gambar OG bawaan &amp; Search Console</a></li><li><a href="#bab-seo-sitemap-robots">Sitemap &amp; robots</a></li></ul></li>
+<li><a href="#bab-users">Bab 19. Pengguna Admin</a><ul><li><a href="#bab-users-daftar-akun">Daftar akun</a></li><li><a href="#bab-users-menambah-akun">Menambah akun</a></li><li><a href="#bab-users-mengubah-akun">Mengubah akun</a></li><li><a href="#bab-users-mereset-kata-sandi">Mereset kata sandi</a></li><li><a href="#bab-users-mengganti-kata-sandi-sendiri">Mengganti kata sandi sendiri</a></li><li><a href="#bab-users-membuka-akun-yang-terkunci">Membuka akun yang terkunci</a></li><li><a href="#bab-users-menghapus-akun">Menghapus akun</a></li><li><a href="#bab-users-pembagian-akses-per-role">Pembagian akses per role</a></li></ul></li>
+<li><a href="#bab-status">Bab 20. Backup &amp; Status</a><ul><li><a href="#bab-status-isi-halaman">Isi halaman</a></li><li><a href="#bab-status-backup-otomatis-mingguan">Backup otomatis mingguan</a></li><li><a href="#bab-status-backup-manual">Backup manual</a></li><li><a href="#bab-status-mengunduh-membuka-backup-otomatis">Mengunduh &amp; membuka backup otomatis</a></li><li><a href="#bab-status-backup-serah-terima-1-salinan-lengkap">Backup serah terima (1 salinan lengkap)</a></li></ul></li>
+<li><a href="#bab-troubleshooting">Bab 21. Troubleshooting dan Kontak Garansi</a><ul><li><a href="#bab-troubleshooting-perubahan-tidak-muncul-di-situs">Perubahan tidak muncul di situs</a></li><li><a href="#bab-troubleshooting-lupa-kata-sandi">Lupa kata sandi</a></li><li><a href="#bab-troubleshooting-unggah-foto-gagal">Unggah foto gagal</a></li><li><a href="#bab-troubleshooting-masalah-lain-yang-sering-ditanyakan">Masalah lain yang sering ditanyakan</a></li><li><a href="#bab-troubleshooting-kontak-garansi">Kontak garansi</a></li></ul></li>
+  </ul>
+</nav>
+<section class="chapter">
+<h1 id="bab-README" class="chapter-title">Pendahuluan</h1>
+<p>Panduan ini ditujukan untuk staf KAMA Spa (admin dan marketing) yang mengelola isi website kamaspa.id. Tidak ada pengetahuan teknis yang dibutuhkan: semua perubahan dilakukan lewat formulir di dashboard <code>https://kamaspa.id/admin</code>.</p>
+<p>Kontrak 01/PKS/XI/KAMA/2026 — bagian dari dokumentasi serah terima (Pasal 8 ayat 7 &amp; 11).</p>
+<h2 id="bab-README-daftar-isi">Daftar isi</h2>
+<p>Urutan bab mengikuti urutan menu samping dashboard. Kolom <strong>Peran</strong> menunjukkan siapa yang boleh membuka modul tersebut.</p>
+<table><thead><tr><th>Bab</th><th>Judul</th><th>Peran</th><th>Halaman admin</th><th>Berkas</th></tr></thead><tbody><tr><td>1</td><td>Login dan ganti kata sandi</td><td>Semua</td><td><code>/admin/login</code>, <code>/admin/account/password</code></td><td><a href="#bab-login">login.md</a></td></tr><tr><td>2</td><td>Treatments, Packages, dan Harga (modul 1 &amp; 2)</td><td>ADMIN, EDITOR</td><td><code>/admin/treatments</code>, <code>/admin/treatments/prices</code></td><td><a href="#bab-treatments">treatments.md</a></td></tr><tr><td>3</td><td>Foto &amp; Gallery (modul 3)</td><td>ADMIN, EDITOR</td><td><code>/admin/gallery</code></td><td><a href="#bab-gallery">gallery.md</a></td></tr><tr><td>4</td><td>Media Library</td><td>ADMIN, EDITOR</td><td><code>/admin/media</code></td><td><a href="#bab-media">media.md</a></td></tr><tr><td>5</td><td>Promos (modul 4)</td><td>ADMIN, EDITOR</td><td><code>/admin/promos</code></td><td><a href="#bab-promos">promos.md</a></td></tr><tr><td>6</td><td>Gift Card (modul 4)</td><td>ADMIN, EDITOR</td><td><code>/admin/gift-card</code></td><td><a href="#bab-gift-card">gift-card.md</a></td></tr><tr><td>7</td><td>Membership (modul 5)</td><td>ADMIN, EDITOR</td><td><code>/admin/membership</code></td><td><a href="#bab-membership">membership.md</a></td></tr><tr><td>8</td><td>Journal (modul 6)</td><td>ADMIN, EDITOR</td><td><code>/admin/journal</code></td><td><a href="#bab-journal">journal.md</a></td></tr><tr><td>9</td><td>Events (modul 7)</td><td>ADMIN, EDITOR</td><td><code>/admin/events</code></td><td><a href="#bab-events">events.md</a></td></tr><tr><td>10</td><td>KAMA Retail (modul 8)</td><td>ADMIN, EDITOR</td><td><code>/admin/retail</code></td><td><a href="#bab-retail">retail.md</a></td></tr><tr><td>11</td><td>Corporate Wellness &amp; Inquiry (modul 9)</td><td>ADMIN, EDITOR</td><td><code>/admin/corporate</code></td><td><a href="#bab-corporate">corporate.md</a></td></tr><tr><td>12</td><td>Homepage (modul 10)</td><td>ADMIN, EDITOR</td><td><code>/admin/homepage</code></td><td><a href="#bab-homepage">homepage.md</a></td></tr><tr><td>13</td><td>Our Story (modul 10)</td><td>ADMIN, EDITOR</td><td><code>/admin/our-story</code></td><td><a href="#bab-our-story">our-story.md</a></td></tr><tr><td>14</td><td>Halaman &amp; URL, Redirect 301</td><td>ADMIN, EDITOR</td><td><code>/admin/pages</code>, <code>/admin/redirects</code></td><td><a href="#bab-pages">pages.md</a></td></tr><tr><td>15</td><td>Menu Navigasi 3 level (modul 11)</td><td>ADMIN, EDITOR</td><td><code>/admin/menu</code></td><td><a href="#bab-menu">menu.md</a></td></tr><tr><td>16</td><td>Kontak, Jam Buka &amp; Umum (modul 12)</td><td>ADMIN</td><td><code>/admin/settings/contact</code></td><td><a href="#bab-settings">settings.md</a></td></tr><tr><td>17</td><td>Template Pesan WhatsApp (modul 12)</td><td>ADMIN</td><td><code>/admin/settings/whatsapp</code></td><td><a href="#bab-whatsapp">whatsapp.md</a></td></tr><tr><td>18</td><td>SEO (modul 13)</td><td>ADMIN, EDITOR</td><td><code>/admin/seo</code></td><td><a href="#bab-seo">seo.md</a></td></tr><tr><td>19</td><td>Pengguna Admin (modul 14)</td><td>ADMIN</td><td><code>/admin/users</code></td><td><a href="#bab-users">users.md</a></td></tr><tr><td>20</td><td>Backup &amp; Status</td><td>ADMIN</td><td><code>/admin/status</code></td><td><a href="#bab-status">status.md</a></td></tr><tr><td>21</td><td>Troubleshooting dan kontak garansi</td><td>Semua</td><td>—</td><td><a href="#bab-troubleshooting">troubleshooting.md</a></td></tr></tbody></table>
+<h2 id="bab-README-video-tutorial">Video tutorial</h2>
+<p>Setiap modul utama punya video pendek (2–5 menit). Tautan diisi setelah video direkam dan diunggah ke Google Drive/YouTube (unlisted) milik KAMA Spa.</p>
+<table><thead><tr><th>Video</th><th>Tautan</th></tr></thead><tbody><tr><td>Login &amp; ganti kata sandi</td><td>______________________</td></tr><tr><td>Treatments, Packages &amp; Harga</td><td>______________________</td></tr><tr><td>Gallery &amp; Media Library</td><td>______________________</td></tr><tr><td>Promos, Gift Card &amp; Membership</td><td>______________________</td></tr><tr><td>Journal &amp; Events</td><td>______________________</td></tr><tr><td>Retail, Homepage &amp; Our Story</td><td>______________________</td></tr><tr><td>Halaman &amp; URL (redirect) dan Menu 3 level</td><td>______________________</td></tr><tr><td>Corporate Wellness &amp; Inquiry</td><td>______________________</td></tr><tr><td>Kontak, WhatsApp &amp; SEO</td><td>______________________</td></tr><tr><td>Pengguna Admin &amp; Backup/Status</td><td>______________________</td></tr></tbody></table>
+<p>Daftar lengkap dan naskahnya: <code>docs/VIDEO-TUTORIAL-PLAN.md</code>.</p>
+<h2 id="bab-README-dua-jenis-peran-role">Dua jenis peran (role)</h2>
+<table><thead><tr><th>Peran</th><th>Yang bisa dilakukan</th></tr></thead><tbody><tr><td><strong>ADMIN</strong></td><td>Semua modul, termasuk tiga modul khusus: <strong>Pengguna Admin</strong>, <strong>Kontak &amp; Umum</strong> (beserta Template WhatsApp), dan <strong>Backup &amp; Status</strong>.</td></tr><tr><td><strong>EDITOR</strong></td><td>Semua modul konten lainnya. Menu samping tidak menampilkan modul khusus ADMIN, dan membuka alamatnya mengembalikan EDITOR ke dashboard dengan peringatan.</td></tr></tbody></table>
+<p>Di luar tiga modul khusus tersebut, ADMIN dan EDITOR memiliki kemampuan yang sama: menambah, mengubah, dan menghapus konten. Cara masuk dan aturan kata sandi dijelaskan di bab 1.</p>
+<h2 id="bab-README-aturan-umum-yang-berlaku-di-semua-modul">Aturan umum yang berlaku di semua modul</h2>
+<p><strong>Perubahan langsung tampil di situs publik.</strong> Tidak ada tombol &quot;terbitkan situs&quot; terpisah. Begitu Anda menekan Simpan, halaman publik terkait langsung diperbarui. Karena itu, gunakan kotak centang <strong>Tampilkan di website</strong> (atau status Draf pada Journal) bila konten belum siap dilihat pengunjung.</p>
+<p><strong>Unggah foto masuk ke Supabase Storage.</strong> Saat Anda memilih berkas pada field gambar, berkas langsung diunggah ke penyimpanan Supabase dan yang disimpan di database hanyalah alamat (URL) gambar tersebut. Ketentuannya:</p>
+<ul><li>
+Format yang diterima: <strong>JPG, PNG, WebP, AVIF, GIF</strong>. Isi berkas harus gambar asli.
+</li><li>
+Ukuran maksimal: <strong>4 MB</strong> per berkas. Foto JPG/PNG/WebP yang besar (di atas ±600 KB atau sisi terpanjang lebih dari 2.400 piksel) otomatis diperkecil di browser dan disimpan sebagai WebP. GIF tidak diubah.
+</li><li>
+Setiap unggahan tercatat di <strong>Media Library</strong> dan bisa dipakai ulang lewat tombol <strong>Pilih dari Media Library</strong> pada field gambar.
+</li><li>
+Mengganti atau mengosongkan gambar di form lalu menyimpan <strong>tidak</strong> menghapus berkas yang tercatat di Media Library. Hapus berkas yang tidak dipakai dari halaman Media Library (lihat bab 4).
+</li><li>
+Tombol <strong>Hapus</strong> di samping pratinjau gambar hanya mengosongkan field.
+</li></ul>
+<p><strong>Istilah field yang sering muncul:</strong></p>
+<ul><li>
+<strong>Slug</strong> — potongan alamat halaman di URL. Hanya boleh huruf kecil, angka, dan tanda hubung (contoh: <code>sukma-laya-60-min</code>). Slug harus unik. Pada halaman, treatment, kategori, package, promo, journal, dan event, mengganti slug otomatis membuat <strong>redirect 301</strong> dari alamat lama (lihat bab 14).
+</li><li>
+<strong>Urutan tampil (sortOrder)</strong> — angka bulat mulai dari 0. Angka lebih kecil tampil lebih dulu.
+</li><li>
+<strong>Tampilkan di website (isPublished)</strong> — kotak centang. Tidak dicentang berarti konten tersimpan tetapi tidak muncul di halaman publik.
+</li><li>
+<strong>SEO title / Meta title</strong> — judul di hasil pencarian Google dan tab peramban. Idealnya maksimal sekitar 60 karakter.
+</li><li>
+<strong>SEO description / Meta description</strong> — ringkasan di bawah judul pada hasil pencarian. Idealnya maksimal sekitar 160 karakter.
+</li><li>
+<strong>Pesan WhatsApp khusus</strong> — teks awal di kolom chat ketika pengunjung menekan tombol WhatsApp pada konten tersebut. Dikosongkan berarti memakai template bawaan (bab 17).
+</li><li>
+<strong>Harga</strong> — rupiah penuh tanpa desimal, contoh <code>145000</code>. Penulisan <code>145.000</code> juga diterima. Nilai negatif atau berdesimal ditolak.
+</li><li>
+<strong>Tanggal</strong> — semua tanggal dan jam dibaca dalam zona waktu WIB. Untuk periode, tanggal mulai dihitung dari pukul 00.00 dan tanggal berakhir sampai pukul 23.59.
+</li></ul>
+<p><strong>Pesan di layar.</strong> Setelah menyimpan muncul pita hijau &quot;Perubahan tersimpan&quot;, dan setelah menghapus muncul pita kuning. Bila ada isian yang salah, muncul kotak merah berisi penjelasan dan data belum tersimpan.</p>
+<p><strong>Menghapus bersifat permanen.</strong> Tidak ada tempat sampah atau fitur pulihkan. Periksa kembali sebelum menekan tombol hapus.</p>
+<p><strong>Teks berformat.</strong> Beberapa modul memakai editor teks kaya (tebal, miring, daftar, tautan). Isi dibersihkan otomatis dari kode yang tidak aman, jadi jangan menempelkan skrip atau embed dari sumber luar — bagian itu akan hilang.</p>
+<p><strong>Data pribadi.</strong> Data inquiry Corporate Wellness adalah data pribadi (UU PDP): jangan disalin, diekspor, atau dibagikan ke luar keperluan tindak lanjut inquiry.</p>
+</section>
+<section class="chapter">
+<h1 id="bab-login" class="chapter-title">Bab 1. Login dan Ganti Kata Sandi</h1>
+<p>Bab ini berlaku untuk semua akun, ADMIN maupun EDITOR.</p>
+<p>Halaman login: <code>https://kamaspa.id/admin/login</code></p>
+<h2 id="bab-login-masuk-ke-dashboard">Masuk ke dashboard</h2>
+<ol><li>
+Buka <code>https://kamaspa.id/admin/login</code>.
+</li><li>
+Isi <strong>Email</strong> dan <strong>Kata sandi</strong> akun Anda, lalu tekan tombol masuk.
+</li><li>
+Setelah berhasil, Anda diarahkan ke dashboard (<code>/admin</code>). Bila sebelumnya Anda membuka alamat admin tertentu, Anda dikembalikan ke alamat tersebut.
+</li></ol>
+<p>Hal yang perlu diketahui:</p>
+<ul><li>
+Pesan &quot;Email atau kata sandi salah.&quot; sengaja dibuat sama untuk email yang tidak terdaftar maupun kata sandi yang salah, demi keamanan.
+</li><li>
+Setelah <strong>5 kali</strong> kata sandi salah, akun dikunci sementara <strong>15 menit</strong>. Pemegang ADMIN dapat membuka kunci lebih awal (lihat bab Pengguna Admin).
+</li><li>
+Satu jaringan (alamat IP) hanya boleh mencoba masuk <strong>10 kali dalam 15 menit</strong>. Batas ini tidak bisa dibuka dari dashboard — tunggu 15 menit.
+</li><li>
+Akun yang dinonaktifkan tidak bisa masuk.
+</li><li>
+Sesi login berlaku <strong>8 jam</strong>; setelah itu Anda perlu masuk lagi.
+</li><li>
+Bila muncul pesan &quot;Sesi Anda berakhir karena kata sandi, peran, atau status akun berubah&quot;, cukup masuk kembali.
+</li></ul>
+<h2 id="bab-login-login-pertama-wajib-mengganti-kata-sandi">Login pertama: wajib mengganti kata sandi</h2>
+<p>Akun baru (dibuat oleh ADMIN lain atau oleh tim teknis saat serah terima) dan akun yang kata sandinya baru di-reset selalu diberi tanda <strong>wajib ganti kata sandi</strong>. Setelah login:</p>
+<ol><li>
+Anda langsung diarahkan ke halaman <strong>Ganti kata sandi</strong> dengan pesan kuning &quot;Kata sandi akun ini dibuat oleh admin lain…&quot;.
+</li><li>
+Isi <strong>Kata sandi saat ini</strong> (kata sandi awal yang Anda terima).
+</li><li>
+Isi <strong>Kata sandi baru</strong> dan <strong>Ulangi kata sandi baru</strong>.
+</li><li>
+Tekan <strong>Simpan kata sandi</strong>.
+</li></ol>
+<p>Selama kata sandi belum diganti, semua halaman admin lain akan mengembalikan Anda ke halaman ini.</p>
+<h2 id="bab-login-aturan-kata-sandi">Aturan kata sandi</h2>
+<ul><li>
+Minimal <strong>12 karakter</strong>, maksimal 128 karakter.
+</li><li>
+Harus berbeda dari kata sandi lama dan tidak sama dengan alamat email.
+</li><li>
+Disarankan memakai kalimat yang mudah diingat tetapi sulit ditebak, misalnya empat kata acak, dan menyimpannya di password manager.
+</li><li>
+Jangan berbagi akun. Satu orang satu akun.
+</li></ul>
+<h2 id="bab-login-mengganti-kata-sandi-kapan-saja">Mengganti kata sandi kapan saja</h2>
+<ol><li>
+Tekan <strong>Ganti kata sandi</strong> di bawah nama Anda pada menu samping (di layar ponsel: tautan <strong>Kata sandi</strong> di bagian atas). Alamatnya <code>/admin/account/password</code>.
+</li><li>
+Isi kata sandi saat ini, kata sandi baru, dan ulangi kata sandi baru.
+</li><li>
+Tekan <strong>Simpan kata sandi</strong>.
+</li></ol>
+<p>Setelah berhasil, Anda tetap masuk di perangkat ini, tetapi perangkat lain yang masih masuk dengan akun Anda otomatis keluar.</p>
+<h2 id="bab-login-keluar-logout">Keluar (logout)</h2>
+<p>Tekan tombol <strong>Keluar</strong> di bagian bawah menu samping (atau di bagian atas layar pada perangkat kecil). Selalu keluar bila memakai komputer bersama.</p>
+<h2 id="bab-login-peran-role">Peran (role)</h2>
+<table><thead><tr><th>Peran</th><th>Yang bisa dilakukan</th></tr></thead><tbody><tr><td><strong>ADMIN</strong></td><td>Semua modul, termasuk <strong>Pengguna Admin</strong>, <strong>Kontak &amp; Umum</strong> (beserta Template WhatsApp), dan <strong>Backup &amp; Status</strong>.</td></tr><tr><td><strong>EDITOR</strong></td><td>Semua modul konten (treatment, harga, gallery, media, promo, membership, journal, events, retail, corporate, homepage, halaman &amp; URL, menu, SEO). Tidak bisa membuka tiga modul khusus ADMIN di atas.</td></tr></tbody></table>
+<p>Menu samping hanya menampilkan modul yang boleh dibuka peran Anda. Bila membuka alamat modul yang tidak diizinkan, Anda dikembalikan ke dashboard dengan peringatan &quot;Anda tidak punya akses ke halaman tersebut&quot;.</p>
+</section>
+<section class="chapter">
+<h1 id="bab-treatments" class="chapter-title">Bab 2. Treatments, Packages, dan Harga</h1>
+<p>Modul 1 dan 2 pada menu samping: <strong>Treatments &amp; Packages</strong> dan <strong>Harga</strong>. Boleh dikelola oleh ADMIN maupun EDITOR.</p>
+<p>Halaman admin:</p>
+<ul><li>
+Daftar treatment: <code>/admin/treatments</code>
+</li><li>
+Daftar package: <code>/admin/treatments/packages</code>
+</li><li>
+Tabel harga: <code>/admin/treatments/prices</code>
+</li></ul>
+<p>Di bagian atas setiap halaman modul ini ada tab <strong>Treatments · Add-on · Kategori · Packages · Harga</strong>.</p>
+<p>Hasilnya tampil di halaman publik:</p>
+<ul><li>
+<code>/menu</code> (halaman Menu, desain asli situs): grid treatment, Layanan Tambahan (add-on), dan paket All Day Spa — <strong>semuanya dari dashboard</strong>. Treatment baru langsung muncul; yang disembunyikan langsung hilang.
+</li><li>
+Detail tiap treatment/paket <code>/menu/&lt;slug&gt;</code>
+</li><li>
+<code>/treatments</code>, halaman per kategori <code>/treatments/&lt;slug-kategori&gt;</code>, dan detail <code>/treatments/&lt;slug-kategori&gt;/&lt;slug-treatment&gt;</code>
+</li><li>
+<code>/treatments/packages</code> dan detail package <code>/treatments/packages/&lt;slug&gt;</code>
+</li></ul>
+<p>Hanya item dengan <strong>Tampilkan di website</strong> aktif — di dalam kategori yang juga tampil — yang muncul di halaman publik.</p>
+<h2 id="bab-treatments-kategori">Kategori</h2>
+<p>Tab <strong>Kategori</strong> (<code>/admin/treatments/categories</code>).</p>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td>Nama</td><td>Ya</td><td>Nama kategori.</td></tr><tr><td>Slug</td><td>Ya</td><td>Alamat halaman kategori: <code>/treatments/&lt;slug&gt;</code>. Tidak boleh <code>packages</code>.</td></tr><tr><td>Jenis</td><td>Ya</td><td><strong>Treatment</strong> = treatment utama (grid di Menu). <strong>Add-on</strong> = layanan tambahan.</td></tr><tr><td>Deskripsi</td><td>Tidak</td><td>Tampil di halaman kategori.</td></tr><tr><td>Foto</td><td>Tidak</td><td>JPG/PNG/WebP/AVIF, maksimal 5 MB.</td></tr><tr><td>Urutan</td><td>Tidak</td><td>Makin kecil makin atas.</td></tr><tr><td>Tampilkan di situs</td><td>—</td><td>Bila mati, kategori <strong>beserta seluruh isinya</strong> tidak tampil.</td></tr><tr><td>Meta title / description</td><td>Tidak</td><td>Untuk hasil pencarian Google.</td></tr></tbody></table>
+<ul><li>
+<strong>Mengubah slug</strong> kategori yang sedang tampil: alamat lama halaman kategori dan setiap treatment di dalamnya otomatis dialihkan permanen (301) ke alamat baru. Form menampilkan peringatan sebelum Anda menyimpan.
+</li><li>
+<strong>Menghapus</strong> kategori hanya bisa bila kategori sudah kosong. Pindahkan atau hapus isinya terlebih dahulu.
+</li></ul>
+<h2 id="bab-treatments-add-on">Add-on</h2>
+<p>Tab <strong>Add-on</strong> (<code>/admin/treatments/addons</code>). Add-on adalah treatment di dalam kategori berjenis Add-on. Tekan <strong>Tambah add-on</strong>; formnya sama dengan treatment, ditambah <strong>Letak di halaman Menu</strong>:</p>
+<table><thead><tr><th>Letak</th><th>Tampil di</th></tr></thead><tbody><tr><td>Body</td><td>Grid &quot;Body &amp; Scrub&quot; — semua add-on Body tampil berjajar.</td></tr><tr><td>Face Ritual / Head &amp; Scalp / Bath Ritual</td><td>Section tersendiri — yang tampil <strong>satu add-on</strong> dengan urutan paling atas.</td></tr></tbody></table>
+<p>Harga yang tampil di Menu adalah baris durasi &amp; harga pertama.</p>
+<h2 id="bab-treatments-menambah-treatment">Menambah treatment</h2>
+<ol><li>
+Buka <strong>Treatments &amp; Packages</strong> di menu samping.
+</li><li>
+Tekan <strong>Tambah treatment</strong> di kanan atas.
+</li><li>
+Isi formulir, lalu tekan <strong>Simpan</strong>.
+</li></ol>
+<p>Penjelasan tiap field:</p>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td>Nama</td><td>Ya</td><td>Nama treatment seperti yang dilihat pengunjung.</td></tr><tr><td>Slug</td><td>Ya</td><td>Potongan URL. Huruf kecil, angka, tanda hubung. Harus unik.</td></tr><tr><td>Kategori</td><td>Ya</td><td>Dipilih dari daftar kategori. Kategori berjenis Add-on ditandai &quot;(add-on)&quot;.</td></tr><tr><td>Tagline</td><td>Tidak</td><td>Kalimat singkat di kartu treatment halaman Menu. (Tidak ada untuk add-on.)</td></tr><tr><td>Deskripsi</td><td>Tidak</td><td>Teks penjelasan treatment.</td></tr><tr><td>Catatan</td><td>Tidak</td><td>Teks kecil di halaman detail, contoh &quot;We are using dry massage techniques without oil.&quot;</td></tr><tr><td>Gambar</td><td>Tidak</td><td>Foto treatment. JPG/PNG/WebP/AVIF, maksimal 5 MB.</td></tr><tr><td>Durasi &amp; Harga</td><td>Ya, minimal satu baris</td><td>Lihat penjelasan di bawah.</td></tr><tr><td>Pesan WhatsApp khusus</td><td>Tidak</td><td>Teks awal chat WhatsApp untuk treatment ini. Kosong berarti memakai template default.</td></tr><tr><td>Judul SEO</td><td>Tidak</td><td>Judul yang muncul di hasil pencarian Google. Kosong berarti memakai nama treatment.</td></tr><tr><td>Deskripsi SEO</td><td>Tidak</td><td>Ringkasan di hasil pencarian Google, idealnya 120-160 karakter. Kosong berarti memakai deskripsi treatment.</td></tr><tr><td>Urutan tampil</td><td>Tidak (bawaan 0)</td><td>Angka bulat 0 atau lebih; makin kecil makin atas.</td></tr><tr><td>Tandai sebagai New</td><td>Tidak</td><td>Memunculkan label &quot;New&quot;.</td></tr><tr><td>Tandai sebagai Best Seller</td><td>Tidak</td><td>Memunculkan label &quot;Best Seller&quot;.</td></tr><tr><td>Tampilkan di website</td><td>Tidak (bawaan aktif)</td><td>Jika tidak dicentang, treatment tersimpan sebagai draf.</td></tr></tbody></table>
+<p>Mengubah <strong>slug</strong> atau <strong>kategori</strong> treatment yang sedang tampil membuat alamat lamanya otomatis dialihkan permanen (301) ke alamat baru.</p>
+<h3 id="bab-treatments-durasi-harga">Durasi &amp; Harga</h3>
+<p>Setiap treatment harus punya <strong>minimal satu</strong> baris durasi dan harga. Satu baris terdiri atas tiga kolom:</p>
+<ul><li>
+<strong>Label durasi</strong> — teks yang dilihat pengunjung, contoh <code>60 min</code>. Wajib diisi.
+</li><li>
+<strong>Menit</strong> — angka bulat lebih besar dari 0, contoh <code>60</code>. Wajib diisi.
+</li><li>
+<strong>Harga</strong> — rupiah penuh tanpa titik, contoh <code>145000</code>. Tidak boleh negatif.
+</li></ul>
+<p>Gunakan <strong>+ Tambah durasi</strong> untuk menambah baris dan tombol <strong>Hapus</strong> di ujung baris untuk membuangnya. Mengosongkan seluruh isian pada satu baris juga dianggap menghapus baris tersebut.</p>
+<p>Perhatian: setiap kali treatment disimpan, seluruh daftar durasi dan harga ditulis ulang sesuai isi formulir. Jadi pastikan semua baris yang ingin dipertahankan masih ada di layar sebelum menekan Simpan.</p>
+<h2 id="bab-treatments-mengubah-atau-menghapus-treatment">Mengubah atau menghapus treatment</h2>
+<ul><li>
+Untuk mengubah: klik nama treatment di daftar, ubah isinya, tekan <strong>Simpan</strong>.
+</li><li>
+Untuk menghapus: buka treatment tersebut, lalu tekan <strong>Hapus treatment ini</strong> di bagian paling bawah halaman.
+</li></ul>
+<p>Yang perlu diperhatikan saat menghapus treatment:</p>
+<ul><li>
+Semua baris durasi dan harga milik treatment itu ikut terhapus.
+</li><li>
+Gambar treatment ikut dihapus dari penyimpanan.
+</li><li>
+Bila treatment itu dipakai sebagai isi sebuah package, package tetap ada, tetapi baris isinya kehilangan kaitan ke treatment tersebut. Periksa kembali package yang bersangkutan.
+</li></ul>
+<h2 id="bab-treatments-packages">Packages</h2>
+<p>Package adalah paket gabungan beberapa treatment dengan satu harga — di halaman Menu tampil sebagai <strong>All Day Spa</strong>.</p>
+<ol><li>
+Buka tab <strong>Packages</strong>.
+</li><li>
+Tekan <strong>Tambah package</strong>.
+</li></ol>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td>Nama</td><td>Ya</td><td>Nama paket.</td></tr><tr><td>Slug</td><td>Ya</td><td>Potongan URL, harus unik antarpackage.</td></tr><tr><td>Subjudul</td><td>Tidak</td><td>Kalimat di atas nama paket, contoh &quot;A state of balance &amp; inner resolution&quot;.</td></tr><tr><td>Deskripsi</td><td>Tidak</td><td>Penjelasan paket.</td></tr><tr><td>Kutipan</td><td>Tidak</td><td>Tampil miring di halaman detail paket.</td></tr><tr><td>Gambar</td><td>Tidak</td><td>Foto paket.</td></tr><tr><td>Harga (Rp)</td><td>Ya</td><td>Rupiah penuh tanpa titik, contoh <code>1500000</code>. Di halaman Menu tampil sebagai <code>1500k</code>.</td></tr><tr><td>Durasi (menit)</td><td>Tidak</td><td>Kosongkan bila paket tidak punya durasi tetap.</td></tr><tr><td>Teks durasi</td><td>Tidak</td><td>Teks yang tampil, contoh &quot;2 hours 30 minute&quot;. Kosong = memakai durasi menit.</td></tr><tr><td>Isi package</td><td>Tidak</td><td>Daftar baris: pilih treatment yang sudah ada atau tulis teks bebas, lalu isi <strong>Menit</strong> (contoh 90). Tampil sebagai &quot;Body Massage 90&quot;. Baris yang kosong sama sekali dianggap dihapus.</td></tr><tr><td>Pesan WhatsApp khusus</td><td>Tidak</td><td>Kosong berarti memakai template default.</td></tr><tr><td>SEO title</td><td>Tidak</td><td>Judul di hasil pencarian.</td></tr><tr><td>SEO description</td><td>Tidak</td><td>Ringkasan di hasil pencarian.</td></tr><tr><td>Urutan tampil</td><td>Tidak (bawaan 0)</td><td>Makin kecil makin atas.</td></tr><tr><td>Tandai sebagai New / Best Seller</td><td>Tidak</td><td>Label pada paket.</td></tr><tr><td>Tampilkan di website</td><td>Tidak (bawaan aktif)</td><td>Mengatur tampil atau tidaknya paket.</td></tr></tbody></table>
+<p>Mengubah slug paket yang sedang tampil membuat alamat lamanya dialihkan permanen (301). Alamat lama <code>/treatments/all-day-spa/...</code> dari versi sebelumnya juga sudah dialihkan ke <code>/treatments/packages/...</code>.</p>
+<p>Seperti pada treatment, daftar isi paket ditulis ulang setiap kali disimpan. Bila sebuah treatment yang dipilih sudah terhapus, muncul pesan &quot;Ada treatment yang dipilih sudah tidak tersedia&quot; dan paket belum tersimpan.</p>
+<p>Menghapus paket dilakukan dari halaman ubah paket. Gambar paket ikut terhapus dari penyimpanan.</p>
+<h2 id="bab-treatments-halaman-harga">Halaman Harga</h2>
+<p>Menu <strong>Harga</strong> (<code>/admin/treatments/prices</code>) adalah satu tempat untuk mengubah semua harga tanpa membuka formulir satu per satu. Halaman ini menampilkan:</p>
+<ul><li>
+Semua pilihan durasi treatment, dikelompokkan per kategori. Kategori add-on ditandai &quot;(add-on)&quot;. Setiap baris punya kolom durasi (menit), kolom harga, dan tombol <strong>Simpan</strong> sendiri.
+</li><li>
+Semua package, dengan kolom harga dan durasi opsional.
+</li><li>
+Semua tier <strong>Membership</strong>. Angka yang disimpan otomatis ditampilkan di situs dengan gaya label halaman Membership, contoh <code>1500000</code> → &quot;Rp 1,5jt&quot;. Kosongkan harga untuk tier tanpa angka (contoh &quot;Custom&quot;); teks labelnya diubah di modul Membership.
+</li><li>
+Semua <strong>produk retail</strong>. Kosongkan harga bila tidak ingin ditampilkan.
+</li></ul>
+<p>Catatan:</p>
+<ul><li>
+Tombol Simpan berlaku per baris. Ubah satu baris lalu simpan baris itu.
+</li><li>
+Harga diisi angka rupiah penuh. <code>145000</code> dan <code>145.000</code> sama-sama diterima; huruf, angka negatif, desimal, dan nilai di atas Rp 1.000.000.000 ditolak dengan pesan di bawah baris tersebut.
+</li><li>
+Pada baris treatment, durasi dan harga keduanya wajib diisi.
+</li><li>
+Pada baris package, durasi boleh dikosongkan; harga tetap wajib.
+</li><li>
+Perubahan langsung tampil di halaman publik (Menu, Treatments, Membership, Retail, dan beranda) setelah disimpan, tanpa deploy ulang.
+</li><li>
+Halaman ini tidak bisa menambah atau menghapus pilihan durasi. Untuk itu gunakan formulir treatment.
+</li></ul>
+</section>
+<section class="chapter">
+<h1 id="bab-gallery" class="chapter-title">Bab 3. Foto &amp; Gallery</h1>
+<p>Modul 3 pada menu samping. Boleh dikelola oleh ADMIN maupun EDITOR.</p>
+<p>Halaman admin:</p>
+<ul><li>
+Daftar album: <code>/admin/gallery</code>
+</li><li>
+Isi album (kelola foto): <code>/admin/gallery/&lt;id-album&gt;</code>
+</li><li>
+Formulir album: <code>/admin/gallery/albums/&lt;id-album&gt;</code>
+</li></ul>
+<p>Hasilnya tampil di halaman publik <code>/gallery</code>. Semua album ditampilkan pada satu halaman yang sama, satu album satu bagian.</p>
+<p>Penting: di halaman publik, album hanya muncul bila <strong>sudah dipublikasikan dan berisi minimal satu foto</strong>. Album kosong tidak ditampilkan sama sekali. Foto dari album yang tayang juga dipakai untuk bagian galeri di beranda (maksimal 12 foto pertama, mengikuti urutan album lalu urutan foto), kecuali feed Instagram sedang aktif.</p>
+<h2 id="bab-gallery-menambah-album">Menambah album</h2>
+<ol><li>
+Buka <strong>Foto &amp; Gallery</strong>.
+</li><li>
+Tekan <strong>Tambah album</strong>.
+</li><li>
+Isi formulir lalu tekan <strong>Simpan</strong>.
+</li></ol>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td>Nama album</td><td>Ya</td><td>Judul album, contoh &quot;Interior Spa&quot;.</td></tr><tr><td>Slug</td><td>Ya</td><td>Potongan URL. Huruf kecil, angka, tanda hubung. Harus unik antaralbum.</td></tr><tr><td>Deskripsi</td><td>Tidak</td><td>Teks singkat di bawah judul album.</td></tr><tr><td>Cover album</td><td>Tidak</td><td>Gambar sampul album.</td></tr><tr><td>Urutan tampil</td><td>Tidak (bawaan: paling akhir)</td><td>Makin kecil makin atas. Bila sama, diurutkan menurut abjad nama album. Lebih mudah diatur dengan tombol naik/turun (lihat di bawah).</td></tr><tr><td>Tampilkan di website</td><td>Tidak (bawaan aktif)</td><td>Jika tidak dicentang, album tidak tampil di <code>/gallery</code>.</td></tr></tbody></table>
+<h2 id="bab-gallery-mengurutkan-album">Mengurutkan album</h2>
+<p>Urutan album di daftar <strong>Foto &amp; Gallery</strong> sama persis dengan urutan bagian album di halaman <code>/gallery</code>.</p>
+<ol><li>
+Buka <strong>Foto &amp; Gallery</strong>.
+</li><li>
+Tekan <strong>↑</strong> untuk menaikkan album satu posisi, atau <strong>↓</strong> untuk menurunkannya. Tombol <strong>↑</strong> pada album teratas dan <strong>↓</strong> pada album terbawah tidak aktif.
+</li></ol>
+<p>Setelah tombol ditekan, nomor <strong>Urutan tampil</strong> semua album dirapikan otomatis menjadi 0, 1, 2, dan seterusnya. Album draf tetap ikut diurutkan, tetapi tidak tampil di website sampai dipublikasikan.</p>
+<h2 id="bab-gallery-aturan-berkas-foto">Aturan berkas foto</h2>
+<p>Berlaku untuk semua cara unggah (satu foto, banyak foto, ganti foto, cover):</p>
+<ul><li>
+Format: <strong>JPG, PNG, WebP, AVIF, atau GIF</strong>.
+</li><li>
+Ukuran maksimal <strong>4 MB per file</strong>. File yang lebih besar perlu dikecilkan atau dikompres terlebih dahulu.
+</li><li>
+Isi file harus <strong>gambar asli</strong>. File lain yang namanya diganti menjadi <code>.jpg</code> (misalnya PDF) akan ditolak.
+</li><li>
+Ekstensi nama file harus sesuai dengan jenis gambarnya.
+</li></ul>
+<p>Setiap foto yang diunggah otomatis tercatat di <strong>Media Library</strong>, sehingga bisa dipakai ulang di modul lain.</p>
+<h2 id="bab-gallery-menambah-foto">Menambah foto</h2>
+<p>Dari daftar album, klik <strong>Kelola foto</strong> untuk membuka halaman isi album.</p>
+<h3 id="bab-gallery-unggah-banyak-foto-sekaligus">Unggah banyak foto sekaligus</h3>
+<ol><li>
+Pada bagian <strong>Unggah banyak foto</strong>, klik pemilih file lalu pilih beberapa foto sekaligus (tahan Ctrl/Cmd atau Shift saat memilih). Maksimal 30 file sekali unggah.
+</li><li>
+Foto langsung diperiksa dan diunggah satu per satu. Status tiap file tampil di bawahnya: <strong>Menunggu</strong>, <strong>Mengunggah…</strong>, <strong>Terunggah</strong>, atau <strong>Gagal</strong> beserta alasannya.
+</li><li>
+File yang gagal (format salah, terlalu besar, dan sebagainya) tidak menggagalkan file lain. Setelah semua selesai, foto yang berhasil langsung ditambahkan ke <strong>akhir</strong> album.
+</li><li>
+Isi caption dan alt text tiap foto setelahnya di daftar foto. Untuk file yang gagal, perbaiki filenya lalu unggah ulang.
+</li></ol>
+<p>Jangan menutup atau meninggalkan halaman selama unggahan berjalan.</p>
+<h3 id="bab-gallery-tambah-satu-foto">Tambah satu foto</h3>
+<ol><li>
+Pada bagian <strong>Tambah satu foto</strong>, isi field <strong>Foto</strong> (wajib) dengan salah satu cara: pilih berkas dari komputer, atau tekan <strong>Pilih dari Media Library</strong> untuk memakai gambar yang sudah pernah diunggah.
+</li><li>
+Isi <strong>Caption</strong> bila perlu (teks keterangan yang tampil saat foto dibuka di website).
+</li><li>
+Isi <strong>Teks alternatif (alt)</strong> bila perlu — deskripsi singkat isi foto yang dibacakan pembaca layar dan dibaca mesin pencari. Bila dikosongkan, website memakai caption, atau nama album bila caption juga kosong.
+</li><li>
+Tekan <strong>Tambah foto</strong>.
+</li></ol>
+<p>Foto baru selalu diletakkan di urutan paling akhir.</p>
+<h2 id="bab-gallery-mengatur-foto">Mengatur foto</h2>
+<p>Pada daftar <strong>Foto dalam album</strong> Anda dapat:</p>
+<ul><li>
+<strong>Mengubah caption dan alt text</strong> satu foto lalu menekan <strong>Simpan caption</strong>.
+</li><li>
+<strong>Mengurutkan foto</strong> dengan tombol <strong>↑ Naikkan</strong> dan <strong>↓ Turunkan</strong>. Urutan ini sama dengan urutan foto di <code>/gallery</code> dan di pratinjau (lightbox).
+</li><li>
+<strong>Mengganti foto</strong>: buka <strong>Ganti foto</strong>, unggah berkas baru atau tekan <strong>Pilih dari Media Library</strong>, lalu tekan <strong>Simpan foto pengganti</strong>. Caption, alt text, dan urutannya tidak berubah. Berkas lama dihapus dari penyimpanan, kecuali berkas itu tersimpan di Media Library.
+</li><li>
+<strong>Menghapus foto</strong> dari album. Berkasnya ikut dihapus dari penyimpanan, kecuali tersimpan di Media Library (berkas Media Library hanya bisa dihapus dari menu Media Library).
+</li></ul>
+<h2 id="bab-gallery-mengubah-atau-menghapus-album">Mengubah atau menghapus album</h2>
+<ul><li>
+Untuk mengubah data album, buka halaman isinya lalu pilih tautan ke formulir album, atau klik tautan ubah pada daftar album.
+</li><li>
+Untuk menghapus album, gunakan tombol hapus pada formulir album.
+</li></ul>
+<p><strong>Perhatian: menghapus album ikut menghapus seluruh foto di dalamnya.</strong> Foto dan gambar cover yang tidak tercatat di Media Library juga dihapus dari penyimpanan Supabase dan tidak bisa dipulihkan. Bila Anda hanya ingin menyembunyikan album untuk sementara, hilangkan centang <strong>Tampilkan di website</strong> alih-alih menghapusnya.</p>
+</section>
+<section class="chapter">
+<h1 id="bab-media" class="chapter-title">Bab 4. Media Library</h1>
+<p>Modul <strong>Media Library</strong> pada menu samping (tepat di bawah Foto &amp; Gallery). Boleh dikelola oleh ADMIN maupun EDITOR.</p>
+<p>Halaman admin:</p>
+<ul><li>
+Daftar berkas: <code>/admin/media</code>
+</li><li>
+Detail satu berkas: <code>/admin/media/&lt;id-berkas&gt;</code>
+</li></ul>
+<p>Media Library adalah tempat semua gambar yang pernah diunggah dari dashboard. Setiap kali Anda mengunggah gambar lewat field gambar di modul mana pun (treatment, promo, journal, gallery, dan seterusnya), berkas tersebut otomatis tercatat di sini. Dari sini Anda bisa mencari, memakai ulang, mengganti, dan menghapus gambar.</p>
+<h2 id="bab-media-melihat-dan-mencari-berkas">Melihat dan mencari berkas</h2>
+<p>Halaman <code>/admin/media</code> menampilkan grid thumbnail. Pada setiap berkas tertera nama file (atau judulnya bila diisi), ukuran, tipe, tanggal unggah, folder, dan jumlah pemakaian:</p>
+<ul><li>
+Label hijau <strong>Dipakai N×</strong> — gambar sedang dipakai di N tempat di situs.
+</li><li>
+Label kuning <strong>Tidak dipakai</strong> — gambar tidak dipakai di konten mana pun.
+</li></ul>
+<p>Gunakan kotak filter di atas grid:</p>
+<table><thead><tr><th>Filter</th><th>Keterangan</th></tr></thead><tbody><tr><td>Folder</td><td>Tampilkan hanya berkas dari satu folder, mis. <code>gallery</code> atau <code>treatments</code>.</td></tr><tr><td>Cari nama atau judul</td><td>Mencari di nama file dan judul (huruf besar/kecil tidak berpengaruh).</td></tr><tr><td>Hanya yang tidak dipakai</td><td>Cocok untuk merapikan berkas yang tidak lagi dibutuhkan.</td></tr></tbody></table>
+<p>Tekan <strong>Terapkan</strong> untuk menjalankan filter, atau <strong>Reset</strong> untuk kembali ke semua berkas.</p>
+<p>Klik thumbnail untuk membuka halaman detail.</p>
+<h2 id="bab-media-mengunggah-berkas">Mengunggah berkas</h2>
+<ol><li>
+Pada bagian <strong>Unggah berkas</strong>, pilih <strong>Folder tujuan</strong>. Pilih <strong>+ Folder baru…</strong> bila ingin membuat folder baru, lalu ketik namanya.
+</li><li>
+Pada <strong>Berkas gambar</strong>, pilih satu atau beberapa berkas sekaligus.
+</li><li>
+Berkas diunggah satu per satu. Setiap berkas menampilkan progres dan statusnya: Menunggu, Mengunggah, Selesai, atau Gagal beserta alasannya.
+</li><li>
+Setelah selesai, berkas yang berhasil langsung muncul di grid. Berkas yang gagal tidak memengaruhi berkas lain.
+</li></ol>
+<p>Nama folder hanya boleh huruf kecil, angka, dan tanda hubung.</p>
+<h3 id="bab-media-aturan-berkas">Aturan berkas</h3>
+<p>Aturan ini berlaku untuk semua unggahan, baik dari Media Library maupun dari field gambar di modul lain:</p>
+<ul><li>
+<strong>Tipe:</strong> JPG, PNG, WebP, AVIF, atau GIF. SVG, PDF, dan berkas lain ditolak.
+</li><li>
+<strong>Ukuran:</strong> maksimal <strong>4 MB</strong> per berkas. Kecilkan atau kompres gambar yang lebih besar sebelum diunggah.
+</li><li>
+<strong>Nama berkas:</strong> maksimal 200 karakter, tidak boleh mengandung <code>/</code>, <code>\</code>, atau karakter khusus tak terlihat, dan ekstensinya harus sesuai tipe (mis. foto JPG harus berakhiran <code>.jpg</code> atau <code>.jpeg</code>). Nama dirapikan otomatis menjadi huruf kecil dengan tanda hubung, mis. <code>Foto Spa (1).JPG</code> menjadi <code>foto-spa-1.jpg</code>.
+</li><li>
+<strong>Isi harus gambar asli.</strong> Sistem memeriksa isi berkas, bukan hanya ekstensinya. Berkas lain yang sekadar diganti namanya menjadi <code>.jpg</code> ditolak dengan pesan &quot;Isi file tidak sesuai dengan tipenya&quot;.
+</li></ul>
+<h2 id="bab-media-memakai-gambar-dari-media-library-di-modul-lain">Memakai gambar dari Media Library di modul lain</h2>
+<p>Setiap field gambar di form admin kini punya tombol <strong>Pilih dari Media Library</strong>. Tekan tombol itu, cari atau saring per folder, lalu klik gambar yang diinginkan. Field langsung terisi; tekan <strong>Simpan</strong> pada form seperti biasa.</p>
+<p>Dengan cara ini satu gambar bisa dipakai di beberapa tempat tanpa diunggah ulang.</p>
+<h2 id="bab-media-mengubah-informasi-berkas">Mengubah informasi berkas</h2>
+<p>Di halaman detail, bagian <strong>Informasi</strong>:</p>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td>Nama file</td><td>Ya</td><td>Nama tampilan di Media Library, maksimal 120 karakter, tanpa <code>/</code>, <code>\</code>, atau karakter khusus. Mengubahnya <strong>tidak</strong> mengubah alamat (URL) gambar.</td></tr><tr><td>Judul</td><td>Tidak</td><td>Membantu pencarian.</td></tr><tr><td>Teks alternatif (alt)</td><td>Tidak</td><td>Deskripsi singkat isi gambar untuk pembaca layar dan mesin pencari.</td></tr></tbody></table>
+<p>Tekan <strong>Simpan</strong>.</p>
+<p>Halaman detail juga menampilkan pratinjau, ukuran, tipe, tanggal unggah, alamat URL, tombol <strong>Salin URL</strong>, dan daftar <strong>Dipakai di</strong>: setiap konten yang memakai gambar ini (termasuk gambar yang disisipkan di dalam teks berformat, mis. isi artikel Journal), lengkap dengan tautan <strong>Buka</strong> ke formulirnya.</p>
+<h2 id="bab-media-mengganti-berkas">Mengganti berkas</h2>
+<p>Gunakan fitur ini bila gambar perlu diperbarui (mis. foto baru dengan komposisi yang sama) tanpa harus mengubah satu per satu konten yang memakainya.</p>
+<ol><li>
+Buka halaman detail berkas.
+</li><li>
+Pada <strong>Ganti berkas</strong>, pilih berkas baru lalu konfirmasi.
+</li><li>
+Berkas baru diunggah dengan aturan berkas yang sama seperti di atas.
+</li><li>
+Semua konten yang memakai gambar lama — termasuk gambar di dalam teks berformat — otomatis dialihkan ke gambar baru, dan situs publik langsung diperbarui.
+</li><li>
+Berkas lama dihapus dari penyimpanan.
+</li></ol>
+<p>Catatan: berkas baru selalu mendapat <strong>alamat (URL) baru</strong>. Ini disengaja, karena alamat lama tersimpan di cache peramban dan jaringan pengiriman konten sampai setahun; dengan alamat baru pengunjung langsung melihat gambar baru. Judul dan alt text berkas tetap dipertahankan.</p>
+<h2 id="bab-media-menghapus-berkas">Menghapus berkas</h2>
+<p>Berkas hanya bisa dihapus bila <strong>tidak dipakai</strong> di mana pun. Bila masih dipakai, bagian <strong>Hapus berkas</strong> menjelaskan jumlah pemakaiannya; ganti atau kosongkan dulu gambar di konten yang tercantum pada <strong>Dipakai di</strong>.</p>
+<p>Untuk berkas yang tidak dipakai, tekan <strong>Hapus berkas</strong> lalu konfirmasi. Berkas dihapus permanen dari penyimpanan dan dari Media Library.</p>
+<h2 id="bab-media-mengurutkan-berkas">Mengurutkan berkas</h2>
+<p>Grid diurutkan per folder, lalu menurut urutan yang Anda atur, lalu berkas terbaru lebih dulu. Gunakan tombol <strong>↑</strong> dan <strong>↓</strong> pada setiap berkas untuk menggeser posisinya satu langkah di dalam foldernya. Urutan ini juga dipakai pada dialog <strong>Pilih dari Media Library</strong>.</p>
+<h2 id="bab-media-sinkronkan-berkas-lama">Sinkronkan berkas lama</h2>
+<p>Gambar yang diunggah sebelum Media Library tersedia belum tercatat di sini. Tekan <strong>Sinkronkan berkas lama</strong> (kanan atas halaman <code>/admin/media</code>) untuk mencatatnya. Sistem memeriksa semua gambar yang sedang dipakai konten, termasuk gambar di dalam teks berformat, dan mencatat yang belum ada.</p>
+<ul><li>
+Aman ditekan berkali-kali: berkas yang sudah tercatat tidak digandakan.
+</li><li>
+Pesan hijau menyebutkan berapa berkas yang baru dicatat.
+</li><li>
+Ukuran berkas lama dibaca dari penyimpanan; bila gagal terbaca, ukurannya tercatat 0 KB tetapi berkas tetap bisa dipakai, diganti, dan dihapus.
+</li><li>
+Gambar dari situs luar (bukan dari penyimpanan KAMA Spa) tidak dicatat.
+</li></ul>
+<h2 id="bab-media-perubahan-perilaku-form-lain">Perubahan perilaku form lain</h2>
+<p>Sebelumnya, ketika Anda mengganti atau mengosongkan gambar di form modul lain lalu menyimpan, berkas lama ikut dihapus dari penyimpanan. Sekarang, <strong>berkas yang tercatat di Media Library tidak lagi dihapus oleh form lain</strong>, karena bisa jadi masih dipakai di tempat lain. Berkas tersebut tetap ada di Media Library; bila sudah tidak diperlukan, saring dengan <strong>Hanya yang tidak dipakai</strong> lalu hapus dari sini.</p>
+</section>
+<section class="chapter">
+<h1 id="bab-promos" class="chapter-title">Bab 5. Promos</h1>
+<p>Modul 4 pada menu samping (<strong>Promos &amp; Gift Card</strong>). Halaman Gift Card dijelaskan terpisah di <a href="#bab-gift-card">gift-card.md</a>. Boleh dikelola oleh ADMIN maupun EDITOR.</p>
+<p>Halaman admin: <code>/admin/promos</code></p>
+<p>Hasilnya tampil di halaman publik:</p>
+<ul><li>
+<code>/promos</code> (daftar promo)
+</li><li>
+<code>/promos/&lt;slug&gt;</code> (detail satu promo)
+</li><li>
+Blok sorotan promo di halaman depan <code>/</code>
+</li></ul>
+<h2 id="bab-promos-status-promo">Status promo</h2>
+<p>Pada daftar promo, setiap baris memiliki penanda status yang dihitung otomatis:</p>
+<table><thead><tr><th>Status</th><th>Artinya</th></tr></thead><tbody><tr><td>Draf</td><td>Kotak <strong>Tampilkan di website</strong> tidak dicentang.</td></tr><tr><td>Aktif</td><td>Dipublikasikan dan hari ini berada dalam periode promo.</td></tr><tr><td>Terjadwal</td><td>Dipublikasikan, tetapi tanggal mulainya belum tiba.</td></tr><tr><td>Kedaluwarsa</td><td>Dipublikasikan, tetapi tanggal berakhirnya sudah lewat.</td></tr></tbody></table>
+<p>Promo yang kedaluwarsa hilang sendiri dari halaman publik tanpa perlu Anda hapus atau nonaktifkan:</p>
+<ul><li>
+Alamat detail promo (<code>/promos/&lt;slug&gt;</code>) langsung menjawab &quot;halaman tidak ditemukan&quot; (404) begitu periodenya berakhir, belum mulai, atau promo berstatus Draf. Mesin pencari pun tidak akan mengindeksnya.
+</li><li>
+Daftar di halaman <code>/promos</code>, sorotan promo di beranda, dan sitemap diperbarui paling lambat sekitar satu menit setelah periode berakhir.
+</li></ul>
+<h2 id="bab-promos-menambah-promo">Menambah promo</h2>
+<ol><li>
+Buka <strong>Promos &amp; Gift Card</strong>.
+</li><li>
+Tekan <strong>Tambah promo</strong>.
+</li><li>
+Isi formulir lalu tekan <strong>Simpan</strong>.
+</li></ol>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td>Judul promo</td><td>Ya</td><td>Judul yang dilihat pengunjung.</td></tr><tr><td>Slug</td><td>Ya</td><td>Potongan URL. Huruf kecil, angka, tanda hubung. Harus unik antarpromo.</td></tr><tr><td>Deskripsi</td><td>Tidak</td><td>Penjelasan promo.</td></tr><tr><td>Banner promo</td><td>Tidak</td><td>Gambar banner. JPG/PNG/WebP/AVIF/GIF, maksimal 4 MB. Bisa diunggah atau dipilih dari Media Library.</td></tr><tr><td>Syarat &amp; ketentuan</td><td>Tidak</td><td>Editor teks berformat (paragraf, daftar berpoin/bernomor, tebal, tautan). Ditampilkan di halaman detail promo.</td></tr><tr><td>Mulai berlaku</td><td>Tidak</td><td>Kosongkan bila promo langsung aktif. Dihitung mulai pukul 00.00 WIB pada tanggal itu.</td></tr><tr><td>Berakhir</td><td>Tidak</td><td>Kosongkan bila promo tidak punya batas akhir. Berlaku sampai pukul 23.59 WIB pada tanggal itu. Harus lebih besar dari tanggal mulai.</td></tr><tr><td>Urutan tampil</td><td>Tidak (bawaan 0)</td><td>Makin kecil makin atas. Bila sama, diurutkan menurut abjad judul.</td></tr><tr><td>Pesan WhatsApp khusus</td><td>Tidak</td><td>Teks awal chat WhatsApp untuk promo ini. Kosong berarti memakai template default.</td></tr><tr><td>Meta title</td><td>Tidak</td><td>Judul di hasil pencarian. Kosong berarti memakai judul promo. Ideal sekitar 60 karakter.</td></tr><tr><td>Meta description</td><td>Tidak</td><td>Ringkasan di hasil pencarian. Ideal sekitar 160 karakter.</td></tr><tr><td>Tampilkan di website</td><td>Tidak (bawaan aktif)</td><td>Jika tidak dicentang, promo berstatus Draf.</td></tr></tbody></table>
+<h2 id="bab-promos-mengubah-atau-menghapus-promo">Mengubah atau menghapus promo</h2>
+<ul><li>
+Untuk mengubah: klik judul promo di daftar, ubah isinya, tekan <strong>Simpan</strong>.
+</li><li>
+Untuk menghapus: buka promo tersebut lalu tekan tautan hapus pada formulir.
+</li></ul>
+<p>Yang perlu diperhatikan:</p>
+<ul><li>
+Menghapus promo atau mengganti banner <strong>tidak</strong> menghapus gambarnya: gambar tetap ada di Media Library (bisa dipakai lagi). Bersihkan lewat filter &quot;Tidak dipakai&quot; di Media Library bila perlu.
+</li><li>
+Untuk promo yang sudah lewat tetapi ingin disimpan sebagai arsip internal, cukup hilangkan centang <strong>Tampilkan di website</strong>, jangan dihapus.
+</li></ul>
+</section>
+<section class="chapter">
+<h1 id="bab-gift-card" class="chapter-title">Bab 6. Gift Card</h1>
+<p>Sub-halaman dari modul 4 (<strong>Promos &amp; Gift Card → Gift Card</strong>). Boleh dikelola oleh ADMIN maupun EDITOR.</p>
+<p>Halaman admin: <code>/admin/gift-card</code></p>
+<p>Hasilnya tampil di halaman publik <code>/gift-card</code>, dan isinya juga dipakai di halaman depan <code>/</code>.</p>
+<p>Modul ini hanya berisi <strong>satu</strong> halaman konten, jadi tidak ada daftar, tidak ada tombol tambah, dan tidak ada tombol hapus. Anda hanya mengubah isinya lalu menyimpan.</p>
+<h2 id="bab-gift-card-cara-mengubah">Cara mengubah</h2>
+<ol><li>
+Buka <strong>Promos &amp; Gift Card → Gift Card</strong>.
+</li><li>
+Ubah isian yang diperlukan.
+</li><li>
+Tekan <strong>Simpan</strong>.
+</li></ol>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td>Judul</td><td>Ya</td><td>Judul halaman gift card (maksimal 120 karakter).</td></tr><tr><td>Subjudul</td><td>Tidak</td><td>Kalimat di bawah judul. Kosong = teks bawaan &quot;Hadiah yang isinya waktu untuk benar-benar berhenti sejenak.&quot;</td></tr><tr><td>Isi gift card</td><td>Ya</td><td>Teks penjelasan, memakai editor teks berformat (tebal, miring, daftar, tautan).</td></tr><tr><td>Gambar gift card</td><td>Tidak</td><td>Gambar ilustrasi. JPG/PNG/WebP/AVIF/GIF, maksimal 4 MB. Bisa dipilih dari Media Library.</td></tr><tr><td>Syarat &amp; ketentuan</td><td>Tidak</td><td>Editor teks berformat. Bila diisi, tampil di bawah isi gift card dengan judul &quot;Syarat &amp; ketentuan&quot;.</td></tr><tr><td>Pesan WhatsApp</td><td>Tidak</td><td>Teks awal chat tombol <strong>Pesan via WhatsApp</strong>. Kosong = &quot;Halo kak, saya mau beli KAMA Gift Card&quot;.</td></tr></tbody></table>
+<p>Hal yang perlu diperhatikan:</p>
+<ul><li>
+Judul dan isi wajib diisi; menyimpan dengan salah satunya kosong akan ditolak.
+</li><li>
+Selama informasi gift card belum pernah disimpan, formulir berisi teks bawaan yang sedang tampil di situs (ada pemberitahuan kuning di atas form).
+</li><li>
+Mengganti gambar tidak menghapus gambar lama dari Media Library.
+</li><li>
+Isi berformat dibersihkan otomatis dari kode yang tidak aman. Jangan menempelkan skrip atau embed dari situs lain.
+</li><li>
+Halaman ini tidak punya kotak centang publikasi: perubahan langsung terlihat di situs setelah disimpan.
+</li></ul>
+</section>
+<section class="chapter">
+<h1 id="bab-membership" class="chapter-title">Bab 7. Membership</h1>
+<p>Modul 5 pada menu samping. Boleh dikelola oleh ADMIN maupun EDITOR.</p>
+<p>Halaman admin: <code>/admin/membership</code></p>
+<p>Hasilnya tampil di halaman publik <code>/membership</code>, <code>/promos/membership</code>, dan banner membership di halaman depan <code>/</code>. Hanya tier dengan <strong>Tampilkan di website</strong> aktif yang muncul. Bila semua tier dijadikan draf, bagian paket di halaman publik kosong.</p>
+<p>Modul ini mengelola dua hal:</p>
+<ol><li>
+<strong>Program membership</strong> — isi halaman <code>/membership</code>: judul, intro, kalimat harga, main benefits, essential services, dan syarat &amp; ketentuan program.
+</li><li>
+<strong>Tier membership</strong> — paket keanggotaan (Individual, Keluarga, dst.) beserta harga, benefit, dan S&amp;K per tier.
+</li></ol>
+<h2 id="bab-membership-program-membership">Program membership</h2>
+<p>Di halaman Membership, klik kotak <strong>Program membership</strong> di atas daftar tier. Selama program belum pernah disimpan, formulir berisi teks yang saat ini tampil di situs (ada pemberitahuan kuning).</p>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td>Eyebrow</td><td>Ya</td><td>Label kecil di atas judul halaman.</td></tr><tr><td>Judul</td><td>Ya</td><td>Judul besar halaman /membership.</td></tr><tr><td>Intro</td><td>Ya</td><td>Paragraf di bawah judul.</td></tr><tr><td>Kalimat harga</td><td>Ya</td><td>Contoh &quot;Just Rp 1.5jt a month.&quot; Tampil di banner membership homepage dan di bagian Main Benefits.</td></tr><tr><td>Deskripsi banner homepage</td><td>Ya</td><td>Teks di banner membership homepage. Bila subjudul Banner Membership diisi di modul Homepage, isian di sana yang dipakai.</td></tr><tr><td>Main benefits</td><td>Minimal 1</td><td>Baris judul + keterangan. Bisa ditambah, dihapus, dan diurutkan (↑/↓). Maksimal 12.</td></tr><tr><td>Intro essential services</td><td>Ya</td><td>Kalimat di atas daftar essential services.</td></tr><tr><td>Essential services</td><td>Tidak</td><td>Nama + deskripsi layanan yang bisa dipakai kredit bulanan. Maksimal 20.</td></tr><tr><td>Syarat &amp; ketentuan program</td><td>Tidak</td><td>Editor teks berformat. Bila diisi, tampil sebagai bagian &quot;Syarat &amp; Ketentuan&quot; di /membership.</td></tr></tbody></table>
+<p>Gambar, judul, dan tombol banner membership di homepage diatur di modul <strong>Homepage &amp; Our Story → Banner Membership</strong>.</p>
+<h2 id="bab-membership-menambah-tier">Menambah tier</h2>
+<ol><li>
+Buka <strong>Membership</strong>.
+</li><li>
+Tekan <strong>Tambah tier</strong>.
+</li><li>
+Isi formulir lalu tekan <strong>Simpan</strong>.
+</li></ol>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td>Nama tier</td><td>Ya</td><td>Contoh: Gold Member.</td></tr><tr><td>Slug</td><td>Ya</td><td>Potongan URL. Huruf kecil, angka, tanda hubung. Harus unik antartier.</td></tr><tr><td>Label harga</td><td>Ya</td><td>Teks harga yang tampil, contoh <code>Rp 1,5jt</code> atau <code>Custom</code>. Angkanya juga bisa diubah dari modul <strong>Harga</strong>; label lalu ditulis ulang otomatis (contoh <code>1500000</code> → &quot;Rp 1,5jt&quot;).</td></tr><tr><td>Catatan penagihan</td><td>Tidak</td><td>Keterangan tambahan, contoh: &quot;per bulan, minimal 3 bulan&quot;.</td></tr><tr><td>Ringkasan</td><td>Tidak</td><td>Kalimat singkat tentang tier ini.</td></tr><tr><td>Benefit</td><td>Tidak</td><td>Daftar manfaat, satu baris satu manfaat. Maksimal 20 baris per tier. Baris kosong diabaikan.</td></tr><tr><td>Syarat &amp; ketentuan</td><td>Tidak</td><td>Editor teks berformat. Tampil di kartu tier pada /membership dan /promos/membership.</td></tr><tr><td>Urutan tampil</td><td>Tidak (bawaan 0)</td><td>Makin kecil makin atas. Bila sama, diurutkan menurut abjad nama.</td></tr><tr><td>Tampilkan di website</td><td>Tidak (bawaan aktif)</td><td>Jika tidak dicentang, tier tersimpan tetapi tidak tampil.</td></tr></tbody></table>
+<p>Catatan tentang <strong>Label harga</strong>: field ini berupa teks supaya bisa berisi &quot;Custom&quot; atau &quot;Hubungi kami&quot;. Bila labelnya berbentuk harga (&quot;Rp 1,5jt&quot;, &quot;Rp 750rb&quot;, &quot;Rp 1.500.000&quot;), angkanya ikut disimpan sehingga muncul dan bisa diubah di modul <strong>Harga</strong>. Label lain (mis. &quot;Custom&quot;, &quot;Rp 2.500.000 / bulan&quot;) dianggap tanpa angka: di modul Harga kolomnya kosong dan labelnya dibiarkan.</p>
+<p><strong>Penting:</strong> kalimat harga di banner membership homepage dan bagian Main Benefits (contoh &quot;Just Rp 1.5jt a month.&quot;) adalah teks terpisah di <strong>Program membership</strong>. Bila harga tier berubah, ubah juga kalimat tersebut.</p>
+<p>Untuk mengelola benefit, gunakan tombol <strong>+ Tambah benefit</strong> untuk menambah baris, tombol <strong>↑/↓</strong> untuk mengurutkan, dan tombol hapus di ujung baris untuk membuangnya. Seluruh daftar benefit ditulis ulang setiap kali tier disimpan.</p>
+<h2 id="bab-membership-mengubah-atau-menghapus-tier">Mengubah atau menghapus tier</h2>
+<ul><li>
+Untuk mengubah: klik nama tier pada daftar, ubah isinya, tekan <strong>Simpan</strong>.
+</li><li>
+Untuk menghapus: buka tier tersebut lalu tekan tautan hapus pada formulir. Penghapusan bersifat permanen.
+</li></ul>
+<p>Modul ini tidak menyimpan gambar, jadi tidak ada berkas yang ikut terhapus.</p>
+</section>
+<section class="chapter">
+<h1 id="bab-journal" class="chapter-title">Bab 8. Journal</h1>
+<p>Modul 6 pada menu samping. Boleh dikelola oleh ADMIN maupun EDITOR.</p>
+<p>Halaman admin: <code>/admin/journal</code></p>
+<p>Hasilnya tampil di halaman publik <code>/our-story/journal</code> (daftar, bisa disaring per kategori dan tag), halaman artikel <code>/our-story/journal/&lt;slug&gt;</code>, dan tiga tulisan terbaru di halaman Our Story.</p>
+<h2 id="bab-journal-tiga-status-artikel">Tiga status artikel</h2>
+<table><thead><tr><th>Status</th><th>Label di dashboard</th><th>Tampil di publik?</th></tr></thead><tbody><tr><td>DRAFT</td><td>Draf</td><td>Tidak. Alamat artikel menjawab 404 (halaman tidak ditemukan).</td></tr><tr><td>SCHEDULED</td><td>Terjadwal</td><td>Belum. Artikel muncul otomatis ketika tanggal publikasinya tiba.</td></tr><tr><td>PUBLISHED</td><td>Terbit</td><td>Ya.</td></tr></tbody></table>
+<p>Penjadwalan berjalan sendiri: tidak perlu ada yang menekan tombol apa pun pada hari penerbitan, dan tidak perlu deploy ulang. Artikel terjadwal muncul di daftar paling lambat sekitar satu–dua menit setelah waktunya tiba; alamat artikelnya sudah bisa dibuka tepat pada waktunya.</p>
+<p>Saat menyimpan, sistem menyesuaikan status dengan tanggalnya:</p>
+<ul><li>
+Pilih <strong>Terbit</strong> dengan tanggal di masa depan → disimpan sebagai <strong>Terjadwal</strong>.
+</li><li>
+Pilih <strong>Terjadwal</strong> dengan tanggal yang sudah lewat → langsung <strong>Terbit</strong>.
+</li><li>
+Pilih <strong>Terbit</strong> tanpa tanggal → terbit sekarang (tanggal diisi waktu simpan).
+</li><li>
+Pilih <strong>Terjadwal</strong> tanpa tanggal → ditolak; tanggal wajib diisi.
+</li></ul>
+<p>Di daftar artikel, label status selalu mengikuti keadaan saat ini: artikel terjadwal yang waktunya sudah lewat langsung berlabel <strong>Terbit</strong>. Gunakan tombol saring di atas daftar (Semua / Draf / Terjadwal / Terbit) untuk menyaring artikel.</p>
+<h2 id="bab-journal-menulis-artikel-baru">Menulis artikel baru</h2>
+<ol><li>
+Buka <strong>Journal</strong>.
+</li><li>
+Tekan <strong>Tulis artikel</strong>.
+</li><li>
+Isi formulir lalu tekan <strong>Simpan</strong>.
+</li></ol>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td>Judul artikel</td><td>Ya</td><td>Judul yang dilihat pembaca. Maksimal 160 karakter.</td></tr><tr><td>Slug</td><td>Tidak</td><td>Potongan URL. <strong>Boleh dikosongkan</strong> — sistem membuatnya otomatis dari judul. Huruf kecil, angka, dan tanda hubung; maksimal 80 karakter; harus unik antarartikel. Alamat lengkapnya terlihat di bawah field.</td></tr><tr><td>Ringkasan (excerpt)</td><td>Tidak</td><td>Teks singkat yang tampil di daftar artikel. Maksimal 400 karakter.</td></tr><tr><td>Isi artikel</td><td>Ya</td><td>Naskah lengkap, memakai editor teks berformat. Tombol <strong>Gambar</strong> di editor menyisipkan gambar di dalam isi artikel.</td></tr><tr><td>Gambar sampul</td><td>Tidak</td><td>Gambar utama artikel: unggah berkas baru atau <strong>Pilih dari Media Library</strong>. JPG/PNG/WebP/AVIF/GIF, maksimal 4 MB. Juga dipakai sebagai gambar pratinjau saat tautan artikel dibagikan (WhatsApp, Facebook, dsb.).</td></tr><tr><td>Kategori</td><td>Tidak</td><td>Pilih dari daftar kategori yang sudah ada atau ketik kategori baru. Huruf besar/kecil tidak membedakan: mengetik <code>wellness</code> saat sudah ada <code>Wellness</code> akan memakai <code>Wellness</code>.</td></tr><tr><td>Tag</td><td>Tidak</td><td>Beberapa kata kunci dipisahkan koma, contoh: <code>wellness, pijat, ritual</code>. Tag yang sudah pernah dipakai muncul sebagai tombol <strong>+ tag</strong> untuk ditambahkan dengan sekali klik. Tag disimpan dalam huruf kecil, tanpa <code>#</code>, tanpa duplikat; maksimal 20 tag, masing-masing maksimal 40 karakter.</td></tr><tr><td>Status</td><td>Ya (bawaan Draf)</td><td>Draf, Terjadwal, atau Terbit.</td></tr><tr><td>Tanggal publikasi (WIB)</td><td>Tergantung status</td><td>Wajib bila status Terjadwal. Lihat aturan di atas.</td></tr><tr><td>Meta title</td><td>Tidak</td><td>Judul di hasil pencarian. Kosong berarti memakai judul artikel. Ideal ±60 karakter.</td></tr><tr><td>Meta description</td><td>Tidak</td><td>Ringkasan di hasil pencarian. Kosong berarti memakai ringkasan (excerpt). Ideal ±160 karakter.</td></tr></tbody></table>
+<p>Di bawah field SEO ada penghitung karakter (hijau = panjang ideal, kuning = terlalu pendek, merah = terlalu panjang dan bisa terpotong) serta perkiraan tampilan artikel di hasil pencarian Google.</p>
+<h2 id="bab-journal-pratinjau-sebelum-terbit">Pratinjau sebelum terbit</h2>
+<p>Dari daftar artikel maupun dari halaman ubah artikel tersedia tautan <strong>Lihat preview</strong> (<code>/admin/journal/&lt;id&gt;/preview</code>). Pratinjau menampilkan artikel berdasarkan versi yang <strong>terakhir tersimpan</strong>. Jadi simpan dulu sebagai Draf, baru buka pratinjau. Artikel yang sudah tampil publik juga punya tautan <strong>Lihat di situs</strong> pada daftar.</p>
+<h2 id="bab-journal-mengubah-atau-menghapus-artikel">Mengubah atau menghapus artikel</h2>
+<ul><li>
+Untuk mengubah: klik judul artikel pada daftar, ubah isinya, tekan <strong>Simpan</strong>.
+</li><li>
+Untuk menghapus: buka artikel tersebut lalu tekan tautan hapus. Artikel tidak bisa dipulihkan. Gambar sampul ikut dihapus dari penyimpanan, kecuali gambar yang tercatat di Media Library (bisa dipakai konten lain).
+</li><li>
+Untuk menarik artikel dari publik cukup ubah statusnya kembali ke Draf; tidak perlu dihapus.
+</li></ul>
+<p>Hal yang perlu diperhatikan:</p>
+<ul><li>
+<strong>Mengganti slug artikel yang sedang tampil publik</strong> otomatis membuat pengalihan permanen (301) dari alamat lama ke alamat baru, sehingga tautan yang pernah dibagikan tetap berfungsi. Pengalihan ini terlihat di menu <strong>Redirects</strong>. Form menampilkan peringatan sebelum Anda menyimpan.
+</li><li>
+Bila artikel dihapus, pengalihan yang menuju artikel itu ikut dihapus supaya tidak mengarah ke halaman kosong.
+</li><li>
+Bila slug artikel yang terbit/terjadwal sama dengan alamat lama yang sedang dialihkan, pengalihan dari alamat itu dihapus agar artikel bisa dibuka.
+</li><li>
+Daftar artikel di dashboard diurutkan dari tanggal publikasi terbaru; artikel tanpa tanggal (draf) berada paling atas.
+</li></ul>
+<h2 id="bab-journal-halaman-publik">Halaman publik</h2>
+<ul><li>
+<code>/our-story/journal</code> menampilkan artikel terbit, terbaru dulu. Tombol kategori dan tag di atas daftar menyaring artikel (<code>?category=…</code>, <code>?tag=…</code>).
+</li><li>
+Di halaman artikel, kategori dan tag bisa diklik untuk membuka daftar yang tersaring.
+</li><li>
+Artikel draf, terjadwal yang belum tiba waktunya, atau slug yang tidak ada menjawab 404 sungguhan sehingga tidak diindeks mesin pencari.
+</li><li>
+Artikel terbit otomatis masuk <code>sitemap.xml</code>.
+</li></ul>
+</section>
+<section class="chapter">
+<h1 id="bab-events" class="chapter-title">Bab 9. Events</h1>
+<p>Modul 7 pada menu samping. Boleh dikelola oleh ADMIN maupun EDITOR.</p>
+<p>Halaman admin:</p>
+<ul><li>
+Daftar event: <code>/admin/events</code> (dengan filter <strong>Semua</strong>, <strong>Akan datang</strong>, <strong>Sudah lewat</strong>, <strong>Kolaborasi</strong>, <strong>Draf</strong>)
+</li><li>
+Halaman satu event (formulir + foto): <code>/admin/events/&lt;id&gt;</code>
+</li></ul>
+<p>Hasilnya tampil di halaman publik:</p>
+<ul><li>
+<code>/events</code> — bagian <strong>Upcoming</strong> (yang akan datang/sedang berlangsung) dan <strong>Telah berlalu</strong> (event biasa yang sudah lewat)
+</li><li>
+<code>/events/collaborations</code> — <strong>Past Collaborations</strong> (event kolaborasi yang sudah lewat)
+</li><li>
+<code>/events/&lt;slug&gt;</code> — detail satu event
+</li><li>
+Beranda — event terdekat tampil di bagian Promo Highlight bila tidak ada promo aktif
+</li></ul>
+<p>Hanya event dengan <strong>Tampilkan di website</strong> aktif yang muncul di halaman publik. Perubahan langsung terbaca tanpa deploy ulang.</p>
+<h2 id="bab-events-status-event-upcoming-past-past-collaborations">Status event (Upcoming / Past / Past Collaborations)</h2>
+<p>Status <strong>tidak diisi manual</strong>; dihitung otomatis dari tanggal (WIB):</p>
+<ul><li>
+Event dimulai pukul 00.00 WIB pada <strong>Tanggal mulai</strong> dan selesai pukul 23.59 WIB pada <strong>Tanggal selesai</strong> (bila kosong: pada tanggal mulai).
+</li><li>
+<strong>Akan datang</strong>: tanggal mulai belum tiba. <strong>Sedang berlangsung</strong>: hari ini berada di antara tanggal mulai dan selesai. <strong>Sudah lewat</strong>: tanggal selesai sudah terlewati. <strong>Tanggal menyusul</strong>: tanggal belum diisi.
+</li></ul>
+<table><thead><tr><th>Kondisi</th><th>Tampil di</th></tr></thead><tbody><tr><td>Akan datang, sedang berlangsung, atau tanggal menyusul (termasuk kolaborasi)</td><td><code>/events</code> → Upcoming</td></tr><tr><td>Sudah lewat, bukan kolaborasi</td><td><code>/events</code> → Telah berlalu</td></tr><tr><td>Sudah lewat dan ditandai kolaborasi, atau kolaborasi tanpa tanggal</td><td><code>/events/collaborations</code></td></tr></tbody></table>
+<p>Event pindah kelompok dengan sendirinya, paling lambat beberapa menit setelah lewat. Pada halaman detail event yang sudah lewat, tombol <strong>Daftar via WhatsApp</strong> disembunyikan.</p>
+<h2 id="bab-events-menambah-event">Menambah event</h2>
+<ol><li>
+Buka <strong>Events</strong>.
+</li><li>
+Tekan <strong>Tambah event</strong>.
+</li><li>
+Isi formulir lalu tekan <strong>Simpan</strong>. Setelah tersimpan, halaman event terbuka kembali supaya foto bisa langsung ditambahkan.
+</li></ol>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td>Judul event</td><td>Ya</td><td>Judul yang dilihat pengunjung.</td></tr><tr><td>Slug</td><td>Ya</td><td>Potongan URL (<code>/events/&lt;slug&gt;</code>). Untuk event baru terisi otomatis dari judul. Huruf kecil, angka, tanda hubung; harus unik. <code>collaborations</code> tidak boleh dipakai.</td></tr><tr><td>Deskripsi</td><td>Tidak</td><td>Penjelasan acara.</td></tr><tr><td>Gambar sampul</td><td>Tidak</td><td>Unggah baru atau <strong>Pilih dari Media Library</strong>. JPG/PNG/WebP/AVIF/GIF, maksimal 4 MB.</td></tr><tr><td>Lokasi</td><td>Tidak</td><td>Contoh: KAMA Spa, Jakarta Selatan.</td></tr><tr><td>Tanggal mulai (WIB)</td><td>Tidak</td><td>Kosong berarti “Tanggal menyusul”.</td></tr><tr><td>Tanggal selesai (WIB)</td><td>Tidak</td><td>Untuk event lebih dari satu hari. Tidak boleh sebelum tanggal mulai; hanya boleh diisi bila tanggal mulai diisi.</td></tr><tr><td>Urutan tampil</td><td>Tidak (bawaan 0)</td><td>Makin kecil makin atas di kelompoknya. Bila sama, diurutkan menurut tanggal (upcoming: terdekat dulu; yang lalu: terbaru dulu).</td></tr><tr><td>Event kolaborasi</td><td>Tidak</td><td>Lihat bagian di bawah.</td></tr><tr><td>Tampilkan di website</td><td>Tidak (bawaan aktif)</td><td>Jika tidak dicentang, event tidak tampil di publik (draf).</td></tr><tr><td>Meta title</td><td>Tidak</td><td>Judul di hasil pencarian. Kosong berarti memakai judul event.</td></tr><tr><td>Meta description</td><td>Tidak</td><td>Ringkasan di hasil pencarian.</td></tr></tbody></table>
+<p>Bila ada isian yang salah, pesan galat muncul di atas tombol <strong>Simpan</strong> dan isian lain tetap tersimpan di formulir.</p>
+<h2 id="bab-events-past-collaborations">Past collaborations</h2>
+<p>Centang <strong>Event kolaborasi</strong> untuk acara bersama mitra/brand/perusahaan. Setelah dicentang, muncul isian mitra:</p>
+<table><thead><tr><th>Field</th><th>Keterangan</th></tr></thead><tbody><tr><td>Nama mitra</td><td>Tampil sebagai “Bersama &lt;nama&gt;” di kartu dan detail event.</td></tr><tr><td>Logo mitra</td><td>Opsional. <strong>Hanya tampil bila diisi.</strong></td></tr><tr><td>Tautan mitra</td><td>Opsional. Situs/Instagram mitra; <code>namabrand.com</code> otomatis menjadi <code>https://namabrand.com</code>. Logo/nama mitra di halaman detail menjadi tautan.</td></tr></tbody></table>
+<p>Selama belum lewat, event kolaborasi tetap tampil di Upcoming. Setelah lewat, event pindah ke <strong>Past Collaborations</strong>. Untuk arsip kolaborasi lama yang tanggalnya tidak diketahui, kosongkan tanggal — event langsung masuk Past Collaborations. Gunakan filter <strong>Kolaborasi</strong> di daftar admin untuk melihat semuanya.</p>
+<h2 id="bab-events-foto-event">Foto event</h2>
+<p>Bagian foto ada di bawah formulir (setelah event pertama kali disimpan).</p>
+<ul><li>
+<strong>Unggah banyak foto event</strong>: pilih beberapa file sekaligus (maksimal 30 file, 4 MB per file). Setiap file diunggah satu per satu; file yang gagal ditandai tanpa menghentikan yang lain. Foto masuk ke urutan paling akhir.
+</li><li>
+<strong>Tambah satu foto</strong>: untuk satu foto dengan caption sekaligus, atau foto dari Media Library.
+</li><li>
+<strong>Caption</strong>: ubah teks lalu tekan <strong>Simpan caption</strong>.
+</li><li>
+<strong>↑ Naikkan / ↓ Turunkan</strong>: mengubah urutan galeri di halaman detail.
+</li><li>
+<strong>Ganti foto</strong>: mengganti berkasnya saja; caption dan urutan tetap.
+</li><li>
+<strong>Hapus foto</strong>: menghapus foto beserta berkasnya di penyimpanan (berkas yang tercatat di Media Library tidak ikut terhapus).
+</li></ul>
+<h2 id="bab-events-mengganti-slug">Mengganti slug</h2>
+<p>Bila slug event yang <strong>sedang tayang</strong> diganti, alamat lama (<code>/events/&lt;slug-lama&gt;</code>) otomatis dialihkan permanen (301) ke alamat baru. Pengalihan ini tercatat di menu <strong>Redirects</strong> dan bisa dihapus dari sana. Formulir menampilkan peringatan saat slug event tayang diubah.</p>
+<h2 id="bab-events-mengubah-atau-menghapus-event">Mengubah atau menghapus event</h2>
+<ul><li>
+Untuk mengubah: klik judul event pada daftar, ubah isinya, tekan <strong>Simpan</strong>.
+</li><li>
+Untuk menghapus: tekan tautan <strong>Hapus event ini</strong> di bawah formulir.
+</li></ul>
+<p><strong>Perhatian: menghapus event ikut menghapus seluruh foto event tersebut</strong>, termasuk berkas foto, gambar sampul, dan logo mitra di penyimpanan. Bila event hanya ingin disembunyikan, hilangkan centang <strong>Tampilkan di website</strong>.</p>
+</section>
+<section class="chapter">
+<h1 id="bab-retail" class="chapter-title">Bab 10. KAMA Retail</h1>
+<p>Modul 8 pada menu samping. Boleh dikelola oleh ADMIN maupun EDITOR.</p>
+<p>Halaman admin: <code>/admin/retail</code></p>
+<p>Hasilnya tampil di halaman publik <code>/retail</code> tanpa perlu redeploy. Hanya produk dengan <strong>Tampilkan di website</strong> aktif yang muncul. Produk yang ditandai <strong>Highlight / Kolaborasi</strong> selalu tampil lebih dahulu (berlabel &quot;Highlight&quot;), lalu sisanya menurut urutan tampil dan abjad nama. Urutan di daftar admin sama persis dengan urutan di website.</p>
+<p>Website ini <strong>tidak memiliki keranjang belanja atau pembayaran online</strong>. Setiap produk punya tombol <strong>Pesan via WhatsApp</strong>. Produk tanpa harga menampilkan tulisan <strong>Hubungi kami</strong>.</p>
+<h2 id="bab-retail-menambah-produk">Menambah produk</h2>
+<ol><li>
+Buka <strong>KAMA Retail</strong>.
+</li><li>
+Tekan <strong>Tambah produk</strong>.
+</li><li>
+Isi formulir lalu tekan <strong>Simpan</strong>.
+</li></ol>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td>Nama</td><td>Ya</td><td>Nama produk, maksimal 120 karakter.</td></tr><tr><td>Slug</td><td>Ya</td><td>Penanda unik produk. Huruf kecil, angka, tanda hubung. Harus unik antarproduk.</td></tr><tr><td>Deskripsi</td><td>Tidak</td><td>Penjelasan produk, maksimal 2.000 karakter. Baris baru ikut tampil.</td></tr><tr><td>Foto produk</td><td>Tidak</td><td>Unggah foto (JPG/PNG/WebP/AVIF) atau tekan <strong>Pilih dari Media Library</strong>.</td></tr><tr><td>Harga (opsional)</td><td>Tidak</td><td>Rupiah penuh, contoh <code>250000</code> atau <code>250.000</code>. <strong>Kosongkan bila harga ditanyakan lewat WhatsApp</strong> — website menampilkan &quot;Hubungi kami&quot;. Harga juga bisa diubah di modul Harga.</td></tr><tr><td>Pesan WhatsApp khusus</td><td>Tidak</td><td>Teks awal chat untuk produk ini. Boleh memakai <code>{{product}}</code> (nama produk) dan <code>{{harga}}</code>. Kosong berarti memakai template (lihat di bawah).</td></tr><tr><td>Urutan tampil</td><td>Tidak</td><td>Makin kecil makin atas. Kosongkan untuk meletakkan produk baru di akhir daftar.</td></tr><tr><td>Tandai sebagai Highlight / Kolaborasi</td><td>Tidak</td><td>Dipakai untuk produk unggulan maupun produk kolaborasi. Produk ini tampil paling atas dengan label &quot;Highlight&quot;.</td></tr><tr><td>Tampilkan di website</td><td>Tidak (bawaan aktif)</td><td>Jika tidak dicentang, produk tersimpan tetapi tidak tampil.</td></tr></tbody></table>
+<h2 id="bab-retail-pesan-whatsapp">Pesan WhatsApp</h2>
+<p>Tombol <strong>Pesan via WhatsApp</strong> memakai nomor WhatsApp dari <strong>Kontak &amp; Umum</strong>. Isi pesannya dipilih dengan urutan berikut:</p>
+<ol><li>
+<strong>Pesan WhatsApp khusus</strong> produk, bila diisi.
+</li><li>
+Template <strong>retail</strong> di <strong>Kontak &amp; Umum → WhatsApp</strong>, bila template itu memuat <code>{{product}}</code>.
+</li><li>
+Template bawaan: &quot;Halo kak, saya mau pesan produk <em>nama produk</em>&quot;.
+</li></ol>
+<p>Bila produk punya harga dan template tidak memuat <code>{{harga}}</code>, harga ditambahkan di akhir pesan, misalnya &quot;Halo kak, saya mau pesan produk Minyak Sukma (Rp 250.000)&quot;.</p>
+<h2 id="bab-retail-mengatur-urutan-dan-menyembunyikan-produk">Mengatur urutan dan menyembunyikan produk</h2>
+<p>Di daftar <strong>KAMA Retail</strong>, tiap produk punya tombol:</p>
+<ul><li>
+<strong>↑ / ↓</strong> — menaikkan atau menurunkan urutan. Produk Highlight/Kolaborasi hanya bisa ditukar dengan sesama Highlight, dan produk biasa dengan sesama produk biasa, karena Highlight selalu tampil lebih dahulu.
+</li><li>
+<strong>Sembunyikan / Tampilkan</strong> — mengubah status tampil tanpa membuka formulir.
+</li></ul>
+<h2 id="bab-retail-mengubah-atau-menghapus-produk">Mengubah atau menghapus produk</h2>
+<ul><li>
+Untuk mengubah: klik nama produk pada daftar, ubah isinya, tekan <strong>Simpan</strong>.
+</li><li>
+Untuk menghapus: buka produk tersebut lalu tekan tautan hapus.
+</li></ul>
+<p>Hal yang perlu diperhatikan:</p>
+<ul><li>
+Menghapus produk juga menghapus fotonya dari penyimpanan (kecuali foto yang dipilih dari Media Library), dan tidak bisa dibatalkan.
+</li><li>
+Mengganti foto lalu menyimpan akan menghapus foto lama dari penyimpanan (kecuali foto dari Media Library).
+</li><li>
+Produk yang sedang kosong stok sebaiknya disembunyikan (tombol <strong>Sembunyikan</strong> atau hilangkan centang <strong>Tampilkan di website</strong>), bukan dihapus, agar datanya bisa ditampilkan lagi nanti.
+</li></ul>
+</section>
+<section class="chapter">
+<h1 id="bab-corporate" class="chapter-title">Bab 11. Corporate Wellness dan Inquiry</h1>
+<p>Modul 9 pada menu samping. Boleh dikelola oleh ADMIN maupun EDITOR.</p>
+<p>Semua isi tampil di halaman publik <strong><code>/corporate</code></strong> (halaman yang ditautkan menu dan footer). Alamat lama <code>/corporate-wellness</code> otomatis dialihkan ke <code>/corporate</code>.</p>
+<p>Halaman admin:</p>
+<table><thead><tr><th>Halaman</th><th>Alamat</th></tr></thead><tbody><tr><td>Ringkasan modul (program, langkah, klien)</td><td><code>/admin/corporate</code></td></tr><tr><td>Konten halaman</td><td><code>/admin/corporate/content</code></td></tr><tr><td>PIC (kontak pihak pertama)</td><td><code>/admin/corporate/pic</code></td></tr><tr><td>Daftar inquiry masuk</td><td><code>/admin/corporate/inquiries</code></td></tr></tbody></table>
+<blockquote><strong>Isi bawaan.</strong> Selama sebuah bagian belum pernah diisi, halaman <code>/corporate</code> menampilkan teks dan foto bawaan (desain awal). Tampilan baru berubah setelah Anda menyimpan isi bagian tersebut.</blockquote>
+<h2 id="bab-corporate-1-konten-halaman">1. Konten halaman</h2>
+<p>Buka <strong>Corporate Wellness → Konten halaman</strong>. Bila belum pernah disimpan, form sudah terisi teks bawaan yang sedang tampil di situs — cukup ubah yang perlu, lalu tekan <strong>Simpan</strong>.</p>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td>Judul hero</td><td>Ya</td><td>Judul besar di bagian atas halaman. Maks. 200 karakter.</td></tr><tr><td>Intro</td><td>Tidak</td><td>Paragraf di bawah &quot;Healthy Employees Build Stronger Companies&quot;. Kosong = teks bawaan.</td></tr><tr><td>Benefit</td><td>Tidak</td><td>Daftar centang di bagian <em>benefits</em>. Satu benefit per baris, urutkan dengan ↑/↓. Daftar kosong = benefit bawaan.</td></tr><tr><td>Blok solusi</td><td>Tidak</td><td>Kartu &quot;Why Partner with KAMA?&quot;. Tiap blok punya judul dan poin (satu poin per baris). Semua blok dihapus = isi bawaan.</td></tr><tr><td>Deskripsi In-Spa</td><td>Tidak</td><td>Paragraf di bagian <em>In-Spa Corporate Experience</em> (editor teks berformat).</td></tr><tr><td>Daftar &quot;Ideal For&quot;</td><td>Tidak</td><td>Daftar di bagian In-Spa. Daftar kosong = daftar bawaan.</td></tr><tr><td>Catatan tambahan In-Office</td><td>Tidak</td><td>Tampil di bawah kartu program.</td></tr><tr><td>Catatan tambahan langkah</td><td>Tidak</td><td>Tampil di bawah langkah kolaborasi.</td></tr></tbody></table>
+<p>Isi berformat dibersihkan otomatis dari kode yang tidak aman sebelum disimpan.</p>
+<h2 id="bab-corporate-2-pic-kontak-pihak-pertama">2. PIC (kontak pihak pertama)</h2>
+<p>Nama, email, dan telepon PIC <strong>ketiganya wajib</strong> dan tampil publik di banner &quot;Let's build your wellness program.&quot; (tombol <em>Talk to {nama}</em> membuka WhatsApp ke nomor PIC; tombol email membuka aplikasi email).</p>
+<ul><li>
+Email harus berformat benar.
+</li><li>
+Telepon 8–15 digit, boleh memakai spasi, tanda hubung, atau awalan <code>+62</code> (contoh <code>+62 813-1485-6565</code>). Gunakan nomor WhatsApp aktif.
+</li><li>
+Email PIC juga menjadi <strong>penerima notifikasi inquiry</strong> bila pengelola server tidak mengisi alamat khusus (lihat bagian 6).
+</li></ul>
+<h2 id="bab-corporate-3-program-in-office">3. Program In-Office</h2>
+<p>Di halaman ringkasan, bagian <strong>Program In-Office</strong>.</p>
+<ul><li>
+<strong>Tambah program</strong> → isi nama, deskripsi, fitur (satu per baris, ↑/↓ untuk urutan), foto opsional (unggah atau <em>Pilih dari Media Library</em>), dan centang <strong>Tampilkan di website</strong>.
+</li><li>
+Urutan kartu diatur dengan tombol <strong>↑ / ↓</strong> di daftar.
+</li><li>
+Program berstatus Draf tidak tampil di situs.
+</li><li>
+Selama daftar kosong, situs menampilkan 3 program bawaan (Essential, Signature, Executive). Tekan <strong>Salin program bawaan agar bisa diubah</strong> untuk menjadikannya data yang bisa diedit.
+</li></ul>
+<h2 id="bab-corporate-4-langkah-kolaborasi">4. Langkah kolaborasi</h2>
+<p>Bagian <strong>Langkah kolaborasi</strong>: judul + keterangan singkat per langkah, urut dengan ↑/↓. Nomor &quot;Step&quot; dan angka pada judul &quot;A Simple 4-Step Collaboration Process&quot; dihitung otomatis dari jumlah langkah. Seperti program, tersedia tombol untuk menyalin 4 langkah bawaan.</p>
+<h2 id="bab-corporate-5-klien-dokumentasi">5. Klien &amp; dokumentasi</h2>
+<p>Bagian <strong>Klien &amp; dokumentasi</strong> mengatur &quot;Past Collaborations&quot;.</p>
+<ul><li>
+Isi <strong>nama klien</strong> (wajib), <strong>logo</strong> (opsional — tanpa logo, nama yang tampil), dan <strong>website</strong> (opsional; <code>https://</code> ditambahkan otomatis, logo menjadi tautan).
+</li><li>
+<strong>Foto dokumentasi</strong>: pilih beberapa foto sekaligus untuk diunggah, atau tambahkan dari Media Library. Urutkan dengan ↑/↓; <strong>Lepas</strong> hanya melepas foto dari klien (berkasnya tetap di Media Library). Maks. 30 foto per klien. Perubahan tersimpan setelah menekan <strong>Simpan</strong>.
+</li><li>
+Selama belum ada klien sama sekali, situs menampilkan 3 foto kolaborasi bawaan. Setelah klien pertama ditambahkan, bagian ini memakai logo dan foto klien yang berstatus tayang.
+</li></ul>
+<h2 id="bab-corporate-6-inquiry-permintaan-masuk">6. Inquiry (permintaan masuk)</h2>
+<p>Pengunjung mengisi formulir di bagian <strong>Corporate Inquiry</strong> pada halaman <code>/corporate</code>. Setiap kiriman:</p>
+<ol><li>
+<strong>disimpan</strong> di dashboard (<strong>Corporate Wellness → Inquiries</strong>), dan
+</li><li>
+<strong>dikirim lewat email</strong> ke pihak pertama (KAMA Spa): alamat yang diatur pengelola server, atau email PIC bila alamat itu kosong. Balasan email langsung tertuju ke pengirim inquiry.
+</li></ol>
+<p>Bila email gagal terkirim, inquiry tetap tersimpan. Status email terlihat di daftar (<em>Email terkirim</em> / <em>Email gagal</em>) dan di halaman detail, lengkap dengan tombol <strong>Coba kirim email lagi</strong>.</p>
+<h3 id="bab-corporate-perlindungan-data-pribadi-uu-pdp">Perlindungan data pribadi (UU PDP)</h3>
+<p>Daftar ini memuat <strong>data pribadi</strong> calon klien (nama, perusahaan, email, telepon, pesan). Hanya ADMIN dan EDITOR yang login yang bisa melihatnya; data ini tidak pernah tampil di halaman publik. Jangan membagikan tangkapan layar atau menyalin data ke luar tim. Ekspor massal sengaja tidak disediakan.</p>
+<p>Pengunjung wajib mencentang persetujuan pemrosesan data sebelum mengirim.</p>
+<h3 id="bab-corporate-daftar-dan-detail">Daftar dan detail</h3>
+<ul><li>
+Diurutkan dari yang terbaru, 25 per halaman, dengan penyaring status (angka di tiap tombol = jumlah inquiry berstatus itu).
+</li><li>
+Klik satu inquiry untuk melihat detail lengkap, mengubah status, dan menulis <strong>catatan internal</strong>.
+</li></ul>
+<table><thead><tr><th>Status</th><th>Arti</th></tr></thead><tbody><tr><td>Baru</td><td>Belum ditindaklanjuti.</td></tr><tr><td>Sudah dihubungi</td><td>Tim sudah menghubungi calon klien.</td></tr><tr><td>Ditutup</td><td>Proses selesai, baik jadi maupun tidak.</td></tr></tbody></table>
+<p>Jumlah inquiry berstatus Baru juga tampil di halaman depan dashboard.</p>
+<h3 id="bab-corporate-menghapus-inquiry">Menghapus inquiry</h3>
+<p>Tombol hapus ada di halaman detail. Penghapusan bersifat permanen dan menghapus seluruh data pengirim. Gunakan untuk pesan spam atau atas permintaan penghapusan data dari pengirimnya.</p>
+<h3 id="bab-corporate-perlindungan-dari-spam">Perlindungan dari spam</h3>
+<p>Formulir dilindungi captcha (Cloudflare Turnstile), batas 5 kiriman per 10 menit per pengunjung, kolom jebakan bot, dan jeda minimal 3 detik sejak formulir dibuka. Bila captcha belum dikonfigurasi di server produksi, formulir diganti tombol WhatsApp/email PIC sampai konfigurasi dilengkapi.</p>
+</section>
+<section class="chapter">
+<h1 id="bab-homepage" class="chapter-title">Bab 12. Homepage</h1>
+<p>Modul 10 pada menu samping (<strong>Homepage &amp; Our Story</strong>). Halaman Our Story dijelaskan terpisah di <a href="#bab-our-story">our-story.md</a>. Boleh dikelola oleh ADMIN maupun EDITOR.</p>
+<p>Halaman admin: <code>/admin/homepage</code></p>
+<p>Hasilnya tampil di halaman depan situs, <code>/</code>.</p>
+<h2 id="bab-homepage-cara-kerja-section">Cara kerja section</h2>
+<p>Halaman depan tersusun dari beberapa bagian (section). Setiap section punya kode tetap (key) yang tidak bisa diubah:</p>
+<table><thead><tr><th>Key</th><th>Nama di dashboard</th></tr></thead><tbody><tr><td>hero</td><td>Hero</td></tr><tr><td>membership-banner</td><td>Banner Membership</td></tr><tr><td>whats-new</td><td>What's New</td></tr><tr><td>reviews</td><td>Reviews</td></tr><tr><td>brand-intro</td><td>Brand Intro</td></tr><tr><td>socials</td><td>Socials</td></tr><tr><td>booking-banner</td><td>Banner Booking</td></tr><tr><td>signature-treatments</td><td>Signature Treatments</td></tr><tr><td>promo-highlight</td><td>Promo Highlight</td></tr><tr><td>gallery-teaser</td><td>Gallery Teaser</td></tr><tr><td>footer</td><td>Footer</td></tr></tbody></table>
+<p>Section yang belum pernah diatur dari dashboard akan ditampilkan di bagian <strong>Tambahkan section</strong> sebagai tombol. Menekan tombol tersebut membuat pengaturannya dengan status yang <strong>sama dengan tampilan sekarang</strong>, sehingga halaman depan tidak berubah:</p>
+<ul><li>
+Section bawaan yang sudah tampil walau belum diatur (Hero, Banner Membership, What's New, Reviews, Brand Intro, Socials, Banner Booking, dan Footer) dibuat <strong>aktif</strong> — tombolnya bertuliskan “(aktif)”.
+</li><li>
+Section baru (Signature Treatments, Promo Highlight, Gallery Teaser) dibuat <strong>mati</strong> — tombolnya bertuliskan “(mati)” — sampai Anda menyalakannya.
+</li></ul>
+<p>Anda <strong>tidak bisa</strong> menambah section jenis baru atau menghapus section yang ada. Yang bisa diatur adalah nyala-mati, urutan, dan — untuk section tertentu — isinya.</p>
+<h2 id="bab-homepage-asal-isi-tiap-section">Asal isi tiap section</h2>
+<table><thead><tr><th>Section</th><th>Isi diatur di</th></tr></thead><tbody><tr><td>Hero, Banner Membership, Banner Booking</td><td>Form di kartu section itu sendiri (lihat <a href="#bab-homepage-hero-dan-banner">Hero dan banner</a>).</td></tr><tr><td>What's New</td><td><strong>Highlight Homepage</strong> (<code>/admin/homepage/highlights</code>) — lihat <a href="#bab-homepage-highlight-whats-new">Highlight “What's New”</a>.</td></tr><tr><td>Signature Treatments</td><td>Treatment yang ditandai best seller di modul Treatments (maks. 6).</td></tr><tr><td>Promo Highlight</td><td>Promo aktif pertama di modul Promos; bila tidak ada, event terdekat di modul Events.</td></tr><tr><td>Gallery Teaser</td><td>Foto di modul Gallery (atau feed Instagram bila tersedia).</td></tr><tr><td>Reviews, Brand Intro, Socials</td><td>Teks bawaan situs; belum bisa diubah dari dashboard.</td></tr><tr><td>Footer</td><td>Isi footer berlaku untuk seluruh situs (tautan footer diatur di modul Menu Navigasi). Di sini hanya ada saklar tampil/sembunyi.</td></tr></tbody></table>
+<p>Kartu section yang isinya diatur di tempat lain hanya menampilkan keterangan asal isi beserta tautan ke modul terkait.</p>
+<h2 id="bab-homepage-hero-dan-banner">Hero dan banner</h2>
+<p>Prinsip utamanya: <strong>field yang dikosongkan memakai teks/gambar bawaan</strong>. Teks bawaan ditampilkan samar di dalam kotak isian sebagai contoh. Jadi Anda cukup mengisi bagian yang ingin diganti; untuk kembali ke tampilan semula, kosongkan field lalu simpan.</p>
+<p>Field yang tersedia berbeda per section:</p>
+<table><thead><tr><th>Field</th><th>Hero</th><th>Banner Membership</th><th>Banner Booking</th></tr></thead><tbody><tr><td>Gambar utama</td><td>Ya</td><td>Ya</td><td>–</td></tr><tr><td>Gambar khusus mobile</td><td>Ya</td><td>Ya</td><td>–</td></tr><tr><td>Teks alt</td><td>Opsional</td><td>Wajib bila gambar diganti</td><td>–</td></tr><tr><td>Judul</td><td>Judul besar (H1)</td><td>Baris miring “KAMA Membership.”</td><td>Judul banner</td></tr><tr><td>Subjudul</td><td>Eyebrow (teks kecil di atas judul)</td><td>Teks deskripsi</td><td>–</td></tr><tr><td>Tombol (label + tujuan)</td><td>Tautan “Book Now” di kartu putih</td><td>Tombol “Join KAMA Now”</td><td>Tombol “Get In Touch”</td></tr></tbody></table>
+<p>Harga membership (“Just Rp 1.5jt a month.”) tidak diatur di sini.</p>
+<h3 id="bab-homepage-mengganti-gambar-hero-banner">Mengganti gambar hero/banner</h3>
+<ol><li>
+Pada kartu <strong>Hero</strong> atau <strong>Banner Membership</strong>, di bagian <strong>Gambar</strong>, klik pilih berkas di <strong>Gambar utama</strong> (atau <strong>Pilih dari Media Library</strong>).
+</li><li>
+Tunggu sampai pratinjau kecil muncul di samping field.
+</li><li>
+Isi <strong>Teks alt</strong> bila diminta, lalu tekan <strong>Simpan section</strong>.
+</li></ol>
+<p>Untuk kembali ke gambar bawaan, tekan <strong>Hapus</strong> di bawah pratinjau lalu simpan.</p>
+<p>Format yang diterima: JPG, PNG, WebP, AVIF, atau GIF, <strong>maksimal 4 MB</strong>.</p>
+<p>Ukuran yang disarankan:</p>
+<table><thead><tr><th>Gambar</th><th>Ukuran</th><th>Catatan</th></tr></thead><tbody><tr><td>Hero (utama)</td><td>lanskap, minimal 1920×1080 px</td><td>Bagian tengah gambar sebaiknya polos/gelap karena tertutup judul.</td></tr><tr><td>Banner Membership (utama)</td><td>rasio 4:3, minimal 1200×900 px</td><td>Di layar lebar gambar dipotong mengikuti tinggi kartu.</td></tr><tr><td>Gambar mobile</td><td>potret, mis. 1080×1350 px</td><td>Hanya dipakai pada layar di bawah 768 px.</td></tr></tbody></table>
+<p>Usahakan berkas di bawah <strong>1 MB</strong> (WebP atau JPG kualitas 75–85%) supaya halaman depan cepat terbuka di ponsel.</p>
+<blockquote><strong>Catatan GIF hero bawaan.</strong> Latar hero bawaan adalah animasi asap (<code>incense_smoke_animated.gif</code>) berukuran sekitar <strong>28 MB</strong> — sangat berat untuk pengunjung ponsel. Sebaiknya ganti dengan gambar diam yang ringan (maks 4 MB, idealnya di bawah 1 MB). GIF animasi sebesar itu tidak bisa diunggah ulang karena melewati batas 4 MB.</blockquote>
+<h3 id="bab-homepage-gambar-khusus-mobile">Gambar khusus mobile</h3>
+<p>Opsional. Bila diisi, ponsel (layar di bawah 768 px) memakai gambar ini, sedangkan layar lebar tetap memakai gambar utama. Berguna bila gambar lanskap terpotong jelek di layar sempit. Bila kosong, gambar utama dipakai di semua ukuran layar.</p>
+<h3 id="bab-homepage-teks-alt">Teks alt</h3>
+<p>Teks alt menjelaskan isi gambar untuk pembaca layar (pengguna tunanetra) dan mesin pencari. Tulis singkat dan deskriptif, mis. “Ruang perawatan KAMA Spa dengan mangkuk bunga”.</p>
+<ul><li>
+<strong>Banner Membership:</strong> wajib diisi bila gambar utama atau mobile diganti.
+</li><li>
+<strong>Hero:</strong> boleh kosong. Gambar hero hanyalah latar dekoratif di balik judul — judulnya sendiri sudah menjelaskan halaman — sehingga pembaca layar sebaiknya melewatinya. Isi hanya bila gambar membawa informasi penting.
+</li></ul>
+<h3 id="bab-homepage-judul">Judul</h3>
+<p>Kosongkan untuk memakai judul bawaan (mis. “Relax. Refresh. (Repeat).” pada hero). Nama section di dashboard (“Hero”, “Banner Membership”, dsb.) tidak pernah ditampilkan sebagai judul di situs. Maksimal 120 karakter.</p>
+<h3 id="bab-homepage-tombol-cta">Tombol (CTA)</h3>
+<p>Isi <strong>Label tombol</strong> dan <strong>Tujuan tombol</strong> sekaligus, atau kosongkan keduanya untuk memakai tombol bawaan. Tujuan tombol harus salah satu dari:</p>
+<ul><li>
+path di situs ini, diawali <code>/</code>, mis. <code>/menu</code>, <code>/membership</code>, <code>/contact</code>;
+</li><li>
+anchor di halaman yang sama, diawali <code>#</code>, mis. <code>#home_whats_new</code>;
+</li><li>
+alamat lengkap <code>https://…</code>, mis. tautan WhatsApp <code>https://wa.me/62…</code>.
+</li></ul>
+<p>Alamat <code>http://</code> (tanpa s), <code>//…</code>, atau teks lain ditolak. Label tombol maksimal 40 karakter.</p>
+<p>Perubahan langsung tampil di halaman depan setelah <strong>Simpan section</strong>.</p>
+<h2 id="bab-homepage-highlight-whats-new">Highlight “What's New”</h2>
+<p>Halaman admin: <code>/admin/homepage/highlights</code> (tautan <strong>Kelola highlight “What’s New” →</strong> di atas halaman Section Homepage, atau <strong>Kelola highlight</strong> pada kartu What's New).</p>
+<p>Setiap highlight tampil sebagai satu kartu di section “What's New”: gambar, label kategori, tulisan tetap “KAMA Journal”, judul, dan tautan “Learn More”. Tampilan kartu sama persis dengan kartu bawaan.</p>
+<h3 id="bab-homepage-kartu-bawaan-dan-highlight">Kartu bawaan dan highlight</h3>
+<ul><li>
+Selama <strong>belum ada highlight sama sekali</strong>, What's New menampilkan 3 kartu bawaan situs.
+</li><li>
+Begitu ada <strong>satu highlight saja</strong> (termasuk draf), kartu bawaan diganti seluruhnya oleh highlight yang sedang tayang. Bila tidak ada yang tayang (semua draf atau di luar periode), What's New tampil tanpa kartu — dashboard memberi peringatan kuning.
+</li><li>
+Supaya tampilan tidak berubah, tekan <strong>Salin 3 kartu bawaan</strong> (muncul saat daftar masih kosong). Ketiga kartu bawaan disalin menjadi highlight yang bisa Anda ubah, urutkan, atau hapus.
+</li><li>
+Bila semua highlight dihapus, kartu bawaan tampil kembali.
+</li></ul>
+<h3 id="bab-homepage-field-highlight">Field highlight</h3>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td>Judul</td><td>Ya</td><td>Judul kartu. Maksimal 160 karakter.</td></tr><tr><td>Label kategori</td><td>Tidak</td><td>Teks kecil di atas judul (mis. Massage, Promo). Maksimal 40 karakter.</td></tr><tr><td>Gambar kartu</td><td>Tidak</td><td>Unggah atau <strong>Pilih dari Media Library</strong>. Dipotong rasio 16:11; disarankan minimal 1200×825 px, di bawah 1 MB. Kosong = kotak krem polos.</td></tr><tr><td>Teks alt</td><td>Tidak</td><td>Boleh kosong bila gambar hanya hiasan (judul kartu sudah dibacakan).</td></tr><tr><td>Tujuan tautan</td><td>Tidak</td><td>Path <code>/…</code>, anchor <code>#…</code>, atau <code>https://…</code> (aturan sama dengan tombol banner). Kosong = kartu tidak bisa diklik dan tanpa teks tombol.</td></tr><tr><td>Teks tombol</td><td>Tidak</td><td>Kosong = “Learn More”. Hanya bisa diisi bila tujuan tautan diisi.</td></tr><tr><td>Mulai tampil / Berhenti tampil</td><td>Tidak</td><td>Periode tayang (WIB). Mulai pukul 00.00, berakhir pukul 23.59.</td></tr><tr><td>Terbitkan di homepage</td><td>–</td><td>Tidak dicentang = draf.</td></tr></tbody></table>
+<h3 id="bab-homepage-status-dan-urutan">Status dan urutan</h3>
+<p>Daftar highlight menampilkan status: <strong>Draf</strong>, <strong>Terjadwal</strong> (tanggal mulai belum tiba), <strong>Berakhir</strong> (tanggal berakhir sudah lewat), atau <strong>Tayang</strong>. Highlight berperiode muncul dan hilang sendiri; perubahan karena periode terlihat di homepage dalam beberapa menit. Tombol <strong>Terbitkan / Jadikan draf</strong> mengubah status langsung dari daftar, dan panah ↑/↓ mengatur urutan kartu.</p>
+<p>Kartu tersusun 3 per baris di layar lebar, jadi jumlah kelipatan 3 terlihat paling rapi.</p>
+<h2 id="bab-homepage-statistik-ulasan-dan-feed-instagram">Statistik, ulasan, dan feed Instagram</h2>
+<p>Tiga bagian homepage yang dulu tertanam kini diatur dari admin. Halamannya ada di sub-menu <strong>Homepage &amp; Our Story</strong> dan sebagai tautan di bagian atas <strong>Section Homepage</strong>:</p>
+<table><thead><tr><th>Halaman</th><th>Mengatur</th><th>Section</th></tr></thead><tbody><tr><td><strong>Statistik</strong></td><td>Kotak angka “KAMA at a glance” (angka + label), maksimal 6</td><td>Brand Intro</td></tr><tr><td><strong>Ulasan</strong></td><td>Kartu ulasan: isi, nama, lokasi, keterangan</td><td>Reviews</td></tr><tr><td><strong>Feed Instagram</strong></td><td>Foto grid (unggah/pilih dari Media Library), teks alt, tautan postingan, maksimal 12 foto</td><td>Socials</td></tr></tbody></table>
+<p>Cara kerjanya sama di ketiganya:</p>
+<ul><li>
+<strong>Tabel kosong = tampilan bawaan.</strong> Selama belum ada satu pun entri, homepage memakai statistik, ulasan, dan 12 foto bawaan situs. Tekan <strong>Salin ... bawaan</strong> untuk menyalinnya menjadi entri yang bisa diedit; tampilan homepage tetap sama persis.
+</li><li>
+<strong>Begitu ada entri, daftar admin menggantikan seluruh bawaan.</strong> Entri berstatus <strong>Draf</strong> tidak tampil. Bila semua entri draf, section tampil tanpa item dan halaman admin memberi peringatan. Terbitkan minimal satu entri, atau matikan section-nya di Section Homepage.
+</li><li>
+Tombol <strong>Terbitkan / Jadikan draf</strong> dan panah ↑/↓ mengatur tayang dan urutan. Perubahan terlihat di homepage dalam beberapa menit.
+</li><li>
+Feed Instagram: tautan postingan kosong berarti foto menuju profil Instagram (username dan URL profil diatur di Kontak &amp; Umum). Tautan harus berupa path internal atau alamat https://….
+</li><li>
+Ulasan: lokasi dan keterangan boleh kosong (barisnya tidak ditampilkan).
+</li></ul>
+<p>Teks tetap yang tidak bisa diubah dari admin: judul section “Reviews”, label “KAMA Journal” di kartu What’s New, serta teks pengantar Brand Intro (“A sanctuary in the heart of South Jakarta”, “More than relaxation …”, “KAMA at a glance”, tombol “Our Story”).</p>
+<h2 id="bab-homepage-footer-homepage">Footer homepage</h2>
+<p>Kartu <strong>Footer</strong> hanya punya tombol <strong>Aktif/Mati</strong>:</p>
+<ul><li>
+Mematikan footer hanya menyembunyikannya <strong>di halaman depan</strong>. Halaman lain tetap menampilkan footer.
+</li><li>
+Saat footer homepage mati, tombol “Subscribe to Newsletter” di What's New ikut disembunyikan karena tujuannya berada di footer.
+</li><li>
+Footer selalu berada di paling bawah halaman, jadi tidak punya panah urutan.
+</li><li>
+Bila kartu Footer belum ada, tekan <strong>Tambahkan Footer (aktif)</strong> di bagian Tambahkan section terlebih dahulu, lalu matikan bila perlu.
+</li></ul>
+<h2 id="bab-homepage-menyalakan-mematikan-dan-mengurutkan">Menyalakan, mematikan, dan mengurutkan</h2>
+<p>Di bagian kanan atas setiap kartu section terdapat:</p>
+<ul><li>
+Tombol status bertuliskan <strong>Aktif</strong> (hijau) atau <strong>Mati</strong> (abu-abu). Tombol ini menunjukkan keadaan section sekarang; menekannya akan membalik keadaan itu. Jadi section bertanda <strong>Aktif</strong> akan menjadi <strong>Mati</strong> setelah ditekan, dan sebaliknya.
+</li><li>
+Tombol panah naik dan panah turun untuk menukar posisi section dengan tetangganya. Section paling atas tidak bisa dinaikkan dan yang paling bawah tidak bisa diturunkan. Footer tidak punya panah karena posisinya tetap.
+</li></ul>
+<p>Section yang dimatikan tidak dirender sama sekali di halaman depan.</p>
+<p>Setiap perubahan di halaman ini langsung terlihat di halaman depan situs.</p>
+</section>
+<section class="chapter">
+<h1 id="bab-our-story" class="chapter-title">Bab 13. Our Story</h1>
+<p>Sub-halaman modul 10 (<strong>Homepage &amp; Our Story → Our Story</strong>). Boleh dikelola oleh ADMIN maupun EDITOR.</p>
+<p>Halaman admin: <code>/admin/our-story</code></p>
+<p>Hasilnya tampil di halaman publik <code>/our-story</code>.</p>
+<p>Halaman ini hanya satu, jadi tidak ada daftar, tombol tambah, atau tombol hapus. Ubah isinya lalu tekan <strong>Simpan</strong>.</p>
+<p>Bila Our Story <strong>belum pernah disimpan</strong>, form sudah terisi teks dan gambar bawaan yang sekarang tampil di situs, disertai pemberitahuan kuning. Menyimpan tanpa mengubah apa pun menghasilkan halaman yang sama.</p>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td>Judul hero</td><td>Ya</td><td>Judul besar di bagian atas halaman, juga teks alt gambar hero. Maksimal 160 karakter.</td></tr><tr><td>Gambar hero</td><td>Tidak</td><td>Unggah berkas atau <strong>Pilih dari Media Library</strong>. Tampil lebar rasio 16:9; disarankan minimal 1920×1080 px, di bawah 1 MB. Kosongkan untuk menyembunyikan gambar.</td></tr><tr><td>Filosofi</td><td>Tidak</td><td>Teks berformat di bagian “Philosophy — Cara kami bekerja”.</td></tr><tr><td>Nilai-nilai</td><td>Tidak</td><td>Teks berformat di bagian “Values — Yang kami pegang”.</td></tr><tr><td>SEO title</td><td>Tidak</td><td>Judul halaman di hasil pencarian. Idealnya maksimal 60 karakter. Kosong = “Our Story”.</td></tr><tr><td>SEO description</td><td>Tidak</td><td>Ringkasan di hasil pencarian. Idealnya maksimal 160 karakter. Kosong = deskripsi bawaan.</td></tr></tbody></table>
+<p>Hal yang perlu diperhatikan:</p>
+<ul><li>
+Judul hero wajib diisi; menyimpan dengan field ini kosong akan ditolak.
+</li><li>
+Gambar menerima format yang sama dengan Media Library (JPG, PNG, WebP, AVIF, GIF, maksimal 4 MB).
+</li><li>
+Teks berformat dibersihkan otomatis dari kode yang tidak aman. Field teks berformat yang dikosongkan membuat bagian tersebut tampil tanpa isi.
+</li><li>
+Teks pengantar di bawah judul, label “Philosophy”/“Values”, dan judul bagiannya masih teks tetap situs.
+</li><li>
+Bila halaman <code>/our-story</code> juga diatur di modul SEO, isian modul SEO yang dipakai untuk judul/deskripsi pencarian.
+</li><li>
+Bagian “Tulisan terbaru” di bawah halaman otomatis menampilkan 3 artikel Journal terbaru.
+</li><li>
+Artikel Journal memiliki modulnya sendiri meskipun alamat publiknya berada di bawah Our Story (<code>/our-story/journal</code>). Lihat <a href="#bab-journal">journal.md</a>.
+</li></ul>
+</section>
+<section class="chapter">
+<h1 id="bab-pages" class="chapter-title">Bab 14. Halaman &amp; URL</h1>
+<p>Modul <strong>Halaman &amp; URL</strong> pada menu samping. Dipakai untuk membuat halaman bebas (misalnya &quot;Kebijakan Pembatalan&quot; atau &quot;FAQ&quot;) tanpa bantuan programmer, dan untuk mengatur pengalihan alamat (redirect). Boleh dikelola oleh ADMIN maupun EDITOR.</p>
+<p>Halaman admin:</p>
+<ul><li>
+<code>/admin/pages</code> (daftar halaman)
+</li><li>
+<code>/admin/redirects</code> (daftar redirect 301)
+</li></ul>
+<p>Hasilnya tampil di halaman publik <code>/&lt;slug&gt;</code>, misalnya <code>kamaspa.id/faq</code>.</p>
+<h2 id="bab-pages-membuat-halaman-baru">Membuat halaman baru</h2>
+<ol><li>
+Buka <strong>Halaman &amp; URL</strong>, lalu tekan <strong>Tambah halaman</strong>.
+</li><li>
+Isi <strong>Judul halaman</strong>. Kolom <strong>Slug</strong> terisi otomatis dari judul.
+</li><li>
+Periksa alamat yang muncul di bawah kolom slug. Itulah alamat halaman setelah terbit.
+</li><li>
+Pilih <strong>Template</strong> dan tulis <strong>Isi halaman</strong>.
+</li><li>
+Pilih <strong>Status</strong>: <em>Draf</em> bila belum siap, <em>Terbit</em> bila siap tampil.
+</li><li>
+Tekan <strong>Simpan</strong>.
+</li></ol>
+<h2 id="bab-pages-arti-setiap-kolom">Arti setiap kolom</h2>
+<table><thead><tr><th>Kolom</th><th>Artinya</th></tr></thead><tbody><tr><td>Judul halaman</td><td>Judul besar di atas halaman. Wajib diisi.</td></tr><tr><td>Slug</td><td>Bagian akhir alamat halaman. Wajib diisi dan tidak boleh sama dengan halaman lain.</td></tr><tr><td>Template</td><td><strong>Standar</strong> untuk halaman informasi biasa. <strong>Dokumen legal</strong> untuk dokumen panjang seperti Kebijakan Privasi.</td></tr><tr><td>Status</td><td><strong>Draf</strong> = belum bisa dibuka pengunjung. <strong>Terbit</strong> = tampil di website dan masuk sitemap Google.</td></tr><tr><td>Isi halaman</td><td>Teks berformat (tebal, miring, judul, daftar, tautan, gambar).</td></tr><tr><td>Meta title</td><td>Judul yang tampil di hasil pencarian Google. Kosongkan untuk memakai judul halaman. Maksimal 70 karakter.</td></tr><tr><td>Meta description</td><td>Ringkasan di hasil pencarian Google. Maksimal 200 karakter; idealnya sekitar 160.</td></tr></tbody></table>
+<p>Penghitung di bawah kolom meta (mis. <code>45/70</code>) berubah merah bila melewati batas. Halaman tidak bisa disimpan sampai teksnya dipendekkan.</p>
+<h2 id="bab-pages-aturan-slug">Aturan slug</h2>
+<p>Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung (<code>-</code>). Tanda hubung tidak boleh di awal, di akhir, atau dobel. Panjang maksimal 80 karakter.</p>
+<table><thead><tr><th>Contoh</th><th>Boleh?</th><th>Alasan</th></tr></thead><tbody><tr><td><code>faq</code></td><td>Ya</td><td></td></tr><tr><td><code>kebijakan-pembatalan</code></td><td>Ya</td><td></td></tr><tr><td><code>promo-2026</code></td><td>Ya</td><td></td></tr><tr><td><code>Kebijakan Pembatalan</code></td><td>Tidak</td><td>Ada huruf besar dan spasi.</td></tr><tr><td><code>info/jam-buka</code></td><td>Tidak</td><td>Slug hanya satu bagian, tanpa garis miring.</td></tr><tr><td><code>-faq</code> atau <code>faq--baru</code></td><td>Tidak</td><td>Tanda hubung di awal atau dobel.</td></tr><tr><td><code>admin</code>, <code>api</code>, <code>promos</code>, <code>treatments</code></td><td>Tidak</td><td>Sudah dipakai sistem atau halaman lain yang ada.</td></tr></tbody></table>
+<p>Alamat yang sudah dipakai sistem atau menu website antara lain: <code>admin</code>, <code>api</code>, <code>contact</code>, <code>corporate</code>, <code>events</code>, <code>gallery</code>, <code>gift-card</code>, <code>membership</code>, <code>menu</code>, <code>our-story</code>, <code>privacy-policy</code>, <code>promos</code>, <code>retail</code>, <code>terms-conditions</code>, <code>treatments</code>, <code>sitemap</code>, dan <code>robots</code>. Bila slug bentrok, pesan merah langsung muncul di bawah kolom slug.</p>
+<h2 id="bab-pages-draf-dan-terbit">Draf dan terbit</h2>
+<ul><li>
+Halaman <strong>Draf</strong> bisa disimpan dan diubah berkali-kali tanpa terlihat pengunjung.
+</li><li>
+Saat pertama kali diubah ke <strong>Terbit</strong>, sistem mencatat tanggal terbitnya.
+</li><li>
+Halaman yang sudah terbit bisa dikembalikan ke <strong>Draf</strong> untuk disembunyikan sementara.
+</li></ul>
+<h2 id="bab-pages-mengubah-slug-halaman-yang-sudah-terbit">Mengubah slug halaman yang sudah terbit</h2>
+<p>Bila halaman pernah terbit lalu slug-nya diubah, muncul pemberitahuan kuning:</p>
+<blockquote>URL lama /lama akan dialihkan permanen (301) ke /baru setelah disimpan.</blockquote>
+<p>Setelah disimpan, sistem otomatis membuat <strong>redirect 301</strong> dari alamat lama ke alamat baru. Tautan lama yang sudah dibagikan di WhatsApp, Instagram, atau Google tetap berfungsi, dan peringkat Google ikut pindah ke alamat baru.</p>
+<p>Yang perlu diketahui:</p>
+<ul><li>
+Redirect lain yang menuju alamat lama ikut diarahkan langsung ke alamat baru.
+</li><li>
+Bila sebelumnya ada redirect (otomatis maupun manual) <strong>dari</strong> alamat baru, redirect itu dihapus karena halaman kini tinggal di alamat tersebut.
+</li><li>
+Mengembalikan slug ke nilai lama aman; sistem mencegah pengalihan berputar.
+</li><li>
+Halaman yang <strong>belum pernah terbit</strong> boleh diganti slug-nya tanpa redirect, karena belum ada yang mengetahui alamat lamanya.
+</li></ul>
+<h2 id="bab-pages-menghapus-halaman">Menghapus halaman</h2>
+<p>Buka halaman tersebut lalu tekan <strong>Hapus halaman ini</strong> di bagian bawah.</p>
+<ul><li>
+Alamat halaman akan menampilkan &quot;halaman tidak ditemukan&quot;.
+</li><li>
+Redirect yang menuju halaman itu ikut dihapus supaya pengunjung tidak dialihkan ke halaman kosong. Jumlahnya disebutkan setelah penghapusan.
+</li><li>
+Bila halaman sudah lama terbit dan banyak dikunjungi, sebaiknya tambahkan <strong>redirect manual</strong> dari alamatnya ke halaman lain yang relevan (lihat di bawah). Alternatif yang lebih aman: ubah status ke <strong>Draf</strong> alih-alih menghapus.
+</li></ul>
+<h2 id="bab-pages-mengelola-redirect-manual">Mengelola redirect manual</h2>
+<p>Buka <strong>Halaman &amp; URL → Redirect 301</strong> (<code>/admin/redirects</code>).</p>
+<ol><li>
+Isi <strong>URL asal</strong>, misalnya <code>/promo-lebaran-2025</code>.
+</li><li>
+Isi <strong>URL tujuan</strong>: path di website ini (mis. <code>/promos</code>) atau alamat lengkap yang diawali <code>https://</code>.
+</li><li>
+Pilih <strong>Jenis</strong>: <em>301 — permanen</em> untuk pindah selamanya, <em>302 — sementara</em> bila alamat lama akan dipakai lagi.
+</li><li>
+Isi <strong>Catatan</strong> (opsional) sebagai pengingat alasan redirect.
+</li><li>
+Tekan <strong>Tambah redirect</strong>.
+</li></ol>
+<p>Di daftar, label <strong>Otomatis</strong> menandai redirect buatan sistem (dari perubahan slug), sedangkan <strong>Manual</strong> adalah redirect yang ditambahkan tim. Keduanya bisa dihapus dengan tombol <strong>Hapus</strong>.</p>
+<p>Aturan redirect manual:</p>
+<ul><li>
+URL asal harus diawali <code>/</code> dan tidak boleh halaman utama <code>/</code>, <code>/admin</code>, <code>/api</code>, atau <code>/_next</code>.
+</li><li>
+Satu URL asal hanya boleh punya satu redirect.
+</li><li>
+URL asal tidak boleh alamat halaman yang sedang <strong>Terbit</strong>, karena redirect akan menyembunyikan halaman itu.
+</li><li>
+Redirect yang membuat putaran (A → B lalu B → A) ditolak.
+</li><li>
+Huruf besar, garis miring di akhir, dan bagian <code>?…</code> pada URL asal diabaikan: <code>/Promo-Lama/</code> disimpan sebagai <code>/promo-lama</code>.
+</li></ul>
+<h2 id="bab-pages-mengatasi-masalah">Mengatasi masalah</h2>
+<table><thead><tr><th>Masalah</th><th>Penyebab dan solusi</th></tr></thead><tbody><tr><td>&quot;Slug sudah dipakai halaman lain.&quot;</td><td>Ada halaman lain dengan slug yang sama. Pilih slug lain atau ubah halaman yang lama.</td></tr><tr><td>Pesan &quot;bentrok dengan alamat sistem&quot;</td><td>Slug sama dengan menu atau alamat bawaan website. Tambahkan kata lain, mis. <code>faq-spa</code>.</td></tr><tr><td>Halaman tidak bisa dibuka pengunjung</td><td>Pastikan status <strong>Terbit</strong> dan sudah disimpan.</td></tr><tr><td>Alamat lama masih membuka halaman lama</td><td>Pengalihan aktif paling lambat 30 detik setelah disimpan. Tunggu sebentar, lalu muat ulang dengan Ctrl+Shift+R.</td></tr><tr><td>&quot;Redirect ini membentuk putaran…&quot;</td><td>Ada redirect lain yang mengarah balik ke URL asal. Periksa daftar redirect dan hapus salah satunya.</td></tr><tr><td>Redirect manual hilang setelah membuat halaman</td><td>Halaman yang terbit di alamat itu merebut kembali alamatnya; redirect lama dihapus otomatis.</td></tr></tbody></table>
+</section>
+<section class="chapter">
+<h1 id="bab-menu" class="chapter-title">Bab 15. Menu Navigasi</h1>
+<p>Modul 11 pada menu samping. Boleh dikelola oleh ADMIN maupun EDITOR.</p>
+<p>Halaman admin: <code>/admin/menu</code></p>
+<p>Modul ini mengatur tiga tempat sekaligus: <strong>menu header</strong> (desktop), <strong>menu ponsel</strong> (mobile), dan <strong>footer</strong>. Struktur menu boleh sampai <strong>3 level</strong>: menu utama → sub-menu → sub-sub-menu.</p>
+<h2 id="bab-menu-tata-letak-halaman">Tata letak halaman</h2>
+<ul><li>
+<strong>Kiri — pohon menu.</strong> Setiap baris menampilkan label, jenis tautan, lokasi (Header/Mobile/Footer), dan penanda bila perlu: <strong>Tersembunyi</strong>, <strong>Tab baru</strong>, atau <strong>Tujuan hilang</strong> (halaman tujuan sudah dihapus atau belum terbit — item ini otomatis tidak tampil di situs).
+</li><li>
+<strong>Kanan — pratinjau.</strong> Tab <strong>Header</strong>, <strong>Mobile</strong>, dan <strong>Footer</strong> memperlihatkan hasil susunan sebelum disimpan.
+</li></ul>
+<h2 id="bab-menu-menambah-menu-utama">Menambah menu utama</h2>
+<ol><li>
+Buka <strong>Menu Navigasi</strong>.
+</li><li>
+Tekan <strong>+ Tambah menu utama</strong>.
+</li><li>
+Isi formulir lalu tekan <strong>Tambah</strong>.
+</li></ol>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td>Label</td><td>Ya</td><td>Tulisan yang terlihat pengunjung, contoh: Treatments.</td></tr><tr><td>Tipe tautan</td><td>Ya</td><td>Lihat tabel jenis tautan di bawah.</td></tr><tr><td>Halaman tujuan / Alamat</td><td>Tergantung tipe</td><td>Muncul sesuai tipe yang dipilih.</td></tr><tr><td>Buka di</td><td>Tidak</td><td><strong>Tab yang sama</strong> (bawaan) atau <strong>Tab baru</strong> — tab baru cocok untuk situs luar.</td></tr><tr><td>Tampilkan di situs</td><td>Tidak (bawaan aktif)</td><td>Hilangkan centang untuk menyembunyikan item tanpa menghapusnya.</td></tr><tr><td>Lokasi</td><td>Ya (menu utama saja)</td><td>Centang <strong>Header</strong>, <strong>Mobile</strong>, dan/atau <strong>Footer</strong>. Sub-menu selalu mengikuti lokasi menu utamanya. Di footer, menu utama menjadi judul grup dan sub-menunya menjadi daftar tautan.</td></tr><tr><td>Pengaturan mega menu header</td><td>Tidak</td><td>Hanya untuk menu utama: teks tautan &quot;lihat semua&quot; di bawah panel, dan <strong>Kunci panel</strong> (kunci teknis kartu promo bergambar — biarkan apa adanya bila ragu).</td></tr></tbody></table>
+<h3 id="bab-menu-jenis-tautan">Jenis tautan</h3>
+<table><thead><tr><th>Tipe</th><th>Kapan dipakai</th><th>Contoh</th></tr></thead><tbody><tr><td><strong>Halaman</strong></td><td>Pilih halaman dari modul Halaman &amp; URL. Bila slug halaman diubah, menu ikut berubah otomatis. <strong>Disarankan.</strong></td><td>Our Story</td></tr><tr><td><strong>URL internal</strong></td><td>Alamat di situs ini, diawali <code>/</code>.</td><td><code>/treatments</code></td></tr><tr><td><strong>URL eksternal</strong></td><td>Situs lain, email, atau telepon.</td><td><code>https://www.fresha.com/…</code>, <code>mailto:hello@kamaspa.id</code></td></tr><tr><td><strong>Anchor</strong></td><td>Bagian tertentu di sebuah halaman.</td><td><code>/menu#packages</code></td></tr><tr><td><strong>Tanpa tautan</strong></td><td>Hanya judul, tidak bisa diklik — cocok untuk judul kolom mega menu.</td><td>Signature</td></tr></tbody></table>
+<h2 id="bab-menu-menambah-sub-menu">Menambah sub-menu</h2>
+<ol><li>
+Pada baris induk, tekan <strong>+ Tambah Sub-menu</strong>.
+</li><li>
+Isi formulir seperti di atas (tanpa pilihan lokasi), lalu tekan <strong>Tambah</strong>.
+</li></ol>
+<p>Tombol <strong>+ Tambah Sub-menu</strong> tidak aktif pada item level 3, karena menu paling dalam hanya 3 level.</p>
+<h2 id="bab-menu-mengubah-susunan-seret-lepas">Mengubah susunan (seret &amp; lepas)</h2>
+<ol><li>
+Seret item dengan pegangan di sisi kiri baris.
+<ul><li>
+Lepas di <strong>tengah</strong> item lain untuk menjadikannya sub-menu item tersebut.
+</li><li>
+Lepas di <strong>tepi atas/bawah</strong> untuk menyisipkan di antara item.
+</li><li>
+Atau pakai tombol panah <strong>↑ / ↓</strong> untuk menukar dengan tetangga.
+</li></ul>
+</li><li>
+Muncul pesan &quot;Susunan menu berubah. Periksa pratinjau, lalu simpan.&quot;
+</li><li>
+Periksa tab pratinjau, lalu tekan <strong>Simpan susunan</strong>. Tekan <strong>Batal</strong> untuk kembali ke susunan terakhir yang tersimpan.
+</li></ol>
+<p>Selama ada susunan yang belum disimpan, tombol Tambah/Ubah dinonaktifkan agar perubahan tidak tercampur. Sistem menolak susunan yang melebihi 3 level atau membuat item menjadi anak dari dirinya sendiri.</p>
+<h2 id="bab-menu-mengubah-item">Mengubah item</h2>
+<p>Tekan <strong>Ubah</strong> pada baris item, perbaiki isinya, lalu tekan <strong>Simpan perubahan</strong>.</p>
+<h2 id="bab-menu-menghapus-item-menu">Menghapus item menu</h2>
+<p>Tekan <strong>Hapus</strong> pada baris item dan konfirmasi.</p>
+<p><strong>Perhatian: menghapus item menu ikut menghapus seluruh sub-menu di bawahnya.</strong> Pesan konfirmasi menyebut jumlah sub-menu yang ikut terhapus. Bila hanya ingin menyembunyikan sementara, hilangkan centang <strong>Tampilkan di situs</strong>.</p>
+<p>Menghapus item menu tidak menghapus halaman yang dituju. Halaman tersebut tetap ada dan tetap bisa dibuka lewat alamatnya langsung.</p>
+</section>
+<section class="chapter">
+<h1 id="bab-settings" class="chapter-title">Bab 16. Kontak, Jam Buka, dan Template WhatsApp</h1>
+<p>Modul 12 pada menu samping (<strong>Kontak &amp; Umum</strong>), dengan sub-halaman <strong>Template WhatsApp</strong>. <strong>Hanya bisa dibuka oleh pemegang role ADMIN</strong> — satu salah isi memengaruhi semua tombol WhatsApp/booking di seluruh situs.</p>
+<p>Halaman admin:</p>
+<ul><li>
+Informasi kontak: <code>/admin/settings/contact</code>
+</li><li>
+Template WhatsApp: <code>/admin/settings/whatsapp</code>
+</li></ul>
+<p>Hasilnya tampil di halaman publik <code>/contact</code>, serta di bagian footer dan tombol-tombol kontak di seluruh halaman situs.</p>
+<h2 id="bab-settings-bagian-1-informasi-kontak-dan-umum">Bagian 1 — Informasi kontak dan umum</h2>
+<p>Halaman ini hanya satu. Ubah isinya lalu tekan <strong>Simpan</strong>; perubahan langsung tampil di situs tanpa perlu deploy ulang. Bila muncul kotak kuning, artinya sebagian field belum pernah disimpan dan form diisi dengan nilai yang saat ini tampil di situs — cukup tekan <strong>Simpan</strong> untuk menyimpannya.</p>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th><th>Tampil di</th></tr></thead><tbody><tr><td>Alamat</td><td>Ya</td><td>Alamat cabang utama (South Jakarta). Tautan <strong>Dapatkan Rute</strong> ikut menyesuaikan.</td><td>Kartu cabang utama &amp; popup peta di <code>/contact</code></td></tr><tr><td>Jam operasional</td><td>Ya (min. 1 baris)</td><td>Satu baris per jadwal, contoh &quot;Mon – Sun. 10 AM – 8 PM&quot;. Gunakan <strong>+ Tambah baris</strong>, <strong>↑/↓</strong> untuk mengubah urutan, dan <strong>Hapus</strong>. Baris kosong diabaikan.</td><td>Semua kartu cabang di <code>/contact</code></td></tr><tr><td>Google Maps embed</td><td>Tidak</td><td>Di Google Maps pilih Share → Embed a map. Tempel URL-nya atau seluruh kode <code>&lt;iframe&gt;</code>; sistem hanya menyimpan alamat <code>https://www.google.com/maps/embed?…</code>. Kosongkan bila peta sematan tidak ingin ditampilkan.</td><td>Peta Google di bawah kartu cabang <code>/contact</code> (hanya bila diisi)</td></tr><tr><td>Nomor WhatsApp booking</td><td>Ya</td><td>Boleh ditulis <code>08xx</code> atau <code>+62xx</code>; otomatis disimpan sebagai <code>628xx</code> (8–15 digit).</td><td>Tombol &amp; nomor WhatsApp di kartu cabang <code>/contact</code>, tombol <strong>Join KAMA Now</strong> di footer, tombol pesan produk Retail</td></tr><tr><td>Email</td><td>Ya</td><td>Harus berformat email yang benar.</td><td>Ikon email &quot;Connect with us&quot; di footer</td></tr><tr><td>Telepon</td><td>Tidak</td><td>Nomor telepon biasa (bukan WhatsApp).</td><td>Belum ditampilkan</td></tr><tr><td>Instagram</td><td>Tidak</td><td>Alamat lengkap <code>https://www.instagram.com/…</code>.</td><td>Ikon footer, bagian Instagram di beranda</td></tr><tr><td>Username Instagram</td><td>Tidak</td><td>Tanpa <code>@</code>; hanya huruf, angka, titik, garis bawah (maks. 30). Bila kosong, diambil dari alamat Instagram.</td><td>Teks <code>@username</code> di bagian Instagram beranda</td></tr><tr><td>TikTok</td><td>Tidak</td><td>Alamat lengkap <code>https://www.tiktok.com/…</code>.</td><td>Ikon footer</td></tr><tr><td>Facebook</td><td>Tidak</td><td>Alamat lengkap <code>https://www.facebook.com/…</code>.</td><td>Ikon footer (hanya bila diisi)</td></tr><tr><td>Fresha</td><td>Tidak</td><td>Alamat halaman booking <code>https://www.fresha.com/…</code>.</td><td>Tombol <strong>Booking via Fresha</strong> di kartu cabang utama (hanya bila diisi)</td></tr><tr><td>GA4 Measurement ID</td><td>Tidak</td><td>Format <code>G-XXXXXXXXXX</code> (Google Analytics → Admin → Data streams).</td><td>Saat ini hanya disimpan; pemasangan Google Analytics menyusul</td></tr></tbody></table>
+<p>Catatan:</p>
+<ul><li>
+Field opsional yang dikosongkan tidak lagi ditampilkan di situs.
+</li><li>
+Field wajib tidak bisa dikosongkan, supaya situs tidak pernah kehilangan alamat, jam buka, atau tombol WhatsApp.
+</li><li>
+Email kolaborasi &amp; partnership (<code>marketing@kamaspa.id</code>) di footer tidak diatur dari halaman ini.
+</li><li>
+Karena nomor WhatsApp dipakai oleh tombol chat, periksa dua kali sebelum mengubahnya.
+</li></ul>
+<h2 id="bab-settings-bagian-2-template-whatsapp">Bagian 2 — Template WhatsApp</h2>
+<p>Template adalah teks yang otomatis sudah terisi di kolom chat ketika pengunjung menekan tombol WhatsApp. Template dipakai bila konten yang bersangkutan (treatment, promo, package, produk retail) tidak punya <strong>Pesan WhatsApp khusus</strong> sendiri.</p>
+<h3 id="bab-settings-menambah-atau-mengubah-template">Menambah atau mengubah template</h3>
+<ol><li>
+Buka <strong>Kontak &amp; Umum → Template WhatsApp</strong>.
+</li><li>
+Tekan <strong>+ Tambah template</strong>, atau pilih template yang sudah ada.
+</li><li>
+Isi formulir lalu tekan <strong>Tambah template</strong> / <strong>Simpan template</strong>.
+</li></ol>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td>Key</td><td>Ya</td><td>Kode pengenal template. Hanya huruf kecil, angka, dan tanda hubung. Harus unik; bila sudah dipakai muncul pesan kesalahan.</td></tr><tr><td>Label</td><td>Ya</td><td>Nama template dalam bahasa manusia, untuk memudahkan Anda mengenalinya.</td></tr><tr><td>Pesan</td><td>Ya</td><td>Isi pesan. Boleh memuat placeholder yang ditulis seperti <code>{{nama}}</code>.</td></tr></tbody></table>
+<p>Penting mengenai <strong>Key</strong>: kode ini dipakai oleh halaman-halaman situs untuk mencari template yang tepat. Mengubah key sebuah template yang sudah dipakai dapat membuat tombol WhatsApp di halaman tertentu kehilangan teks bawaannya. Bila ragu, ubah hanya field <strong>Pesan</strong> dan biarkan key apa adanya, atau tanyakan ke tim pengembang.</p>
+<h3 id="bab-settings-menghapus-template">Menghapus template</h3>
+<p>Tersedia tombol hapus per template. Penghapusan bersifat permanen. Setelah dihapus, halaman yang memakai key tersebut tidak lagi menemukan teks bawaannya.</p>
+</section>
+<section class="chapter">
+<h1 id="bab-whatsapp" class="chapter-title">Bab 17. Template Pesan WhatsApp</h1>
+<p>Sub-halaman <strong>Template WhatsApp</strong> di modul <strong>Kontak &amp; Umum</strong> (<code>/admin/settings/whatsapp</code>). Hak akses mengikuti modul Kontak &amp; Umum.</p>
+<p>Semua tombol WhatsApp di website memakai <em>click-to-chat</em> (<code>https://wa.me/…</code>): tamu langsung masuk ke aplikasi WhatsApp dengan pesan awal yang sudah terisi. Tidak ada API berbayar.</p>
+<h2 id="bab-whatsapp-nomor-tujuan">Nomor tujuan</h2>
+<p>Nomor diambil dari <strong>Kontak &amp; Umum → Nomor WhatsApp</strong>. Format bebas (<code>0813-…</code>, <code>+62 813 …</code>); otomatis diubah menjadi <code>62…</code>. Bila kosong atau tidak valid, website memakai nomor bawaan KAMA Spa. Halaman template menampilkan nomor yang sedang dipakai.</p>
+<h2 id="bab-whatsapp-konteks-dan-placeholder">Konteks dan placeholder</h2>
+<table><thead><tr><th>Konteks</th><th>Dipakai di</th><th>Placeholder</th></tr></thead><tbody><tr><td><code>default</code> — Reservasi umum</td><td>Tombol WhatsApp melayang, tombol WhatsApp di menu mobile</td><td>—</td></tr><tr><td><code>treatment</code></td><td>Halaman detail treatment, kartu treatment</td><td><code>{{treatment}}</code>, <code>{{category}}</code></td></tr><tr><td><code>package</code></td><td>Halaman detail paket, kartu paket</td><td><code>{{package}}</code>, <code>{{price}}</code>, <code>{{duration}}</code></td></tr><tr><td><code>promo</code></td><td>Tombol &quot;Tanya Promo via WhatsApp&quot;</td><td><code>{{promo}}</code></td></tr><tr><td><code>gift</code></td><td>Tombol &quot;Pesan via WhatsApp&quot; di Gift Card</td><td><code>{{giftCard}}</code></td></tr><tr><td><code>membership</code></td><td>Tombol &quot;Join KAMA Now&quot; / &quot;Join Now&quot;</td><td>—</td></tr><tr><td><code>retail</code></td><td>Tombol &quot;Pesan via WhatsApp&quot; di Retail</td><td><code>{{product}}</code>, <code>{{price}}</code></td></tr></tbody></table>
+<p>Placeholder yang nilainya kosong (mis. paket tanpa durasi) dihapus rapi dari pesan. Placeholder lain di luar daftar ditolak saat menyimpan. Panjang pesan maksimal 1.000 karakter.</p>
+<h2 id="bab-whatsapp-urutan-prioritas-pesan">Urutan prioritas pesan</h2>
+<ol><li>
+<strong>Pesan WhatsApp khusus</strong> yang diisi di treatment, paket, promo, gift card, atau produk retail.
+</li><li>
+<strong>Template konteks</strong> di halaman ini.
+</li><li>
+<strong>Teks bawaan</strong> konteks (pesan yang dipakai website sejak awal).
+</li></ol>
+<p>Konteks yang belum tersimpan ditandai &quot;Belum tersimpan — memakai teks bawaan&quot;. Tekan <strong>Tambahkan template bawaan</strong> untuk membuat semuanya sekaligus. Template sistem tidak bisa dihapus; gunakan <strong>Kembalikan teks bawaan</strong> untuk mengembalikan isinya.</p>
+<h2 id="bab-whatsapp-pratinjau">Pratinjau</h2>
+<p>Setiap template menampilkan pratinjau pesan dengan contoh nilai dan tautan <code>wa.me</code> lengkap. Klik tautan untuk mencoba langsung. Perubahan tampil di website begitu disimpan, tanpa deploy ulang.</p>
+</section>
+<section class="chapter">
+<h1 id="bab-seo" class="chapter-title">Bab 18. SEO</h1>
+<p>Modul 13 pada menu samping. Boleh dikelola oleh ADMIN maupun EDITOR.</p>
+<p>Halaman admin: <code>/admin/seo</code> dan <code>/admin/seo/settings</code></p>
+<p>Modul ini mengatur bagaimana situs tampil di hasil pencarian Google dan saat tautannya dibagikan di WhatsApp/media sosial: <strong>meta title</strong>, <strong>meta description</strong>, <strong>gambar OG</strong> (gambar pratinjau tautan), <strong>favicon</strong>, dan <strong>verifikasi Google Search Console</strong>. Semua perubahan langsung berlaku di situs tanpa perlu deploy ulang.</p>
+<h2 id="bab-seo-daftar-halaman">Daftar halaman</h2>
+<p><code>/admin/seo</code> menampilkan <strong>semua halaman publik</strong>, dikelompokkan:</p>
+<ul><li>
+<strong>Halaman tetap</strong> — Beranda, Treatments, Menu, Promos, Membership, Corporate, Our Story, Journal, Gallery, Events, Retail, Gift Card, Contact, Privacy Policy, Terms &amp; Conditions.
+</li><li>
+<strong>Konten dari database</strong> — kategori treatment, treatment, package, artikel journal, event, promo, dan halaman dari modul Halaman &amp; URL.
+</li></ul>
+<p>Setiap baris menunjukkan judul dan ringkasan yang <strong>benar-benar dipakai</strong>, beserta sumbernya:</p>
+<table><thead><tr><th>Penanda</th><th>Arti</th></tr></thead><tbody><tr><td>Entri SEO</td><td>Diatur di modul SEO ini.</td></tr><tr><td>SEO konten</td><td>Diambil dari field SEO di modul kontennya.</td></tr><tr><td>Dari nama/ringkasan</td><td>Field SEO konten kosong, jadi memakai nama dan ringkasan konten.</td></tr><tr><td>Bawaan halaman</td><td>Belum diatur; memakai teks bawaan halaman.</td></tr><tr><td>Tidak tayang</td><td>Draf/nonaktif — tidak muncul di situs maupun sitemap.</td></tr><tr><td>Title panjang / Desc panjang</td><td>Lebih dari 60 / 160 karakter; kemungkinan dipotong Google.</td></tr><tr><td>URL kurang ramah SEO</td><td>Alamat memuat huruf besar/garis bawah. Ganti slug-nya di modul konten.</td></tr><tr><td>Entri SEO menimpa SEO konten</td><td>Ada entri SEO di modul ini untuk halaman konten. Sebaiknya dihapus dan diatur di modul kontennya.</td></tr></tbody></table>
+<h2 id="bab-seo-halaman-tetap-mengatur-meta-gambar-og">Halaman tetap: mengatur meta &amp; gambar OG</h2>
+<ol><li>
+Pada baris halaman, tekan <strong>Atur meta &amp; gambar OG</strong> (atau <strong>Ubah entri SEO</strong> bila sudah ada).
+</li><li>
+Isi field lalu tekan <strong>Simpan</strong>.
+</li></ol>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td>Path</td><td>Ya</td><td>Alamat halaman, diawali <code>/</code>, contoh <code>/contact</code>. Satu path satu entri.</td></tr><tr><td>Meta title</td><td>Tidak</td><td>Judul di hasil pencarian. Akhiran “ • KAMA Spa” ditambahkan otomatis, kecuali judul sudah memuat “KAMA Spa”. Idealnya total ≤ 60 karakter.</td></tr><tr><td>Meta description</td><td>Tidak</td><td>Ringkasan di hasil pencarian, idealnya 70–160 karakter.</td></tr><tr><td>Gambar OG</td><td>Tidak</td><td>Gambar saat tautan dibagikan, ideal 1200×630 piksel.</td></tr></tbody></table>
+<p>Formulir menampilkan jumlah karakter dan <strong>pratinjau hasil pencarian</strong>. Field yang dikosongkan tidak menimpa apa pun: halaman memakai teks bawaannya. Untuk menghapus entri, buka entrinya lalu tekan tautan hapus di bawah formulir.</p>
+<h2 id="bab-seo-konten-treatment-artikel-event-promo-halaman">Konten: treatment, artikel, event, promo, halaman</h2>
+<p>Konten ini punya field <strong>SEO title</strong> dan <strong>SEO description</strong> sendiri di modulnya. Tekan <strong>Edit SEO di editor …</strong> pada barisnya untuk membuka editor konten tersebut. Bila field SEO konten kosong, nama dan ringkasan konten yang dipakai. Gambar OG-nya otomatis memakai gambar sampul/banner konten.</p>
+<p>Our Story punya dua tempat: field SEO di modul Our Story, dan entri SEO di sini (entri SEO di sini yang menang bila keduanya diisi).</p>
+<h2 id="bab-seo-favicon-gambar-og-bawaan-search-console">Favicon, gambar OG bawaan &amp; Search Console</h2>
+<p>Buka <strong>Favicon, OG &amp; Search Console</strong> (<code>/admin/seo/settings</code>).</p>
+<ul><li>
+<strong>Favicon</strong> — unggah <strong>PNG persegi, disarankan 512×512 piksel</strong>. Format <code>.ico</code> tidak bisa diunggah. Kosongkan untuk kembali ke favicon bawaan. Browser sering menyimpan favicon lama; muat ulang dengan Ctrl/Cmd + Shift + R.
+</li><li>
+<strong>Gambar OG bawaan</strong> — dipakai saat halaman tidak punya gambar sendiri. Ideal 1200×630 piksel, JPG/PNG, di bawah 1 MB.
+</li><li>
+<strong>Verifikasi Google Search Console</strong> — lihat langkah di bawah.
+</li></ul>
+<h3 id="bab-seo-langkah-verifikasi-google-search-console">Langkah verifikasi Google Search Console</h3>
+<ol><li>
+Buka <a href="https://search.google.com/search-console" rel="noopener">Google Search Console</a>, masuk dengan akun Google bisnis.
+</li><li>
+<strong>Tambah properti</strong> → pilih <strong>Awalan URL</strong> → isi alamat situs, mis. <code>https://kamaspa.id</code>.
+</li><li>
+Pilih metode <strong>Tag HTML</strong>, salin tag <code>&lt;meta name=&quot;google-site-verification&quot; content=&quot;…&quot; /&gt;</code>.
+</li><li>
+Tempel tag tersebut (atau kodenya saja) di kolom <strong>Verifikasi Google Search Console</strong>, lalu <strong>Simpan</strong>.
+</li><li>
+Kembali ke Search Console dan tekan <strong>Verifikasi</strong>. Jangan hapus kode ini setelah berhasil — Google memeriksanya berkala.
+</li><li>
+Di menu <strong>Sitemap</strong> Search Console, kirim <code>https://kamaspa.id/sitemap.xml</code>. Cukup sekali; sitemap diperbarui otomatis.
+</li></ol>
+<p>Kode berawalan <code>google-site-verification=</code> adalah untuk metode DNS (record TXT di pengelola domain) dan akan ditolak — gunakan metode Tag HTML.</p>
+<h2 id="bab-seo-sitemap-robots">Sitemap &amp; robots</h2>
+<ul><li>
+<strong><code>/sitemap.xml</code></strong> dibuat otomatis dari database: halaman tetap ditambah kategori, treatment, package, artikel journal terbit, event terbit, promo aktif, dan halaman terbit. Tanggal perubahan terakhir diambil dari waktu konten terakhir disimpan. Konten draf/kedaluwarsa tidak dimasukkan.
+</li><li>
+<strong><code>/robots.txt</code></strong> mengizinkan semua halaman publik, memblokir <code>/admin</code> dan <code>/api</code>, dan menunjuk ke sitemap. Di server staging/preview seluruh situs otomatis diblokir dari mesin pencari.
+</li></ul>
+</section>
+<section class="chapter">
+<h1 id="bab-users" class="chapter-title">Bab 19. Pengguna Admin</h1>
+<p>Modul 14 pada menu samping. <strong>Hanya bisa dibuka oleh pemegang role ADMIN.</strong> EDITOR tidak melihat modul ini di menu samping, dan bila mencoba membuka alamatnya akan dikembalikan ke dashboard dengan peringatan.</p>
+<p>Halaman admin: <code>/admin/users</code></p>
+<p>Modul ini tidak memengaruhi halaman publik sama sekali.</p>
+<h2 id="bab-users-daftar-akun">Daftar akun</h2>
+<p>Daftar menampilkan setiap akun beserta email, nama, role, status aktif, waktu login terakhir, dan keterangan bila akun sedang terkunci.</p>
+<h2 id="bab-users-menambah-akun">Menambah akun</h2>
+<ol><li>
+Buka <strong>Pengguna Admin</strong>.
+</li><li>
+Tekan <strong>Tambah akun</strong>.
+</li><li>
+Isi formulir lalu tekan <strong>Tambah akun</strong>.
+</li></ol>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td>Email</td><td>Ya</td><td>Harus berformat email yang benar dan belum dipakai akun lain. Dipakai untuk login dan tidak bisa diubah setelah akun dibuat.</td></tr><tr><td>Nama lengkap</td><td>Ya</td><td>Nama pemilik akun.</td></tr><tr><td>Role</td><td>Ya</td><td><strong>EDITOR</strong> untuk mengelola konten, <strong>ADMIN</strong> untuk akses penuh termasuk modul ini.</td></tr><tr><td>Kata sandi awal</td><td>Tidak</td><td>Kosongkan agar sistem membuatkan kata sandi acak. Bila diisi sendiri: minimal 12 karakter dan tidak boleh sama dengan alamat email.</td></tr></tbody></table>
+<p>Bila kata sandi dibuatkan sistem, kata sandi itu <strong>ditampilkan satu kali</strong> di layar setelah akun dibuat. Salin saat itu juga — setelah Anda pindah halaman, kata sandi tersebut tidak bisa ditampilkan lagi (sistem hanya menyimpan bentuk teracaknya). Bila terlewat, cukup reset kata sandinya.</p>
+<p>Sampaikan kata sandi awal kepada pemilik akun lewat jalur terpisah (misalnya pesan langsung), jangan lewat email yang sama dengan alamat login.</p>
+<p>Akun baru langsung berstatus aktif. Saat pertama kali masuk, pemilik akun <strong>wajib mengganti kata sandi awal</strong> dengan kata sandi miliknya sendiri; semua halaman dashboard lain tertutup sampai langkah ini selesai. Dengan begitu kata sandi yang Anda ketahui tidak bisa dipakai lagi setelahnya.</p>
+<h2 id="bab-users-mengubah-akun">Mengubah akun</h2>
+<p>Klik akun pada daftar untuk membuka halaman ubah. Yang bisa diubah:</p>
+<table><thead><tr><th>Field</th><th>Keterangan</th></tr></thead><tbody><tr><td>Nama lengkap</td><td>Wajib diisi.</td></tr><tr><td>Role</td><td>ADMIN atau EDITOR. Role akun Anda sendiri tidak bisa diubah.</td></tr><tr><td>Status aktif</td><td>Akun nonaktif tidak bisa login.</td></tr></tbody></table>
+<p>Alamat email tidak bisa diubah dari dashboard.</p>
+<p>Mengubah role atau status aktif langsung mengeluarkan akun tersebut dari dashboard di semua perangkat. Pemiliknya akan melihat pesan &quot;Sesi Anda berakhir&quot; dan perlu masuk lagi (bila akunnya masih aktif).</p>
+<h3 id="bab-users-pengaman-yang-berlaku">Pengaman yang berlaku</h3>
+<ul><li>
+Anda tidak bisa menurunkan role akun Anda sendiri dari ADMIN ke EDITOR.
+</li><li>
+Anda tidak bisa menonaktifkan akun Anda sendiri.
+</li><li>
+Sistem selalu menjaga agar <strong>minimal ada satu akun ADMIN yang aktif</strong>. Bila perubahan Anda akan menghilangkan ADMIN aktif terakhir, perubahan ditolak dengan pesan yang meminta Anda menaikkan atau mengaktifkan akun lain lebih dahulu.
+</li></ul>
+<h2 id="bab-users-mereset-kata-sandi">Mereset kata sandi</h2>
+<p>Di halaman ubah akun terdapat bagian <strong>Reset kata sandi</strong>. Kosongkan kolom kata sandi agar sistem membuatkan kata sandi acak yang ditampilkan sekali, atau isi sendiri (minimal 12 karakter), lalu tekan <strong>Reset kata sandi</strong>.</p>
+<p>Mereset kata sandi sekaligus:</p>
+<ul><li>
+menghapus hitungan percobaan login gagal dan membuka kunci akun;
+</li><li>
+mengeluarkan akun tersebut dari semua perangkat yang sedang masuk;
+</li><li>
+mewajibkan pemilik akun mengganti kata sandi itu saat masuk berikutnya.
+</li></ul>
+<p>Fitur reset ini tidak bisa dipakai untuk akun Anda sendiri. Untuk akun sendiri, gunakan <strong>Ganti kata sandi</strong> (lihat di bawah).</p>
+<h2 id="bab-users-mengganti-kata-sandi-sendiri">Mengganti kata sandi sendiri</h2>
+<p>Berlaku untuk semua akun, ADMIN maupun EDITOR.</p>
+<ol><li>
+Tekan <strong>Ganti kata sandi</strong> di bawah nama Anda pada menu samping (di layar ponsel: tautan <strong>Kata sandi</strong> di bagian atas).
+</li><li>
+Isi kata sandi saat ini, kata sandi baru (minimal 12 karakter, harus berbeda dari yang lama dan tidak sama dengan alamat email), dan ulangi kata sandi baru.
+</li><li>
+Tekan <strong>Simpan kata sandi</strong>.
+</li></ol>
+<p>Setelah berhasil, Anda tetap masuk di perangkat yang sedang dipakai, tetapi perangkat lain yang masih masuk dengan akun Anda otomatis keluar.</p>
+<p>Salah memasukkan kata sandi saat ini 5 kali dalam 15 menit membuat formulir ini menolak percobaan berikutnya sampai 15 menit berlalu.</p>
+<p>Lupa kata sandi? Minta pemegang ADMIN lain untuk mereset akun Anda. Bila tidak ada ADMIN lain, hubungi tim teknis.</p>
+<h2 id="bab-users-membuka-akun-yang-terkunci">Membuka akun yang terkunci</h2>
+<p>Akun yang salah memasukkan kata sandi sebanyak 5 kali akan terkunci selama 15 menit. Kunci tersebut hilang sendiri setelah 15 menit.</p>
+<p>Bila pemilik akun tidak bisa menunggu, pemegang ADMIN dapat menekan tombol <strong>Buka kunci</strong> pada baris akun tersebut di daftar akun. Hitungan percobaan gagal dikembalikan ke nol.</p>
+<p>Selain itu, satu jaringan (alamat IP) hanya boleh mencoba masuk 10 kali dalam 15 menit, terhadap akun mana pun. Batas ini tidak bisa dibuka dari dashboard; tunggu hingga 15 menit berlalu.</p>
+<h2 id="bab-users-menghapus-akun">Menghapus akun</h2>
+<p>Menghapus akun dilakukan dua langkah supaya tidak terjadi tanpa sengaja:</p>
+<ol><li>
+Nonaktifkan akun lebih dahulu (hapus centang <strong>Akun aktif</strong>, lalu simpan). Langkah ini saja sudah menghentikan akses pemilik akun.
+</li><li>
+Buka lagi halaman ubah akun. Di bagian <strong>Hapus akun</strong>, ketik ulang alamat email akun tersebut, lalu tekan <strong>Hapus akun permanen</strong>.
+</li></ol>
+<p>Penghapusan tidak bisa dibatalkan. Media yang pernah diunggah akun itu tetap ada (kolom pengunggahnya menjadi kosong). Akun Anda sendiri tidak bisa dihapus, dan sistem tetap menjaga minimal satu ADMIN aktif.</p>
+<p>Bila riwayat akun ingin disimpan, cukup biarkan akun dalam status nonaktif.</p>
+<h2 id="bab-users-pembagian-akses-per-role">Pembagian akses per role</h2>
+<table><thead><tr><th>Modul</th><th>ADMIN</th><th>EDITOR</th></tr></thead><tbody><tr><td>Treatments &amp; Packages, Harga, Foto &amp; Gallery, Media Library</td><td>Ya</td><td>Ya</td></tr><tr><td>Promos &amp; Gift Card, Membership, Journal, Events, KAMA Retail</td><td>Ya</td><td>Ya</td></tr><tr><td>Corporate Wellness, Homepage &amp; Our Story, Halaman &amp; URL (termasuk Redirect 301), Menu Navigasi</td><td>Ya</td><td>Ya</td></tr><tr><td>SEO (judul &amp; deskripsi per halaman)</td><td>Ya</td><td>Ya</td></tr><tr><td>Kontak &amp; Umum (termasuk Template WhatsApp, Google Analytics, Search Console, favicon)</td><td>Ya</td><td>Tidak</td></tr><tr><td>Pengguna Admin</td><td>Ya</td><td>Tidak</td></tr><tr><td>Backup &amp; Status</td><td>Ya</td><td>Tidak</td></tr><tr><td>Dashboard dan Ganti kata sandi sendiri</td><td>Ya</td><td>Ya</td></tr></tbody></table>
+<p>Alasannya: modul yang khusus ADMIN mengatur sistem, bukan konten. Kontak &amp; Umum menentukan nomor WhatsApp, tautan booking, dan kode pelacakan yang dipakai di seluruh situs — satu salah isi memengaruhi semua halaman. Pengguna Admin menentukan siapa yang boleh masuk, dan Backup berisi salinan seluruh data termasuk data pribadi pengirim inquiry.</p>
+<p>Modul yang tidak boleh dibuka tidak muncul di menu samping maupun di dashboard. Bila alamatnya dibuka langsung, Anda dikembalikan ke dashboard dengan pesan bahwa modul tersebut hanya untuk role ADMIN.</p>
+</section>
+<section class="chapter">
+<h1 id="bab-status" class="chapter-title">Bab 20. Backup &amp; Status</h1>
+<p>Modul 19 pada menu samping. <strong>Hanya bisa dibuka oleh pemegang role ADMIN.</strong> EDITOR yang membuka alamatnya dikembalikan ke dashboard dengan peringatan.</p>
+<p>Halaman admin: <code>/admin/status</code></p>
+<p>Modul ini tidak mengubah halaman publik. Isi backup <strong>tidak pernah</strong> ditampilkan di dashboard dan <strong>tidak pernah</strong> disimpan di storage situs (bucket gambar bersifat publik). Dashboard hanya menyimpan <em>catatan</em> backup: jenis, status, ukuran, lokasi, dan checksum.</p>
+<h2 id="bab-status-isi-halaman">Isi halaman</h2>
+<table><thead><tr><th>Bagian</th><th>Keterangan</th></tr></thead><tbody><tr><td>Ringkasan backup</td><td>Waktu backup otomatis terakhir yang sukses, backup manual terakhir, dan catatan serah terima. Badge <strong>Terlambat</strong> muncul bila lebih dari 8 hari tidak ada backup otomatis yang sukses; <strong>Gagal</strong> bila percobaan terakhir gagal.</td></tr><tr><td>Backup manual</td><td>Dua pilihan tanpa biaya (lihat di bawah).</td></tr><tr><td>Backup serah terima</td><td>Formulir pencatatan 1 salinan backup lengkap saat serah terima.</td></tr><tr><td>Riwayat backup</td><td>30 catatan terbaru beserta lokasi, ukuran, checksum SHA-256, dan siapa yang memicu.</td></tr><tr><td>Status situs</td><td>Domain, HTTPS, kode respons situs, dan sertifikat SSL (penerbit, tanggal habis, sisa hari). Hasil disimpan sementara ±5 menit.</td></tr><tr><td>Versi platform</td><td>Node.js, Next.js, React, Prisma, dan paket penting lain; commit &amp; lingkungan deploy Vercel; jumlah migrasi database yang sudah diterapkan.</td></tr><tr><td>Konfigurasi environment</td><td>Daftar variabel penting dengan status <strong>Terisi</strong>/<strong>Kosong</strong> saja — nilainya tidak pernah ditampilkan. Juga status GA4 dan verifikasi Google Search Console.</td></tr></tbody></table>
+<h2 id="bab-status-backup-otomatis-mingguan">Backup otomatis mingguan</h2>
+<p>Berjalan sendiri setiap <strong>Minggu pukul 02.00 WIB</strong> lewat GitHub Actions (gratis) di repo milik KAMA Spa. Hasilnya berupa dump database lengkap (pg_dump) yang <strong>dienkripsi</strong> dan disimpan sebagai <em>artifact</em> di GitHub selama 90 hari. Setelah selesai, hasilnya otomatis tercatat di <strong>Riwayat backup</strong>.</p>
+<p>Bila badge <strong>Terlambat</strong> atau <strong>Gagal</strong> muncul: buka repo di GitHub → tab <strong>Actions</strong> → workflow <strong>Backup database</strong>, lihat run terakhir, atau hubungi pengelola teknis.</p>
+<h2 id="bab-status-backup-manual">Backup manual</h2>
+<h3 id="bab-status-a-unduh-ekspor-data-json">A. Unduh ekspor data (JSON)</h3>
+<ol><li>
+Pilih apakah data inquiry Corporate Wellness ikut diekspor.
+</li><li>
+Centang pernyataan data pribadi.
+</li><li>
+Tekan <strong>Unduh ekspor JSON</strong>. Berkas <code>kamaspa-data-&lt;tanggal&gt;.json</code> langsung terunduh ke komputer Anda.
+</li></ol>
+<p>Catatan penting:</p>
+<ul><li>
+Berkas berisi data pribadi (nama/e-mail admin; bila dipilih, juga data pengirim inquiry). Simpan di folder terenkripsi atau berkata sandi, jangan dikirim lewat chat/e-mail, dan jangan diunggah ke Media Library.
+</li><li>
+Password admin tidak pernah ikut diekspor.
+</li><li>
+Ini backup <strong>data</strong>, bukan pengganti backup pg_dump: struktur tabel dan riwayat migrasi tidak ikut. Untuk pemulihan penuh gunakan backup pg_dump.
+</li><li>
+Dibatasi 3 kali per 15 menit. Setiap unduhan tercatat di riwayat beserta checksum SHA-256-nya.
+</li></ul>
+<h3 id="bab-status-b-backup-database-lengkap-sekarang-pg-dump">B. Backup database lengkap sekarang (pg_dump)</h3>
+<p>Tombol <strong>Jalankan backup pg_dump sekarang</strong> menjalankan workflow backup yang sama dengan backup mingguan, saat itu juga. Hasilnya tercatat di riwayat setelah 2–5 menit (muat ulang halaman). Tombol nonaktif bila pengaturan GitHub (<code>GITHUB_BACKUP_TOKEN</code>, <code>GITHUB_BACKUP_REPO</code>) belum diisi; workflow tetap bisa dijalankan manual dari GitHub → <strong>Actions</strong> → <strong>Backup database</strong> → <strong>Run workflow</strong>.</p>
+<h2 id="bab-status-mengunduh-membuka-backup-otomatis">Mengunduh &amp; membuka backup otomatis</h2>
+<ol><li>
+GitHub → <strong>Actions</strong> → <strong>Backup database</strong> → pilih run → bagian <strong>Artifacts</strong> → unduh <code>kamaspa-db-&lt;nomor&gt;</code> (zip).
+</li><li>
+Ekstrak; isinya <code>kamaspa-&lt;tanggal&gt;.sql.gz.gpg</code> dan berkas <code>.sha256</code>.
+</li><li>
+Cek keaslian: <code>shasum -a 256 -c kamaspa-&lt;tanggal&gt;.sql.gz.gpg.sha256</code>.
+</li><li>
+Buka enkripsi (butuh passphrase <code>BACKUP_PASSPHRASE</code> yang disimpan di password manager): <code>gpg --decrypt kamaspa-&lt;tanggal&gt;.sql.gz.gpg &gt; kamaspa.sql.gz</code>.
+</li></ol>
+<p>Pemulihan (restore) dilakukan oleh pengelola teknis — lihat <code>docs/TECH_HANDOVER.md</code> bagian <em>Backup dan restore</em>.</p>
+<h2 id="bab-status-backup-serah-terima-1-salinan-lengkap">Backup serah terima (1 salinan lengkap)</h2>
+<p>Dilakukan developer bersama PIC klien sebelum BAST:</p>
+<ol><li>
+Developer menjalankan <code>./scripts/backup-db.sh</code> (sebaiknya dengan <code>BACKUP_PASSPHRASE</code> agar langsung terenkripsi). Script mencetak baris <strong>SHA-256</strong> dan menulis berkas <code>.sha256</code>.
+</li><li>
+Developer <strong>menguji restore</strong> ke database kosong/terpisah dan memastikan data tampil (lihat <code>docs/TECH_HANDOVER.md</code>).
+</li><li>
+Berkas backup diserahkan ke lokasi yang disepakati (mis. Google Drive klien). Passphrase diserahkan terpisah (password manager), bukan di folder yang sama.
+</li><li>
+Di <code>/admin/status</code> → <strong>Backup serah terima</strong>, isi:
+</li></ol>
+<table><thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead><tbody><tr><td>Lokasi penyimpanan</td><td>Ya</td><td>Tempat berkas disimpan. Jangan menulis password atau connection string — formulir menolaknya.</td></tr><tr><td>Checksum SHA-256</td><td>Ya</td><td>Tempel baris SHA-256 dari keluaran script (boleh berikut nama berkasnya).</td></tr><tr><td>Ukuran</td><td>Tidak</td><td>Byte, atau mis. <code>850 KB</code>, <code>1,2 MB</code>.</td></tr><tr><td>Uji restore sudah berhasil</td><td>—</td><td>Centang bila langkah 2 sudah dilakukan.</td></tr><tr><td>Catatan</td><td>Tidak</td><td>Mis. diserahkan kepada siapa, di mana passphrase disimpan (tanpa menulis passphrase-nya).</td></tr></tbody></table>
+<ol start="5"><li>
+Tekan <strong>Catat backup serah terima</strong>. Catatan muncul di ringkasan dan riwayat.
+</li></ol>
+</section>
+<section class="chapter">
+<h1 id="bab-troubleshooting" class="chapter-title">Bab 21. Troubleshooting dan Kontak Garansi</h1>
+<p>Kumpulan masalah yang paling sering ditemui beserta langkah penyelesaiannya. Coba langkah di bawah lebih dulu sebelum menghubungi tim teknis.</p>
+<h2 id="bab-troubleshooting-perubahan-tidak-muncul-di-situs">Perubahan tidak muncul di situs</h2>
+<ol><li>
+<strong>Pastikan sudah tersimpan.</strong> Setelah menekan Simpan harus muncul pita hijau &quot;Perubahan tersimpan&quot;. Bila muncul kotak merah, perbaiki isian yang disebutkan lalu simpan ulang.
+</li><li>
+<strong>Periksa status tayang.</strong> Konten dengan centang <strong>Tampilkan di website</strong> kosong, status <strong>Draf</strong>, atau tanggal terbit di masa depan (Journal) memang tidak tampil. Promo dan event juga mengikuti periode tanggalnya.
+</li><li>
+<strong>Muat ulang halaman publik dengan paksa.</strong> Tekan <code>Ctrl + Shift + R</code> (Windows) atau <code>Cmd + Shift + R</code> (Mac), atau buka di jendela penyamaran/incognito. Peramban sering menyimpan salinan lama.
+</li><li>
+<strong>Tunggu beberapa menit.</strong> Sebagian besar halaman langsung diperbarui saat disimpan, tetapi beberapa bagian (misalnya redirect URL dan data yang dibaca saat database sempat bermasalah) menyegarkan diri dalam hitungan detik hingga menit. Jangan menyimpan berulang kali karena mengira gagal.
+</li><li>
+<strong>Periksa tempat yang benar.</strong> Contoh: kalimat harga di homepage diatur di modul Homepage, bukan di modul Harga; nomor WhatsApp diatur di Kontak &amp; Umum; item menu yang halamannya dihapus ditandai <strong>Tujuan hilang</strong> dan otomatis disembunyikan.
+</li><li>
+Bila setelah 15 menit masih belum berubah, catat URL halaman, modul yang diubah, jam penyimpanan, dan tangkapan layar, lalu laporkan (lihat bagian Kontak garansi).
+</li></ol>
+<h2 id="bab-troubleshooting-lupa-kata-sandi">Lupa kata sandi</h2>
+<ul><li>
+Tidak ada tombol &quot;lupa kata sandi&quot; otomatis lewat email, demi keamanan.
+</li><li>
+<strong>Minta pemegang ADMIN lain</strong> membuka <strong>Pengguna Admin</strong> → akun Anda → <strong>Reset kata sandi</strong>. Anda akan menerima kata sandi sementara dan wajib menggantinya saat login.
+</li><li>
+Bila akun Anda hanya <strong>terkunci</strong> (5 kali salah), tunggu 15 menit atau minta ADMIN menekan <strong>Buka kunci</strong>.
+</li><li>
+Bila <strong>tidak ada ADMIN lain</strong> yang bisa login, hubungi tim teknis: akun dapat di-reset dari server dengan skrip khusus. Karena itu, sebaiknya selalu ada <strong>minimal 2 akun ADMIN</strong> milik orang yang berbeda.
+</li></ul>
+<h2 id="bab-troubleshooting-unggah-foto-gagal">Unggah foto gagal</h2>
+<table><thead><tr><th>Pesan / gejala</th><th>Penyebab</th><th>Solusi</th></tr></thead><tbody><tr><td>Format tidak didukung</td><td>Berkas bukan JPG, PNG, WebP, AVIF, atau GIF (mis. HEIC dari iPhone, PDF)</td><td>Simpan ulang sebagai JPG/PNG. Di iPhone: Pengaturan → Kamera → Format → &quot;Paling Kompatibel&quot;.</td></tr><tr><td>Berkas terlalu besar</td><td>Lebih dari 4 MB setelah dikompres</td><td>Foto JPG/PNG/WebP besar otomatis diperkecil di browser, tetapi GIF tidak. Perkecil GIF atau pakai foto statis.</td></tr><tr><td>Sesi berakhir / diminta login</td><td>Sesi 8 jam habis</td><td>Login ulang, lalu unggah kembali.</td></tr><tr><td>Lama sekali / berhenti</td><td>Koneksi internet lambat</td><td>Coba lagi di jaringan yang lebih stabil; foto yang sudah ada di Media Library bisa dipilih ulang tanpa mengunggah.</td></tr><tr><td>Berhasil tetapi gambar tidak tampil</td><td>Konten belum disimpan, atau konten belum tayang</td><td>Tekan Simpan pada formulir konten setelah gambar terpilih.</td></tr><tr><td>Pesan lain yang menyebut konfigurasi/penyimpanan</td><td>Pengaturan server</td><td>Laporkan ke tim teknis beserta tangkapan layar.</td></tr></tbody></table>
+<h2 id="bab-troubleshooting-masalah-lain-yang-sering-ditanyakan">Masalah lain yang sering ditanyakan</h2>
+<ul><li>
+<strong>Tidak bisa menyimpan karena slug sudah dipakai.</strong> Ganti slug dengan yang unik (huruf kecil, angka, tanda hubung).
+</li><li>
+<strong>Tidak bisa menghapus atau menurunkan peran ADMIN terakhir.</strong> Disengaja — sistem selalu menyisakan minimal satu ADMIN aktif.
+</li><li>
+<strong>Form inquiry Corporate Wellness tertutup.</strong> Kunci captcha belum diisi di server; pengunjung diarahkan ke WhatsApp/email. Laporkan ke tim teknis.
+</li><li>
+<strong>Dashboard error atau tidak bisa dibuka, padahal situs publik tampil.</strong> Kemungkinan database sedang bermasalah (situs publik memakai data cadangan). Laporkan sebagai masalah <strong>kritis</strong>.
+</li><li>
+<strong>Badge &quot;Terlambat&quot; atau &quot;Gagal&quot; di Backup &amp; Status.</strong> Backup mingguan tidak berjalan. Laporkan ke tim teknis/pemegang akun GitHub.
+</li></ul>
+<h2 id="bab-troubleshooting-kontak-garansi">Kontak garansi</h2>
+<p>Masa garansi perbaikan bug: <strong>3 bulan sejak BAST</strong> (± 9 Januari – 9 April 2027, Pasal 9 kontrak). Garansi mencakup perbaikan bug, <strong>bukan</strong> penambahan fitur baru (fitur baru memerlukan adendum tertulis).</p>
+<table><thead><tr><th>Kanal</th><th>Kontak</th></tr></thead><tbody><tr><td>Nama tim teknis</td><td>______________________</td></tr><tr><td>WhatsApp</td><td>______________________</td></tr><tr><td>Email</td><td>______________________</td></tr><tr><td>Jam layanan</td><td>______________________</td></tr></tbody></table>
+<p>Cara melapor bug (tertulis, lewat email/WhatsApp di atas):</p>
+<ol><li>
+Alamat halaman (URL) yang bermasalah.
+</li><li>
+Langkah yang dilakukan sampai masalah muncul.
+</li><li>
+Yang diharapkan vs yang terjadi.
+</li><li>
+Tangkapan layar atau rekaman layar.
+</li><li>
+Akun/peran yang dipakai, perangkat &amp; peramban, serta jam kejadian.
+</li></ol>
+<table><thead><tr><th>Kategori</th><th>Contoh</th><th>Target tanggapan</th></tr></thead><tbody><tr><td>Kritis</td><td>Situs atau dashboard mati, data bocor, form tidak bisa dipakai sama sekali</td><td>Ditriase ≤ 1 hari kerja</td></tr><tr><td>Mayor</td><td>Satu modul tidak bisa menyimpan, tampilan rusak di satu halaman</td><td>Ditriase ≤ 1 hari kerja</td></tr><tr><td>Minor</td><td>Salah ketik, tampilan kurang rapi</td><td>Ditriase ≤ 1 hari kerja, dijadwalkan bersama</td></tr></tbody></table>
+<p><strong>Jangan pernah mengirim kata sandi</strong> lewat chat atau email saat melapor.</p>
+</section>
+</body>
+</html>

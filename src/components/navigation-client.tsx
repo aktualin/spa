@@ -103,14 +103,18 @@ function MegaPanel({
                   alt=""
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                <span className="absolute left-0 top-0 bg-base-100 px-1.5 py-0.5 text-[0.5625rem] uppercase tracking-[0.14em] text-cocoa">
-                  {h.badge}
-                </span>
+                {h.badge ? (
+                  <span className="absolute left-0 top-0 bg-base-100 px-1.5 py-0.5 text-[0.5625rem] uppercase tracking-[0.14em] text-cocoa">
+                    {h.badge}
+                  </span>
+                ) : null}
               </span>
               <span className="flex min-w-0 flex-col">
-                <span className="text-[0.6875rem] uppercase tracking-[0.12em] text-cocoa/75">
-                  {h.eyebrow}
-                </span>
+                {h.eyebrow ? (
+                  <span className="text-[0.6875rem] uppercase tracking-[0.12em] text-cocoa/75">
+                    {h.eyebrow}
+                  </span>
+                ) : null}
                 <span className="text-[0.875rem] text-cocoa group-hover:text-ink">
                   {h.label}
                 </span>
@@ -181,14 +185,18 @@ function MobileGroup({
                   alt=""
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                <span className="absolute left-0 top-0 bg-base-100 px-1.5 py-0.5 text-[0.5625rem] uppercase tracking-[0.14em] text-cocoa">
-                  {h.badge}
-                </span>
+                {h.badge ? (
+                  <span className="absolute left-0 top-0 bg-base-100 px-1.5 py-0.5 text-[0.5625rem] uppercase tracking-[0.14em] text-cocoa">
+                    {h.badge}
+                  </span>
+                ) : null}
               </span>
               <span className="flex min-w-0 flex-col">
-                <span className="text-[0.6875rem] uppercase tracking-[0.12em] text-cocoa/75">
-                  {h.eyebrow}
-                </span>
+                {h.eyebrow ? (
+                  <span className="text-[0.6875rem] uppercase tracking-[0.12em] text-cocoa/75">
+                    {h.eyebrow}
+                  </span>
+                ) : null}
                 <span className="text-[0.875rem] text-cocoa group-hover:text-ink">
                   {h.label}
                 </span>
@@ -217,11 +225,14 @@ export function NavigationClient({
   header,
   mobile,
   bookNow,
+  bookNowHref,
   whatsappHref,
 }: {
   header: NavData;
   mobile: NavData;
+  /** Label & tujuan tombol Book Now; salah satu kosong → tombol disembunyikan. */
   bookNow: string;
+  bookNowHref: string;
   /** Tautan wa.me (nomor + template "default") — dibangun di server. */
   whatsappHref: string | null;
 }) {
@@ -521,12 +532,14 @@ export function NavigationClient({
             </ul>
 
             {/* CTA */}
-            <Link
-              href="/contact"
-              className="btn btn-primary ml-4 shrink-0 whitespace-nowrap px-6 py-3 text-[0.9375rem]"
-            >
-              {bookNow}
-            </Link>
+            {bookNow && bookNowHref ? (
+              <Link
+                href={bookNowHref}
+                className="btn btn-primary ml-4 shrink-0 whitespace-nowrap px-6 py-3 text-[0.9375rem]"
+              >
+                {bookNow}
+              </Link>
+            ) : null}
           </div>
         </nav>
       </header>
@@ -617,13 +630,15 @@ export function NavigationClient({
           {/* Call to action — always visible, no scrolling needed. */}
           <div className="border-t border-tan/70 bg-base-100/95 backdrop-blur-sm">
             <div className="container-kama flex items-center gap-3 py-3">
-              <Link
-                href="/contact"
-                onClick={closeMobileMenu}
-                className="btn btn-primary flex-1 justify-center py-3 text-[0.9375rem]"
-              >
-                {bookNow}
-              </Link>
+              {bookNow && bookNowHref ? (
+                <Link
+                  href={bookNowHref}
+                  onClick={closeMobileMenu}
+                  className="btn btn-primary flex-1 justify-center py-3 text-[0.9375rem]"
+                >
+                  {bookNow}
+                </Link>
+              ) : null}
               {whatsappHref ? (
                 <a
                   href={whatsappHref}

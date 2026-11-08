@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Email, Facebook, Instagram, TikTok } from "./icons";
 import { CopyrightYear } from "./copyright-year";
-import { footerTagline } from "@/data/content";
 import { getNavigationData } from "@/lib/content/navigation";
 import { getSiteSettings, getWhatsAppTemplate } from "@/lib/content/site";
 import { footerSocials } from "@/lib/domain/site-settings";
@@ -81,9 +80,11 @@ export async function Footer() {
                   })}
                 </div>
 
-                <p className="max-w-[46ch] font-display text-title-lg text-cream-soft md:text-[1.75rem] md:leading-[1.4]">
-                  {footerTagline}
-                </p>
+                {settings.footerTagline ? (
+                  <p className="max-w-[46ch] font-display text-title-lg text-cream-soft md:text-[1.75rem] md:leading-[1.4]">
+                    {settings.footerTagline}
+                  </p>
+                ) : null}
 
                 {/* Partnership enquiries go straight to the e-mail. */}
                 <p className="text-caption text-cream-soft/70">

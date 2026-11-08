@@ -4,14 +4,11 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { LocationMap } from "@/components/contact/location-map";
 import { LocationInfo } from "@/components/contact/location-info";
-import { locations as staticLocations } from "@/data/content";
 import { Reveal } from "@/components/reveal";
+import { getBranches } from "@/lib/content/branches";
 import { withPageSeo } from "@/lib/content/seo";
 import { getSiteSettings } from "@/lib/content/site";
-import {
-  FLAGSHIP_LOCATION_SLUG,
-  applySiteSettingsToLocations,
-} from "@/lib/domain/site-settings";
+import { FLAGSHIP_LOCATION_SLUG } from "@/lib/domain/site-settings";
 
 export async function generateMetadata(): Promise<Metadata> {
   return withPageSeo("/contact", {
@@ -22,10 +19,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ContactPage() {
-  // Alamat, jam, nomor WhatsApp, peta & Fresha diatur di Kontak & Umum;
-  // tanpa perubahan admin hasilnya identik dengan data statis.
-  const settings = await getSiteSettings();
-  const locations = applySiteSettingsToLocations(staticLocations, settings);
+  // Cabang dikelola di modul Cabang; alamat, jam, nomor, peta, dan koordinat
+  // per cabang. Nomor/jam yang dikosongkan per cabang mengikuti Kontak & Umum.
+  const [branches, settings] = await Promise.all([getBranches(), getSiteSettings()]);
   return (
     <>
       <Navigation />
@@ -51,21 +47,27 @@ export default async function ContactPage() {
                 <h2 className="header-l">Our Locations</h2>
               </div>
               <div id="contact-map">
-                <LocationMap locations={locations} />
+                <LocationMap locations={branches} />
               </div>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-10">
-                {locations.map((loc) => (
-                  <div key={loc.slug} className="contact-info-card">
-                    <LocationInfo
-                      loc={loc}
-                      waNumber={settings.whatsappNumber}
-                      freshaUrl={
-                        loc.slug === FLAGSHIP_LOCATION_SLUG ? settings.freshaUrl : undefined
-                      }
-                    />
-                  </div>
-                ))}
-              </div>
+              {branches.length === 0 ? (
+                <p className="mt-10 body-m text-color-gray">
+                  Lokasi kami akan diumumkan segera. Sementara itu, hubungi kami
+                  via WhatsApp untuk reservasi di semua area kami.
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-10">
+                  {branches.map((branch) => (
+                    <div key={branch.slug} className="contact-info-card">
+                      <LocationInfo
+                        loc={branch}
+                        freshaUrl={
+                          branch.slug === FLAGSHIP_LOCATION_SLUG ? settings.freshaUrl : undefined
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
               {settings.mapsEmbedUrl ? (
                 <iframe
                   src={settings.mapsEmbedUrl}

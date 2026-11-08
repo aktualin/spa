@@ -44,6 +44,12 @@ export async function getSiteSettings(): Promise<SiteSettings> {
           facebookUrl: true,
           freshaUrl: true,
           ga4MeasurementId: true,
+          footerTagline: true,
+          priceDisclaimer: true,
+          bookNowLabel: true,
+          bookNowHref: true,
+          menuScanUrls: true,
+          menuPdfUrl: true,
         },
       });
       return mergeSiteSettings(row);

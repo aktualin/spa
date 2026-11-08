@@ -13,6 +13,7 @@
 import { z } from "zod";
 
 import { type Location } from "../../data/content.ts";
+import { isSafeCtaHref, isSafeImageUrl } from "./homepage-banner.ts";
 
 /* ------------------------------------------------------------------ */
 /* Tipe data                                                           */
@@ -33,6 +34,17 @@ export type SiteSettings = {
   freshaUrl: string;
   mapsEmbedUrl: string;
   ga4MeasurementId: string;
+  /** Tagline di footer. */
+  footerTagline: string;
+  /** Catatan harga di halaman menu. */
+  priceDisclaimer: string;
+  /** Label & tujuan tombol Book Now di header; kosong → tombol disembunyikan. */
+  bookNowLabel: string;
+  bookNowHref: string;
+  /** Halaman scan menu book, berurutan. */
+  menuScanUrls: string[];
+  /** Berkas PDF menu yang bisa diunduh. */
+  menuPdfUrl: string;
 };
 
 /**
@@ -52,6 +64,12 @@ export type SiteSettingsRow = {
   facebookUrl: string | null;
   freshaUrl: string | null;
   ga4MeasurementId: string | null;
+  footerTagline: string | null;
+  priceDisclaimer: string | null;
+  bookNowLabel: string | null;
+  bookNowHref: string | null;
+  menuScanUrls: string[];
+  menuPdfUrl: string | null;
 };
 
 /** Nilai yang ditulis ke database oleh form Kontak & Umum. */
@@ -79,6 +97,12 @@ export function emptySiteSettings(): SiteSettings {
     freshaUrl: "",
     mapsEmbedUrl: "",
     ga4MeasurementId: "",
+    footerTagline: "",
+    priceDisclaimer: "",
+    bookNowLabel: "",
+    bookNowHref: "",
+    menuScanUrls: [],
+    menuPdfUrl: "",
   };
 }
 
@@ -263,7 +287,23 @@ export type SiteSettingsInput = {
   freshaUrl: string;
   mapsEmbedUrl: string;
   ga4MeasurementId: string;
+  footerTagline: string;
+  priceDisclaimer: string;
+  bookNowLabel: string;
+  bookNowHref: string;
+  menuScanUrls: string[];
+  menuPdfUrl: string;
 };
+
+export const MAX_FOOTER_TAGLINE = 400;
+export const MAX_PRICE_DISCLAIMER = 300;
+export const MAX_BOOK_NOW_LABEL = 40;
+export const MAX_MENU_SCANS = 30;
+
+/** Rapikan daftar URL gambar: trim, buang yang kosong, urutan dipertahankan. */
+export function normalizeMenuScanUrls(urls: readonly string[]): string[] {
+  return urls.map((url) => url.trim()).filter(Boolean);
+}
 
 const blank = (value: string) => value.trim() === "";
 
@@ -352,6 +392,46 @@ export const siteSettingsInputSchema = z.object({
       "Measurement ID GA4 harus berformat G-XXXXXXXXXX.",
     )
     .transform((value) => (blank(value) ? "" : (normalizeGa4Id(value) as string))),
+  footerTagline: z
+    .string()
+    .trim()
+    .max(MAX_FOOTER_TAGLINE, `Tagline footer maks. ${MAX_FOOTER_TAGLINE} karakter.`),
+  priceDisclaimer: z
+    .string()
+    .trim()
+    .max(
+      MAX_PRICE_DISCLAIMER,
+      `Catatan harga maks. ${MAX_PRICE_DISCLAIMER} karakter.`,
+    ),
+  bookNowLabel: z
+    .string()
+    .trim()
+    .max(MAX_BOOK_NOW_LABEL, `Label Book Now maks. ${MAX_BOOK_NOW_LABEL} karakter.`),
+  bookNowHref: z
+    .string()
+    .trim()
+    .refine(
+      (value) => blank(value) || isSafeCtaHref(value),
+      "Tujuan Book Now harus path internal (/contact), anchor (#booking), atau URL https://.",
+    ),
+  menuScanUrls: z
+    .array(z.string())
+    .transform(normalizeMenuScanUrls)
+    .refine(
+      (urls) => urls.every((url) => isSafeImageUrl(url)),
+      "Setiap halaman menu harus berupa URL gambar https:// atau path internal.",
+    )
+    .refine(
+      (urls) => urls.length <= MAX_MENU_SCANS,
+      `Halaman menu maks. ${MAX_MENU_SCANS} gambar.`,
+    ),
+  menuPdfUrl: z
+    .string()
+    .trim()
+    .refine(
+      (value) => blank(value) || isSafeCtaHref(value),
+      "PDF menu harus berupa URL https:// atau path internal (/img/...).",
+    ),
 });
 
 export type SiteSettingsParsed = z.output<typeof siteSettingsInputSchema>;
@@ -372,6 +452,12 @@ export function toSiteSettingsWrite(parsed: SiteSettingsParsed): SiteSettingsWri
     freshaUrl: orNull(parsed.freshaUrl),
     mapsEmbedUrl: orNull(parsed.mapsEmbedUrl),
     ga4MeasurementId: orNull(parsed.ga4MeasurementId),
+    footerTagline: orNull(parsed.footerTagline),
+    priceDisclaimer: orNull(parsed.priceDisclaimer),
+    bookNowLabel: orNull(parsed.bookNowLabel),
+    bookNowHref: orNull(parsed.bookNowHref),
+    menuScanUrls: parsed.menuScanUrls,
+    menuPdfUrl: orNull(parsed.menuPdfUrl),
   };
 }
 
@@ -412,6 +498,14 @@ export function mergeSiteSettings(row: SiteSettingsRow | null): SiteSettings {
     freshaUrl: optionalUrl(row.freshaUrl),
     mapsEmbedUrl: parseMapsEmbedInput(text(row.mapsEmbedUrl)) ?? "",
     ga4MeasurementId: normalizeGa4Id(text(row.ga4MeasurementId)) ?? "",
+    footerTagline: text(row.footerTagline),
+    priceDisclaimer: text(row.priceDisclaimer),
+    bookNowLabel: text(row.bookNowLabel),
+    // Tujuan yang tidak aman diperlakukan kosong supaya tombolnya disembunyikan,
+    // bukan dirender dengan tautan yang bisa menyesatkan.
+    bookNowHref: isSafeCtaHref(text(row.bookNowHref)) ? text(row.bookNowHref) : "",
+    menuScanUrls: normalizeMenuScanUrls(row.menuScanUrls ?? []).filter(isSafeImageUrl),
+    menuPdfUrl: isSafeCtaHref(text(row.menuPdfUrl)) ? text(row.menuPdfUrl) : "",
   };
 }
 
@@ -469,6 +563,12 @@ export function siteSettingsFormDefaults(row: SiteSettingsRow | null): FormDefau
       freshaUrl: text(row.freshaUrl),
       mapsEmbedUrl: text(row.mapsEmbedUrl),
       ga4MeasurementId: text(row.ga4MeasurementId),
+      footerTagline: text(row.footerTagline),
+      priceDisclaimer: text(row.priceDisclaimer),
+      bookNowLabel: text(row.bookNowLabel),
+      bookNowHref: text(row.bookNowHref),
+      menuScanUrls: normalizeMenuScanUrls(row.menuScanUrls ?? []),
+      menuPdfUrl: text(row.menuPdfUrl),
     },
     prefilled,
     noRow: false,

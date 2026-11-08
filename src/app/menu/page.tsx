@@ -5,8 +5,8 @@ import { Suspense } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { ArrowRight } from "@/components/icons";
-import { priceDisclaimer } from "@/data/content";
 import { getMenuAddonsCached } from "@/lib/content/catalog";
+import { getSiteSettings } from "@/lib/content/site";
 import {
   MenuPackagesGrid,
   MenuPackagesGridFallback,
@@ -49,18 +49,14 @@ const featureSections = [
   },
 ] as const;
 
-const menuBookPages = Array.from(
-  { length: 10 },
-  (_, i) => ({
-    n: i + 1,
-    src: `/img/kama/menu/menu-page-${String(i + 1).padStart(2, "0")}.jpg`,
-  }),
-);
-
 export default async function MenuPage() {
   // Add-on dikelola dari admin (kategori berjenis Add-on).
-  const additionalServices = await getMenuAddonsCached();
+  const [additionalServices, settings] = await Promise.all([
+    getMenuAddonsCached(),
+    getSiteSettings(),
+  ]);
   const bodyAddOns = additionalServices.filter((s) => s.category === "Body");
+  const { priceDisclaimer, menuScanUrls, menuPdfUrl } = settings;
 
   return (
     <>
@@ -94,8 +90,12 @@ export default async function MenuPage() {
               <Suspense fallback={<MenuTreatmentsGridFallback />}>
                 <MenuTreatmentsGrid />
               </Suspense>
-              <div className="spacer-large" />
-              <div className="eyebrow-s text-color-gray">{priceDisclaimer}</div>
+              {priceDisclaimer ? (
+                <>
+                  <div className="spacer-large" />
+                  <div className="eyebrow-s text-color-gray">{priceDisclaimer}</div>
+                </>
+              ) : null}
             </div>
           </div>
         </Reveal>
@@ -184,8 +184,12 @@ export default async function MenuPage() {
         {/* Booking CTA + price disclaimer for add-ons */}
         <div className="padding-global">
           <div className="container-large">
-            <div className="spacer-large" />
-            <div className="eyebrow-s text-color-gray">{priceDisclaimer}</div>
+            {priceDisclaimer ? (
+              <>
+                <div className="spacer-large" />
+                <div className="eyebrow-s text-color-gray">{priceDisclaimer}</div>
+              </>
+            ) : null}
 
             <div className="spacer-xlarge" />
             <Link href="/contact" className="button is-secondary is-icon w-inline-block">
@@ -214,54 +218,81 @@ export default async function MenuPage() {
               <Suspense fallback={<MenuPackagesGridFallback />}>
                 <MenuPackagesGrid />
               </Suspense>
-              <div className="spacer-large" />
-              <div className="eyebrow-s text-color-gray">{priceDisclaimer}</div>
+              {priceDisclaimer ? (
+                <>
+                  <div className="spacer-large" />
+                  <div className="eyebrow-s text-color-gray">{priceDisclaimer}</div>
+                </>
+              ) : null}
             </div>
           </div>
         </Reveal>
 
-        {/* Menu book gallery */}
-        <Reveal as="section" id="gallery" className="padding-section-global home-locations">
-          <div className="padding-global">
-            <div className="container-large">
-              <div className="section-header">
-                <div className="eyebrow-s text-style-allcaps">Menu Book</div>
-                <h2 className="header-l">Galeri Menu KAMA Spa 2026</h2>
-                <p className="body-m text-color-gray">
-                  Jelajahi menu lengkap kami sebagaimana tampil di menu book resmi — atau
-                  unduh PDF-nya untuk dibawa pulang.
-                </p>
-              </div>
-
-              <div className="menu-gallery">
-                {menuBookPages.map((page) => (
-                  <a
-                    key={page.src}
-                    href="/img/kama/menu/kama-menu-2026.pdf"
-                    target="_blank"
-                    rel="noopener"
-                    className="menu-gallery_item"
-                    aria-label={`Open menu book page ${page.n}`}
-                  >
-                    <img src={page.src} alt={`KAMA Spa menu book — page ${page.n}`} loading="lazy" />
-                  </a>
-                ))}
-              </div>
-
-              <div className="spacer-large" />
-              <a
-                href="/img/kama/menu/kama-menu-2026.pdf"
-                download
-                className="button is-secondary is-icon w-inline-block"
-              >
-                <div>Download Menu (PDF)</div>
-                <div className="button_icon w-embed">
-                  <ArrowRight />
+        {/* Menu book gallery — halaman scan & PDF-nya dikelola dari admin. */}
+        {menuScanUrls.length > 0 || menuPdfUrl ? (
+          <Reveal as="section" id="gallery" className="padding-section-global home-locations">
+            <div className="padding-global">
+              <div className="container-large">
+                <div className="section-header">
+                  <div className="eyebrow-s text-style-allcaps">Menu Book</div>
+                  <h2 className="header-l">Galeri Menu KAMA Spa 2026</h2>
+                  <p className="body-m text-color-gray">
+                    Jelajahi menu lengkap kami sebagaimana tampil di menu book resmi — atau
+                    unduh PDF-nya untuk dibawa pulang.
+                  </p>
                 </div>
-              </a>
+
+                {menuScanUrls.length > 0 ? (
+                  <div className="menu-gallery">
+                    {menuScanUrls.map((src, index) => {
+                      const page = index + 1;
+                      const image = (
+                        <img
+                          src={src}
+                          alt={`KAMA Spa menu book — page ${page}`}
+                          loading="lazy"
+                        />
+                      );
+                      // Tanpa PDF, halaman menu tetap tampil tetapi tidak bisa diklik.
+                      return menuPdfUrl ? (
+                        <a
+                          key={src}
+                          href={menuPdfUrl}
+                          target="_blank"
+                          rel="noopener"
+                          className="menu-gallery_item"
+                          aria-label={`Open menu book page ${page}`}
+                        >
+                          {image}
+                        </a>
+                      ) : (
+                        <div key={src} className="menu-gallery_item">
+                          {image}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : null}
+
+                {menuPdfUrl ? (
+                  <>
+                    <div className="spacer-large" />
+                    <a
+                      href={menuPdfUrl}
+                      download
+                      className="button is-secondary is-icon w-inline-block"
+                    >
+                      <div>Download Menu (PDF)</div>
+                      <div className="button_icon w-embed">
+                        <ArrowRight />
+                      </div>
+                    </a>
+                  </>
+                ) : null}
+              </div>
             </div>
-          </div>
-        </Reveal>
+          </Reveal>
+        ) : null}
       </main>
       <Footer />
     </>

@@ -5,12 +5,12 @@
  */
 import { cacheLife, cacheTag } from "next/cache";
 
-import { nav as staticNav, type NavLink } from "@/data/content";
+import type { NavLink } from "@/data/content";
 import { buildMenuTree, type MenuRow } from "@/lib/domain/menu";
 import {
   menuTreeToFooter,
   menuTreeToNav,
-  presetsFromMegaGroups,
+  panelPresetsFromRows,
   type NavData,
 } from "@/lib/domain/menu-nav";
 import { safeQueryWithMeta } from "@/lib/safe-query";
@@ -58,9 +58,7 @@ export async function getNavigationData(): Promise<NavigationData> {
       panelLinkLabel: item.panelLinkLabel,
     }));
 
-    // Kartu highlight & lebar panel belum punya modul admin; diambil dari
-    // preset menu lama berdasarkan panelKey.
-    const presets = presetsFromMegaGroups(staticNav.megaGroups);
+    const presets = panelPresetsFromRows(items);
     return {
       header: menuTreeToNav(buildMenuTree(rows, "HEADER"), presets),
       mobile: menuTreeToNav(buildMenuTree(rows, "MOBILE"), presets),

@@ -17,6 +17,7 @@ import {
   type MenuAdminRow,
   type MenuPageOption,
 } from "../actions/menu";
+import { ImageField } from "../image-field";
 import { ErrorMessage, Field, SaveButton, inputClass } from "../settings/_components/form-ui";
 import { LINK_TYPE_LABEL, LOCATION_LABEL } from "./menu-manager";
 
@@ -244,7 +245,7 @@ export function MenuItemForm({
             <Field
               label="Kunci panel"
               htmlFor="menu-panel-key"
-              hint="Kunci teknis untuk kartu promo bergambar di panel (mis. services, corporate). Biarkan seperti apa adanya bila ragu."
+              hint="Kunci teknis panel (mis. services, corporate). Biarkan seperti apa adanya bila ragu."
             >
               <input
                 id="menu-panel-key"
@@ -254,6 +255,67 @@ export function MenuItemForm({
                 className={`${inputClass} font-mono`}
               />
             </Field>
+
+            <Field
+              label="Lebar panel"
+              htmlFor="menu-panel-width"
+              hint="Otomatis: lebar mengikuti jumlah kolom sub-menu."
+            >
+              <select
+                id="menu-panel-width"
+                name="panelWidth"
+                defaultValue={
+                  item?.panelWidth === null || item?.panelWidth === undefined
+                    ? ""
+                    : item.panelWidth >= 2
+                      ? "wide"
+                      : "narrow"
+                }
+                className={inputClass}
+              >
+                <option value="">Otomatis</option>
+                <option value="narrow">Sempit (satu kolom)</option>
+                <option value="wide">Lebar (dua kolom)</option>
+              </select>
+            </Field>
+
+            <fieldset className="space-y-3 rounded-md border border-neutral-200 p-3">
+              <legend className="px-1 text-sm font-medium text-neutral-700">
+                Kartu promo di panel
+              </legend>
+              <p className="text-xs text-neutral-500">
+                Isi ketiganya agar kartu tampil. Kosongkan semuanya bila panel ini tidak
+                perlu kartu promo.
+              </p>
+              <ImageField
+                name="highlightImageUrl"
+                label="Gambar kartu"
+                folder="menu"
+                defaultValue={item?.highlightImageUrl ?? ""}
+              />
+              <Field label="Label kartu" htmlFor="menu-highlight-label">
+                <input
+                  id="menu-highlight-label"
+                  name="highlightLabel"
+                  defaultValue={item?.highlightLabel ?? ""}
+                  maxLength={60}
+                  className={inputClass}
+                />
+              </Field>
+              <Field
+                label="Tujuan kartu"
+                htmlFor="menu-highlight-href"
+                hint="Path internal (/membership), anchor (#packages), atau https://…"
+              >
+                <input
+                  id="menu-highlight-href"
+                  name="highlightHref"
+                  defaultValue={item?.highlightHref ?? ""}
+                  maxLength={500}
+                  className={`${inputClass} font-mono`}
+                />
+              </Field>
+            </fieldset>
           </div>
         </details>
       ) : null}

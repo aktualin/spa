@@ -14,6 +14,7 @@ import { config as loadEnv } from "dotenv";
 import {
   additionalServices,
   footerLinks,
+  locations,
   nav,
   packages,
   site,
@@ -421,6 +422,48 @@ function policyBodyHtml(page: PolicyPage): string {
     .join("");
 }
 
+async function seedBranches() {
+  // Koordinat sebelumnya hidup di location-map.tsx (COORDS) — tidak ada di
+  // data statis, jadi dipindahkan ke sini.
+  const coords: Record<string, [number, number]> = {
+    "south-jakarta": [-6.2438873, 106.7935745],
+    sudirman: [-6.2247181, 106.8106879],
+    kebayoran: [-6.2264582, 106.8014745],
+  };
+
+  let created = 0;
+  for (const [index, loc] of locations.entries()) {
+    const [latitude, longitude] = coords[loc.slug] ?? [null, null];
+    // Cabang yang sudah ada tidak disentuh sama sekali: seluruh kolom Branch
+    // dikelola admin, jadi suntingan dari dashboard tidak pernah tertimpa.
+    const before = await prisma.branch.findUnique({ where: { slug: loc.slug } });
+    if (before) continue;
+    await prisma.branch.create({
+      data: {
+        slug: loc.slug,
+        name: loc.name,
+        area: loc.area,
+        tag: loc.tag || null,
+        address: loc.address,
+        openingHours: [loc.hours],
+        // Nomor & jam dipakai bersama semua cabang lama; dibiarkan kosong agar
+        // mengikuti Kontak & Umum, seperti perilaku data statis lama.
+        whatsappNumber: null,
+        phone: null,
+        email: loc.email,
+        mapsEmbedUrl: loc.mapEmbed,
+        mapsUrl: loc.mapDirections,
+        latitude,
+        longitude,
+        isPublished: true,
+        sortOrder: index,
+      },
+    });
+    created++;
+  }
+  console.log(`✔ ${created} cabang dari ${locations.length} lokasi statis`);
+}
+
 async function seedLegalPages() {
   const pages = [
     { slug: "privacy-policy", title: "Privacy Policy", source: privacyPolicy },
@@ -463,6 +506,7 @@ try {
     await seedJournal();
     await seedSiteSettings();
     await seedWhatsAppTemplates();
+    await seedBranches();
     await seedHomepageSections();
     await seedLegalPages();
     await seedMenu();
