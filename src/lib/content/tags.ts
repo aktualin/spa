@@ -20,6 +20,10 @@ export const CONTENT_TAGS = {
   menu: "content:menu", // MenuItem
   settings: "content:settings", // SiteSettings, WhatsAppTemplate
   seo: "content:seo", // PageSeo
+  pages: "content:pages", // StaticPage
+  // Redirect dibaca proxy lewat cache memori ber-TTL (src/lib/redirects.ts),
+  // bukan "use cache"; tag ini untuk bacaan halaman admin/sitemap saja.
+  redirects: "content:redirects", // Redirect
 } as const;
 
 export type ContentTag = (typeof CONTENT_TAGS)[keyof typeof CONTENT_TAGS];

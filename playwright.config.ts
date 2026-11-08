@@ -60,5 +60,7 @@ export default defineConfig({
     url: baseURL,
     reuseExistingServer: true,
     timeout: 180_000,
+    // Cache redirect di proxy dimatikan agar perubahan tabel Redirect langsung terlihat.
+    env: { REDIRECT_CACHE_TTL_MS: "0" },
   },
 });

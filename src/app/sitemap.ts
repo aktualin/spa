@@ -3,6 +3,7 @@ import type { MetadataRoute } from "next";
 import { getCatalogSlugs } from "@/lib/content/catalog";
 import { getEventSlugs } from "@/lib/content/events";
 import { getJournalPosts } from "@/lib/content/journal";
+import { getPublishedPageSlugs } from "@/lib/content/pages";
 import { getActivePromos } from "@/lib/content/promos";
 import { getSiteUrl } from "@/lib/site-url";
 
@@ -47,11 +48,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route.priority,
   }));
 
-  const [catalog, posts, eventSlugs, promos] = await Promise.all([
+  const [catalog, posts, eventSlugs, promos, pages] = await Promise.all([
     getCatalogSlugs(),
     getJournalPosts(),
     getEventSlugs(),
     getActivePromos(),
+    getPublishedPageSlugs(),
   ]);
 
   for (const slug of catalog.categories) {
@@ -100,6 +102,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: url(`promos/${promo.slug}`),
       changeFrequency: "weekly",
       priority: 0.6,
+    });
+  }
+
+  for (const page of pages) {
+    entries.push({
+      url: url(page.slug),
+      lastModified: page.updatedAt,
+      changeFrequency: "monthly",
+      priority: 0.5,
     });
   }
 

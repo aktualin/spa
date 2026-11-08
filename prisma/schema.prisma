@@ -457,3 +457,52 @@ model PageSeo {
 
   updatedAt DateTime @updatedAt
 }
+
+/* ---------- Modul 14: Halaman & URL ---------- */
+
+enum PageStatus {
+  DRAFT
+  PUBLISHED
+}
+
+// Tata letak halaman publik; menentukan komponen render di src/app/[slug].
+enum PageTemplate {
+  STANDARD // judul + isi teks berformat
+  LEGAL    // tata letak dokumen panjang seperti Kebijakan Privasi
+}
+
+// Halaman bebas yang dibuat admin, tampil di /<slug>.
+model StaticPage {
+  id       String       @id @default(cuid())
+  slug     String       @unique
+  title    String
+  template PageTemplate @default(STANDARD)
+  bodyHtml String       @default("")
+
+  seoTitle       String?
+  seoDescription String?
+
+  status      PageStatus @default(DRAFT)
+  publishedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+// Pengalihan URL lama → URL baru, diterapkan di src/proxy.ts. Dibuat otomatis
+// saat slug berubah, atau manual dari dashboard. Rantai selalu diratakan
+// (A→C, bukan A→B→C) oleh planSlugRedirect di src/lib/domain/page-url.ts.
+model Redirect {
+  id         String  @id @default(cuid())
+  fromPath   String  @unique
+  toPath     String
+  statusCode Int     @default(301)
+  // "auto" = dibuat sistem saat slug berubah; "manual" = diisi admin.
+  source     String  @default("manual")
+  note       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
