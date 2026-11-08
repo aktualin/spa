@@ -1,59 +1,105 @@
 "use server";
 
+import { Prisma } from "@prisma/client";
 import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { requireRole, requireSession } from "@/lib/auth";
 import { CONTENT_TAGS } from "@/lib/content/tags";
-import { prisma } from "@/lib/prisma";
-import { sanitizeHtml } from "@/lib/domain/sanitize";
-import { slugify } from "@/lib/domain/slug";
+import {
+  JOURNAL_BASE_PATH,
+  JOURNAL_CATEGORY_MAX,
+  JOURNAL_EXCERPT_MAX,
+  JOURNAL_SEO_DESCRIPTION_MAX,
+  JOURNAL_SEO_TITLE_MAX,
+  JOURNAL_TITLE_MAX,
+  collectJournalCategories,
+  collectJournalTags,
+  isRichTextEmpty,
+  journalPath,
+  normalizeJournalCategory,
+  parseJournalTags,
+  resolveJournalSchedule,
+  resolveJournalSlug,
+  validateJournalSlug,
+} from "@/lib/domain/journal";
+import { normalizePath } from "@/lib/domain/page-url";
+import { plainTextToHtml } from "@/lib/domain/rich-text";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
+import { sanitizeHtml } from "@/lib/domain/sanitize";
+import { isJournalVisible } from "@/lib/domain/visibility";
+import { recordPathMoves } from "@/lib/path-moves";
+import { prisma } from "@/lib/prisma";
 import { deleteImageByUrl } from "@/lib/storage";
 
-import { JOURNAL_STATUSES, type JournalStatus } from "../journal/journal-status";
+import { JOURNAL_STATUSES } from "../journal/journal-status";
 
 import {
   firstIssue,
   optionalImageUrl,
   optionalText,
   parseWibInput,
-  slugSchema,
   text,
 } from "../promos/_kit/schema";
 
 export type ActionState = { error: string | null; ok?: boolean };
 
+const SLUG_TAKEN = (slug: string) => `Slug "${slug}" sudah dipakai artikel lain.`;
+
 const postSchema = z.object({
-  slug: slugSchema,
-  title: z.string().trim().min(1, "Judul artikel wajib diisi."),
-  excerpt: optionalText,
-  bodyHtml: z.string().trim().min(1, "Isi artikel wajib diisi."),
+  slug: z
+    .string()
+    .trim()
+    .superRefine((value, ctx) => {
+      const message = validateJournalSlug(value);
+      if (message) ctx.addIssue({ code: "custom", message });
+    }),
+  title: z
+    .string()
+    .trim()
+    .min(1, "Judul artikel wajib diisi.")
+    .max(JOURNAL_TITLE_MAX, `Judul maksimal ${JOURNAL_TITLE_MAX} karakter.`),
+  excerpt: optionalText.refine(
+    (value) => !value || value.length <= JOURNAL_EXCERPT_MAX,
+    `Ringkasan maksimal ${JOURNAL_EXCERPT_MAX} karakter.`,
+  ),
+  bodyHtml: z
+    .string()
+    .optional()
+    // Teks polos (mis. hasil tempel) dijadikan paragraf, lalu WAJIB disanitasi.
+    .transform((value) => sanitizeHtml(plainTextToHtml(value ?? "")))
+    .refine((value) => !isRichTextEmpty(value), "Isi artikel wajib diisi."),
   coverUrl: optionalImageUrl,
-  category: optionalText,
-  tags: z.array(z.string().trim().min(1)).max(20, "Maksimal 20 tag per artikel."),
-  status: z.enum(JOURNAL_STATUSES),
-  publishedAt: z.date().nullable(),
-  seoTitle: optionalText,
-  seoDescription: optionalText,
+  category: optionalText.refine(
+    (value) => !value || value.length <= JOURNAL_CATEGORY_MAX,
+    `Kategori maksimal ${JOURNAL_CATEGORY_MAX} karakter.`,
+  ),
+  status: z.enum(JOURNAL_STATUSES, { message: "Status tidak dikenal." }),
+  seoTitle: optionalText.refine(
+    (value) => !value || value.length <= JOURNAL_SEO_TITLE_MAX,
+    `Meta title maksimal ${JOURNAL_SEO_TITLE_MAX} karakter.`,
+  ),
+  seoDescription: optionalText.refine(
+    (value) => !value || value.length <= JOURNAL_SEO_DESCRIPTION_MAX,
+    `Meta description maksimal ${JOURNAL_SEO_DESCRIPTION_MAX} karakter.`,
+  ),
 });
 
-/** Form mengirim tag sebagai satu input comma-separated. */
-function parseTags(formData: FormData): string[] {
-  const raw = String(formData.get("tags") ?? "");
-  return raw
-    .split(",")
-    .map((value) => value.trim())
-    .filter((value) => value.length > 0)
-    .slice(0, 20);
-}
-
-function revalidateJournal(slug?: string | null) {
+function revalidateJournal(slugs: (string | null | undefined)[], redirectsChanged: boolean) {
   updateTag(CONTENT_TAGS.journal);
+  if (redirectsChanged) {
+    updateTag(CONTENT_TAGS.redirects);
+    revalidatePath("/admin/redirects");
+  }
   revalidatePath("/admin/journal");
-  revalidatePath("/our-story/journal");
-  if (slug) revalidatePath(`/our-story/journal/${slug}`);
+  revalidatePath(JOURNAL_BASE_PATH);
+  // Halaman Our Story menampilkan tiga tulisan terbaru.
+  revalidatePath("/our-story");
+  revalidatePath("/sitemap.xml");
+  for (const slug of new Set(slugs)) {
+    if (slug) revalidatePath(journalPath(slug));
+  }
 }
 
 export async function savePostAction(
@@ -64,87 +110,129 @@ export async function savePostAction(
 
   const id = String(formData.get("id") ?? "");
   const title = String(formData.get("title") ?? "").trim();
-  const rawSlug = String(formData.get("slug") ?? "").trim();
-  const status = String(formData.get("status") ?? "DRAFT") as JournalStatus;
-  const publishedAt = parseWibInput(text(formData, "publishedAt"));
 
-  if (publishedAt === undefined) {
+  const publishedAtInput = parseWibInput(text(formData, "publishedAt"));
+  if (publishedAtInput === undefined) {
     return { error: "Tanggal publikasi tidak valid." };
   }
 
-  // Slug boleh kosong → dibuat otomatis dari judul.
-  const slug = rawSlug || slugify(title);
-
   const parsed = postSchema.safeParse({
-    slug,
+    // Slug boleh kosong → dibuat otomatis dari judul.
+    slug: resolveJournalSlug(String(formData.get("slug") ?? ""), title),
     title,
     excerpt: text(formData, "excerpt"),
     bodyHtml: text(formData, "bodyHtml"),
     coverUrl: text(formData, "coverUrl"),
     category: text(formData, "category"),
-    tags: parseTags(formData),
-    status,
-    publishedAt,
+    status: text(formData, "status") ?? "DRAFT",
     seoTitle: text(formData, "seoTitle"),
     seoDescription: text(formData, "seoDescription"),
   });
-
   if (!parsed.success) {
     return { error: firstIssue(parsed.error) };
   }
-
   const data = parsed.data;
 
-  if (data.status === "SCHEDULED" && !data.publishedAt) {
-    return { error: "Tanggal publikasi wajib diisi untuk artikel terjadwal." };
-  }
+  const tags = parseJournalTags(text(formData, "tags") ?? "");
+  if (tags.error) return { error: tags.error };
 
-  // PUBLISHED tanpa tanggal → terbit sekarang.
-  const publishedAtValue =
-    data.status === "PUBLISHED"
-      ? (data.publishedAt ?? new Date())
-      : data.publishedAt;
+  const now = new Date();
+  const schedule = resolveJournalSchedule(data.status, publishedAtInput, now);
+  if (!schedule.ok) return { error: schedule.error };
+
+  const previous = id
+    ? await prisma.journalPost.findUnique({
+        where: { id },
+        select: { slug: true, status: true, publishedAt: true, coverUrl: true },
+      })
+    : null;
+  if (id && !previous) {
+    return { error: "Artikel tidak ditemukan. Mungkin sudah dihapus." };
+  }
 
   const clash = await prisma.journalPost.findFirst({
     where: { slug: data.slug, ...(id ? { NOT: { id } } : {}) },
     select: { id: true },
   });
-  if (clash) {
-    return { error: `Slug "${data.slug}" sudah dipakai artikel lain.` };
-  }
+  if (clash) return { error: SLUG_TAKEN(data.slug) };
 
-  if (id) {
-    const previous = await prisma.journalPost.findUnique({
-      where: { id },
-      select: { coverUrl: true },
-    });
-    if (previous?.coverUrl && previous.coverUrl !== data.coverUrl) {
-      await deleteImageByUrl(previous.coverUrl).catch(() => {});
-    }
-  }
+  // Kategori yang sama beda huruf besar/kecil memakai ejaan yang sudah ada.
+  const existingCategories = await prisma.journalPost.findMany({
+    where: { category: { not: null }, ...(id ? { NOT: { id } } : {}) },
+    select: { category: true },
+    distinct: ["category"],
+  });
+  const category = normalizeJournalCategory(
+    data.category,
+    existingCategories.map((row) => row.category ?? ""),
+  );
 
   const payload = {
     slug: data.slug,
     title: data.title,
     excerpt: data.excerpt,
-    // HTML dari rich text editor WAJIB disanitasi sebelum disimpan.
-    bodyHtml: sanitizeHtml(data.bodyHtml),
+    bodyHtml: data.bodyHtml,
     coverUrl: data.coverUrl,
-    category: data.category,
-    tags: data.tags,
-    status: data.status,
-    publishedAt: publishedAtValue,
+    category,
+    tags: tags.tags,
+    status: schedule.status,
+    publishedAt: schedule.publishedAt,
     seoTitle: data.seoTitle,
     seoDescription: data.seoDescription,
   };
 
-  if (id) {
-    await prisma.journalPost.update({ where: { id }, data: payload });
-  } else {
-    await prisma.journalPost.create({ data: payload });
+  const newPath = journalPath(data.slug);
+  // Alamat lama tetap hidup (301) bila slug artikel yang sudah tampil publik berubah.
+  const needsSlugRedirect =
+    previous !== null && previous.slug !== data.slug && isJournalVisible(previous, now);
+
+  let redirectsChanged = false;
+  try {
+    redirectsChanged = await prisma.$transaction(async (tx) => {
+      let changed = false;
+
+      if (needsSlugRedirect && previous) {
+        changed = await recordPathMoves(
+          tx,
+          [{ from: journalPath(previous.slug), to: newPath }],
+          `Slug artikel journal "${data.title}" diubah`,
+        );
+      }
+
+      // Artikel (akan) terbit merebut kembali URL-nya: redirect dari alamat ini
+      // akan menutupi artikel.
+      if (schedule.status !== "DRAFT") {
+        const shadowing = (
+          await tx.redirect.findMany({ select: { fromPath: true } })
+        ).filter((r) => normalizePath(r.fromPath) === newPath);
+        if (shadowing.length > 0) {
+          await tx.redirect.deleteMany({
+            where: { fromPath: { in: shadowing.map((r) => r.fromPath) } },
+          });
+          changed = true;
+        }
+      }
+
+      if (id) {
+        await tx.journalPost.update({ where: { id }, data: payload });
+      } else {
+        await tx.journalPost.create({ data: payload });
+      }
+      return changed;
+    });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      return { error: SLUG_TAKEN(data.slug) };
+    }
+    throw error;
   }
 
-  revalidateJournal(data.slug);
+  // Sampul lama dibuang setelah simpan berhasil (berkas Media Library tidak ikut terhapus).
+  if (previous?.coverUrl && previous.coverUrl !== data.coverUrl) {
+    await deleteImageByUrl(previous.coverUrl).catch(() => {});
+  }
+
+  revalidateJournal([previous?.slug, data.slug], redirectsChanged);
   redirect("/admin/journal?saved=1");
 }
 
@@ -154,12 +242,35 @@ export async function deletePostAction(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   if (!id) return;
 
-  const post = await prisma.journalPost.delete({ where: { id } });
+  const post = await prisma.journalPost.findUnique({
+    where: { id },
+    select: { slug: true, coverUrl: true },
+  });
+  if (!post) redirect("/admin/journal?deleted=1");
+
+  const path = journalPath(post.slug);
+
+  // Redirect yang menuju artikel ini (mis. dari slug lamanya) ikut dihapus
+  // agar tidak mengarah ke halaman 404.
+  const removed = await prisma.$transaction(async (tx) => {
+    const pointing = (
+      await tx.redirect.findMany({ select: { fromPath: true, toPath: true } })
+    ).filter((r) => r.toPath.startsWith("/") && normalizePath(r.toPath) === path);
+
+    if (pointing.length > 0) {
+      await tx.redirect.deleteMany({
+        where: { fromPath: { in: pointing.map((r) => r.fromPath) } },
+      });
+    }
+    await tx.journalPost.delete({ where: { id } });
+    return pointing.length;
+  });
+
   if (post.coverUrl) {
     await deleteImageByUrl(post.coverUrl).catch(() => {});
   }
 
-  revalidateJournal(post.slug);
+  revalidateJournal([post.slug], removed > 0);
   redirect("/admin/journal?deleted=1");
 }
 
@@ -167,7 +278,7 @@ export async function listPosts() {
   await requireSession();
 
   return prisma.journalPost.findMany({
-    orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+    orderBy: [{ publishedAt: { sort: "desc", nulls: "first" } }, { createdAt: "desc" }],
   });
 }
 
@@ -175,4 +286,21 @@ export async function getPost(id: string) {
   await requireSession();
 
   return prisma.journalPost.findUnique({ where: { id } });
+}
+
+/** Kategori & tag yang sudah dipakai (termasuk draf), untuk saran di form. */
+export async function listJournalTaxonomy(): Promise<{
+  categories: string[];
+  tags: string[];
+}> {
+  await requireSession();
+
+  const rows = await prisma.journalPost.findMany({
+    select: { category: true, tags: true },
+    orderBy: [{ updatedAt: "desc" }],
+  });
+  return {
+    categories: collectJournalCategories(rows).sort((a, b) => a.localeCompare(b, "id")),
+    tags: collectJournalTags(rows),
+  };
 }

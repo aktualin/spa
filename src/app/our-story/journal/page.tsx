@@ -9,12 +9,23 @@ import {
   PublicEmptyState,
   PublicPageHeader,
 } from "@/components/public/page-parts";
-import { getJournalPosts, getJournalCategories } from "@/lib/content/journal";
+import {
+  getJournalCategories,
+  getJournalPosts,
+  getJournalTags,
+} from "@/lib/content/journal";
 import { withPageSeo } from "@/lib/content/seo";
+import {
+  JOURNAL_BASE_PATH,
+  journalListHref,
+  parseJournalFilter,
+} from "@/lib/domain/journal";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return withPageSeo("/our-story/journal", {
+  return withPageSeo(JOURNAL_BASE_PATH, {
     title: "Journal",
+    // Versi tersaring (?category=, ?tag=) menunjuk ke daftar utama.
+    alternates: { canonical: JOURNAL_BASE_PATH },
     description:
       "Tulisan KAMA Spa tentang perawatan tubuh, ritual, dan kebiasaan istirahat yang baik.",
   });
@@ -31,11 +42,11 @@ function formatPublishedAt(date: Date | null): string | null {
 }
 
 type JournalPageProps = {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string | string[]; tag?: string | string[] }>;
 };
 
 export default function JournalPage({ searchParams }: JournalPageProps) {
-  /* Filter kategori datang dari query string — runtime data, jadi daftar
+  /* Filter kategori/tag datang dari query string — runtime data, jadi daftar
      artikelnya dibaca di dalam Suspense boundary. Header halaman tetap
      ter-prerender. */
   return (
@@ -67,11 +78,15 @@ function JournalListFallback() {
 }
 
 async function JournalList({ searchParams }: JournalPageProps) {
-  const { category } = await searchParams;
-  const [posts, categories] = await Promise.all([
-    getJournalPosts(category),
+  const { category, tag } = parseJournalFilter(await searchParams);
+  const [posts, categories, tags] = await Promise.all([
+    getJournalPosts({ category, tag }),
     getJournalCategories(),
+    getJournalTags(),
   ]);
+  const activeCategory = categories.find(
+    (name) => name.toLowerCase() === category?.toLowerCase(),
+  );
 
   return (
     <>
@@ -80,7 +95,7 @@ async function JournalList({ searchParams }: JournalPageProps) {
             <div className="container-kama pt-10 md:pt-12">
               <div className="flex flex-wrap gap-2">
                 <Link
-                  href="/our-story/journal"
+                  href={journalListHref({ tag })}
                   aria-current={category ? undefined : "page"}
                   className={`btn btn-outline border-cocoa/40 ${
                     category ? "" : "bg-cocoa/10"
@@ -91,15 +106,47 @@ async function JournalList({ searchParams }: JournalPageProps) {
                 {categories.map((name) => (
                   <Link
                     key={name}
-                    href={`/our-story/journal?category=${encodeURIComponent(name)}`}
-                    aria-current={category === name ? "page" : undefined}
+                    href={journalListHref({ category: name, tag })}
+                    aria-current={activeCategory === name ? "page" : undefined}
                     className={`btn btn-outline border-cocoa/40 ${
-                      category === name ? "bg-cocoa/10" : ""
+                      activeCategory === name ? "bg-cocoa/10" : ""
                     }`}
                   >
                     {name}
                   </Link>
                 ))}
+              </div>
+            </div>
+          </Reveal>
+        ) : null}
+
+        {tags.length > 0 ? (
+          <Reveal as="section" className="bg-cream">
+            <div
+              className={`container-kama ${categories.length > 0 ? "pt-4" : "pt-10 md:pt-12"}`}
+            >
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-caption text-cocoa/50">Tag:</span>
+                {tags.map((name) => {
+                  const current = tag === name;
+                  return (
+                    <Link
+                      key={name}
+                      href={journalListHref({
+                        category: activeCategory ?? category,
+                        tag: current ? undefined : name,
+                      })}
+                      aria-current={current ? "page" : undefined}
+                      className={`border px-3 py-1 text-caption transition-colors ${
+                        current
+                          ? "border-cocoa/60 bg-cocoa/10 text-cocoa"
+                          : "border-cocoa/20 text-cocoa/60 hover:border-cocoa/50"
+                      }`}
+                    >
+                      {name}
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           </Reveal>
@@ -158,8 +205,13 @@ async function JournalList({ searchParams }: JournalPageProps) {
             ) : (
               <PublicEmptyState
                 title={
-                  category
-                    ? `Belum ada tulisan di kategori "${category}"`
+                  category || tag
+                    ? `Belum ada tulisan ${[
+                        category ? `di kategori "${activeCategory ?? category}"` : "",
+                        tag ? `dengan tag "${tag}"` : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}`
                     : "Belum ada tulisan"
                 }
                 description="Daftar ini terisi otomatis begitu artikel dipublikasikan dari dashboard admin."

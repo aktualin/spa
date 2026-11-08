@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 
 import { requireRole } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
+import { isJournalVisible } from "@/lib/domain/visibility";
 
+import { getPost, listJournalTaxonomy } from "../../actions/journal";
 import { toWibDateTimeInput } from "../../promos/_kit/schema";
 import { JournalForm, type JournalFormData } from "../journal-form";
 
@@ -19,42 +20,43 @@ export default async function JournalEditPage({
   const { id } = await params;
   const isNew = id === "new";
 
-  let data: JournalFormData;
+  const [post, taxonomy] = await Promise.all([
+    isNew ? null : getPost(id),
+    listJournalTaxonomy(),
+  ]);
+  if (!isNew && !post) notFound();
 
-  if (isNew) {
-    data = {
-      id: null,
-      title: "",
-      slug: "",
-      excerpt: "",
-      bodyHtml: "",
-      coverUrl: "",
-      category: "",
-      tags: "",
-      status: "DRAFT",
-      publishedAt: "",
-      seoTitle: "",
-      seoDescription: "",
-    };
-  } else {
-    const post = await prisma.journalPost.findUnique({ where: { id } });
-    if (!post) notFound();
+  const data: JournalFormData = post
+    ? {
+        id: post.id,
+        title: post.title,
+        slug: post.slug,
+        excerpt: post.excerpt ?? "",
+        bodyHtml: post.bodyHtml,
+        coverUrl: post.coverUrl ?? "",
+        category: post.category ?? "",
+        tags: post.tags.join(", "),
+        status: post.status,
+        publishedAt: toWibDateTimeInput(post.publishedAt),
+        seoTitle: post.seoTitle ?? "",
+        seoDescription: post.seoDescription ?? "",
+        isPublic: isJournalVisible(post, new Date()),
+      }
+    : {
+        id: null,
+        title: "",
+        slug: "",
+        excerpt: "",
+        bodyHtml: "",
+        coverUrl: "",
+        category: "",
+        tags: "",
+        status: "DRAFT",
+        publishedAt: "",
+        seoTitle: "",
+        seoDescription: "",
+        isPublic: false,
+      };
 
-    data = {
-      id: post.id,
-      title: post.title,
-      slug: post.slug,
-      excerpt: post.excerpt ?? "",
-      bodyHtml: post.bodyHtml,
-      coverUrl: post.coverUrl ?? "",
-      category: post.category ?? "",
-      tags: post.tags.join(", "),
-      status: post.status,
-      publishedAt: toWibDateTimeInput(post.publishedAt),
-      seoTitle: post.seoTitle ?? "",
-      seoDescription: post.seoDescription ?? "",
-    };
-  }
-
-  return <JournalForm post={data} />;
+  return <JournalForm post={data} taxonomy={taxonomy} />;
 }

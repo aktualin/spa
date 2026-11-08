@@ -7,9 +7,12 @@ import {
   resolveRedirect,
   validatePageSlug,
 } from "@/lib/domain/page-url";
-import { isPromoActive } from "@/lib/domain/visibility";
+import { isValidSlug } from "@/lib/domain/slug";
+import { isJournalVisible, isPromoActive } from "@/lib/domain/visibility";
 import {
+  fetchJournalVisibility,
   fetchPromoPeriod,
+  getJournalVisibility,
   getPromoPeriods,
   getPublishedPageSlugs,
   getRedirectMap,
@@ -34,6 +37,7 @@ export async function proxy(request: NextRequest) {
       (await applyRedirect(request)) ??
       (await notFoundForUnknownPage(request)) ??
       (await notFoundForInactivePromo(request)) ??
+      (await notFoundForHiddenJournalPost(request)) ??
       NextResponse.next()
     );
   }
@@ -165,6 +169,39 @@ async function notFoundForInactivePromo(
   const fresh = await fetchPromoPeriod(slug);
   if (fresh === undefined) return null; // database bermasalah: jangan menebak
   if (fresh && isPromoActive(fresh, now)) return null;
+
+  return NextResponse.rewrite(new URL("/_not-found", request.url), {
+    status: 404,
+  });
+}
+
+/**
+ * `/our-story/journal/[slug]` juga merender notFound() di dalam Suspense
+ * (soft-404). Artikel draf, terjadwal yang belum tiba waktunya, atau tidak ada
+ * dijawab 404 di sini. Visibilitas dievaluasi pada waktu request, jadi artikel
+ * terjadwal mulai bisa dibuka tepat saat jadwalnya tiba. Sebelum menjawab 404,
+ * status dibaca ulang langsung dari database supaya artikel yang baru
+ * diterbitkan tidak tertolak oleh cache proxy yang belum diperbarui.
+ */
+async function notFoundForHiddenJournalPost(
+  request: NextRequest,
+): Promise<NextResponse | null> {
+  if (request.method !== "GET" && request.method !== "HEAD") return null;
+  const match = /^\/our-story\/journal\/([^/]+)\/?$/.exec(request.nextUrl.pathname);
+  if (!match) return null;
+
+  const slug = decodeURIComponentSafe(match[1]);
+  // Slug yang tidak mungkin dibuat admin tidak perlu ditanyakan ke database.
+  if (isValidSlug(slug)) {
+    const now = new Date();
+    const cached = await getJournalVisibility();
+    const fromCache = cached.value.get(slug);
+    if (fromCache && isJournalVisible(fromCache, now)) return null;
+
+    const fresh = await fetchJournalVisibility(slug);
+    if (fresh === undefined) return null; // database bermasalah: jangan menebak
+    if (fresh && isJournalVisible(fresh, now)) return null;
+  }
 
   return NextResponse.rewrite(new URL("/_not-found", request.url), {
     status: 404,

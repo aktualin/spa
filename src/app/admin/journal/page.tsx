@@ -1,18 +1,32 @@
 import Link from "next/link";
 
+import { effectiveJournalStatus, journalPath } from "@/lib/domain/journal";
+
 import { listPosts } from "../actions/journal";
 import { Badge, PageHeader, StatusBanners, Thumb, primaryLinkClass } from "../promos/_kit/list-ui";
 import { formatWibDateTime } from "../promos/_kit/schema";
-import { journalStatusMeta } from "./journal-status";
+import { JOURNAL_STATUSES, journalStatusMeta, type JournalStatus } from "./journal-status";
 
 export const instant = false;
+
+const FILTERS: { value: JournalStatus | null; label: string }[] = [
+  { value: null, label: "Semua" },
+  ...JOURNAL_STATUSES.map((value) => ({ value, label: journalStatusMeta[value].label })),
+];
 
 export default async function AdminJournalPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string; deleted?: string }>;
+  searchParams: Promise<{ saved?: string; deleted?: string; status?: string }>;
 }) {
   const [posts, params] = await Promise.all([listPosts(), searchParams]);
+  const now = new Date();
+
+  const rows = posts.map((post) => ({ post, status: effectiveJournalStatus(post, now) }));
+  const active = JOURNAL_STATUSES.find((value) => value === params.status) ?? null;
+  const shown = active ? rows.filter((row) => row.status === active) : rows;
+  const count = (value: JournalStatus | null) =>
+    value ? rows.filter((row) => row.status === value).length : rows.length;
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -32,13 +46,35 @@ export default async function AdminJournalPage({
         deletedLabel="Artikel dihapus."
       />
 
-      <div className="mt-6">
-        {posts.length === 0 ? (
-          <p className="text-sm text-neutral-500">Belum ada artikel journal.</p>
+      <nav aria-label="Saring status" className="mt-6 flex flex-wrap gap-2">
+        {FILTERS.map((filter) => {
+          const current = filter.value === active;
+          return (
+            <Link
+              key={filter.label}
+              href={filter.value ? `/admin/journal?status=${filter.value}` : "/admin/journal"}
+              aria-current={current ? "page" : undefined}
+              className={`rounded-full border px-3 py-1 text-xs ${
+                current
+                  ? "border-neutral-900 bg-neutral-900 text-white"
+                  : "border-neutral-300 text-neutral-700 hover:bg-neutral-50"
+              }`}
+            >
+              {filter.label} ({count(filter.value)})
+            </Link>
+          );
+        })}
+      </nav>
+
+      <div className="mt-4">
+        {shown.length === 0 ? (
+          <p className="text-sm text-neutral-500">
+            {posts.length === 0 ? "Belum ada artikel journal." : "Tidak ada artikel dengan status ini."}
+          </p>
         ) : (
           <ul className="divide-y divide-neutral-200 overflow-hidden rounded-lg border border-neutral-200 bg-white">
-            {posts.map((post) => {
-              const meta = journalStatusMeta[post.status];
+            {shown.map(({ post, status }) => {
+              const meta = journalStatusMeta[status];
               return (
                 <li
                   key={post.id}
@@ -57,20 +93,36 @@ export default async function AdminJournalPage({
                         <Badge tone={meta.tone}>{meta.label}</Badge>
                       </div>
                       <p className="mt-0.5 truncate text-xs text-neutral-500">
-                        /{post.slug}
+                        {journalPath(post.slug)}
                         {post.category ? ` · ${post.category}` : ""}
+                        {post.tags.length > 0 ? ` · ${post.tags.map((t) => `#${t}`).join(" ")}` : ""}
                       </p>
                     </div>
                   </div>
 
                   <div className="text-right text-xs text-neutral-500">
-                    <p>{formatWibDateTime(post.publishedAt)}</p>
-                    <Link
-                      href={`/admin/journal/${post.id}/preview`}
-                      className="text-neutral-700 underline"
-                    >
-                      Preview
-                    </Link>
+                    <p>
+                      {status === "SCHEDULED" ? "Terbit otomatis " : ""}
+                      {formatWibDateTime(post.publishedAt)}
+                    </p>
+                    <p className="mt-0.5 space-x-3">
+                      <Link
+                        href={`/admin/journal/${post.id}/preview`}
+                        className="text-neutral-700 underline"
+                      >
+                        Preview
+                      </Link>
+                      {status === "PUBLISHED" ? (
+                        <a
+                          href={journalPath(post.slug)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-neutral-700 underline"
+                        >
+                          Lihat di situs
+                        </a>
+                      ) : null}
+                    </p>
                   </div>
                 </li>
               );

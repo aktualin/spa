@@ -2,26 +2,25 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { Navigation } from "@/components/navigation";
+import { DeferredNavigation } from "@/components/public/deferred-navigation";
 import { Footer } from "@/components/footer";
 import { ArrowLeft } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
 import { getJournalPost, getJournalPosts } from "@/lib/content/journal";
 import { withPageSeo } from "@/lib/content/seo";
+import { journalListHref, journalPath } from "@/lib/domain/journal";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 
 type JournalPostPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-/**
- * Slug yang di-prerender. Tanpa ini Next 16 hanya menyiapkan shell rute, dan
- * `usePathname()` di `Navigation` memblokir prerender (`CLIENT_HOOK_DYNAMIC`).
+/*
+ * Tanpa `generateStaticParams`: daftar artikel terbit bisa kosong dan daftar
+ * kosong menggagalkan build. Slug dibaca di dalam Suspense (seperti
+ * /promos/[slug]) dan navigasi memakai `DeferredNavigation`. Artikel yang
+ * tidak terlihat publik dijawab 404 sungguhan oleh `src/proxy.ts`.
  */
-export async function generateStaticParams() {
-  const posts = await getJournalPosts();
-  return posts.map((post) => ({ slug: post.slug }));
-}
 
 export async function generateMetadata({
   params,
@@ -33,12 +32,33 @@ export async function generateMetadata({
     return { title: "Tulisan tidak ditemukan" };
   }
 
-  return withPageSeo(`/our-story/journal/${slug}`, {
-    title: post.seoTitle ?? post.title,
-    description:
-      post.seoDescription ??
-      post.excerpt ??
-      `${post.title} — Journal KAMA Spa.`,
+  const path = journalPath(post.slug);
+  const title = post.seoTitle ?? post.title;
+  const description =
+    post.seoDescription ?? post.excerpt ?? `${post.title} — Journal KAMA Spa.`;
+  const images = post.coverUrl ? [{ url: post.coverUrl, alt: post.title }] : undefined;
+
+  return withPageSeo(path, {
+    title,
+    description,
+    alternates: { canonical: path },
+    openGraph: {
+      type: "article",
+      url: path,
+      title,
+      description,
+      images,
+      publishedTime: post.publishedAt?.toISOString(),
+      modifiedTime: post.updatedAt?.toISOString(),
+      section: post.category ?? undefined,
+      tags: post.tags.length > 0 ? post.tags : undefined,
+    },
+    twitter: {
+      card: images ? "summary_large_image" : "summary",
+      title,
+      description,
+      images: images?.map((image) => image.url),
+    },
   });
 }
 
@@ -56,7 +76,7 @@ export default function JournalPostPage({ params }: JournalPostPageProps) {
   /* Slug adalah runtime data — dibaca di dalam Suspense boundary. */
   return (
     <>
-      <Navigation />
+      <DeferredNavigation />
       <Suspense fallback={<JournalPostFallback />}>
         <JournalPostContent params={params} />
       </Suspense>
@@ -102,7 +122,12 @@ async function JournalPostContent({ params }: JournalPostPageProps) {
               </Link>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                 {post.category ? (
-                  <span className="eyebrow text-cocoa/60">{post.category}</span>
+                  <Link
+                    href={journalListHref({ category: post.category })}
+                    className="eyebrow text-cocoa/60 transition-opacity hover:opacity-70"
+                  >
+                    {post.category}
+                  </Link>
                 ) : null}
                 {published ? (
                   <span className="text-caption text-cocoa/50">{published}</span>
@@ -149,12 +174,13 @@ async function JournalPostContent({ params }: JournalPostPageProps) {
             {post.tags.length > 0 ? (
               <div className="mt-10 flex flex-wrap gap-2">
                 {post.tags.map((tag) => (
-                  <span
+                  <Link
                     key={tag}
-                    className="border border-cocoa/20 px-3 py-1 text-caption text-cocoa/60"
+                    href={journalListHref({ tag })}
+                    className="border border-cocoa/20 px-3 py-1 text-caption text-cocoa/60 transition-colors hover:border-cocoa/50"
                   >
                     {tag}
-                  </span>
+                  </Link>
                 ))}
               </div>
             ) : null}

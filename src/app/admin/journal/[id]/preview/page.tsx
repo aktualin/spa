@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
+import { effectiveJournalStatus } from "@/lib/domain/journal";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 
 import { formatWibDateTime } from "../../../promos/_kit/schema";
@@ -28,7 +29,7 @@ export default async function JournalPreviewPage({
   const post = await prisma.journalPost.findUnique({ where: { id } });
   if (!post) notFound();
 
-  const meta = journalStatusMeta[post.status];
+  const meta = journalStatusMeta[effectiveJournalStatus(post, new Date())];
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -41,7 +42,8 @@ export default async function JournalPreviewPage({
 
       <p className="mt-3 rounded-md bg-blue-50 px-3 py-2 text-sm text-blue-800">
         Preview artikel tersimpan. Konten di bawah belum tentu sama dengan
-        tampilan publik selama status artikel bukan Terbit.
+        tampilan publik selama status artikel bukan Terbit atau jadwalnya belum
+        tiba.
       </p>
 
       <article className="mt-6">
@@ -59,7 +61,7 @@ export default async function JournalPreviewPage({
           </h1>
           <p className="mt-1 text-xs text-neutral-500">
             {formatWibDateTime(post.publishedAt)}
-            {post.tags.length > 0 ? ` · ${post.tags.join(", ")}` : ""}
+            {post.tags.length > 0 ? ` · ${post.tags.map((t) => `#${t}`).join(" ")}` : ""}
           </p>
           {post.excerpt ? (
             <p className="mt-3 text-sm text-neutral-600">{post.excerpt}</p>

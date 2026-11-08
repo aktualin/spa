@@ -83,7 +83,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const post of posts) {
     entries.push({
       url: url(`our-story/journal/${post.slug}`),
-      lastModified: post.publishedAt ?? undefined,
+      lastModified: post.updatedAt ?? post.publishedAt ?? undefined,
       changeFrequency: "yearly",
       priority: 0.5,
     });
