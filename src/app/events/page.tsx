@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return withPageSeo("/events", {
     title: "Events",
     description:
-      "Upcoming events dan program KAMA Spa — personally curated experiences, corporate wellness, dan kolaborasiksi dengan brandtemu.",
+      "Upcoming events dan program KAMA Spa — personally curated experiences, corporate wellness, dan kolaborasi dengan brand.",
   });
 }
 
@@ -59,7 +59,7 @@ export default async function EventsPage() {
             <PublicSectionHeader
               eyebrow="Past Events"
               title="Telah berlalu"
-              description="Potongan momentarily yang pernah kami jalankan."
+              description="Potongan momen dari event yang pernah kami jalankan."
             />
             {past.length > 0 ? (
               <EventGrid events={past} />

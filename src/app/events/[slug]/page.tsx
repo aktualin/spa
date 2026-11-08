@@ -12,6 +12,7 @@ import {
 } from "@/components/public/page-parts";
 import {
   EventGallery,
+  EventPartner,
   formatEventDate,
 } from "@/components/public/events/event-parts";
 import { getEvent } from "@/lib/content/events";
@@ -79,14 +80,17 @@ async function EventContent({
         description={event.description ?? undefined}
       >
         <div className="button-group mt-4 flex flex-wrap gap-3">
-          <a
-            href={waLink(`Halo kak, saya mau ikut event ${event.title}`)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-primary"
-          >
-            Daftar via WhatsApp
-          </a>
+          {/* Pendaftaran hanya untuk event yang belum lewat. */}
+          {event.phase !== "past" ? (
+            <a
+              href={waLink(`Halo kak, saya mau ikut event ${event.title}`)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary"
+            >
+              Daftar via WhatsApp
+            </a>
+          ) : null}
           <Link href="/events" className="btn btn-outline border-cocoa/40">
             Semua Event
             <ArrowRight className="h-4 w-4" />
@@ -127,6 +131,23 @@ async function EventContent({
             )}
             {event.location ? (
               <p className="text-body text-cocoa/70">Lokasi: {event.location}</p>
+            ) : null}
+            {event.isCollaboration && (event.partnerName || event.partnerLogoUrl) ? (
+              <div className="flex flex-col gap-2">
+                <span className="eyebrow text-cocoa/60">Kolaborasi</span>
+                {event.partnerUrl ? (
+                  <a
+                    href={event.partnerUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-fit transition-opacity hover:opacity-70"
+                  >
+                    <EventPartner event={event} size="lg" />
+                  </a>
+                ) : (
+                  <EventPartner event={event} size="lg" />
+                )}
+              </div>
             ) : null}
           </div>
         </div>

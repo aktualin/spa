@@ -16,17 +16,14 @@ export default async function EventEditPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ saved?: string; deleted?: string }>;
+  searchParams: Promise<{ saved?: string; created?: string; photoDeleted?: string }>;
 }) {
   await requireRole(CONTENT_ROLES);
 
   const [{ id }, query] = await Promise.all([params, searchParams]);
-  const isNew = id === "new";
 
-  let data: EventFormData;
-
-  if (isNew) {
-    data = {
+  if (id === "new") {
+    const data: EventFormData = {
       id: null,
       slug: "",
       title: "",
@@ -36,58 +33,78 @@ export default async function EventEditPage({
       startDate: "",
       endDate: "",
       isCollaboration: false,
+      partnerName: "",
+      partnerLogoUrl: "",
+      partnerUrl: "",
       isPublished: true,
       sortOrder: 0,
       seoTitle: "",
       seoDescription: "",
     };
-  } else {
-    const event = await prisma.eventItem.findUnique({
-      where: { id },
-      include: { photos: { orderBy: [{ sortOrder: "asc" }, { id: "asc" }] } },
-    });
-    if (!event) notFound();
-
-    data = {
-      id: event.id,
-      slug: event.slug,
-      title: event.title,
-      description: event.description ?? "",
-      coverUrl: event.coverUrl ?? "",
-      location: event.location ?? "",
-      startDate: toWibDateInput(event.startDate),
-      endDate: toWibDateInput(event.endDate),
-      isCollaboration: event.isCollaboration,
-      isPublished: event.isPublished,
-      sortOrder: event.sortOrder,
-      seoTitle: event.seoTitle ?? "",
-      seoDescription: event.seoDescription ?? "",
-    };
-
     return (
-      <div className="mx-auto max-w-2xl space-y-10">
-        <StatusBanners
-          saved={query.saved}
-          deleted={query.deleted}
-          deletedLabel="Foto event dihapus."
-        />
-
+      <div className="mx-auto max-w-2xl space-y-4">
         <EventForm event={data} />
-
-        <section className="border-t border-neutral-200 pt-8">
-          <EventPhotoManager
-            eventId={event.id}
-            photos={event.photos.map((photo) => ({
-              id: photo.id,
-              imageUrl: photo.imageUrl,
-              caption: photo.caption ?? "",
-              sortOrder: photo.sortOrder,
-            }))}
-          />
-        </section>
+        <p className="text-xs text-neutral-500">
+          Foto galeri event bisa ditambahkan setelah event pertama kali disimpan.
+        </p>
       </div>
     );
   }
 
-  return <EventForm event={data} />;
+  const event = await prisma.eventItem.findUnique({
+    where: { id },
+    include: { photos: { orderBy: [{ sortOrder: "asc" }, { id: "asc" }] } },
+  });
+  if (!event) notFound();
+
+  const data: EventFormData = {
+    id: event.id,
+    slug: event.slug,
+    title: event.title,
+    description: event.description ?? "",
+    coverUrl: event.coverUrl ?? "",
+    location: event.location ?? "",
+    startDate: toWibDateInput(event.startDate),
+    endDate: toWibDateInput(event.endDate),
+    isCollaboration: event.isCollaboration,
+    partnerName: event.partnerName ?? "",
+    partnerLogoUrl: event.partnerLogoUrl ?? "",
+    partnerUrl: event.partnerUrl ?? "",
+    isPublished: event.isPublished,
+    sortOrder: event.sortOrder,
+    seoTitle: event.seoTitle ?? "",
+    seoDescription: event.seoDescription ?? "",
+  };
+
+  return (
+    <div className="mx-auto max-w-2xl space-y-10">
+      {query.created ? (
+        <p
+          role="status"
+          className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-800"
+        >
+          Event tersimpan. Tambahkan foto galeri di bagian bawah halaman ini.
+        </p>
+      ) : null}
+      <StatusBanners
+        saved={query.saved}
+        deleted={query.photoDeleted}
+        deletedLabel="Foto event dihapus."
+      />
+
+      <EventForm event={data} publishedSlug={event.isPublished ? event.slug : null} />
+
+      <section className="border-t border-neutral-200 pt-8">
+        <EventPhotoManager
+          eventId={event.id}
+          photos={event.photos.map((photo) => ({
+            id: photo.id,
+            imageUrl: photo.imageUrl,
+            caption: photo.caption ?? "",
+            sortOrder: photo.sortOrder,
+          }))}
+        />
+      </section>
+    </div>
+  );
 }

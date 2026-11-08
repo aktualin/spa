@@ -1,15 +1,19 @@
 /**
  * Bacaan publik event (`EventItem` + `EventPhoto`).
  *
- * Pemisahan upcoming/past/collaborations memakai `groupEvents` dari
- * `@/lib/domain/events` — dijalankan DI DALAM fungsi cached supaya
- * hasilnya konsisten (dan tidak error saat prerender).
+ * Status upcoming/past/collaborations memakai aturan di `@/lib/domain/events`
+ * dan dievaluasi DI DALAM fungsi `"use cache"` dengan `cacheLife("minutes")`:
+ * event yang baru lewat pindah kelompok paling lambat beberapa menit kemudian
+ * tanpa deploy ulang, dan tulisan admin langsung terbaca lewat `updateTag`.
+ *
+ * Detail per slug membaca langsung dari database (cache di-key slug), bukan
+ * menyaring daftar — event yang dibuat setelah build tetap ditemukan.
  *
  * DB kosong/down → daftar kosong; halaman menampilkan pesan ramah.
  */
 import { cacheLife, cacheTag } from "next/cache";
 
-import { groupEvents } from "@/lib/domain/events";
+import { eventPhase, groupEvents, type EventPhase } from "@/lib/domain/events";
 import { safeQueryWithMeta } from "@/lib/safe-query";
 
 import { CONTENT_TAGS } from "./tags";
@@ -30,8 +34,14 @@ export type PublicEvent = {
   startDate: Date | null;
   endDate: Date | null;
   isCollaboration: boolean;
+  partnerName: string | null;
+  partnerLogoUrl: string | null;
+  partnerUrl: string | null;
+  sortOrder: number;
   seoTitle: string | null;
   seoDescription: string | null;
+  /** Status saat data dibaca (lihat aturan di `@/lib/domain/events`). */
+  phase: EventPhase;
   photos: PublicEventPhoto[];
 };
 
@@ -43,31 +53,17 @@ export type EventGroups = {
 
 const EMPTY: PublicEvent[] = [];
 
-type EventRow = {
-  id: string;
-  slug: string;
-  title: string;
-  description: string | null;
-  coverUrl: string | null;
-  location: string | null;
-  startDate: Date | null;
-  endDate: Date | null;
-  isCollaboration: boolean;
-  seoTitle: string | null;
-  seoDescription: string | null;
-  photos: { id: string; imageUrl: string; caption: string | null }[];
+const eventInclude = {
+  photos: {
+    orderBy: [{ sortOrder: "asc" as const }, { id: "asc" as const }],
+    select: { id: true, imageUrl: true, caption: true },
+  },
 };
 
-async function queryEventRows(): Promise<EventRow[]> {
-  const { prisma } = await import("@/lib/prisma");
-  const rows = await prisma.eventItem.findMany({
-    where: { isPublished: true },
-    orderBy: [{ sortOrder: "asc" }, { startDate: "asc" }],
-    include: {
-      photos: { orderBy: [{ sortOrder: "asc" }, { id: "asc" }] },
-    },
-  });
-  return rows.map((r) => ({
+type EventRow = Omit<PublicEvent, "phase">;
+
+function toRow(r: EventRow): EventRow {
+  return {
     id: r.id,
     slug: r.slug,
     title: r.title,
@@ -77,6 +73,10 @@ async function queryEventRows(): Promise<EventRow[]> {
     startDate: r.startDate,
     endDate: r.endDate,
     isCollaboration: r.isCollaboration,
+    partnerName: r.partnerName,
+    partnerLogoUrl: r.partnerLogoUrl,
+    partnerUrl: r.partnerUrl,
+    sortOrder: r.sortOrder,
     seoTitle: r.seoTitle,
     seoDescription: r.seoDescription,
     photos: r.photos.map((p) => ({
@@ -84,68 +84,80 @@ async function queryEventRows(): Promise<EventRow[]> {
       imageUrl: p.imageUrl,
       caption: p.caption,
     })),
-  }));
+  };
 }
+
+const withPhase = (row: EventRow, now: Date): PublicEvent => ({
+  ...row,
+  phase: eventPhase(row, now),
+});
 
 /**
  * Semua event published, dikelompokkan menjadi upcoming / past / collaborations.
- * `cacheLife("minutes")` → event yang baru dipublish atau sudah lewat cepat
- * terbaca tanpa perlu deploy ulang.
  */
 export async function getEventGroups(): Promise<EventGroups> {
   "use cache";
   cacheTag(CONTENT_TAGS.events);
+  cacheLife("minutes");
 
-  const { data, usedFallback } = await safeQueryWithMeta<EventGroups>(
+  const { data } = await safeQueryWithMeta<EventGroups>(
     async () => {
-      const rows = await queryEventRows();
-      const grouped = groupEvents(rows, new Date());
-      return {
-        upcoming: grouped.upcoming,
-        past: grouped.past,
-        collaborations: grouped.collaborations,
-      };
+      const { prisma } = await import("@/lib/prisma");
+      const rows = await prisma.eventItem.findMany({
+        where: { isPublished: true },
+        include: eventInclude,
+      });
+      const now = new Date();
+      return groupEvents(
+        rows.map((row) => withPhase(toRow(row), now)),
+        now,
+      );
     },
     { upcoming: EMPTY, past: EMPTY, collaborations: EMPTY },
   );
 
-  if (usedFallback) cacheLife("minutes");
-  else cacheLife("minutes");
   return data;
 }
 
-/** Detail satu event (beserta foto-fotonya). */
+/** Detail satu event published (beserta foto-fotonya), dibaca per slug. */
 export async function getEvent(slug: string): Promise<PublicEvent | null> {
   "use cache";
   cacheTag(CONTENT_TAGS.events);
+  cacheLife("minutes");
 
-  const { data, usedFallback } = await safeQueryWithMeta<PublicEvent | null>(
+  const { data } = await safeQueryWithMeta<PublicEvent | null>(
     async () => {
-      const rows = await queryEventRows();
-      return rows.find((r) => r.slug === slug) ?? null;
+      const { prisma } = await import("@/lib/prisma");
+      const row = await prisma.eventItem.findFirst({
+        where: { slug, isPublished: true },
+        include: eventInclude,
+      });
+      return row ? withPhase(toRow(row), new Date()) : null;
     },
     null,
   );
 
-  if (usedFallback) cacheLife("minutes");
-  else cacheLife("minutes");
   return data;
 }
 
-/** Daftar ringkas event — dipakai sitemap. */
+/** Slug semua event published — dipakai sitemap. */
 export async function getEventSlugs(): Promise<string[]> {
   "use cache";
   cacheTag(CONTENT_TAGS.events);
+  cacheLife("minutes");
 
-  const { data, usedFallback } = await safeQueryWithMeta<string[]>(
+  const { data } = await safeQueryWithMeta<string[]>(
     async () => {
-      const rows = await queryEventRows();
+      const { prisma } = await import("@/lib/prisma");
+      const rows = await prisma.eventItem.findMany({
+        where: { isPublished: true },
+        orderBy: [{ sortOrder: "asc" }, { startDate: "desc" }],
+        select: { slug: true },
+      });
       return rows.map((r) => r.slug);
     },
     [],
   );
 
-  if (usedFallback) cacheLife("minutes");
-  else cacheLife("minutes");
   return data;
 }

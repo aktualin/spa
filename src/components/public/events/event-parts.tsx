@@ -2,22 +2,43 @@ import Link from "next/link";
 import { ArrowRight } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
 import type { PublicEvent } from "@/lib/content/events";
+import { formatEventDateRange } from "@/lib/domain/events";
 
-/** Format tanggal event — Bahasa Indonesia, tanpa timezone gymnastics. */
+/**
+ * Format tanggal event — Bahasa Indonesia, selalu dalam WIB (server Vercel
+ * berjalan di UTC; tanpa zona waktu, 00.00 WIB tampil mundur sehari).
+ */
 export function formatEventDate(startDate: Date | null, endDate: Date | null): string {
-  if (!startDate) return "Tanggal menyusul";
-  const start = startDate.toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-  if (!endDate) return start;
-  const end = endDate.toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-  return `${start} — ${end}`;
+  return formatEventDateRange(startDate, endDate);
+}
+
+/** Logo/nama mitra kolaborasi — hanya tampil bila diisi. */
+export function EventPartner({
+  event,
+  size = "sm",
+}: {
+  event: PublicEvent;
+  size?: "sm" | "lg";
+}) {
+  if (!event.isCollaboration || (!event.partnerName && !event.partnerLogoUrl)) {
+    return null;
+  }
+  const logoClass = size === "lg" ? "h-12 max-w-[10rem]" : "h-8 max-w-[7rem]";
+  return (
+    <span className="flex flex-wrap items-center gap-3">
+      {event.partnerLogoUrl ? (
+        <img
+          src={event.partnerLogoUrl}
+          alt={event.partnerName ? `Logo ${event.partnerName}` : "Logo mitra"}
+          loading="lazy"
+          className={`${logoClass} w-auto object-contain`}
+        />
+      ) : null}
+      {event.partnerName ? (
+        <span className="text-body text-cocoa/70">Bersama {event.partnerName}</span>
+      ) : null}
+    </span>
+  );
 }
 
 export function EventCard({ event }: { event: PublicEvent }) {
@@ -46,6 +67,7 @@ export function EventCard({ event }: { event: PublicEvent }) {
         {event.location ? (
           <p className="text-body text-cocoa/70">{event.location}</p>
         ) : null}
+        <EventPartner event={event} />
         {event.description ? (
           <p className="line-clamp-3 text-body text-cocoa/70">{event.description}</p>
         ) : null}
