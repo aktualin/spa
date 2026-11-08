@@ -94,5 +94,37 @@ Hasil tiga audit paralel terhadap kontrak peta konten → tampilan.
 - `CorporateClient` tidak punya `year` maupun `description`.
 - `RetailProduct` tidak punya `isCollaboration` (hanya `isHighlight`) — keputusan lama yang masih menggantung.
 
-**⚠️ Ketegangan aturan yang perlu keputusan user:**
-Prompt master meminta "JANGAN fallback hardcoded, pakai empty state". Proyek ini justru sengaja memakai pola fallback ke konten statis saat tabel kosong (`socials.tsx` 12 gambar, `homepage.ts`, `corporate.ts` via `usedFallback`) supaya situs tidak pernah tampak kosong. Dua aturan ini bertabrakan — perlu keputusan mana yang menang sebelum perilaku fallback diubah.
+**Keputusan user 9 Nov 2026: TIDAK BOLEH ada konten statis.** Tabel kosong → empty state. Semua temuan H-1..H-6 dikerjakan.
+
+### Tindak lanjut audit (9 Nov 2026)
+**Selesai — commit `7db7275` (H-1, H-2, H-3, H-5, H-6):**
+- Membership: reader mengekspos `priceIdr` + filter `isPublished` di DB; harga dipusatkan lewat `membershipPriceText` (`priceIdr` menang, `priceLabel` hanya untuk harga non-angka). Format pendek "Rp 1,5jt" dipertahankan karena itu gaya desain situs, bukan `formatIdr`. Deskripsi SEO dari `program`, `billingNote` tidak lagi dobel.
+  - Koreksi premis H-1: `updateMembershipPriceAction` sudah menulis ulang `priceLabel` dari `priceIdr`, jadi harga sebenarnya sudah sampai ke web. Celah nyatanya reader tidak mengekspos `priceIdr` (API tidak bisa menyajikan angka) dan dua kolom bisa melenceng bila ada jalur tulis lain.
+- Katalog: `TreatmentCategory.imageUrl` dirender di `/treatments` dan halaman kategori; badge New/Best Seller tampil di kartu treatment/package/signature lewat komponen baru `catalog-badges.tsx`.
+- Dilewati: konversi ke `next/image` — `next.config.ts` belum punya `images.remotePatterns` sehingga URL Supabase akan gagal dimuat, dan layout Webflow legacy berisiko rusak. Butuh keputusan terpisah.
+
+**Selesai — commit `134c43f` (Kelas A, tanpa migrasi):**
+- Akar masalah: 10 reader sengaja `throw` saat tabel kosong supaya fallback statis terpakai. Kini mengembalikan kosong/null. `safeQuery` tetap menjaga situs saat DB tak terjangkau — hanya nilai fallbacknya tidak lagi berupa konten.
+- Dihapus: 12 gambar Instagram hardcode, 9 foto album statis, 3 artikel contoh, blok seed katalog statis, `STATIC_TEMPLATES` WA, alamat/jam/WA hardcode di `mergeSiteSettings`.
+- Tombol WhatsApp (termasuk FAB & menu mobile) disembunyikan saat nomor belum diatur, bukan menghasilkan tautan rusak.
+- `/privacy-policy` & `/terms-conditions` pindah ke `StaticPage`; kedua folder halaman dihapus, dilayani rute `/[slug]`. Slug dilepas dari `RESERVED_ROOT_SEGMENTS` dan `PUBLIC_STATIC_ROUTES` (sitemap sudah menambahkannya lewat `getPublishedPageSlugs`).
+- Dipertahankan sebagai struktur (bukan konten): `defaultSectionLayout()` di `homepage.ts` — hanya menentukan section mana & urutannya, tanpa teks/gambar. Tanpa ini homepage dan footer hilang total saat tabel kosong.
+- Verifikasi: tsc bersih, 492/492 unit test, build lolos.
+
+**⚠️ PERLU DIJALANKAN MANUAL:** `node scripts/seed.mts` untuk mengisi dua baris `StaticPage` (privacy-policy, terms-conditions). **Tanpa ini kedua URL 404.** Seed idempoten; `bodyHtml` & `status` sengaja tidak ditimpa saat update agar suntingan admin bertahan.
+
+**⚠️ Delta visual yang disadari:** markup lama membungkus tiap bagian halaman legal dalam `<details open>`; tag itu tidak ada di `ALLOWED_TAGS` sanitizer sehingga kerangka accordion hilang. Isi teks identik dan semula memang sudah terbuka. Tanggal hardcode "1 Januari 2026" diganti `page.updatedAt`.
+
+### Kelas B — butuh kolom/tabel DB baru (belum dikerjakan)
+| Konten | Lokasi | Yang dibutuhkan |
+|---|---|---|
+| Daftar cabang | `contact/page.tsx:28`, `reservation-form.tsx:65`, `newsletter-form.tsx:54` | Tabel `Branch`/`Location` — modul "Cabang" disebut di panduan tapi belum ada |
+| 10 scan menu + PDF (H-4) | `menu/page.tsx:52-58,240,253` | Tabel/kolom array di Media Library |
+| `priceDisclaimer` | `menu/page.tsx:98,188,218`, `menu/[slug]:173` | Kolom `SiteSettings.priceDisclaimer` |
+| `footerTagline` | `footer.tsx:85` | Kolom `SiteSettings.footerTagline` |
+| Label & href Book Now | `navigation.tsx:17` | Kolom di `SiteSettings` |
+| Kartu highlight & lebar panel mega-menu | `content/navigation.ts:63-65` | Kolom di `MenuItem` (`highlightImageUrl`, `panelWidth`) |
+| Banner membership homepage | `hero.tsx:170-175` | Kolom di `MembershipProgram` (`priceHeadline` sudah dari DB) |
+| Judul section & CTA | `sections.tsx:34,83-88,96,122`; `membership/page.tsx:65,92,137-138,195`; `contact/page.tsx:86`; `socials.tsx:57,69` | Kolom teks per section — rombongan terbesar, paling mengubah UI admin |
+| `CorporateClient.year` & `description` | schema | Kolom baru |
+| `RetailProduct.isCollaboration` | schema | Kolom baru (kini menumpang `isHighlight`) |
