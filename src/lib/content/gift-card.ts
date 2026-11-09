@@ -5,37 +5,19 @@
  * ter-sanitasi; di halaman publik dirender ulang lewat `sanitizeHtml`.
  *
  * Belum diisi admin atau DB tidak terbaca → `null` (halaman menampilkan empty
- * state). `staticGiftCard()` tetap ada, tapi hanya untuk mengisi awal form
- * admin — bukan untuk dirender ke pengunjung.
+ * state). Tanpa fallback statis per kolom: kolom yang dikosongkan admin tetap
+ * kosong dan elemennya disembunyikan. `staticGiftCard()` tetap ada, tapi hanya
+ * untuk seed dan mengisi awal form admin — bukan untuk dirender ke pengunjung.
  */
 import { cacheLife, cacheTag } from "next/cache";
 
-import { GIFT_CARD_DEFAULTS } from "@/lib/domain/gift-card";
+import { staticGiftCard, type GiftCard } from "@/lib/domain/gift-card";
 import { safeQueryWithMeta } from "@/lib/safe-query";
 
 import { CONTENT_TAGS } from "./tags";
 
-export type GiftCard = {
-  title: string;
-  subtitle: string;
-  bodyHtml: string;
-  imageUrl: string | null;
-  termsHtml: string | null;
-  whatsappMessage: string;
-};
-
-/** Isi awal form admin saat gift card belum pernah disimpan. */
-export function staticGiftCard(): GiftCard {
-  return {
-    title: "KAMA Gift Card",
-    subtitle: GIFT_CARD_DEFAULTS.subtitle,
-    termsHtml: null,
-    whatsappMessage: GIFT_CARD_DEFAULTS.whatsappMessage,
-    bodyHtml:
-      "<p>KAMA Gift Card adalah cara tercepat untuk hadiah yang berarti. Berlaku untuk seluruh treatment dan ritual KAMA Spa, dan dapat dipakai kapan saja bersama orang terdekat.</p><ul><li>NominalFleksibel sesuai kebutuhan</li><li>Berlaku untuk semua treatment</li><li>Pemesanan dan pembayaran lewat WhatsApp</li></ul>",
-    imageUrl: "/img/kama/05-foot-bath.jpg",
-  };
-}
+export type { GiftCard };
+export { staticGiftCard };
 
 export async function getGiftCard(): Promise<GiftCard | null> {
   "use cache";
@@ -47,11 +29,11 @@ export async function getGiftCard(): Promise<GiftCard | null> {
     if (!row) return null;
     return {
       title: row.title,
-      subtitle: row.subtitle || GIFT_CARD_DEFAULTS.subtitle,
+      subtitle: row.subtitle ?? "",
       bodyHtml: row.bodyHtml,
       imageUrl: row.imageUrl,
       termsHtml: row.termsHtml,
-      whatsappMessage: row.whatsappMessage || GIFT_CARD_DEFAULTS.whatsappMessage,
+      whatsappMessage: row.whatsappMessage ?? "",
     };
   }, null);
 

@@ -207,3 +207,46 @@ describe("resolveRedirect (dipakai proxy)", () => {
     assert.equal(resolveRedirect(sys, "/admin"), null);
   });
 });
+
+/**
+ * Penjaga aturan "semua konten dari DB": jalur render (src/lib/content/*)
+ * tidak boleh memakai isi statis sebagai pengganti baris/kolom yang kosong.
+ * Builder statis tetap boleh ada — tapi hanya dipanggil seed dan form admin.
+ */
+describe("jalur render bebas fallback statis", () => {
+  const RENDER_READERS = [
+    "corporate.ts",
+    "gift-card.ts",
+    "membership.ts",
+    "our-story.ts",
+    "homepage.ts",
+  ];
+
+  /** Membuang komentar supaya penyebutan di dokumentasi tidak ikut terbaca. */
+  function kode(source: string): string {
+    return source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+  }
+
+  it("reader publik tidak memanggil builder statis sebagai nilai fallback", async () => {
+    const { readFile } = await import("node:fs/promises");
+    for (const file of RENDER_READERS) {
+      const source = kode(await readFile(new URL(`../../src/lib/content/${file}`, import.meta.url), "utf8"));
+      // Definisi (`export function staticX`) boleh; pemanggilan (`staticX()`) tidak.
+      const calls = [...source.matchAll(/(?<!function )\bstatic[A-Z]\w*\(\)/g)].map((m) => m[0]);
+      assert.deepEqual(
+        calls,
+        [],
+        `${file} memanggil ${calls.join(", ")} di jalur render; tabel kosong harus jadi empty state.`,
+      );
+    }
+  });
+
+  it("tidak ada konstanta *_DEFAULTS yang dipakai menambal kolom kosong", async () => {
+    const { readFile } = await import("node:fs/promises");
+    for (const file of RENDER_READERS) {
+      const source = kode(await readFile(new URL(`../../src/lib/content/${file}`, import.meta.url), "utf8"));
+      const patched = [...source.matchAll(/\|\|\s*[A-Z_]+_DEFAULTS\.\w+/g)].map((m) => m[0]);
+      assert.deepEqual(patched, [], `${file} menambal kolom kosong dengan ${patched.join(", ")}.`);
+    }
+  });
+});

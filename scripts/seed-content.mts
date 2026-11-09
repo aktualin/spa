@@ -193,6 +193,8 @@ const CONTENT_BLOCKS: { key: string; value: string }[] = [
     value: "Pilih yang paling sesuai dengan ritme Anda.",
   },
   { key: "membership.plans_empty", value: "Belum ada paket membership yang dipublikasikan." },
+  { key: "membership.empty_title", value: "Program membership belum tersedia" },
+  { key: "membership.empty_description", value: "Informasi membership akan tampil di sini setelah diisi dari dashboard admin." },
   { key: "membership.join_now_label", value: "Join Now" },
   { key: "membership.terms_title", value: "Syarat & Ketentuan" },
   { key: "membership.contact_title", value: "Have any questions? Drop us a line." },

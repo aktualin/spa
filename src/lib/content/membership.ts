@@ -76,20 +76,22 @@ export function membershipPriceText(tier: MembershipTier): string {
 export type MembershipProgram = MembershipProgramData;
 
 /**
- * Informasi program membership (singleton). Belum pernah disimpan admin /
- * database bermasalah → isi statis lama, sehingga tampilan tidak berubah.
+ * Informasi program membership (singleton). Tanpa fallback statis: belum
+ * pernah disimpan admin atau database tidak terbaca → `null`, dan pemanggil
+ * menyembunyikan bagiannya. Isi awalnya dipasang `scripts/seed.mts`;
+ * `staticMembershipProgram()` tinggal dipakai seed & form admin.
  */
-export async function getMembershipProgram(): Promise<MembershipProgram> {
+export async function getMembershipProgram(): Promise<MembershipProgram | null> {
   "use cache";
   cacheTag(CONTENT_TAGS.membership);
 
-  const { data, usedFallback } = await safeQueryWithMeta<MembershipProgram>(
+  const { data, usedFallback } = await safeQueryWithMeta<MembershipProgram | null>(
     async () => {
       const { prisma } = await import("@/lib/prisma");
       const row = await prisma.membershipProgram.findUnique({
         where: { id: "singleton" },
       });
-      if (!row) throw new Error("program membership belum diisi");
+      if (!row) return null;
       return {
         eyebrow: row.eyebrow,
         title: row.title,
@@ -102,7 +104,7 @@ export async function getMembershipProgram(): Promise<MembershipProgram> {
         termsHtml: row.termsHtml,
       };
     },
-    staticMembershipProgram(),
+    null,
   );
 
   if (usedFallback) cacheLife("minutes");

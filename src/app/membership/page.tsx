@@ -14,6 +14,7 @@ import { plainTextToHtml } from "@/lib/domain/rich-text";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { whatsAppHref } from "@/lib/content/whatsapp";
 import { Reveal } from "@/components/reveal";
+import { PublicEmptyState } from "@/components/public/page-parts";
 
 export async function generateMetadata(): Promise<Metadata> {
   return withPageSeo("/membership", {});
@@ -26,6 +27,28 @@ export default async function MembershipPage() {
     whatsAppHref("membership"),
     getPageCopy(),
   ]);
+
+  // Singleton belum diisi admin → empty state, bukan teks bawaan dari kode.
+  if (!membership) {
+    return (
+      <>
+        <Navigation />
+        <main className="main-wrapper">
+          <Reveal as="section" className="page-hero">
+            <div className="padding-global">
+              <div className="container-large">
+                <PublicEmptyState
+                  title={copy(pageCopy, "membership.empty_title")}
+                  description={copy(pageCopy, "membership.empty_description")}
+                />
+              </div>
+            </div>
+          </Reveal>
+        </main>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>

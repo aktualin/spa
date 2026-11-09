@@ -11,7 +11,6 @@ import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { whatsAppHref } from "@/lib/content/whatsapp";
-import { GIFT_CARD_DEFAULTS } from "@/lib/domain/gift-card";
 
 export async function generateMetadata(): Promise<Metadata> {
   return withPageSeo("/gift-card", {});
@@ -36,13 +35,9 @@ export default async function GiftCardPage() {
     );
   }
 
-  /* Teks bawaan yang mengisi kolom kosong bukan pesan khusus, jadi template
-     "gift" boleh menggantikannya. */
+  /* Admin mengosongkan pesan → template "gift" yang dipakai. */
   const waHref = await whatsAppHref("gift", {
-    custom:
-      giftCard.whatsappMessage === GIFT_CARD_DEFAULTS.whatsappMessage
-        ? null
-        : giftCard.whatsappMessage,
+    custom: giftCard.whatsappMessage.trim() || null,
     values: { giftCard: giftCard.title },
   });
 

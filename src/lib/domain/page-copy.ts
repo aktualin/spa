@@ -106,6 +106,8 @@ export const PAGE_COPY_GROUPS: readonly PageCopyGroup[] = [
       { key: "membership.plans_eyebrow", label: "Eyebrow paket", type: "text", maxLength: 60 },
       { key: "membership.plans_title", label: "Judul paket", type: "text", maxLength: 140 },
       { key: "membership.plans_empty", label: "Pesan paket kosong", type: "textarea", maxLength: 240 },
+      { key: "membership.empty_title", label: "Judul halaman kosong", type: "text", maxLength: 80 },
+      { key: "membership.empty_description", label: "Deskripsi halaman kosong", type: "textarea", maxLength: 240 },
       { key: "membership.join_now_label", label: "Label tombol join paket", type: "text", maxLength: 40 },
       { key: "membership.terms_title", label: "Judul syarat & ketentuan", type: "text", maxLength: 80 },
       { key: "membership.contact_title", label: "Judul banner kontak", type: "text", maxLength: 120 },

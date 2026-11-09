@@ -2,7 +2,6 @@
 
 import { useActionState } from "react";
 
-import { GIFT_CARD_DEFAULTS } from "@/lib/domain/gift-card";
 
 import { saveGiftCardAction, type ActionState } from "../actions/gift-card";
 import { ImageField } from "../image-field";
@@ -58,7 +57,7 @@ export function GiftCardForm({
         <Field
           label="Subjudul"
           htmlFor="subtitle"
-          hint={`Kalimat di bawah judul. Kosongkan untuk memakai: "${GIFT_CARD_DEFAULTS.subtitle}"`}
+          hint="Kalimat di bawah judul. Dikosongkan → baris ini tidak tampil di halaman."
         >
           <input
             id="subtitle"
@@ -93,7 +92,7 @@ export function GiftCardForm({
         <Field
           label="Pesan WhatsApp"
           htmlFor="whatsappMessage"
-          hint={`Teks awal chat tombol "Pesan via WhatsApp". Kosongkan untuk memakai: "${GIFT_CARD_DEFAULTS.whatsappMessage}"`}
+          hint='Teks awal chat tombol "Pesan via WhatsApp". Dikosongkan → memakai Template WhatsApp konteks "gift".'
         >
           <input
             id="whatsappMessage"

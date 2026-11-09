@@ -26,6 +26,7 @@ import { buildStaticCatalogSeed } from "../src/lib/domain/catalog-seed.ts";
 import { escapeHtml } from "../src/lib/domain/corporate.ts";
 import { buildStaticMenuSeed } from "../src/lib/domain/menu-seed.ts";
 import { slugify } from "../src/lib/domain/slug.ts";
+import { staticGiftCard } from "../src/lib/domain/gift-card.ts";
 import {
   staticCorporateContent,
   staticCorporatePrograms,
@@ -338,6 +339,27 @@ async function seedCorporate() {
   );
 }
 
+async function seedGiftCard() {
+  const base = staticGiftCard();
+  const existing = await prisma.giftCardInfo.findUnique({ where: { id: "singleton" } });
+  if (existing) {
+    console.log("• gift card dilewati (sudah ada)");
+    return;
+  }
+
+  await prisma.giftCardInfo.create({
+    data: {
+      id: "singleton",
+      title: base.title,
+      subtitle: base.subtitle,
+      bodyHtml: base.bodyHtml,
+      imageUrl: base.imageUrl,
+      whatsappMessage: base.whatsappMessage,
+    },
+  });
+  console.log("✔ konten gift card");
+}
+
 async function seedSiteSettings() {
   const [openLabel] = site.hours.split(".").slice(-1);
   const defaults = {
@@ -627,6 +649,7 @@ try {
     await seedWhatsAppTemplates();
     await seedBranches();
     await seedCorporate();
+    await seedGiftCard();
     await seedContent(prisma);
     await seedLegalPages();
     await seedMenu();
