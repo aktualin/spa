@@ -150,6 +150,15 @@ Every card in a grid must:
 
 Card families that must obey this together: `.treatment-card`, `.package-card`, `.location-card_component`, `.contact-card`, `.benefits_card`, `.whats-new_card`, `.review_card`. A new card family must be added to this list when it is introduced.
 
+### Visitor analytics (first-party, no GA dependency)
+
+- `PageView` rows are written two ways: `src/proxy.ts` records full public document loads (via `src/lib/analytics/track.ts`, `event.waitUntil`), and `src/instrumentation-client.ts` sends a beacon to `/api/analytics/view` for App Router client-side navigations. Proxy cannot detect Next prefetch — Next strips `next-router-prefetch`/RSC headers before middleware — so it only accepts `Accept: text/html` documents.
+- The request rules live in `src/lib/domain/page-view.ts` (pure/tested): GET/document only, public pages only, no `/admin`, API, assets, bots, or prefetch. A failed insert logs a warning and never delays or breaks the page.
+- A random visitor ID (UUID) is stored in the httpOnly cookie `kama_visitor_id` (set by the proxy or the beacon route); no IP or User-Agent is persisted. Requests carrying the admin session cookie are not counted. Clearing the cookie counts as a new visitor.
+- Dashboard shows unique visitors + page views for the last 30 days; the separate module **Pengunjung & Halaman** (`/admin/analytics`, group `analitik`) shows 7/30/90-day charts and the top-50 page table.
+- Aggregates are raw SQL in `src/lib/analytics/report.ts`; day buckets use the WIB calendar in `src/lib/domain/traffic.ts`. Never sum daily unique visitors to claim a period total — the period total is its own `COUNT(DISTINCT visitorId)` query.
+- GA4 (optional, Measurement ID in Kontak & Umum) is a separate layer and is not required for these reports.
+
 ## Update backlog
 
 - [x] **U1** WhatsApp templates: per-location, generic, member join (`src/lib/whatsapp.ts`).

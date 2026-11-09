@@ -1,4 +1,10 @@
-import { NextResponse, type NextRequest } from "next/server";
+import {
+  NextResponse,
+  type NextFetchEvent,
+  type NextRequest,
+} from "next/server";
+
+import { trackPageView } from "@/lib/analytics/track";
 
 import { CHANGE_PASSWORD_PATH } from "@/lib/domain/admin-redirect";
 import { isSameOrigin, isStateChangingMethod } from "@/lib/domain/same-origin";
@@ -29,7 +35,7 @@ const EVENT_STATIC_SEGMENTS = ["collaborations"];
 // Proxy (pengganti middleware di Next.js 16). Guard admin hanya verifikasi JWT;
 // pencocokan sesi dengan database (akun aktif, sessionVersion) dan role
 // dilakukan di src/lib/auth.ts. Redirect publik dibaca dari cache di memori.
-export async function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest, event: NextFetchEvent) {
   const { pathname, searchParams } = request.nextUrl;
 
   if (pathname === "/api/admin" || pathname.startsWith("/api/admin/")) {
@@ -37,14 +43,19 @@ export async function proxy(request: NextRequest) {
   }
 
   if (pathname !== "/admin" && !pathname.startsWith("/admin/")) {
-    return (
+    const handled =
       (await applyRedirect(request)) ??
       (await notFoundForUnknownPage(request)) ??
       (await notFoundForInactivePromo(request)) ??
       (await notFoundForHiddenJournalPost(request)) ??
-      (await notFoundForUnpublishedEvent(request)) ??
-      NextResponse.next()
-    );
+      (await notFoundForUnpublishedEvent(request));
+    // Redirect dan 404 tidak dihitung; hanya halaman publik yang benar-benar
+    // dirender yang masuk analitik.
+    if (handled) return handled;
+
+    const response = NextResponse.next();
+    trackPageView(request, response, event);
+    return response;
   }
 
   // Login dimatikan sementara: /admin bebas diakses, /admin/login dialihkan ke

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { getTrafficOverview } from "@/lib/analytics/report";
 import { requireSession } from "@/lib/auth";
 import { autoBackupHealth } from "@/lib/domain/backup";
 import {
@@ -14,6 +15,11 @@ import {
   type JournalStatusSegment,
   type TrendPoint,
 } from "@/lib/domain/admin-dashboard";
+import {
+  averagePagesPerVisitor,
+  dailyTrafficSeries,
+  dayBuckets,
+} from "@/lib/domain/traffic";
 import { prisma } from "@/lib/prisma";
 
 import { StatusDonut, TrendArea, TrendBars } from "./_components/dashboard-charts";
@@ -54,6 +60,10 @@ export default async function AdminDashboardPage({
   const now = new Date();
   const buckets = monthBuckets(now, 6);
   const chartSince = buckets[0]!.start;
+
+  // Analitik pengunjung berdiri sendiri: bila query-nya gagal, ringkasan konten
+  // tetap tampil dan bagian pengunjung menunjukkan nilai nol + catatan.
+  const trafficPromise = getTrafficOverview(now, 30).catch(() => null);
 
   // Ringkasan tidak boleh membuat dashboard kosong saat DB bermasalah —
   // dashboard tetap tampil dengan nilai 0 dan catatan error.
@@ -185,6 +195,32 @@ export default async function AdminDashboardPage({
     summaryError = true;
   }
 
+  const trafficReport = await trafficPromise;
+  const trafficBuckets = trafficReport?.buckets ?? dayBuckets(now, 30);
+  const visitorTrend = dailyTrafficSeries(
+    trafficReport?.daily ?? [],
+    trafficBuckets,
+    "visitors",
+  );
+  const viewTrend = dailyTrafficSeries(
+    trafficReport?.daily ?? [],
+    trafficBuckets,
+    "views",
+  );
+  const traffic = {
+    uniqueVisitors: trafficReport?.uniqueVisitors ?? 0,
+    totalViews: trafficReport?.totalViews ?? 0,
+    visitorsToday: trafficReport?.visitorsToday ?? 0,
+  };
+  const averageViews = averagePagesPerVisitor(
+    traffic.totalViews,
+    traffic.uniqueVisitors,
+  );
+  const trafficError = trafficReport === null;
+  const numberFormat = new Intl.NumberFormat("id-ID", {
+    maximumFractionDigits: 1,
+  });
+
   const journalTotal = journalTrend.reduce((sum, point) => sum + point.value, 0);
   const inquiryTotal = inquiryTrend.reduce((sum, point) => sum + point.value, 0);
   const formattedDate = new Intl.DateTimeFormat("id-ID", {
@@ -246,6 +282,79 @@ export default async function AdminDashboardPage({
           <StatCard label="Journal terbit" value={summary.journalPublished} />
           <StatCard label="Event mendatang" value={summary.eventsUpcoming} />
         </div>
+      </section>
+
+      <section className="mt-8">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <h2 className="text-sm font-semibold text-neutral-900">Pengunjung</h2>
+            <p className="mt-0.5 text-xs text-neutral-400">
+              30 hari terakhir · waktu Jakarta
+            </p>
+          </div>
+          <Link
+            href="/admin/analytics"
+            className="text-xs font-medium text-cocoa underline-offset-2 hover:underline"
+          >
+            Detail halaman →
+          </Link>
+        </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <StatCard label="Pengunjung unik" value={traffic.uniqueVisitors} />
+          <StatCard label="Tampilan halaman" value={traffic.totalViews} />
+          <StatCard label="Pengunjung hari ini" value={traffic.visitorsToday} />
+        </div>
+        <div className="mt-3 grid gap-3 lg:grid-cols-3">
+          <ChartCard
+            title="Pengunjung unik per hari"
+            subtitle={`${traffic.uniqueVisitors} pengunjung unik`}
+          >
+            <TrendArea
+              points={visitorTrend}
+              label="Pengunjung unik per hari"
+              suffix=" pengunjung"
+            />
+          </ChartCard>
+          <ChartCard
+            title="Tampilan halaman per hari"
+            subtitle={`${traffic.totalViews} tampilan`}
+          >
+            <TrendBars
+              points={viewTrend}
+              label="Tampilan halaman per hari"
+              suffix=" tampilan"
+            />
+          </ChartCard>
+          <div className="rounded-xl border border-neutral-200/80 bg-white p-4 sm:p-5">
+            <h3 className="text-xs font-semibold text-neutral-700">
+              Cara menghitung
+            </h3>
+            <ul className="mt-2 space-y-1.5 text-[11px] leading-relaxed text-neutral-500">
+              <li>
+                Pengunjung unik memakai ID acak di cookie, bukan alamat IP.
+              </li>
+              <li>
+                Admin, API, aset, bot, dan prefetch tidak ikut dihitung.
+              </li>
+              <li>
+                Rata-rata {numberFormat.format(averageViews)} halaman dibuka per
+                pengunjung pada periode ini.
+              </li>
+            </ul>
+            <Link
+              href="/admin/analytics"
+              className="mt-3 inline-block text-[11px] font-medium text-cocoa underline-offset-2 hover:underline"
+            >
+              Lihat halaman terpopuler →
+            </Link>
+          </div>
+        </div>
+        {trafficError ? (
+          <p className="mt-3 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            Data pengunjung tidak dapat dimuat karena kesalahan database. Angka
+            di atas ditampilkan sebagai nol.
+          </p>
+        ) : null}
       </section>
 
       <section className="mt-8">

@@ -84,6 +84,9 @@ export function TrendBars({
   const max = Math.max(...points.map((point) => point.value));
   const step = PLOT_W / points.length;
   const barWidth = Math.min(30, step * 0.5);
+  // Seri 30/90 hari: label sumbu X dijarangkan supaya tidak bertumpuk.
+  const labelEvery = points.length <= 12 ? 1 : Math.ceil(points.length / 5);
+  const showValues = points.length <= 12;
 
   return (
     <figure>
@@ -113,7 +116,7 @@ export function TrendBars({
               >
                 <title>{`${point.label}: ${point.value}${suffix}`}</title>
               </rect>
-              {point.value > 0 ? (
+              {showValues && point.value > 0 ? (
                 <text
                   x={center}
                   y={y - 7}
@@ -124,15 +127,17 @@ export function TrendBars({
                   {point.value}
                 </text>
               ) : null}
-              <text
-                x={center}
-                y={HEIGHT - 8}
-                textAnchor="middle"
-                fontSize={10}
-                fill="#a3a3a3"
-              >
-                {point.label}
-              </text>
+              {index % labelEvery === 0 || index === points.length - 1 ? (
+                <text
+                  x={center}
+                  y={HEIGHT - 8}
+                  textAnchor="middle"
+                  fontSize={10}
+                  fill="#a3a3a3"
+                >
+                  {point.label}
+                </text>
+              ) : null}
             </g>
           );
         })}
@@ -166,6 +171,10 @@ export function TrendArea({
     .map((coordinate, index) => `${index === 0 ? "M" : "L"}${coordinate.x} ${coordinate.y}`)
     .join(" ");
   const area = `${line} L${coordinates.at(-1)!.x} ${PAD_TOP + PLOT_H} L${coordinates[0]!.x} ${PAD_TOP + PLOT_H} Z`;
+  // Seri panjang (30/90 hari): jarangkan label, sembunyikan titik & angka.
+  const labelEvery = points.length <= 12 ? 1 : Math.ceil(points.length / 5);
+  const showDots = points.length <= 14;
+  const showValues = points.length <= 12;
 
   return (
     <figure>
@@ -186,12 +195,14 @@ export function TrendArea({
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        {coordinates.map(({ x, y, point }) => (
+        {coordinates.map(({ x, y, point }, index) => (
           <g key={point.key}>
-            <circle cx={x} cy={y} r={4} fill="#fff" stroke="var(--color-cocoa)" strokeWidth={2}>
-              <title>{`${point.label}: ${point.value}${suffix}`}</title>
-            </circle>
-            {point.value > 0 ? (
+            {showDots ? (
+              <circle cx={x} cy={y} r={4} fill="#fff" stroke="var(--color-cocoa)" strokeWidth={2}>
+                <title>{`${point.label}: ${point.value}${suffix}`}</title>
+              </circle>
+            ) : null}
+            {showValues && point.value > 0 ? (
               <text
                 x={x}
                 y={y - 10}
@@ -202,15 +213,17 @@ export function TrendArea({
                 {point.value}
               </text>
             ) : null}
-            <text
-              x={x}
-              y={HEIGHT - 8}
-              textAnchor="middle"
-              fontSize={10}
-              fill="#a3a3a3"
-            >
-              {point.label}
-            </text>
+            {index % labelEvery === 0 || index === points.length - 1 ? (
+              <text
+                x={x}
+                y={HEIGHT - 8}
+                textAnchor="middle"
+                fontSize={10}
+                fill="#a3a3a3"
+              >
+                {point.label}
+              </text>
+            ) : null}
           </g>
         ))}
       </svg>

@@ -926,3 +926,22 @@ model InstagramPost {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+/**
+ * ---------- Analitik pengunjung ----------
+ */
+
+// Satu baris = satu tampilan halaman publik. Sengaja tidak menyimpan IP atau
+// User-Agent: `visitorId` adalah ID acak dari cookie httpOnly yang dipasang
+// proxy, dipakai hanya untuk menghitung pengunjung unik. Halaman admin, API,
+// aset, bot, dan prefetch tidak dicatat (lihat src/lib/domain/page-view.ts).
+model PageView {
+  id        BigInt   @id @default(autoincrement())
+  path      String
+  visitorId String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([path, createdAt])
+  @@index([visitorId, createdAt])
+}
