@@ -1,6 +1,14 @@
 import Link from "next/link";
 
 import { requireSession } from "@/lib/auth";
+import { autoBackupHealth } from "@/lib/domain/backup";
+import {
+  CONTENT_SPOTS,
+  dashboardAlerts,
+  emptyContentSpots,
+  promoEndingSoonRange,
+  type DashboardAlert,
+} from "@/lib/domain/admin-dashboard";
 import { prisma } from "@/lib/prisma";
 
 import {
@@ -17,9 +25,7 @@ type Summary = {
   packages: number;
   promosActive: number;
   journalPublished: number;
-  journalScheduled: number;
   eventsUpcoming: number;
-  inquiriesNew: number;
 };
 
 export default async function AdminDashboardPage({
@@ -46,23 +52,30 @@ export default async function AdminDashboardPage({
     packages: 0,
     promosActive: 0,
     journalPublished: 0,
-    journalScheduled: 0,
     eventsUpcoming: 0,
-    inquiriesNew: 0,
   };
+  let alerts: DashboardAlert[] = [];
   let summaryError = false;
 
   try {
     const now = new Date();
+    const endingSoon = promoEndingSoonRange(now);
+    // Status backup hanya diambil untuk ADMIN: modul Backup & Status memang
+    // tertutup untuk EDITOR, jadi EDITOR tidak perlu diberi tahu soal itu.
+    const isAdmin = session.role === "ADMIN";
 
     const [
       treatmentsPublished,
       packages,
       promosActive,
       journalPublished,
-      journalScheduled,
       eventsUpcoming,
       inquiriesNew,
+      journalScheduled,
+      journalOverdue,
+      promosEndingSoon,
+      spotCounts,
+      lastAutoBackup,
     ] = await Promise.all([
       prisma.treatment.count({ where: { isPublished: true } }),
       prisma.package.count({ where: { isPublished: true } }),
@@ -76,7 +89,6 @@ export default async function AdminDashboardPage({
         },
       }),
       prisma.journalPost.count({ where: { status: "PUBLISHED" } }),
-      prisma.journalPost.count({ where: { status: "SCHEDULED" } }),
       prisma.eventItem.count({
         where: {
           isPublished: true,
@@ -84,6 +96,21 @@ export default async function AdminDashboardPage({
         },
       }),
       prisma.corporateInquiry.count({ where: { status: "NEW" } }),
+      prisma.journalPost.count({
+        where: { status: "SCHEDULED", OR: [{ publishedAt: null }, { publishedAt: { gt: now } }] },
+      }),
+      prisma.journalPost.count({
+        where: { status: "SCHEDULED", publishedAt: { lte: now } },
+      }),
+      prisma.promo.count({ where: { isPublished: true, endDate: endingSoon } }),
+      contentSpotCounts(),
+      isAdmin
+        ? prisma.backupRun.findFirst({
+            where: { kind: "AUTO", status: "SUCCESS" },
+            orderBy: { createdAt: "desc" },
+            select: { createdAt: true },
+          })
+        : Promise.resolve(null),
     ]);
 
     summary = {
@@ -91,16 +118,23 @@ export default async function AdminDashboardPage({
       packages,
       promosActive,
       journalPublished,
-      journalScheduled,
       eventsUpcoming,
-      inquiriesNew,
     };
+
+    alerts = dashboardAlerts({
+      inquiriesNew,
+      journalScheduled,
+      journalOverdue,
+      promosEndingSoon,
+      emptyContent: emptyContentSpots(spotCounts),
+      backup: isAdmin ? autoBackupHealth(lastAutoBackup?.createdAt ?? null, now) : null,
+    });
   } catch {
     summaryError = true;
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-5xl">
       {params.forbidden ? (
         <p
           role="alert"
@@ -132,6 +166,11 @@ export default async function AdminDashboardPage({
       </p>
 
       <h2 className="mt-6 text-sm font-semibold text-neutral-800">
+        Perlu perhatian
+      </h2>
+      <AlertList alerts={alerts} />
+
+      <h2 className="mt-6 text-sm font-semibold text-neutral-800">
         Modul yang bisa Anda buka
       </h2>
       {groups.map((group) => (
@@ -161,7 +200,10 @@ export default async function AdminDashboardPage({
         </section>
       ))}
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <h2 className="mt-8 text-sm font-semibold text-neutral-800">
+        Isi situs saat ini
+      </h2>
+      <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard label="Treatment published" value={summary.treatmentsPublished} />
         <StatCard label="Package published" value={summary.packages} />
         <StatCard label="Promo aktif" value={summary.promosActive} />
@@ -169,20 +211,7 @@ export default async function AdminDashboardPage({
           label="Artikel journal published"
           value={summary.journalPublished}
         />
-        <StatCard label="Artikel terjadwal" value={summary.journalScheduled} />
         <StatCard label="Event mendatang" value={summary.eventsUpcoming} />
-        <div className="rounded-lg border border-neutral-200 bg-white p-4 sm:col-span-2 lg:col-span-3">
-          <p className="text-sm text-neutral-600">Inquiry corporate baru</p>
-          <p className="mt-1 text-2xl font-semibold text-neutral-900">
-            {summary.inquiriesNew}
-          </p>
-          <Link
-            href="/admin/corporate/inquiries"
-            className="mt-2 inline-block text-sm text-neutral-700 underline-offset-2 hover:underline"
-          >
-            Lihat daftar inquiry →
-          </Link>
-        </div>
       </div>
 
       {summaryError ? (
@@ -215,6 +244,87 @@ export default async function AdminDashboardPage({
         </p>
       </div>
     </div>
+  );
+}
+
+/**
+ * Jumlah baris tiap tempat konten di `CONTENT_SPOTS`. Satu query per tabel,
+ * semuanya paralel; kunci hasilnya sama dengan `ContentSpot.key`.
+ */
+async function contentSpotCounts(): Promise<Record<string, number>> {
+  const [
+    homepageHighlight,
+    homepageReview,
+    homepageStat,
+    instagramPost,
+    contentBlock,
+    branch,
+    galleryPhoto,
+    retailProduct,
+    menuItem,
+    staticPage,
+  ] = await Promise.all([
+    prisma.homepageHighlight.count(),
+    prisma.homepageReview.count(),
+    prisma.homepageStat.count(),
+    prisma.instagramPost.count(),
+    prisma.contentBlock.count(),
+    prisma.branch.count(),
+    prisma.galleryPhoto.count(),
+    prisma.retailProduct.count(),
+    prisma.menuItem.count(),
+    prisma.staticPage.count(),
+  ]);
+
+  return {
+    homepageHighlight,
+    homepageReview,
+    homepageStat,
+    instagramPost,
+    contentBlock,
+    branch,
+    galleryPhoto,
+    retailProduct,
+    menuItem,
+    staticPage,
+  };
+}
+
+function AlertList({ alerts }: { alerts: DashboardAlert[] }) {
+  if (alerts.length === 0) {
+    return (
+      <p className="mt-2 rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-600">
+        Tidak ada yang perlu ditindaklanjuti. Semua bagian situs sudah terisi,
+        tidak ada inquiry baru, dan tidak ada promo yang segera berakhir.
+      </p>
+    );
+  }
+
+  return (
+    <ul className="mt-2 space-y-2">
+      {alerts.map((alert) => (
+        <li key={alert.id}>
+          <Link
+            href={alert.href}
+            className={`flex items-start gap-3 rounded-lg border px-4 py-3 transition hover:border-neutral-400 ${
+              alert.tone === "attention"
+                ? "border-amber-200 bg-amber-50"
+                : "border-neutral-200 bg-white"
+            }`}
+          >
+            {alert.count === undefined ? null : (
+              <span className="mt-0.5 shrink-0 rounded-md bg-neutral-900 px-2 py-0.5 text-xs font-semibold text-white">
+                {alert.count}
+              </span>
+            )}
+            <span className="min-w-0">
+              <span className="block text-sm font-medium text-neutral-900">{alert.label}</span>
+              <span className="block text-xs text-neutral-600">{alert.detail}</span>
+            </span>
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 }
 
