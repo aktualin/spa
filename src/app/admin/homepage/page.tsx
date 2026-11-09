@@ -52,6 +52,12 @@ export default async function AdminHomepagePage({
       </p>
       <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
         <Link
+          href="/admin/homepage/hero"
+          className="font-medium text-neutral-900 underline underline-offset-2"
+        >
+          Kelola slide Hero →
+        </Link>
+        <Link
           href="/admin/homepage/highlights"
           className="font-medium text-neutral-900 underline underline-offset-2"
         >

@@ -15,7 +15,7 @@ export const CONTENT_TAGS = {
   events: "content:events", // EventItem, EventPhoto
   retail: "content:retail", // RetailProduct
   corporate: "content:corporate", // CorporateContent, CorporateProgram, CorporateStep, CorporateClient (BUKAN CorporateInquiry — PII)
-  homepage: "content:homepage", // HomepageSection, HomepageHighlight
+  homepage: "content:homepage", // HomepageSection, HomepageHighlight, HomepageStat, HeroSlide
   ourStory: "content:our-story", // OurStoryContent
   menu: "content:menu", // MenuItem
   branches: "content:branches", // Branch

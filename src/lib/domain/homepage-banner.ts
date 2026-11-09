@@ -326,11 +326,11 @@ export function resolveBanner(
   };
 }
 
-/** Nilai bawaan hero & booking banner (sama persis dengan hardcode lama). */
+/** Nilai bawaan hero & booking banner. */
 export const HERO_DEFAULTS: BannerDefaults = {
   title: "Relax. Refresh. (Repeat).",
   subtitle: "Massage • Spa • Corporate Wellness",
-  imageUrl: "/img/kama/incense_smoke_animated.gif",
+  imageUrl: "/img/kama/incense-smoke-poster.jpg",
   imageAlt: "",
   ctaLabel: "Book Now",
   ctaHref: "/contact",

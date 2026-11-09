@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { ArrowRight, ArrowRightThin } from "@/components/icons";
+import { ArrowRightThin } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
-import type { HomepageSection } from "@/lib/content/homepage";
+import { HeroSlider } from "@/components/home/hero-slider";
+import type { HomepageSection, HeroSlideRow } from "@/lib/content/homepage";
 import { copy, type PageCopy } from "@/lib/content/page-copy";
 import { isSafeCtaHref, isSafeImageUrl, MOBILE_MEDIA_QUERY } from "@/lib/domain/homepage-banner";
+import { resolveHeroSlides } from "@/lib/domain/hero-slide";
 import type { StatItem } from "@/lib/domain/homepage";
 
 /**
@@ -57,104 +59,19 @@ function BannerImage({
   );
 }
 
-export function Hero({ section, copyBlocks }: BannerProps) {
-  const title = clean(section?.title);
-  const subtitle = clean(section?.subtitle);
-  const imageUrl = safeImage(section?.imageUrl);
-  const mobileImageUrl = safeImage(section?.mobileImageUrl);
-  const imageAlt = clean(section?.imageAlt);
-  const ctaLabel = clean(section?.ctaLabel);
-  const ctaHref = safeHref(section?.ctaHref);
-  const cardEyebrow = copy(copyBlocks, "home.hero.card_eyebrow");
-  const cardBody = copy(copyBlocks, "home.hero.card_body");
-  const scrollLabel = copy(copyBlocks, "home.hero.scroll_label");
-  const showCard = Boolean(cardEyebrow || cardBody || (ctaLabel && ctaHref));
+export function Hero({
+  section,
+  copyBlocks,
+  slides = [],
+}: BannerProps & { slides?: HeroSlideRow[] }) {
+  const media = resolveHeroSlides(slides, section);
+  const labels = {
+    cardEyebrow: copy(copyBlocks, "home.hero.card_eyebrow"),
+    cardBody: copy(copyBlocks, "home.hero.card_body"),
+    scrollLabel: copy(copyBlocks, "home.hero.scroll_label"),
+  };
 
-  return (
-    <Reveal as="header" className="relative isolate overflow-hidden bg-espresso text-white">
-      {/* Background image + overlays */}
-      <div className="absolute inset-0 -z-10">
-        {imageUrl ? (
-          <BannerImage
-            src={imageUrl}
-            mobileSrc={mobileImageUrl}
-            alt={imageAlt}
-            className="h-full w-full object-cover"
-          />
-        ) : null}
-        <div className="absolute inset-0 bg-espresso/45" />
-        <div
-          className="absolute -left-1/4 top-1/4 -z-10 h-[28rem] w-[28rem] rounded-full bg-caramel/25 blur-3xl"
-          aria-hidden="true"
-        />
-        <div
-          className="absolute -right-1/4 -top-1/4 -z-10 h-[34rem] w-[34rem] rounded-full bg-cocoa/50 blur-3xl"
-          aria-hidden="true"
-        />
-      </div>
-
-      <div className="container-kama relative">
-        <div className="relative flex min-h-[92svh] flex-col items-center justify-center pb-12 pt-28 text-center lg:pb-44 lg:pt-36">
-          <div className="flex max-w-[52rem] flex-col items-center">
-            {subtitle ? (
-              <h2 className="eyebrow text-white/85">
-                <Link href="/menu" className="transition-opacity hover:opacity-70">
-                  {subtitle}
-                </Link>
-              </h2>
-            ) : null}
-
-            {title ? (
-              <h1 className="mt-6 font-display text-display font-normal md:text-[2.75rem] lg:text-[4.1875rem] lg:leading-[1.1]">
-                {title}
-              </h1>
-            ) : null}
-
-            {scrollLabel ? (
-              <a
-                href="#home_whats_new"
-                aria-label={scrollLabel}
-                className="mt-8 inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/50 transition-colors hover:bg-white hover:text-cocoa"
-              >
-                <ArrowRightThin className="h-4 w-4 rotate-90" />
-              </a>
-            ) : null}
-          </div>
-
-          {/* Membership card — in the flow on mobile, floating card on desktop */}
-          {showCard ? (
-            <div className="mt-10 w-full lg:absolute lg:bottom-0 lg:right-0 lg:mt-0 lg:w-[24rem]">
-              <div className="bg-white p-6 text-cocoa shadow-lg shadow-black/10 lg:py-7">
-                <div className="flex flex-col gap-2">
-                  {cardEyebrow ? (
-                    <span className="eyebrow text-cocoa/70">
-                      <Link href="/menu" className="hover:opacity-70">
-                        {cardEyebrow}
-                      </Link>
-                    </span>
-                  ) : null}
-                  {cardBody ? (
-                    <p className="text-lead text-cocoa/80">
-                      <Link href="/menu">{cardBody}</Link>
-                    </p>
-                  ) : null}
-                </div>
-                {ctaLabel && ctaHref ? (
-                  <Link
-                    href={ctaHref}
-                    className="mt-5 inline-flex items-center gap-2 text-[0.9375rem] transition-opacity hover:opacity-70"
-                  >
-                    {ctaLabel}
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                ) : null}
-              </div>
-            </div>
-          ) : null}
-        </div>
-      </div>
-    </Reveal>
-  );
+  return <HeroSlider section={section} labels={labels} slides={media} />;
 }
 
 /** `stats` dari `getHomepageStats()`; tabel kosong → daftar kosong. */

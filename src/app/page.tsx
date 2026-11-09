@@ -8,6 +8,7 @@ import { SignatureTreatmentsSection } from "@/components/public/home/signature-t
 import { PromoHighlightSection } from "@/components/public/home/promo-highlight";
 import { GalleryTeaserSection } from "@/components/public/home/gallery-teaser";
 import {
+  getHeroSlides,
   getHomepageReviews,
   getHomepageSections,
   getHomepageStats,
@@ -43,15 +44,23 @@ export async function generateMetadata(): Promise<Metadata> {
  * tetap di paling bawah (tidak ikut urutan). Tanpa baris DB → tampil.
  */
 export default async function Home() {
-  const [sections, membershipProgram, whatsNewCards, stats, reviews, pageCopy] =
-    await Promise.all([
-      getHomepageSections(),
-      getMembershipProgram(),
-      getWhatsNewCards(),
-      getHomepageStats(),
-      getHomepageReviews(),
-      getPageCopy(),
-    ]);
+  const [
+    sections,
+    membershipProgram,
+    whatsNewCards,
+    stats,
+    reviews,
+    heroSlides,
+    pageCopy,
+  ] = await Promise.all([
+    getHomepageSections(),
+    getMembershipProgram(),
+    getWhatsNewCards(),
+    getHomepageStats(),
+    getHomepageReviews(),
+    getHeroSlides(),
+    getPageCopy(),
+  ]);
 
   const showFooter = sections.footer?.isEnabled ?? true;
 
@@ -91,7 +100,14 @@ export default async function Home() {
         {visible.map(({ key, section }) => {
           switch (key) {
             case "hero":
-              return <Hero key={key} section={section} copyBlocks={pageCopy} />;
+              return (
+                <Hero
+                  key={key}
+                  section={section}
+                  copyBlocks={pageCopy}
+                  slides={heroSlides}
+                />
+              );
             case "membership-banner":
               return <MembershipBanner
                 key={key}

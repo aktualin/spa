@@ -391,6 +391,20 @@ function BannerFields({
             Gambar
           </legend>
 
+          {bannerKey === "hero" ? (
+            <p className="rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-900">
+              Slider (foto/video) diatur di{" "}
+              <Link
+                href="/admin/homepage/hero"
+                className="font-medium underline underline-offset-2"
+              >
+                Kelola slide Hero
+              </Link>
+              . Gambar utama di bawah hanya dipakai sebagai fallback bila tabel
+              slide masih kosong.
+            </p>
+          ) : null}
+
           <ImageField
             name="imageUrl"
             label="Gambar utama"

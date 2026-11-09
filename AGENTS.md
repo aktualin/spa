@@ -56,8 +56,10 @@ node scripts/screenshot.mjs http://localhost:3000 /tmp/kama mobile   # one viewp
 - `src/components/whatsapp-button.tsx` — the floating WhatsApp button (used by `src/app/layout.tsx`).
 - `src/components/copyright-year.tsx` — client component that prints the current year.
 - `src/components/home/reviews-carousel.tsx` — the swipeable reviews carousel.
+- `src/components/home/hero.tsx` — server wrapper for the homepage hero/banners; `src/components/home/hero-slider.tsx` is the client hero media slider.
+- `src/lib/domain/hero-slide.ts` — pure media URL validation + `HeroSlide` fallback/resolve rules (unit tested).
 - `src/components/forms/*` — reservation + newsletter forms. They are **not wired to anything**: submit is `preventDefault()` + local `sent` state. Don't assume a backend/API route exists.
-- `public/fonts`, `public/img` — locally hosted fonts (Faesa Breages for display, POI Carbonic for body/labels) and imagery. `@font-face` rules live in `src/app/kama.css`; the old family names (`Romie trial`, `Ft regola neue trial`) are kept only as aliases because `hiatus.css` hardcodes them on legacy classes.
+- `public/fonts`, `public/img`, `public/video` — locally hosted fonts (Faesa Breages for display, POI Carbonic for body/labels), imagery, and the hero video. `@font-face` rules live in `src/app/kama.css`; the old family names (`Romie trial`, `Ft regola neue trial`) are kept only as aliases because `hiatus.css` hardcodes them on legacy classes.
 - `references/` — source PDFs (menu, colour reference). PDFs are gitignored.
 - `.opencode/` — project tooling for opencode: `skills/` (nextjs-frontend, tailwind-kama-styling, kama-content-data, visual-verification), `agent/ui-reviewer`, `command/` (`/verify`, `/new-page`, `/new-treatment`, `/ui-review`), `plugins/kama-guardrails.js` (blocks edits to `hiatus.css`/`kama.css.bak`, protects the `@layer` order, enforces `<Navigation>`/`<main>`/`<Footer>` on route pages). See `.opencode/README.md`.
 
@@ -139,6 +141,16 @@ Rules:
 - `prefers-reduced-motion: reduce` disables every animation (reveal, WhatsApp pulse, carousel auto-motion).
 - Custom animations live in `src/app/kama.css` (or `@theme { --animate-* }` + `@keyframes` in `globals.css` for Tailwind v4 utilities) — never in `hiatus.css`.
 - The reviews carousel (`src/components/home/reviews-carousel.tsx`) uses CSS scroll-snap so a native swipe works on touch devices; the arrows are an enhancement, not the only way to move.
+
+### Homepage hero media
+
+- `HeroSlide` is **media-only**: the hero text, eyebrow and CTA still come from the `HomepageSection` row with key `hero`; each slide supplies a photo or a video + poster.
+- Fallback is deliberate: an **empty** `HeroSlide` table uses `HomepageSection.hero.imageUrl` (the admin banner form calls it the fallback image). Once any row exists, only published/valid rows render — all drafts means no hero media, not a silent return to the fallback.
+- Initial rows (migration `20261109181254_hero_slides`): one video (`/video/incense-smoke.mp4` + `/img/kama/incense-smoke-poster.jpg`) and three photos (`01-incense`, `02-bottle-shadows`, `08-water-drop`). The old 27.9 MB GIF must not be re-added.
+- Video is a **direct file URL** (`.mp4`/`.webm`, https or internal path), never a YouTube/Vimeo page. Poster is required; there is no video upload (image uploads stay image-only, max 4 MB).
+- Autoplay is 6 s. It pauses on hover/focus inside the hero, when the tab is hidden, and under `prefers-reduced-motion` (which also disables the crossfade and video). There is intentionally no visible pause button; one slide renders no controls/autoplay.
+- Admin CRUD lives at `/admin/homepage/hero` (`src/app/admin/actions/hero-slides.ts`). Saves must `updateTag(CONTENT_TAGS.homepage)` and revalidate `/`, `/admin/homepage`, `/admin/homepage/hero`; removed images are cleaned with `deleteImageByUrl`.
+- `Reveal` does not forward event handlers, so the client slider wraps it in a pointer/focus-capture container. Keep the `data-hero-slide`/`data-active` hooks used by `tests/hero.spec.ts`.
 
 ### Card consistency (the anti-jomplang rule)
 

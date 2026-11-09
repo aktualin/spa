@@ -27,7 +27,7 @@ const HOMEPAGE_SECTIONS: SectionSeed[] = [
     key: "hero",
     title: "Relax. Refresh. (Repeat).",
     subtitle: "Massage • Spa • Corporate Wellness",
-    imageUrl: "/img/kama/incense_smoke_animated.gif",
+    imageUrl: "/img/kama/incense-smoke-poster.jpg",
     ctaLabel: "Book Now",
     ctaHref: "/contact",
     legacyTitles: ["Hero"],

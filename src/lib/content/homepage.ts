@@ -24,6 +24,7 @@ import {
   type ReviewItem,
   type StatItem,
 } from "@/lib/domain/homepage";
+import type { HeroSlideMediaType } from "@/lib/domain/hero-slide";
 import { safeQueryWithMeta } from "@/lib/safe-query";
 
 import { CONTENT_TAGS } from "./tags";
@@ -54,6 +55,18 @@ export type HomepageSection = {
   ctaLabel: string | null;
   ctaHref: string | null;
   isEnabled: boolean;
+  sortOrder: number;
+};
+
+/** Baris `HeroSlide` yang siap dipakai resolver slider hero. */
+export type HeroSlideRow = {
+  id: string;
+  mediaType: HeroSlideMediaType;
+  imageUrl: string | null;
+  mobileImageUrl: string | null;
+  videoUrl: string | null;
+  imageAlt: string | null;
+  isPublished: boolean;
   sortOrder: number;
 };
 
@@ -102,6 +115,35 @@ export async function getHomepageSections(): Promise<
 
   if (usedFallback) cacheLife("minutes");
   else cacheLife("hours");
+  return data;
+}
+
+/**
+ * Slide media hero. Tabel kosong atau DB tidak terbaca → daftar kosong;
+ * `resolveHeroSlides` di domain akan memakai gambar fallback section.
+ */
+export async function getHeroSlides(): Promise<HeroSlideRow[]> {
+  "use cache";
+  cacheTag(CONTENT_TAGS.homepage);
+  cacheLife("minutes");
+
+  const { data } = await safeQueryWithMeta<HeroSlideRow[]>(async () => {
+    const { prisma } = await import("@/lib/prisma");
+    const rows = await prisma.heroSlide.findMany({
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    });
+    return rows.map((row) => ({
+      id: row.id,
+      mediaType: row.mediaType,
+      imageUrl: row.imageUrl,
+      mobileImageUrl: row.mobileImageUrl,
+      videoUrl: row.videoUrl,
+      imageAlt: row.imageAlt,
+      isPublished: row.isPublished,
+      sortOrder: row.sortOrder,
+    }));
+  }, []);
+
   return data;
 }
 

@@ -554,6 +554,28 @@ model HomepageSection {
   updatedAt DateTime @updatedAt
 }
 
+enum HeroSlideMediaType {
+  IMAGE
+  VIDEO
+}
+
+// Media slider hero. Teks/CTA tetap dari HomepageSection berkey "hero".
+// VIDEO wajib punya poster (imageUrl) agar tetap tampil saat autoplay diblokir.
+model HeroSlide {
+  id             String             @id @default(cuid())
+  mediaType      HeroSlideMediaType @default(IMAGE)
+  imageUrl       String?
+  mobileImageUrl String?
+  videoUrl       String?
+  imageAlt       String?
+  isPublished    Boolean            @default(true)
+  sortOrder      Int                @default(0)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  @@index([isPublished, sortOrder])
+}
+
 // Kartu highlight homepage (section "What's New" / konten sorotan).
 model HomepageHighlight {
   id          String    @id @default(cuid())
