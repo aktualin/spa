@@ -6,22 +6,23 @@ import { LocationMap } from "@/components/contact/location-map";
 import { LocationInfo } from "@/components/contact/location-info";
 import { Reveal } from "@/components/reveal";
 import { getBranches } from "@/lib/content/branches";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
 import { getSiteSettings } from "@/lib/content/site";
 import { FLAGSHIP_LOCATION_SLUG } from "@/lib/domain/site-settings";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return withPageSeo("/contact", {
-    title: "Contact",
-    description:
-      "Hubungi KAMA Spa untuk reservasi treatment di South Jakarta. Booking via WhatsApp atau formulir reservasi.",
-  });
+  return withPageSeo("/contact", {});
 }
 
 export default async function ContactPage() {
   // Cabang dikelola di modul Cabang; alamat, jam, nomor, peta, dan koordinat
   // per cabang. Nomor/jam yang dikosongkan per cabang mengikuti Kontak & Umum.
-  const [branches, settings] = await Promise.all([getBranches(), getSiteSettings()]);
+  const [branches, settings, pageCopy] = await Promise.all([
+    getBranches(),
+    getSiteSettings(),
+    getPageCopy(),
+  ]);
   return (
     <>
       <Navigation />
@@ -30,11 +31,12 @@ export default async function ContactPage() {
           <div className="padding-global">
             <div className="container-large">
               <div className="section-header">
-                <h1 className="header-xxl">Contact</h1>
-                <p className="body-m text-color-gray">
-                  Reserve your treatment, or just drop us a line — we&apos;ll help you find
-                  the right ritual for what you need today.
-                </p>
+                <h1 className="header-xxl">{copy(pageCopy, "contact.hero.title")}</h1>
+                {copy(pageCopy, "contact.hero.description") ? (
+                  <p className="body-m text-color-gray">
+                    {copy(pageCopy, "contact.hero.description")}
+                  </p>
+                ) : null}
               </div>
             </div>
           </div>
@@ -44,16 +46,20 @@ export default async function ContactPage() {
           <div className="padding-global">
             <div className="container-large">
               <div className="section-header">
-                <h2 className="header-l">Our Locations</h2>
+                <h2 className="header-l">{copy(pageCopy, "contact.locations.title")}</h2>
               </div>
               <div id="contact-map">
-                <LocationMap locations={branches} />
+                <LocationMap
+                  locations={branches}
+                  openMapsLabel={copy(pageCopy, "contact.location.open_maps")}
+                />
               </div>
               {branches.length === 0 ? (
-                <p className="mt-10 body-m text-color-gray">
-                  Lokasi kami akan diumumkan segera. Sementara itu, hubungi kami
-                  via WhatsApp untuk reservasi di semua area kami.
-                </p>
+                copy(pageCopy, "contact.locations.empty") ? (
+                  <p className="mt-10 body-m text-color-gray">
+                    {copy(pageCopy, "contact.locations.empty")}
+                  </p>
+                ) : null
               ) : (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-10">
                   {branches.map((branch) => (
@@ -63,6 +69,16 @@ export default async function ContactPage() {
                         freshaUrl={
                           branch.slug === FLAGSHIP_LOCATION_SLUG ? settings.freshaUrl : undefined
                         }
+                        labels={{
+                          addressMissing: copy(pageCopy, "contact.location.address_missing"),
+                          whatsappFallback: copy(
+                            pageCopy,
+                            "contact.location.whatsapp_fallback",
+                          ),
+                          whatsappCta: copy(pageCopy, "contact.location.whatsapp_cta"),
+                          directions: copy(pageCopy, "contact.location.directions"),
+                          fresha: copy(pageCopy, "contact.location.fresha"),
+                        }}
                       />
                     </div>
                   ))}
@@ -85,12 +101,12 @@ export default async function ContactPage() {
         <Reveal as="section" className="section_get-in-touch is-top-off">
           <div className="get-in-touch_container">
             <div className="get-in-touch_banner">
-              <h4 className="header-l">Want to experience KAMA first?</h4>
+              <h4 className="header-l">{copy(pageCopy, "contact.cta.title")}</h4>
               <Link
                 href="/menu"
                 className="button is-tertiary is-icon margin-left-auto-desktop w-inline-block"
               >
-                <div>View The Menu</div>
+                <div>{copy(pageCopy, "contact.cta.label")}</div>
               </Link>
             </div>
           </div>

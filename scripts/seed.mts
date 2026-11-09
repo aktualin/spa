@@ -26,6 +26,7 @@ import { buildStaticCatalogSeed } from "../src/lib/domain/catalog-seed.ts";
 import { escapeHtml } from "../src/lib/domain/corporate.ts";
 import { buildStaticMenuSeed } from "../src/lib/domain/menu-seed.ts";
 import { slugify } from "../src/lib/domain/slug.ts";
+import { seedContent } from "./seed-content.mts";
 
 loadEnv({ path: ".env.local", quiet: true });
 
@@ -259,29 +260,67 @@ async function seedJournal() {
 
 async function seedSiteSettings() {
   const [openLabel] = site.hours.split(".").slice(-1);
-  await prisma.siteSettings.upsert({
+  const defaults = {
+    address: site.address,
+    openingHours: [site.hours],
+    whatsappNumber: site.phone.replace(/\D/g, ""),
+    email: site.email,
+    phone: site.phone,
+    instagramUrl: site.instagram,
+    tiktokUrl: site.tiktok,
+  };
+  const existing = await prisma.siteSettings.findUnique({
     where: { id: "singleton" },
-    create: {
-      id: "singleton",
-      address: site.address,
-      openingHours: [site.hours],
-      whatsappNumber: site.phone.replace(/\D/g, ""),
-      email: site.email,
-      phone: site.phone,
-      instagramUrl: site.instagram,
-      tiktokUrl: site.tiktok,
-    },
-    update: {
-      address: site.address,
-      openingHours: [site.hours],
-      whatsappNumber: site.phone.replace(/\D/g, ""),
-      email: site.email,
-      phone: site.phone,
-      instagramUrl: site.instagram,
-      tiktokUrl: site.tiktok,
-    },
   });
+  if (!existing) {
+    await prisma.siteSettings.create({
+      data: { id: "singleton", ...defaults },
+    });
+  } else {
+    const update: Record<string, unknown> = {};
+    if (!existing.address?.trim()) update.address = defaults.address;
+    if (existing.openingHours.length === 0) update.openingHours = defaults.openingHours;
+    if (!existing.whatsappNumber?.trim()) update.whatsappNumber = defaults.whatsappNumber;
+    if (!existing.email?.trim()) update.email = defaults.email;
+    if (!existing.phone?.trim()) update.phone = defaults.phone;
+    if (!existing.instagramUrl?.trim()) update.instagramUrl = defaults.instagramUrl;
+    if (!existing.tiktokUrl?.trim()) update.tiktokUrl = defaults.tiktokUrl;
+    if (Object.keys(update).length > 0) {
+      await prisma.siteSettings.update({ where: { id: "singleton" }, data: update });
+    }
+  }
   console.log(`✔ pengaturan situs (jam: ${openLabel.trim()})`);
+
+async function seedPageSeo(prisma: PrismaClient): Promise<void> {
+  const routes = [
+    { path: "/", title: "KAMA Spa • Wellness Sanctuary di South Jakarta", description: "KAMA Spa adalah wellness sanctuary di jantung South Jakarta. Memadukan teknik penyembuhan tradisional dengan pendekatan wellness modern untuk treatments, massage, dan corporate wellness." },
+    { path: "/treatments", title: "Treatments", description: "Seluruh treatment KAMA Spa — massage, body, facial, head & scalp, dan bath ritual, lengkap dengan durasi dan harga." },
+    { path: "/treatments/packages", title: "Spa Packages", description: "Paket dan All Day Spa KAMA — rangkaian treatment yang disusun jadi satu ritual lengkap." },
+    { path: "/menu", title: "Menu Treatments", description: "KAMA Spa menu — massage, body scrub, face ritual, head & scalp treatment, bath ritual, dan paket All Day Spa." },
+    { path: "/promos", title: "Promos", description: "Promo dan penawaran khusus KAMA Spa yang sedang berjalan — termasuk membership dan paket treatment." },
+    { path: "/membership", title: "Membership", description: "KAMA Membership — paket keanggotaan dengan essential service bulanan, harga anggota untuk seluruh menu, dan benefit khusus." },
+    { path: "/promos/membership", title: "Promo Membership", description: "KAMA Membership — paket keanggotaan dengan essential service bulanan, harga anggota untuk seluruh menu, dan benefit khusus." },
+    { path: "/corporate", title: "Corporate Wellness", description: "KAMA Corporate Wellness Solutions — program wellness di kantor, pengalaman wellness tim, dan benefit kesehatan karyawan." },
+    { path: "/our-story", title: "Our Story", description: "Filosofi dan nilai KAMA Spa — perawatan tradisional yang dikerjakan tanpa terburu-buru." },
+    { path: "/our-story/journal", title: "Journal", description: "Tulisan KAMA Spa tentang perawatan tubuh, ritual, dan kebiasaan istirahat yang baik." },
+    { path: "/gallery", title: "Gallery", description: "Foto ruang, ritual, dan detail kecil di KAMA Spa — supaya Anda tahu seperti apa suasananya sebelum datang." },
+    { path: "/events", title: "Events", description: "Upcoming events dan program KAMA Spa — personally curated experiences, corporate wellness, dan kolaborasi dengan brand." },
+    { path: "/events/collaborations", title: "Kolaborasi", description: "Program wellness KAMA Spa yang pernah dijalankan bersama partner, perusahaan, dan brand — a glimpse of wellness in action." },
+    { path: "/retail", title: "KAMA Retail", description: "Produk perawatan KAMA Spa yang bisa dibawa pulang — minyak, scrub, dan perlengkapan ritual di rumah." },
+    { path: "/gift-card", title: "Gift Card", description: "KAMA Gift Card — hadiah berupa waktu istirahat, berlaku untuk seluruh treatment dan ritual KAMA Spa." },
+  ];
+  for (const route of routes) {
+    const existing = await prisma.pageSeo.findUnique({ where: { path: route.path } });
+    if (!existing) {
+      await prisma.pageSeo.create({ data: { path: route.path, title: route.title, description: route.description } });
+    } else if (!existing.title?.trim() || !existing.description?.trim()) {
+      await prisma.pageSeo.update({ where: { path: route.path }, data: { title: existing.title || route.title, description: existing.description || route.description } });
+    }
+  }
+  console.log(`✔ ${routes.length} entri PageSeo`);
+}
+
+
 }
 
 const WHATSAPP_TEMPLATES = [
@@ -507,7 +546,7 @@ try {
     await seedSiteSettings();
     await seedWhatsAppTemplates();
     await seedBranches();
-    await seedHomepageSections();
+    await seedContent(prisma);
     await seedLegalPages();
     await seedMenu();
   }

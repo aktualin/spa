@@ -36,6 +36,13 @@ export type SiteSettings = {
   ga4MeasurementId: string;
   /** Tagline di footer. */
   footerTagline: string;
+  /** CTA membership di footer. */
+  footerMembershipTitle: string;
+  footerMembershipLearnLabel: string;
+  footerMembershipJoinLabel: string;
+  /** Blok partnership di footer. */
+  partnershipIntro: string;
+  partnershipEmail: string;
   /** Catatan harga di halaman menu. */
   priceDisclaimer: string;
   /** Label & tujuan tombol Book Now di header; kosong → tombol disembunyikan. */
@@ -65,6 +72,11 @@ export type SiteSettingsRow = {
   freshaUrl: string | null;
   ga4MeasurementId: string | null;
   footerTagline: string | null;
+  footerMembershipTitle: string | null;
+  footerMembershipLearnLabel: string | null;
+  footerMembershipJoinLabel: string | null;
+  partnershipIntro: string | null;
+  partnershipEmail: string | null;
   priceDisclaimer: string | null;
   bookNowLabel: string | null;
   bookNowHref: string | null;
@@ -98,6 +110,11 @@ export function emptySiteSettings(): SiteSettings {
     mapsEmbedUrl: "",
     ga4MeasurementId: "",
     footerTagline: "",
+    footerMembershipTitle: "",
+    footerMembershipLearnLabel: "",
+    footerMembershipJoinLabel: "",
+    partnershipIntro: "",
+    partnershipEmail: "",
     priceDisclaimer: "",
     bookNowLabel: "",
     bookNowHref: "",
@@ -288,6 +305,11 @@ export type SiteSettingsInput = {
   mapsEmbedUrl: string;
   ga4MeasurementId: string;
   footerTagline: string;
+  footerMembershipTitle: string;
+  footerMembershipLearnLabel: string;
+  footerMembershipJoinLabel: string;
+  partnershipIntro: string;
+  partnershipEmail: string;
   priceDisclaimer: string;
   bookNowLabel: string;
   bookNowHref: string;
@@ -296,6 +318,9 @@ export type SiteSettingsInput = {
 };
 
 export const MAX_FOOTER_TAGLINE = 400;
+export const MAX_FOOTER_MEMBERSHIP_TITLE = 160;
+export const MAX_FOOTER_MEMBERSHIP_LABEL = 60;
+export const MAX_PARTNERSHIP_INTRO = 120;
 export const MAX_PRICE_DISCLAIMER = 300;
 export const MAX_BOOK_NOW_LABEL = 40;
 export const MAX_MENU_SCANS = 30;
@@ -396,6 +421,42 @@ export const siteSettingsInputSchema = z.object({
     .string()
     .trim()
     .max(MAX_FOOTER_TAGLINE, `Tagline footer maks. ${MAX_FOOTER_TAGLINE} karakter.`),
+  footerMembershipTitle: z
+    .string()
+    .trim()
+    .max(
+      MAX_FOOTER_MEMBERSHIP_TITLE,
+      `Judul CTA membership maks. ${MAX_FOOTER_MEMBERSHIP_TITLE} karakter.`,
+    ),
+  footerMembershipLearnLabel: z
+    .string()
+    .trim()
+    .max(
+      MAX_FOOTER_MEMBERSHIP_LABEL,
+      `Label tombol “Learn More” maks. ${MAX_FOOTER_MEMBERSHIP_LABEL} karakter.`,
+    ),
+  footerMembershipJoinLabel: z
+    .string()
+    .trim()
+    .max(
+      MAX_FOOTER_MEMBERSHIP_LABEL,
+      `Label tombol “Join” maks. ${MAX_FOOTER_MEMBERSHIP_LABEL} karakter.`,
+    ),
+  partnershipIntro: z
+    .string()
+    .trim()
+    .max(
+      MAX_PARTNERSHIP_INTRO,
+      `Kalimat partnership maks. ${MAX_PARTNERSHIP_INTRO} karakter.`,
+    ),
+  partnershipEmail: z
+    .string()
+    .trim()
+    .refine(
+      (value) => blank(value) || z.email().safeParse(value).success,
+      "Email partnership tidak valid.",
+    )
+    .transform((value) => value.toLowerCase()),
   priceDisclaimer: z
     .string()
     .trim()
@@ -453,6 +514,11 @@ export function toSiteSettingsWrite(parsed: SiteSettingsParsed): SiteSettingsWri
     mapsEmbedUrl: orNull(parsed.mapsEmbedUrl),
     ga4MeasurementId: orNull(parsed.ga4MeasurementId),
     footerTagline: orNull(parsed.footerTagline),
+    footerMembershipTitle: orNull(parsed.footerMembershipTitle),
+    footerMembershipLearnLabel: orNull(parsed.footerMembershipLearnLabel),
+    footerMembershipJoinLabel: orNull(parsed.footerMembershipJoinLabel),
+    partnershipIntro: orNull(parsed.partnershipIntro),
+    partnershipEmail: orNull(parsed.partnershipEmail),
     priceDisclaimer: orNull(parsed.priceDisclaimer),
     bookNowLabel: orNull(parsed.bookNowLabel),
     bookNowHref: orNull(parsed.bookNowHref),
@@ -499,6 +565,11 @@ export function mergeSiteSettings(row: SiteSettingsRow | null): SiteSettings {
     mapsEmbedUrl: parseMapsEmbedInput(text(row.mapsEmbedUrl)) ?? "",
     ga4MeasurementId: normalizeGa4Id(text(row.ga4MeasurementId)) ?? "",
     footerTagline: text(row.footerTagline),
+    footerMembershipTitle: text(row.footerMembershipTitle),
+    footerMembershipLearnLabel: text(row.footerMembershipLearnLabel),
+    footerMembershipJoinLabel: text(row.footerMembershipJoinLabel),
+    partnershipIntro: text(row.partnershipIntro),
+    partnershipEmail: text(row.partnershipEmail),
     priceDisclaimer: text(row.priceDisclaimer),
     bookNowLabel: text(row.bookNowLabel),
     // Tujuan yang tidak aman diperlakukan kosong supaya tombolnya disembunyikan,
@@ -564,6 +635,11 @@ export function siteSettingsFormDefaults(row: SiteSettingsRow | null): FormDefau
       mapsEmbedUrl: text(row.mapsEmbedUrl),
       ga4MeasurementId: text(row.ga4MeasurementId),
       footerTagline: text(row.footerTagline),
+      footerMembershipTitle: text(row.footerMembershipTitle),
+      footerMembershipLearnLabel: text(row.footerMembershipLearnLabel),
+      footerMembershipJoinLabel: text(row.footerMembershipJoinLabel),
+      partnershipIntro: text(row.partnershipIntro),
+      partnershipEmail: text(row.partnershipEmail),
       priceDisclaimer: text(row.priceDisclaimer),
       bookNowLabel: text(row.bookNowLabel),
       bookNowHref: text(row.bookNowHref),

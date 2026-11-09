@@ -12,6 +12,7 @@ import {
 } from "@/components/public/page-parts";
 import { TreatmentCard } from "@/components/public/treatment-card";
 import { getCatalogSlugs, getCategory } from "@/lib/content/catalog";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
 
 type CategoryPageProps = {
@@ -30,7 +31,8 @@ export async function generateMetadata({
   const category = await getCategory(categorySlug);
 
   if (!category) {
-    return { title: "Kategori tidak ditemukan" };
+    const pageCopy = await getPageCopy();
+    return { title: copy(pageCopy, "catalog.treatments.empty_title") || undefined };
   }
 
   return withPageSeo(`/treatments/${categorySlug}`, {
@@ -42,12 +44,20 @@ export async function generateMetadata({
   });
 }
 
-export default function CategoryPage({ params }: CategoryPageProps) {
+export default async function CategoryPage({ params }: CategoryPageProps) {
   /* Slug adalah runtime data — dibaca di dalam Suspense boundary. */
+  const pageCopy = await getPageCopy();
   return (
     <>
       <Navigation />
-      <Suspense fallback={<CategoryFallback />}>
+      <Suspense
+        fallback={
+          <CategoryFallback
+            eyebrow={copy(pageCopy, "catalog.treatments.eyebrow")}
+            title={copy(pageCopy, "catalog.category.loading_title")}
+          />
+        }
+      >
         <CategoryContent params={params} />
       </Suspense>
       <Footer />
@@ -55,24 +65,27 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   );
 }
 
-function CategoryFallback() {
+function CategoryFallback({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
     <main className="flex-1">
-      <PublicPageHeader eyebrow="Treatments" title="Memuat kategori…" />
+      <PublicPageHeader eyebrow={eyebrow} title={title} />
     </main>
   );
 }
 
 async function CategoryContent({ params }: CategoryPageProps) {
   const { categorySlug } = await params;
-  const category = await getCategory(categorySlug);
+  const [category, pageCopy] = await Promise.all([
+    getCategory(categorySlug),
+    getPageCopy(),
+  ]);
 
   if (!category) notFound();
 
   return (
     <main className="flex-1">
         <PublicPageHeader
-          eyebrow="Treatments"
+          eyebrow={copy(pageCopy, "catalog.treatments.eyebrow")}
           title={category.name}
           description={category.description ?? undefined}
           imageUrl={category.imageUrl}
@@ -82,7 +95,7 @@ async function CategoryContent({ params }: CategoryPageProps) {
             className="inline-flex items-center gap-2 text-[0.9375rem] underline underline-offset-4 transition-opacity hover:opacity-70"
           >
             <ArrowLeft className="h-4 w-4" />
-            Semua treatment
+            {copy(pageCopy, "catalog.back_treatments")}
           </Link>
         </PublicPageHeader>
 
@@ -96,8 +109,8 @@ async function CategoryContent({ params }: CategoryPageProps) {
               </div>
             ) : (
               <PublicEmptyState
-                title="Belum ada treatment di kategori ini"
-                description="Daftar ini terisi otomatis begitu treatment dipublikasikan."
+                title={copy(pageCopy, "catalog.category.empty_title")}
+                description={copy(pageCopy, "catalog.category.empty_description")}
               />
             )}
           </div>

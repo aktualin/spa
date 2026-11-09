@@ -7,6 +7,7 @@ import { Footer } from "@/components/footer";
 import { ArrowRight } from "@/components/icons";
 import { getMenuAddonsCached } from "@/lib/content/catalog";
 import { getSiteSettings } from "@/lib/content/site";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import {
   MenuPackagesGrid,
   MenuPackagesGridFallback,
@@ -16,45 +17,40 @@ import {
 import { Reveal } from "@/components/reveal";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return withPageSeo("/menu", {
-    title: "Menu Treatments",
-    description:
-      "KAMA Spa menu — massage, body scrub, face ritual, head & scalp treatment, bath ritual, dan paket All Day Spa.",
-  });
+  return withPageSeo("/menu", {});
 }
-
-const categoryLabels: Record<string, string> = {
-  Massage: "Massage",
-  Body: "Body",
-  Face: "Facials",
-  "Head & Scalp": "Head & Scalp",
-  Bath: "Bath",
-};
-
-const featureSections = [
-  {
-    anchor: "face",
-    eyebrow: "Perawatan Wajah",
-    imageFirst: true,
-  },
-  {
-    anchor: "head",
-    eyebrow: "Perawatan Kepala & Kulit Kepala",
-    imageFirst: false,
-  },
-  {
-    anchor: "bath",
-    eyebrow: "Ritual Bak Mandi",
-    imageFirst: true,
-  },
-] as const;
 
 export default async function MenuPage() {
   // Add-on dikelola dari admin (kategori berjenis Add-on).
-  const [additionalServices, settings] = await Promise.all([
+  const [additionalServices, settings, pageCopy] = await Promise.all([
     getMenuAddonsCached(),
     getSiteSettings(),
+    getPageCopy(),
   ]);
+  const categoryLabels: Record<string, string> = {
+    Massage: copy(pageCopy, "menu.category.massage"),
+    Body: copy(pageCopy, "menu.category.body"),
+    Face: copy(pageCopy, "menu.category.face"),
+    "Head & Scalp": copy(pageCopy, "menu.category.head"),
+    Bath: copy(pageCopy, "menu.category.bath"),
+  };
+  const featureSections = [
+    {
+      anchor: "face",
+      eyebrow: copy(pageCopy, "menu.feature.face.eyebrow"),
+      imageFirst: true,
+    },
+    {
+      anchor: "head",
+      eyebrow: copy(pageCopy, "menu.feature.head.eyebrow"),
+      imageFirst: false,
+    },
+    {
+      anchor: "bath",
+      eyebrow: copy(pageCopy, "menu.feature.bath.eyebrow"),
+      imageFirst: true,
+    },
+  ] as const;
   const bodyAddOns = additionalServices.filter((s) => s.category === "Body");
   const { priceDisclaimer, menuScanUrls, menuPdfUrl } = settings;
 
@@ -66,13 +62,14 @@ export default async function MenuPage() {
           <div className="padding-global">
             <div className="container-large">
               <div className="section-header">
-                <div className="eyebrow-s text-style-allcaps">Menu</div>
-                <h1 className="header-xxl">Each of our massage style is a nurturing journey of healing.</h1>
+                <div className="eyebrow-s text-style-allcaps">{copy(pageCopy, "menu.hero.eyebrow")}</div>
+                <h1 className="header-xxl">{copy(pageCopy, "menu.hero.title")}</h1>
                 <div className="spacer-medium" />
-                <p className="body-m text-color-gray">
-                  The journey through our signature touch is where tension fades and inner
-                  peace is lovingly restored.
-                </p>
+                {copy(pageCopy, "menu.hero.description") ? (
+                  <p className="body-m text-color-gray">
+                    {copy(pageCopy, "menu.hero.description")}
+                  </p>
+                ) : null}
               </div>
             </div>
           </div>
@@ -83,12 +80,12 @@ export default async function MenuPage() {
           <div className="padding-global">
             <div className="container-large">
               <div className="section-header">
-                <div className="eyebrow-s text-style-allcaps">Massage</div>
-                <h2 className="header-l">Signature Treatments</h2>
+                <div className="eyebrow-s text-style-allcaps">{copy(pageCopy, "menu.massage.eyebrow")}</div>
+                <h2 className="header-l">{copy(pageCopy, "menu.massage.title")}</h2>
               </div>
 
               <Suspense fallback={<MenuTreatmentsGridFallback />}>
-                <MenuTreatmentsGrid />
+                <MenuTreatmentsGrid categoryLabels={categoryLabels} />
               </Suspense>
               {priceDisclaimer ? (
                 <>
@@ -105,8 +102,8 @@ export default async function MenuPage() {
           <div className="padding-global">
             <div className="container-large">
               <div className="section-header">
-                <div className="eyebrow-s text-style-allcaps">Layanan Tambahan</div>
-                <h2 className="header-l">Body & Scrub</h2>
+                <div className="eyebrow-s text-style-allcaps">{copy(pageCopy, "menu.addons.eyebrow")}</div>
+                <h2 className="header-l">{copy(pageCopy, "menu.addons.title")}</h2>
               </div>
 
               <div className="w-layout-grid whats-new_list">
@@ -120,7 +117,7 @@ export default async function MenuPage() {
                       <h3 className="header-s">{s.name}</h3>
                       <div className="body-m text-color-gray">{s.description}</div>
                       <div className="treatment-card_price-row">
-                        <span className="caption-s text-color-gray">Add-on</span>
+                        <span className="caption-s text-color-gray">{copy(pageCopy, "menu.addon_label")}</span>
                         <span className="price-row_value">{s.price}</span>
                       </div>
                     </div>
@@ -147,7 +144,7 @@ export default async function MenuPage() {
             <div className="treatment-card_body">
               <div className="body-m text-color-gray">{service.description}</div>
               <div className="treatment-card_price-row">
-                <span className="caption-s text-color-gray">Add-on</span>
+                <span className="caption-s text-color-gray">{copy(pageCopy, "menu.addon_label")}</span>
                 <span className="price-row_value">{service.price}</span>
               </div>
             </div>
@@ -193,7 +190,7 @@ export default async function MenuPage() {
 
             <div className="spacer-xlarge" />
             <Link href="/contact" className="button is-secondary is-icon w-inline-block">
-              <div>Book Your Treatment</div>
+              <div>{copy(pageCopy, "menu.booking_label")}</div>
               <div className="button_icon w-embed">
                 <ArrowRight />
               </div>
@@ -206,13 +203,13 @@ export default async function MenuPage() {
           <div className="padding-global">
             <div className="container-large">
               <div className="section-header">
-                <div className="eyebrow-s text-style-allcaps">All Day Spa</div>
-                <h2 className="header-l">Our spa bundles</h2>
-                <p className="body-m text-color-gray">
-                  Our thoughtfully curated spa bundles combine massages, treatments, and
-                  rituals designed to pamper, restore balance, and leave you refreshed all day
-                  long.
-                </p>
+                <div className="eyebrow-s text-style-allcaps">{copy(pageCopy, "menu.packages.eyebrow")}</div>
+                <h2 className="header-l">{copy(pageCopy, "menu.packages.title")}</h2>
+                {copy(pageCopy, "menu.packages.description") ? (
+                  <p className="body-m text-color-gray">
+                    {copy(pageCopy, "menu.packages.description")}
+                  </p>
+                ) : null}
               </div>
 
               <Suspense fallback={<MenuPackagesGridFallback />}>
@@ -234,12 +231,13 @@ export default async function MenuPage() {
             <div className="padding-global">
               <div className="container-large">
                 <div className="section-header">
-                  <div className="eyebrow-s text-style-allcaps">Menu Book</div>
-                  <h2 className="header-l">Galeri Menu KAMA Spa 2026</h2>
-                  <p className="body-m text-color-gray">
-                    Jelajahi menu lengkap kami sebagaimana tampil di menu book resmi — atau
-                    unduh PDF-nya untuk dibawa pulang.
-                  </p>
+                  <div className="eyebrow-s text-style-allcaps">{copy(pageCopy, "menu.menu_book.eyebrow")}</div>
+                  <h2 className="header-l">{copy(pageCopy, "menu.menu_book.title")}</h2>
+                  {copy(pageCopy, "menu.menu_book.description") ? (
+                    <p className="body-m text-color-gray">
+                      {copy(pageCopy, "menu.menu_book.description")}
+                    </p>
+                  ) : null}
                 </div>
 
                 {menuScanUrls.length > 0 ? (
@@ -282,7 +280,7 @@ export default async function MenuPage() {
                       download
                       className="button is-secondary is-icon w-inline-block"
                     >
-                      <div>Download Menu (PDF)</div>
+                      <div>{copy(pageCopy, "menu.menu_book.download_label")}</div>
                       <div className="button_icon w-embed">
                         <ArrowRight />
                       </div>

@@ -7,6 +7,7 @@ import { Footer } from "@/components/footer";
 import { ArrowLeft } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
 import { getJournalPost, getJournalPosts } from "@/lib/content/journal";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
 import { journalListHref, journalPath } from "@/lib/domain/journal";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
@@ -29,7 +30,8 @@ export async function generateMetadata({
   const post = await getJournalPost(slug);
 
   if (!post) {
-    return { title: "Tulisan tidak ditemukan" };
+    const pageCopy = await getPageCopy();
+    return { title: copy(pageCopy, "journal.detail.not_found_title") || undefined };
   }
 
   const path = journalPath(post.slug);
@@ -72,12 +74,19 @@ function formatPublishedAt(date: Date | null): string | null {
   }).format(date);
 }
 
-export default function JournalPostPage({ params }: JournalPostPageProps) {
+export default async function JournalPostPage({ params }: JournalPostPageProps) {
   /* Slug adalah runtime data — dibaca di dalam Suspense boundary. */
+  const pageCopy = await getPageCopy();
   return (
     <>
       <DeferredNavigation />
-      <Suspense fallback={<JournalPostFallback />}>
+      <Suspense
+        fallback={
+          <JournalPostFallback
+            title={copy(pageCopy, "journal.detail.loading_title")}
+          />
+        }
+      >
         <JournalPostContent params={params} />
       </Suspense>
       <Footer />
@@ -85,13 +94,13 @@ export default function JournalPostPage({ params }: JournalPostPageProps) {
   );
 }
 
-function JournalPostFallback() {
+function JournalPostFallback({ title }: { title: string }) {
   return (
     <main className="flex-1">
       <Reveal as="section" className="bg-cream-soft">
         <div className="container-kama py-14 md:py-20 lg:py-24">
           <h1 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-            Memuat tulisan…
+            {title}
           </h1>
         </div>
       </Reveal>
@@ -101,7 +110,10 @@ function JournalPostFallback() {
 
 async function JournalPostContent({ params }: JournalPostPageProps) {
   const { slug } = await params;
-  const post = await getJournalPost(slug);
+  const [post, pageCopy] = await Promise.all([
+    getJournalPost(slug),
+    getPageCopy(),
+  ]);
 
   if (!post) notFound();
 
@@ -118,7 +130,7 @@ async function JournalPostContent({ params }: JournalPostPageProps) {
                 className="inline-flex items-center gap-2 text-[0.9375rem] underline underline-offset-4 transition-opacity hover:opacity-70"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Journal
+                {copy(pageCopy, "journal.detail.back_label")}
               </Link>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                 {post.category ? (
@@ -167,7 +179,7 @@ async function JournalPostContent({ params }: JournalPostPageProps) {
               />
             ) : (
               <p className="max-w-[70ch] text-body text-cocoa/70">
-                Isi tulisan ini belum tersedia.
+                {copy(pageCopy, "journal.detail.empty_body")}
               </p>
             )}
 
@@ -191,7 +203,7 @@ async function JournalPostContent({ params }: JournalPostPageProps) {
           <Reveal as="section" className="bg-cream-soft">
             <div className="container-kama py-14 md:py-16 lg:py-20">
               <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-                Tulisan lainnya
+                {copy(pageCopy, "journal.detail.others_title")}
               </h2>
               <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {others.map((other) => (

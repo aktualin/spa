@@ -1,6 +1,7 @@
 import { Reveal } from "@/components/reveal";
 import { PublicPageHeader } from "@/components/public/page-parts";
 import type { PublicPage } from "@/lib/content/pages";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 
 /** Tanggal pembaruan dalam format Indonesia, mis. "8 November 2026". */
@@ -14,11 +15,12 @@ function formatUpdatedAt(date: Date): string {
 }
 
 /** Template umum — mengikuti halaman konten sederhana seperti /gift-card. */
-export function StandardPageTemplate({ page }: { page: PublicPage }) {
+export async function StandardPageTemplate({ page }: { page: PublicPage }) {
+  const pageCopy = await getPageCopy();
   return (
     <>
       <PublicPageHeader
-        eyebrow="KAMA Spa"
+        eyebrow={copy(pageCopy, "pages.header_eyebrow")}
         title={page.title}
         description={page.seoDescription ?? undefined}
       />
@@ -32,7 +34,7 @@ export function StandardPageTemplate({ page }: { page: PublicPage }) {
             />
           ) : (
             <p className="max-w-[70ch] text-body text-cocoa/70">
-              Isi halaman ini belum tersedia.
+              {copy(pageCopy, "pages.empty_body")}
             </p>
           )}
         </div>
@@ -42,7 +44,8 @@ export function StandardPageTemplate({ page }: { page: PublicPage }) {
 }
 
 /** Template legal — mengikuti /privacy-policy dan /terms-conditions. */
-export function LegalPageTemplate({ page }: { page: PublicPage }) {
+export async function LegalPageTemplate({ page }: { page: PublicPage }) {
+  const pageCopy = await getPageCopy();
   return (
     <>
       <Reveal as="section" className="page-hero">
@@ -66,7 +69,7 @@ export function LegalPageTemplate({ page }: { page: PublicPage }) {
           <div className="container-large">
             <div className="w-layout-grid grid_content is-text-pages">
               <div className="body-m text-color-gray">
-                <div className="eyebrow-s text-style-allcaps">Terakhir diperbarui</div>
+                <div className="eyebrow-s text-style-allcaps">{copy(pageCopy, "pages.updated_label")}</div>
                 <div>{formatUpdatedAt(page.updatedAt)}</div>
               </div>
 
@@ -76,7 +79,9 @@ export function LegalPageTemplate({ page }: { page: PublicPage }) {
                   dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.bodyHtml) }}
                 />
               ) : (
-                <p className="body-m text-color-gray">Isi halaman ini belum tersedia.</p>
+                <p className="body-m text-color-gray">
+                  {copy(pageCopy, "pages.empty_body")}
+                </p>
               )}
             </div>
           </div>

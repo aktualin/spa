@@ -2,9 +2,11 @@ import Link from "next/link";
 import { ArrowRight } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
 import type { PublicPromo } from "@/lib/content/promos";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { formatEventDate } from "@/components/public/events/event-parts";
 
-export function PromoCard({ promo }: { promo: PublicPromo }) {
+export async function PromoCard({ promo }: { promo: PublicPromo }) {
+  const pageCopy = await getPageCopy();
   return (
     <Link href={`/promos/${promo.slug}`} className="group flex h-full flex-col bg-cream">
       {promo.bannerUrl ? (
@@ -28,7 +30,7 @@ export function PromoCard({ promo }: { promo: PublicPromo }) {
           <p className="line-clamp-3 text-body text-cocoa/70">{promo.description}</p>
         ) : null}
         <span className="mt-auto inline-flex items-center gap-2 pt-2 text-[0.9375rem] underline underline-offset-4 transition-opacity group-hover:opacity-70">
-          Lihat Detail
+          {copy(pageCopy, "global.view_detail_label")}
           <ArrowRight className="h-4 w-4" />
         </span>
       </div>
@@ -36,7 +38,7 @@ export function PromoCard({ promo }: { promo: PublicPromo }) {
   );
 }
 
-export function PromoGrid({ promos }: { promos: PublicPromo[] }) {
+export async function PromoGrid({ promos }: { promos: PublicPromo[] }) {
   return (
     <ul className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
       {promos.map((promo) => (

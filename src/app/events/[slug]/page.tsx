@@ -16,6 +16,7 @@ import {
   formatEventDate,
 } from "@/components/public/events/event-parts";
 import { getEvent } from "@/lib/content/events";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
 import { whatsAppHref } from "@/lib/content/whatsapp";
 
@@ -26,7 +27,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const event = await getEvent(slug);
-  if (!event) return { title: "Event Not Found" };
+  if (!event) {
+    const pageCopy = await getPageCopy();
+    return { title: copy(pageCopy, "events.detail.not_found_title") || undefined };
+  }
   return withPageSeo(`/events/${event.slug}`, {
     title: event.seoTitle ?? event.title,
     description: event.seoDescription ?? event.description ?? undefined,
@@ -36,16 +40,24 @@ export async function generateMetadata({
   });
 }
 
-export default function EventDetailPage({
+export default async function EventDetailPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   /* Slug adalah runtime data — harus dibaca di dalam Suspense boundary. */
+  const pageCopy = await getPageCopy();
   return (
     <>
       <DeferredNavigation />
-      <Suspense fallback={<EventFallback />}>
+      <Suspense
+        fallback={
+          <EventFallback
+            eyebrow={copy(pageCopy, "events.hero.eyebrow")}
+            title={copy(pageCopy, "events.detail.loading_title")}
+          />
+        }
+      >
         <EventContent params={params} />
       </Suspense>
       <Footer />
@@ -53,10 +65,10 @@ export default function EventDetailPage({
   );
 }
 
-function EventFallback() {
+function EventFallback({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
     <main className="flex-1">
-      <PublicPageHeader eyebrow="Events" title="Memuat event…" />
+      <PublicPageHeader eyebrow={eyebrow} title={title} />
     </main>
   );
 }
@@ -67,7 +79,7 @@ async function EventContent({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const event = await getEvent(slug);
+  const [event, pageCopy] = await Promise.all([getEvent(slug), getPageCopy()]);
 
   if (!event) {
     notFound();
@@ -95,11 +107,11 @@ async function EventContent({
               rel="noopener noreferrer"
               className="btn btn-primary"
             >
-              Daftar via WhatsApp
+              {copy(pageCopy, "events.detail.register_label")}
             </a>
           ) : null}
           <Link href="/events" className="btn btn-outline border-cocoa/40">
-            Semua Event
+            {copy(pageCopy, "events.detail.back_label")}
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -124,7 +136,7 @@ async function EventContent({
         <div className="container-kama py-14 md:py-16 lg:py-20">
           <div className="flex flex-col gap-6">
             <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-              Detail event
+              {copy(pageCopy, "events.detail.title")}
             </h2>
             {event.description ? (
               <p className="max-w-[70ch] text-lead text-cocoa/80">
@@ -132,16 +144,18 @@ async function EventContent({
               </p>
             ) : (
               <PublicEmptyState
-                title="Detail event belum tersedia"
-                description="Hubungi kami via WhatsApp untuk informasi lebih lanjut."
+                title={copy(pageCopy, "events.detail.empty_title")}
+                description={copy(pageCopy, "events.detail.empty_description")}
               />
             )}
             {event.location ? (
-              <p className="text-body text-cocoa/70">Lokasi: {event.location}</p>
+              <p className="text-body text-cocoa/70">
+                {copy(pageCopy, "events.detail.location_prefix")} {event.location}
+              </p>
             ) : null}
             {event.isCollaboration && (event.partnerName || event.partnerLogoUrl) ? (
               <div className="flex flex-col gap-2">
-                <span className="eyebrow text-cocoa/60">Kolaborasi</span>
+                <span className="eyebrow text-cocoa/60">{copy(pageCopy, "events.detail.collab_label")}</span>
                 {event.partnerUrl ? (
                   <a
                     href={event.partnerUrl}

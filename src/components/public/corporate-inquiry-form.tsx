@@ -46,16 +46,46 @@ const TURNSTILE_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?ren
 const fieldClass =
   "border border-cocoa/30 bg-cream px-4 py-3 text-body text-cocoa outline-none transition-colors focus:border-cocoa";
 
+export type CorporateFormLabels = {
+  name: string;
+  company: string;
+  email: string;
+  phone: string;
+  message: string;
+  messagePlaceholder: string;
+  consentPrefix: string;
+  privacyLabel: string;
+  consentSuffix: string;
+  submit: string;
+  submitting: string;
+  unavailable: string;
+  whatsapp: string;
+  successTitle: string;
+  successBody: string;
+  errorName: string;
+  errorEmailRequired: string;
+  errorEmailFormat: string;
+  errorMessage: string;
+  errorConsent: string;
+  errorCaptcha: string;
+  errorCaptchaLoad: string;
+  errorIncomplete: string;
+  errorSend: string;
+  errorNetwork: string;
+};
+
 export function CorporateInquiryForm({
   captchaSiteKey,
   available,
   whatsappHref,
   contactEmail,
+  labels,
 }: {
   captchaSiteKey: string | null;
   available: boolean;
   whatsappHref: string;
   contactEmail: string;
+  labels: CorporateFormLabels;
 }) {
   const [state, setState] = useState<FormState>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -94,7 +124,7 @@ export function CorporateInquiryForm({
         "error-callback": () =>
           setFieldErrors((prev) => ({
             ...prev,
-            captcha: "Captcha gagal dimuat. Muat ulang halaman lalu coba lagi.",
+            captcha: labels.errorCaptchaLoad,
           })),
       });
     };
@@ -121,7 +151,7 @@ export function CorporateInquiryForm({
       }
       widgetIdRef.current = null;
     };
-  }, [available, captchaSiteKey]);
+  }, [available, captchaSiteKey, labels.errorCaptchaLoad]);
 
   function resetCaptcha() {
     setCaptchaToken(null);
@@ -145,22 +175,22 @@ export function CorporateInquiryForm({
     const consent = formData.get("consent") === "on";
 
     const errors: Record<string, string> = {};
-    if (name.length < 2) errors.name = "Nama wajib diisi.";
+    if (name.length < 2) errors.name = labels.errorName;
     if (!email) {
-      errors.email = "Email wajib diisi.";
+      errors.email = labels.errorEmailRequired;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.email = "Format email belum benar.";
+      errors.email = labels.errorEmailFormat;
     }
-    if (message.length < 10) errors.message = "Pesan minimal 10 karakter.";
-    if (!consent) errors.consent = "Mohon centang persetujuan ini.";
+    if (message.length < 10) errors.message = labels.errorMessage;
+    if (!consent) errors.consent = labels.errorConsent;
     if (captchaSiteKey && !captchaToken) {
-      errors.captcha = "Mohon selesaikan captcha terlebih dahulu.";
+      errors.captcha = labels.errorCaptcha;
     }
 
     setFieldErrors(errors);
     if (Object.keys(errors).length > 0) {
       setState("error");
-      setError("Mohon lengkapi isian yang masih kosong atau belum benar.");
+      setError(labels.errorIncomplete);
       return;
     }
 
@@ -193,8 +223,7 @@ export function CorporateInquiryForm({
       if (!response.ok) {
         setState("error");
         setError(
-          serverError ||
-            "Terjadi kendala saat mengirim. Silakan coba lagi atau hubungi kami via WhatsApp.",
+          serverError || labels.errorSend,
         );
         resetCaptcha();
         return;
@@ -209,19 +238,17 @@ export function CorporateInquiryForm({
       resetCaptcha();
     } catch {
       setState("error");
-      setError("Tidak dapat menghubungi server. Periksa koneksi Anda lalu coba lagi.");
+      setError(labels.errorNetwork);
     }
   }
 
   if (!available) {
     return (
       <div role="status" className="flex flex-col gap-3 border border-cocoa/20 bg-cream px-6 py-8">
-        <p className="text-body text-cocoa/80">
-          Formulir inquiry sedang tidak tersedia. Silakan hubungi tim corporate kami langsung:
-        </p>
+        <p className="text-body text-cocoa/80">{labels.unavailable}</p>
         <div className="flex flex-wrap gap-3">
           <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
-            WhatsApp
+            {labels.whatsapp}
           </a>
           <a href={`mailto:${contactEmail}`} className="btn btn-outline border-cocoa/40">
             {contactEmail}
@@ -235,11 +262,10 @@ export function CorporateInquiryForm({
     return (
       <div role="status" className="flex flex-col gap-2 border border-cocoa/20 bg-cream px-6 py-10">
         <h3 className="font-display text-title-sm md:text-[1.375rem]">
-          Terima kasih, inquiry Anda sudah terkirim.
+          {labels.successTitle}
         </h3>
         <p className="max-w-[52ch] text-body text-cocoa/70">
-          Tim KAMA akan menghubungi Anda kembali pada jam operasional. Untuk hal mendesak,
-          hubungi kami via WhatsApp.
+          {labels.successBody}
         </p>
       </div>
     );
@@ -255,13 +281,13 @@ export function CorporateInquiryForm({
     >
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <label className="flex min-w-0 flex-col gap-2">
-          <span className="eyebrow text-cocoa/70">Nama *</span>
+          <span className="eyebrow text-cocoa/70">{labels.name}</span>
           <input name="name" type="text" required maxLength={120} autoComplete="name" className={fieldClass} />
           {fieldErrors.name ? <span className="text-caption text-error">{fieldErrors.name}</span> : null}
         </label>
 
         <label className="flex min-w-0 flex-col gap-2">
-          <span className="eyebrow text-cocoa/70">Perusahaan</span>
+          <span className="eyebrow text-cocoa/70">{labels.company}</span>
           <input
             name="company"
             type="text"
@@ -272,25 +298,25 @@ export function CorporateInquiryForm({
         </label>
 
         <label className="flex min-w-0 flex-col gap-2">
-          <span className="eyebrow text-cocoa/70">Email *</span>
+          <span className="eyebrow text-cocoa/70">{labels.email}</span>
           <input name="email" type="email" required maxLength={254} autoComplete="email" className={fieldClass} />
           {fieldErrors.email ? <span className="text-caption text-error">{fieldErrors.email}</span> : null}
         </label>
 
         <label className="flex min-w-0 flex-col gap-2">
-          <span className="eyebrow text-cocoa/70">Telepon</span>
+          <span className="eyebrow text-cocoa/70">{labels.phone}</span>
           <input name="phone" type="tel" maxLength={40} autoComplete="tel" className={fieldClass} />
         </label>
       </div>
 
       <label className="flex flex-col gap-2">
-        <span className="eyebrow text-cocoa/70">Pesan *</span>
+        <span className="eyebrow text-cocoa/70">{labels.message}</span>
         <textarea
           name="message"
           required
           rows={5}
           maxLength={5000}
-          placeholder="Jumlah karyawan, jenis program (in-office / in-spa), perkiraan tanggal…"
+          placeholder={labels.messagePlaceholder}
           className={fieldClass}
         />
         {fieldErrors.message ? (
@@ -309,12 +335,11 @@ export function CorporateInquiryForm({
       <label className="flex items-start gap-3 text-body text-cocoa/80">
         <input name="consent" type="checkbox" required className="mt-1 size-4 shrink-0" />
         <span>
-          Saya setuju data di atas digunakan KAMA Spa hanya untuk menindaklanjuti inquiry ini,
-          sesuai{" "}
+          {labels.consentPrefix}{" "}
           <Link href="/privacy-policy" className="underline">
-            Kebijakan Privasi
+            {labels.privacyLabel}
           </Link>
-          .
+          {labels.consentSuffix}
         </span>
       </label>
       {fieldErrors.consent ? (
@@ -342,7 +367,7 @@ export function CorporateInquiryForm({
           className="btn btn-primary"
           disabled={!hydrated || state === "loading"}
         >
-          {state === "loading" ? "Mengirim…" : "Kirim Inquiry"}
+          {state === "loading" ? labels.submitting : labels.submit}
         </button>
       </div>
     </form>

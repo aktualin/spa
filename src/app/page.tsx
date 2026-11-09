@@ -14,6 +14,7 @@ import {
   getWhatsNewCards,
 } from "@/lib/content/homepage";
 import { getMembershipProgram } from "@/lib/content/membership";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
 import { DEFAULT_DESCRIPTION, DEFAULT_OG_DESCRIPTION, DEFAULT_TITLE } from "@/lib/domain/seo";
 
@@ -34,27 +35,23 @@ export async function generateMetadata(): Promise<Metadata> {
  * dengan CSS. Section baru (signature-treatments, promo-highlight,
  * gallery-teaser) hanya muncul bila barisnya ada di DB dan aktif.
  *
- * Hero, banner membership, dan banner booking menerima data section-nya
- * (gambar, teks, tombol); isian kosong memakai teks/gambar bawaan.
- *
- * "What's New" menampilkan kartu highlight dari admin (`HomepageHighlight`),
- * atau kartu statis lama bila tabel highlight kosong.
- *
- * Statistik Brand Intro, ulasan, dan feed Instagram dibaca dari tabel
- * `HomepageStat`, `HomepageReview`, `InstagramPost`; tabel kosong → teks/foto
- * statis lama (tampilan identik).
+ * Semua teks/gambar/tombol berasal dari DB (`HomepageSection`, `ContentBlock`,
+ * `HomepageHighlight`, `HomepageStat`, `HomepageReview`, `InstagramPost`).
+ * Tidak ada teks cadangan di kode.
  *
  * Section `footer` hanya mengatur tampil/sembunyi footer di homepage; posisinya
  * tetap di paling bawah (tidak ikut urutan). Tanpa baris DB → tampil.
  */
 export default async function Home() {
-  const [sections, membershipProgram, whatsNewCards, stats, reviews] = await Promise.all([
-    getHomepageSections(),
-    getMembershipProgram(),
-    getWhatsNewCards(),
-    getHomepageStats(),
-    getHomepageReviews(),
-  ]);
+  const [sections, membershipProgram, whatsNewCards, stats, reviews, pageCopy] =
+    await Promise.all([
+      getHomepageSections(),
+      getMembershipProgram(),
+      getWhatsNewCards(),
+      getHomepageStats(),
+      getHomepageReviews(),
+      getPageCopy(),
+    ]);
 
   const showFooter = sections.footer?.isEnabled ?? true;
 
@@ -87,14 +84,21 @@ export default async function Home() {
             Hero, judul tetap ada untuk mesin pencari & pembaca layar tanpa
             mengubah tampilan. */}
         {visible.some(({ key }) => key === "hero") ? null : (
-          <h1 className="sr-only">{DEFAULT_TITLE}</h1>
+          copy(pageCopy, "global.site_title") ? (
+            <h1 className="sr-only">{copy(pageCopy, "global.site_title")}</h1>
+          ) : null
         )}
         {visible.map(({ key, section }) => {
           switch (key) {
             case "hero":
-              return <Hero key={key} section={section} />;
+              return <Hero key={key} section={section} copyBlocks={pageCopy} />;
             case "membership-banner":
-              return <MembershipBanner key={key} section={section} program={membershipProgram} />;
+              return <MembershipBanner
+                key={key}
+                section={section}
+                program={membershipProgram}
+                copyBlocks={pageCopy}
+              />;
             case "whats-new":
               return (
                 <WhatsNewSection
@@ -102,6 +106,7 @@ export default async function Home() {
                   cards={whatsNewCards}
                   section={section}
                   showNewsletterLink={showFooter}
+                  copyBlocks={pageCopy}
                 />
               );
             case "reviews":
@@ -109,17 +114,17 @@ export default async function Home() {
                 <TestimonialsSection key={key} reviews={reviews} section={section} />
               );
             case "brand-intro":
-              return <HeroStats key={key} stats={stats} />;
+              return <HeroStats key={key} stats={stats} section={section} copyBlocks={pageCopy} />;
             case "socials":
-              return <SocialsSection key={key} />;
+              return <SocialsSection key={key} section={section} copyBlocks={pageCopy} />;
             case "booking-banner":
-              return <BookingBanner key={key} section={section} />;
+              return <BookingBanner key={key} section={section} copyBlocks={pageCopy} />;
             case "signature-treatments":
-              return <SignatureTreatmentsSection key={key} />;
+              return <SignatureTreatmentsSection key={key} section={section} copyBlocks={pageCopy} />;
             case "promo-highlight":
-              return <PromoHighlightSection key={key} />;
+              return <PromoHighlightSection key={key} copyBlocks={pageCopy} />;
             case "gallery-teaser":
-              return <GalleryTeaserSection key={key} />;
+              return <GalleryTeaserSection key={key} section={section} copyBlocks={pageCopy} />;
             default:
               return null;
           }

@@ -7,6 +7,7 @@
 import Link from "next/link";
 
 import type { CatalogTreatment } from "@/lib/content/catalog";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { formatDuration } from "@/lib/domain/pricing";
 import { formatIdr } from "@/lib/format";
 
@@ -19,7 +20,8 @@ type TreatmentCardProps = {
   withCta?: boolean;
 };
 
-export function TreatmentCard({ treatment, withCta = false }: TreatmentCardProps) {
+export async function TreatmentCard({ treatment, withCta = false }: TreatmentCardProps) {
+  const pageCopy = await getPageCopy();
   const first = treatment.options[0];
 
   return (
@@ -43,6 +45,8 @@ export function TreatmentCard({ treatment, withCta = false }: TreatmentCardProps
         <CatalogBadges
           isNew={treatment.isNew}
           isBestSeller={treatment.isBestSeller}
+          newLabel={copy(pageCopy, "global.badge_new")}
+          bestSellerLabel={copy(pageCopy, "global.badge_best_seller")}
         />
         <h3 className="header-s">
           <Link href={`/treatments/${treatment.categorySlug}/${treatment.slug}`}>
@@ -80,7 +84,7 @@ export function TreatmentCard({ treatment, withCta = false }: TreatmentCardProps
               context="treatment"
               custom={treatment.whatsappMessage}
               values={{ treatment: treatment.name, category: treatment.categoryName }}
-              label="Book via WhatsApp"
+              label={copy(pageCopy, "global.book_via_whatsapp")}
               className="button is-secondary is-icon w-inline-block"
             />
           </>

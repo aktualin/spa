@@ -9,42 +9,42 @@ import {
 } from "@/components/public/page-parts";
 import { EventGrid } from "@/components/public/events/event-parts";
 import { getEventGroups } from "@/lib/content/events";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return withPageSeo("/events/collaborations", {
-    title: "Past Collaborations",
-    description:
-      "Program wellness KAMA Spa yang pernah dijalankan bersama partner, perusahaan, dan brand — a glimpse of wellness in action.",
-  });
+  return withPageSeo("/events/collaborations", {});
 }
 
 export default async function CollaborationsPage() {
-  const { collaborations } = await getEventGroups();
+  const [{ collaborations }, pageCopy] = await Promise.all([
+    getEventGroups(),
+    getPageCopy(),
+  ]);
 
   return (
     <>
       <Navigation />
       <main className="flex-1">
         <PublicPageHeader
-          eyebrow="Collaborations"
-          title="Wellness in action — on location."
-          description="Program corporate wellness dan kolaborasi yang pernah kami jalankan bersama partner."
+          eyebrow={copy(pageCopy, "events.collab.hero_eyebrow")}
+          title={copy(pageCopy, "events.collab.hero_title")}
+          description={copy(pageCopy, "events.collab.hero_description")}
         />
 
         <Reveal as="section" className="bg-cream">
           <div className="container-kama py-14 md:py-16 lg:py-20">
             <PublicSectionHeader
-              eyebrow="Past Collaborations"
-              title="Program yang pernah berjalan"
+              eyebrow={copy(pageCopy, "events.collab.section_eyebrow")}
+              title={copy(pageCopy, "events.collab.section_title")}
             />
             {collaborations.length > 0 ? (
               <EventGrid events={collaborations} />
             ) : (
               <div className="mt-8">
                 <PublicEmptyState
-                  title="Belum ada kolaborasi yang tercatat"
-                  description="Kolaborasi yang sudah selesai akan tampil di sini."
+                  title={copy(pageCopy, "events.collab.empty_title")}
+                  description={copy(pageCopy, "events.collab.empty_description")}
                 />
               </div>
             )}

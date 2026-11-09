@@ -9,6 +9,7 @@ import { Reveal } from "@/components/reveal";
 import { PackageCard } from "@/components/public/package-card";
 import { WaLink } from "@/components/public/wa-button";
 import { getCatalogSlugs, getPackage, getPackages } from "@/lib/content/catalog";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
 import { formatDuration } from "@/lib/domain/pricing";
 import { formatIdr } from "@/lib/format";
@@ -30,7 +31,8 @@ export async function generateMetadata({
   const pkg = await getPackage(slug);
 
   if (!pkg) {
-    return { title: "Paket tidak ditemukan" };
+    const pageCopy = await getPageCopy();
+    return { title: copy(pageCopy, "catalog.package.not_found_title") || undefined };
   }
 
   return withPageSeo(`/treatments/packages/${slug}`, {
@@ -42,12 +44,15 @@ export async function generateMetadata({
   });
 }
 
-export default function PackagePage({ params }: PackagePageProps) {
+export default async function PackagePage({ params }: PackagePageProps) {
   /* Slug adalah runtime data — dibaca di dalam Suspense boundary. */
+  const pageCopy = await getPageCopy();
   return (
     <>
       <Navigation />
-      <Suspense fallback={<PackageFallback />}>
+      <Suspense
+        fallback={<PackageFallback title={copy(pageCopy, "catalog.package.loading_title")} />}
+      >
         <PackageContent params={params} />
       </Suspense>
       <Footer />
@@ -55,13 +60,13 @@ export default function PackagePage({ params }: PackagePageProps) {
   );
 }
 
-function PackageFallback() {
+function PackageFallback({ title }: { title: string }) {
   return (
     <main className="flex-1">
       <Reveal as="section" className="bg-cream-soft">
         <div className="container-kama py-14 md:py-20 lg:py-24">
           <h1 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-            Memuat paket…
+            {title}
           </h1>
         </div>
       </Reveal>
@@ -71,7 +76,7 @@ function PackageFallback() {
 
 async function PackageContent({ params }: PackagePageProps) {
   const { slug } = await params;
-  const pkg = await getPackage(slug);
+  const [pkg, pageCopy] = await Promise.all([getPackage(slug), getPageCopy()]);
 
   if (!pkg) notFound();
 
@@ -96,9 +101,9 @@ async function PackageContent({ params }: PackagePageProps) {
                   className="inline-flex items-center gap-2 text-[0.9375rem] underline underline-offset-4 transition-opacity hover:opacity-70"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  Semua paket
+                  {copy(pageCopy, "catalog.package.back")}
                 </Link>
-                <span className="eyebrow text-cocoa/60">Package</span>
+                <span className="eyebrow text-cocoa/60">{copy(pageCopy, "catalog.package.eyebrow")}</span>
                 <h1 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
                   {pkg.name}
                 </h1>
@@ -119,7 +124,7 @@ async function PackageContent({ params }: PackagePageProps) {
                 </div>
                 <div>
                   <WaLink href={waHref} context="package">
-                    Reservasi via WhatsApp
+                    {copy(pageCopy, "catalog.package.cta_whatsapp")}
                   </WaLink>
                 </div>
               </div>
@@ -142,7 +147,7 @@ async function PackageContent({ params }: PackagePageProps) {
           <Reveal as="section" className="bg-cream">
             <div className="container-kama py-14 md:py-16 lg:py-20">
               <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-                Isi paket
+                {copy(pageCopy, "catalog.package.includes_title")}
               </h2>
               <ul className="mt-8 flex max-w-[48rem] flex-col">
                 {pkg.items.map((item) => (
@@ -172,7 +177,7 @@ async function PackageContent({ params }: PackagePageProps) {
           <Reveal as="section" className="bg-cream-soft">
             <div className="container-kama py-14 md:py-16 lg:py-20">
               <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-                Paket lainnya
+                {copy(pageCopy, "catalog.package.others_title")}
               </h2>
               <div className="w-layout-grid whats-new_list mt-8">
                 {others.map((other) => (

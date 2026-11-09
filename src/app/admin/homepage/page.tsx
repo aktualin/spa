@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { requireRole } from "@/lib/auth";
-import { MEMBERSHIP_BANNER_DEFAULTS } from "@/components/home/hero";
 import {
   BOOKING_BANNER_DEFAULTS,
   HERO_DEFAULTS,
@@ -19,7 +18,14 @@ export const instant = false;
 /** Teks/gambar bawaan banner — ditampilkan sebagai placeholder di form. */
 const BANNER_DEFAULTS: Record<BannerKey, BannerDefaults> = {
   hero: HERO_DEFAULTS,
-  "membership-banner": MEMBERSHIP_BANNER_DEFAULTS,
+  "membership-banner": {
+    title: "KAMA Membership.",
+    subtitle: "",
+    imageUrl: "",
+    imageAlt: "",
+    ctaLabel: "Join KAMA Now",
+    ctaHref: "/membership",
+  },
   "booking-banner": BOOKING_BANNER_DEFAULTS,
 };
 

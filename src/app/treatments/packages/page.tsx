@@ -10,34 +10,31 @@ import {
 } from "@/components/public/page-parts";
 import { PackageCard } from "@/components/public/package-card";
 import { getPackages } from "@/lib/content/catalog";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return withPageSeo("/treatments/packages", {
-    title: "Spa Packages",
-    description:
-      "Paket dan All Day Spa KAMA — rangkaian treatment yang disusun jadi satu ritual lengkap.",
-  });
+  return withPageSeo("/treatments/packages", {});
 }
 
 export default async function PackagesPage() {
-  const packages = await getPackages();
+  const [packages, pageCopy] = await Promise.all([getPackages(), getPageCopy()]);
 
   return (
     <>
       <Navigation />
       <main className="flex-1">
         <PublicPageHeader
-          eyebrow="Packages"
-          title="Satu ritual, dirangkai lengkap."
-          description="Gabungan beberapa treatment dalam satu kunjungan — untuk waktu yang memang disediakan untuk diri sendiri."
+          eyebrow={copy(pageCopy, "catalog.packages.eyebrow")}
+          title={copy(pageCopy, "catalog.packages.title")}
+          description={copy(pageCopy, "catalog.packages.description")}
         >
           <Link
             href="/treatments"
             className="inline-flex items-center gap-2 text-[0.9375rem] underline underline-offset-4 transition-opacity hover:opacity-70"
           >
             <ArrowLeft className="h-4 w-4" />
-            Semua treatment
+            {copy(pageCopy, "catalog.packages.back")}
           </Link>
         </PublicPageHeader>
 
@@ -51,8 +48,8 @@ export default async function PackagesPage() {
               </div>
             ) : (
               <PublicEmptyState
-                title="Belum ada paket"
-                description="Paket akan muncul di sini begitu dipublikasikan dari dashboard admin."
+                title={copy(pageCopy, "catalog.packages.empty_title")}
+                description={copy(pageCopy, "catalog.packages.empty_description")}
               />
             )}
           </div>

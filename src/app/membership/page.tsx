@@ -9,25 +9,22 @@ import {
   getMembershipTiers,
   membershipPriceText,
 } from "@/lib/content/membership";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { plainTextToHtml } from "@/lib/domain/rich-text";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { whatsAppHref } from "@/lib/content/whatsapp";
 import { Reveal } from "@/components/reveal";
 
 export async function generateMetadata(): Promise<Metadata> {
-  // Deskripsi diambil dari program agar tidak basi ketika harga berubah.
-  const program = await getMembershipProgram();
-  return withPageSeo("/membership", {
-    title: program.title || "Membership",
-    description: [program.priceHeadline, program.intro].filter(Boolean).join(" "),
-  });
+  return withPageSeo("/membership", {});
 }
 
 export default async function MembershipPage() {
-  const [membership, tiers, joinHref] = await Promise.all([
+  const [membership, tiers, joinHref, pageCopy] = await Promise.all([
     getMembershipProgram(),
     getMembershipTiers(),
     whatsAppHref("membership"),
+    getPageCopy(),
   ]);
 
   return (
@@ -52,11 +49,11 @@ export default async function MembershipPage() {
                       data-wa-context="membership"
                       className="button is-tertiary sizing-grow w-inline-block"
                     >
-                      <div>Join KAMA Now</div>
+                      <div>{copy(pageCopy, "membership.join_label")}</div>
                     </a>
                   ) : null}
                   <a href="/menu" className="button is-secondary sizing-grow w-inline-block">
-                    <div>Lihat Menu</div>
+                    <div>{copy(pageCopy, "membership.menu_label")}</div>
                   </a>
                 </div>
               </div>
@@ -69,12 +66,13 @@ export default async function MembershipPage() {
           <div className="padding-global padding-section-global is-basic">
             <div className="container-large">
               <div className="section-header">
-                <h2 className="header-l">Main Benefits</h2>
+                <h2 className="header-l">{copy(pageCopy, "membership.benefits_title")}</h2>
                 <div className="spacer-medium" />
-                <p className="body-m text-color-gray">
-                  {membership.priceHeadline} Anda mendapatkan seluruh manfaat berikut, tanpa
-                  komitmen jangka panjang.
-                </p>
+                {copy(pageCopy, "membership.benefits_intro") ? (
+                  <p className="body-m text-color-gray">
+                    {copy(pageCopy, "membership.benefits_intro")}
+                  </p>
+                ) : null}
               </div>
               <div className="w-layout-grid grid_benefits">
                 {membership.benefits.map((benefit) => (
@@ -96,7 +94,7 @@ export default async function MembershipPage() {
             <div className="container-large">
               <div className="dropdowns_content">
                 <div className="dropdowns_group-wrapper">
-                  <h4 className="header-l">KAMA Essential Services</h4>
+                  <h4 className="header-l">{copy(pageCopy, "membership.services_title")}</h4>
                   <div className="body-m text-color-gray">{membership.servicesIntro}</div>
                 </div>
                 <div className="dropdowns_group">
@@ -121,7 +119,7 @@ export default async function MembershipPage() {
                             href="/contact"
                             className="button is-tertiary is-icon is-small w-inline-block"
                           >
-                            <div>Book Now</div>
+                            <div>{copy(pageCopy, "membership.service_book_label")}</div>
                             <div className="button_icon w-embed">
                               <ArrowRight />
                             </div>
@@ -141,13 +139,15 @@ export default async function MembershipPage() {
           <div className="padding-global">
             <div className="container-large">
               <div className="section-header">
-                <div className="eyebrow-s text-style-allcaps">Membership Plans</div>
-                <h2 className="header-l">Pilih yang paling sesuai dengan ritme Anda.</h2>
+                <div className="eyebrow-s text-style-allcaps">{copy(pageCopy, "membership.plans_eyebrow")}</div>
+                <h2 className="header-l">{copy(pageCopy, "membership.plans_title")}</h2>
               </div>
               {tiers.length === 0 ? (
-                <p className="body-m text-color-gray">
-                  Belum ada paket membership yang dipublikasikan.
-                </p>
+                copy(pageCopy, "membership.plans_empty") ? (
+                  <p className="body-m text-color-gray">
+                    {copy(pageCopy, "membership.plans_empty")}
+                  </p>
+                ) : null
               ) : (
               <div className="w-layout-grid whats-new_list">
                 {tiers.map((plan) => (
@@ -188,7 +188,7 @@ export default async function MembershipPage() {
                           data-wa-context="membership"
                           className="button is-tertiary is-icon w-inline-block"
                         >
-                          <div>Join Now</div>
+                          <div>{copy(pageCopy, "membership.join_now_label")}</div>
                           <div className="button_icon w-embed">
                             <ArrowRight />
                           </div>
@@ -208,7 +208,7 @@ export default async function MembershipPage() {
             <div className="padding-global">
               <div className="container-large">
                 <div className="section-header">
-                  <h2 className="header-l">Syarat & Ketentuan</h2>
+                  <h2 className="header-l">{copy(pageCopy, "membership.terms_title")}</h2>
                   <div className="spacer-medium" />
                   <div
                     className="body-m text-color-gray text-rich-text"
@@ -223,12 +223,12 @@ export default async function MembershipPage() {
         <Reveal as="section" className="section_get-in-touch is-top-off">
           <div className="get-in-touch_container">
             <div className="get-in-touch_banner">
-              <h4 className="header-l">Have any questions? Drop us a line.</h4>
+              <h4 className="header-l">{copy(pageCopy, "membership.contact_title")}</h4>
               <Link
                 href="/contact"
                 className="button is-tertiary is-icon margin-left-auto-desktop w-inline-block"
               >
-                <div>Get In Touch</div>
+                <div>{copy(pageCopy, "membership.contact_label")}</div>
                 <div className="button_icon w-embed">
                   <ArrowRight />
                 </div>

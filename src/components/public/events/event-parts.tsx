@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
 import type { PublicEvent } from "@/lib/content/events";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { formatEventDateRange } from "@/lib/domain/events";
 
 /**
@@ -13,13 +14,14 @@ export function formatEventDate(startDate: Date | null, endDate: Date | null): s
 }
 
 /** Logo/nama mitra kolaborasi — hanya tampil bila diisi. */
-export function EventPartner({
+export async function EventPartner({
   event,
   size = "sm",
 }: {
   event: PublicEvent;
   size?: "sm" | "lg";
 }) {
+  const pageCopy = await getPageCopy();
   if (!event.isCollaboration || (!event.partnerName && !event.partnerLogoUrl)) {
     return null;
   }
@@ -29,19 +31,26 @@ export function EventPartner({
       {event.partnerLogoUrl ? (
         <img
           src={event.partnerLogoUrl}
-          alt={event.partnerName ? `Logo ${event.partnerName}` : "Logo mitra"}
+          alt={
+            event.partnerName
+              ? `${copy(pageCopy, "global.partner_logo_alt")} ${event.partnerName}`
+              : copy(pageCopy, "global.partner_logo_alt")
+          }
           loading="lazy"
           className={`${logoClass} w-auto object-contain`}
         />
       ) : null}
       {event.partnerName ? (
-        <span className="text-body text-cocoa/70">Bersama {event.partnerName}</span>
+        <span className="text-body text-cocoa/70">
+          {copy(pageCopy, "global.event_partner_prefix")} {event.partnerName}
+        </span>
       ) : null}
     </span>
   );
 }
 
-export function EventCard({ event }: { event: PublicEvent }) {
+export async function EventCard({ event }: { event: PublicEvent }) {
+  const pageCopy = await getPageCopy();
   return (
     <Link
       href={`/events/${event.slug}`}
@@ -72,7 +81,7 @@ export function EventCard({ event }: { event: PublicEvent }) {
           <p className="line-clamp-3 text-body text-cocoa/70">{event.description}</p>
         ) : null}
         <span className="mt-auto inline-flex items-center gap-2 pt-2 text-[0.9375rem] underline underline-offset-4 transition-opacity group-hover:opacity-70">
-          Lihat Detail
+          {copy(pageCopy, "global.view_detail_label")}
           <ArrowRight className="h-4 w-4" />
         </span>
       </div>
@@ -80,7 +89,7 @@ export function EventCard({ event }: { event: PublicEvent }) {
   );
 }
 
-export function EventGrid({ events }: { events: PublicEvent[] }) {
+export async function EventGrid({ events }: { events: PublicEvent[] }) {
   return (
     <ul className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
       {events.map((event) => (
@@ -92,13 +101,14 @@ export function EventGrid({ events }: { events: PublicEvent[] }) {
   );
 }
 
-export function EventGallery({ event }: { event: PublicEvent }) {
+export async function EventGallery({ event }: { event: PublicEvent }) {
   if (event.photos.length === 0) return null;
+  const pageCopy = await getPageCopy();
   return (
     <Reveal as="section" className="bg-cream-soft">
       <div className="container-kama py-14 md:py-16 lg:py-20">
         <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-          Galeri Event
+          {copy(pageCopy, "events.detail.gallery_title")}
         </h2>
         <ul className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 lg:gap-4">
           {event.photos.map((photo) => (

@@ -4,9 +4,10 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import { ArrowRight, Check } from "@/components/icons";
-import { priceDisclaimer } from "@/data/content";
+import { Check } from "@/components/icons";
 import { getCatalogSlugs, getMenuEntry } from "@/lib/content/catalog";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
+import { getSiteSettings } from "@/lib/content/site";
 import { withPageSeo } from "@/lib/content/seo";
 
 // Slug untuk prerender saat build diambil dari database, bukan daftar statis.
@@ -24,7 +25,8 @@ export async function generateMetadata({
   const entry = await getMenuEntry(slug);
 
   if (!entry) {
-    return { title: "Treatment Not Found" };
+    const pageCopy = await getPageCopy();
+    return { title: copy(pageCopy, "menu.detail.not_found_title") || undefined };
   }
 
   return withPageSeo(`/menu/${slug}`, {
@@ -36,7 +38,7 @@ export async function generateMetadata({
   });
 }
 
-export default function TreatmentPage({
+export default async function TreatmentPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
@@ -45,10 +47,18 @@ export default function TreatmentPage({
      Suspense boundary, otherwise Next.js complains about "URL data during
      prerendering". Every slug of `generateStaticParams` is prerendered, so
      the fallback is only a safety net. */
+  const pageCopy = await getPageCopy();
   return (
     <>
       <Navigation />
-      <Suspense fallback={<TreatmentFallback />}>
+      <Suspense
+        fallback={
+          <TreatmentFallback
+            eyebrow={copy(pageCopy, "menu.detail.eyebrow")}
+            title={copy(pageCopy, "menu.detail.loading_title")}
+          />
+        }
+      >
         <TreatmentContent params={params} />
       </Suspense>
       <Footer />
@@ -56,14 +66,14 @@ export default function TreatmentPage({
   );
 }
 
-function TreatmentFallback() {
+function TreatmentFallback({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
     <main className="main-wrapper">
       <section className="page-hero">
         <div className="padding-global">
           <div className="container-large">
-            <div className="eyebrow-s text-style-allcaps">KAMA Spa</div>
-            <h1 className="header-xxl">Memuat treatment…</h1>
+            <div className="eyebrow-s text-style-allcaps">{eyebrow}</div>
+            <h1 className="header-xxl">{title}</h1>
           </div>
         </div>
       </section>
@@ -77,7 +87,11 @@ async function TreatmentContent({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const entry = await getMenuEntry(slug);
+  const [entry, pageCopy, settings] = await Promise.all([
+    getMenuEntry(slug),
+    getPageCopy(),
+    getSiteSettings(),
+  ]);
 
   if (!entry) {
     notFound();
@@ -91,7 +105,9 @@ async function TreatmentContent({
               <div className="layout-row gap-large">
                 <div className="sizing-grow">
                   <div className="eyebrow-s text-style-allcaps">
-                    {entry.kind === "package" ? "All Day Spa" : entry.category}
+                    {entry.kind === "package"
+                      ? copy(pageCopy, "menu.packages.eyebrow")
+                      : entry.category}
                   </div>
                   <h1 className="header-xxl">{entry.name}</h1>
                   <div className="body-m text-color-gray">
@@ -141,7 +157,7 @@ async function TreatmentContent({
                 <div className="sizing-grow">
                   <div className="package-card">
                     <div className="package-card_body">
-                      <div className="eyebrow-s text-style-allcaps">Pricing</div>
+                      <div className="eyebrow-s text-style-allcaps">{copy(pageCopy, "menu.detail.pricing_label")}</div>
 
                       {entry.kind === "package" ? (
                         <>
@@ -150,7 +166,7 @@ async function TreatmentContent({
                             <span className="price-row_value">{entry.price}</span>
                           </div>
                           <div className="spacer-small" />
-                          <div className="eyebrow-s text-style-allcaps">Include</div>
+                          <div className="eyebrow-s text-style-allcaps">{copy(pageCopy, "menu.detail.include_label")}</div>
                           <div className="package-includes">
                             {entry.includes.map((inc) => (
                               <span key={inc.label} className="package-includes_item">
@@ -169,12 +185,18 @@ async function TreatmentContent({
                         ))
                       )}
 
-                      <div className="spacer-small" />
-                      <div className="eyebrow-s text-color-gray">{priceDisclaimer}</div>
+                      {settings.priceDisclaimer ? (
+                        <>
+                          <div className="spacer-small" />
+                          <div className="eyebrow-s text-color-gray">
+                            {settings.priceDisclaimer}
+                          </div>
+                        </>
+                      ) : null}
 
                       <div className="spacer-medium" />
                       <Link href="/contact" className="button width-fill w-inline-block">
-                        <div>Book This Treatment</div>
+                        <div>{copy(pageCopy, "menu.detail.book_label")}</div>
                       </Link>
                     </div>
                   </div>

@@ -4,7 +4,13 @@ import { useEffect, useRef } from "react";
 import type { Branch } from "@/lib/content/branches";
 import { branchesCenter } from "@/lib/domain/branch";
 
-export function LocationMap({ locations: branches }: { locations: readonly Branch[] }) {
+export function LocationMap({
+  locations: branches,
+  openMapsLabel,
+}: {
+  locations: readonly Branch[];
+  openMapsLabel: string;
+}) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
 
@@ -40,7 +46,7 @@ export function LocationMap({ locations: branches }: { locations: readonly Branc
       }).addTo(map);
 
       marker.bindPopup(
-        `<div style="min-width:220px;padding:4px"><b style="font-size:16px;color:#4A2C1A">${branch.name}</b><br/><span style="color:#666;font-size:13px">${branch.address}</span><br/><br/><a href="${branch.mapsUrl}" target="_blank" rel="noopener noreferrer" style="color:#4A2C1A;font-weight:600;font-size:14px">Buka di Maps ↗</a></div>`,
+        `<div style="min-width:220px;padding:4px"><b style="font-size:16px;color:#4A2C1A">${branch.name}</b><br/><span style="color:#666;font-size:13px">${branch.address}</span><br/><br/><a href="${branch.mapsUrl}" target="_blank" rel="noopener noreferrer" style="color:#4A2C1A;font-weight:600;font-size:14px">${openMapsLabel} ↗</a></div>`,
         { maxWidth: 300 }
       );
     });
@@ -51,7 +57,7 @@ export function LocationMap({ locations: branches }: { locations: readonly Branc
       map.remove();
       mapInstanceRef.current = null;
     };
-  }, [branches]);
+  }, [branches, openMapsLabel]);
 
   // Belum ada satu pun koordinat → peta tidak dirender daripada menampilkan
   // pandangan dunia kosong.

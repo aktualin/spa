@@ -10,31 +10,31 @@ import {
   PublicSectionHeader,
 } from "@/components/public/page-parts";
 import { getMembershipTiers, membershipPriceText } from "@/lib/content/membership";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
 import { plainTextToHtml } from "@/lib/domain/rich-text";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { whatsAppHref } from "@/lib/content/whatsapp";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return withPageSeo("/promos/membership", {
-    title: "Membership",
-    description:
-      "KAMA Membership — paket keanggotaan dengan essential service bulanan, harga anggota untuk seluruh menu, dan benefit khusus.",
-  });
+  return withPageSeo("/promos/membership", {});
 }
 
 export default async function PromosMembershipPage() {
-  const memberHref = await whatsAppHref("membership");
-  const tiers = await getMembershipTiers();
+  const [memberHref, tiers, pageCopy] = await Promise.all([
+    whatsAppHref("membership"),
+    getMembershipTiers(),
+    getPageCopy(),
+  ]);
 
   return (
     <>
       <Navigation />
       <main className="flex-1">
         <PublicPageHeader
-          eyebrow="Membership"
-          title="KAMA Membership."
-          description="Pastikan waktu me-time Anda selalu tercatat. Setiap bulan Anda mendapat kredit untuk satu essential service, harga yang lebih ringan, serta penawaran khusus untuk anggota KAMA."
+          eyebrow={copy(pageCopy, "promos.membership.hero_eyebrow")}
+          title={copy(pageCopy, "promos.membership.hero_title")}
+          description={copy(pageCopy, "promos.membership.hero_description")}
         >
           <div className="button-group mt-4 flex flex-wrap gap-3">
             {memberHref ? (
@@ -45,11 +45,11 @@ export default async function PromosMembershipPage() {
                 rel="noopener noreferrer"
                 className="btn btn-primary"
               >
-                Join KAMA Now
+                {copy(pageCopy, "promos.membership.join_label")}
               </a>
             ) : null}
             <Link href="/menu" className="btn btn-outline border-cocoa/40">
-              Lihat Menu
+              {copy(pageCopy, "promos.membership.menu_label")}
             </Link>
           </div>
         </PublicPageHeader>
@@ -57,8 +57,8 @@ export default async function PromosMembershipPage() {
         <Reveal as="section" className="bg-cream">
           <div className="container-kama py-14 md:py-16 lg:py-20">
             <PublicSectionHeader
-              eyebrow="Membership Plans"
-              title="Pilih yang paling sesuai dengan ritme Anda."
+              eyebrow={copy(pageCopy, "promos.membership.plans_eyebrow")}
+              title={copy(pageCopy, "promos.membership.plans_title")}
             />
             {tiers.length > 0 ? (
               <ul className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
@@ -109,7 +109,7 @@ export default async function PromosMembershipPage() {
                         rel="noopener noreferrer"
                         className="btn btn-outline mt-6 border-cocoa/40"
                       >
-                        Join Now
+                        {copy(pageCopy, "promos.membership.join_now_label")}
                         <ArrowRight className="h-4 w-4" />
                       </a>
                     ) : null}
@@ -119,8 +119,8 @@ export default async function PromosMembershipPage() {
             ) : (
               <div className="mt-8">
                 <PublicEmptyState
-                  title="Belum ada paket membership"
-                  description="Paket membership akan tampil di sini setelah dipublikasikan."
+                  title={copy(pageCopy, "promos.membership.empty_title")}
+                  description={copy(pageCopy, "promos.membership.empty_description")}
                 />
               </div>
             )}

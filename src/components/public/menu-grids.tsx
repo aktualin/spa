@@ -9,15 +9,13 @@ import Link from "next/link";
 import { Check } from "@/components/icons";
 import type { Package as StaticPackage, Treatment as StaticTreatment } from "@/data/content";
 
-const categoryLabels: Record<string, string> = {
-  Massage: "Massage",
-  Body: "Body",
-  Face: "Facials",
-  "Head & Scalp": "Head & Scalp",
-  Bath: "Bath",
-};
-
-export function MassageGrid({ items }: { items: StaticTreatment[] }) {
+export function MassageGrid({
+  items,
+  categoryLabels,
+}: {
+  items: StaticTreatment[];
+  categoryLabels: Record<string, string>;
+}) {
   return (
     <div className="w-layout-grid whats-new_list">
       {items.map((t) => (

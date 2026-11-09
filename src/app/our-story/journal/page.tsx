@@ -14,6 +14,7 @@ import {
   getJournalPosts,
   getJournalTags,
 } from "@/lib/content/journal";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
 import {
   JOURNAL_BASE_PATH,
@@ -22,12 +23,9 @@ import {
 } from "@/lib/domain/journal";
 
 export async function generateMetadata(): Promise<Metadata> {
+  // Versi tersaring (?category=, ?tag=) menunjuk ke daftar utama.
   return withPageSeo(JOURNAL_BASE_PATH, {
-    title: "Journal",
-    // Versi tersaring (?category=, ?tag=) menunjuk ke daftar utama.
     alternates: { canonical: JOURNAL_BASE_PATH },
-    description:
-      "Tulisan KAMA Spa tentang perawatan tubuh, ritual, dan kebiasaan istirahat yang baik.",
   });
 }
 
@@ -45,20 +43,25 @@ type JournalPageProps = {
   searchParams: Promise<{ category?: string | string[]; tag?: string | string[] }>;
 };
 
-export default function JournalPage({ searchParams }: JournalPageProps) {
+export default async function JournalPage({ searchParams }: JournalPageProps) {
   /* Filter kategori/tag datang dari query string — runtime data, jadi daftar
      artikelnya dibaca di dalam Suspense boundary. Header halaman tetap
      ter-prerender. */
+  const pageCopy = await getPageCopy();
   return (
     <>
       <Navigation />
       <main className="flex-1">
         <PublicPageHeader
-          eyebrow="Journal"
-          title="Catatan dari ruang rawat."
-          description="Tulisan singkat tentang treatment, bahan yang kami pakai, dan cara merawat diri di antara kunjungan."
+          eyebrow={copy(pageCopy, "journal.hero.eyebrow")}
+          title={copy(pageCopy, "journal.hero.title")}
+          description={copy(pageCopy, "journal.hero.description")}
         />
-        <Suspense fallback={<JournalListFallback />}>
+        <Suspense
+          fallback={
+            <JournalListFallback text={copy(pageCopy, "journal.loading")} />
+          }
+        >
           <JournalList searchParams={searchParams} />
         </Suspense>
       </main>
@@ -67,11 +70,11 @@ export default function JournalPage({ searchParams }: JournalPageProps) {
   );
 }
 
-function JournalListFallback() {
+function JournalListFallback({ text }: { text: string }) {
   return (
     <Reveal as="section" className="bg-cream">
       <div className="container-kama py-14 md:py-16 lg:py-20">
-        <p className="text-body text-cocoa/60">Memuat tulisan…</p>
+        <p className="text-body text-cocoa/60">{text}</p>
       </div>
     </Reveal>
   );
@@ -79,10 +82,11 @@ function JournalListFallback() {
 
 async function JournalList({ searchParams }: JournalPageProps) {
   const { category, tag } = parseJournalFilter(await searchParams);
-  const [posts, categories, tags] = await Promise.all([
+  const [posts, categories, tags, pageCopy] = await Promise.all([
     getJournalPosts({ category, tag }),
     getJournalCategories(),
     getJournalTags(),
+    getPageCopy(),
   ]);
   const activeCategory = categories.find(
     (name) => name.toLowerCase() === category?.toLowerCase(),
@@ -101,7 +105,7 @@ async function JournalList({ searchParams }: JournalPageProps) {
                     category ? "" : "bg-cocoa/10"
                   }`}
                 >
-                  Semua
+                  {copy(pageCopy, "journal.all_label")}
                 </Link>
                 {categories.map((name) => (
                   <Link
@@ -126,7 +130,7 @@ async function JournalList({ searchParams }: JournalPageProps) {
               className={`container-kama ${categories.length > 0 ? "pt-4" : "pt-10 md:pt-12"}`}
             >
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-caption text-cocoa/50">Tag:</span>
+                <span className="text-caption text-cocoa/50">{copy(pageCopy, "journal.tag_label")}</span>
                 {tags.map((name) => {
                   const current = tag === name;
                   return (
@@ -195,7 +199,7 @@ async function JournalList({ searchParams }: JournalPageProps) {
                         <p className="text-body text-cocoa/70">{post.excerpt}</p>
                       ) : null}
                       <span className="inline-flex items-center gap-2 text-[0.9375rem] underline underline-offset-4">
-                        Baca
+                        {copy(pageCopy, "global.read_label")}
                         <ArrowRight className="h-4 w-4" />
                       </span>
                     </Link>
@@ -206,15 +210,10 @@ async function JournalList({ searchParams }: JournalPageProps) {
               <PublicEmptyState
                 title={
                   category || tag
-                    ? `Belum ada tulisan ${[
-                        category ? `di kategori "${activeCategory ?? category}"` : "",
-                        tag ? `dengan tag "${tag}"` : "",
-                      ]
-                        .filter(Boolean)
-                        .join(" ")}`
-                    : "Belum ada tulisan"
+                    ? copy(pageCopy, "journal.empty_filtered_title")
+                    : copy(pageCopy, "journal.empty_title")
                 }
-                description="Daftar ini terisi otomatis begitu artikel dipublikasikan dari dashboard admin."
+                description={copy(pageCopy, "journal.empty_description")}
               />
             )}
           </div>

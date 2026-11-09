@@ -7,21 +7,18 @@ import { Reveal } from "@/components/reveal";
 import { PublicPageHeader } from "@/components/public/page-parts";
 import { WaLink } from "@/components/public/wa-button";
 import { getGiftCard } from "@/lib/content/gift-card";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { whatsAppHref } from "@/lib/content/whatsapp";
 import { GIFT_CARD_DEFAULTS } from "@/lib/domain/gift-card";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return withPageSeo("/gift-card", {
-    title: "Gift Card",
-    description:
-      "KAMA Gift Card — hadiah berupa waktu istirahat, berlaku untuk seluruh treatment dan ritual KAMA Spa.",
-  });
+  return withPageSeo("/gift-card", {});
 }
 
 export default async function GiftCardPage() {
-  const giftCard = await getGiftCard();
+  const [giftCard, pageCopy] = await Promise.all([getGiftCard(), getPageCopy()]);
 
   if (!giftCard) {
     return (
@@ -29,9 +26,9 @@ export default async function GiftCardPage() {
         <Navigation />
         <main className="flex-1">
           <PublicPageHeader
-            eyebrow="Gift Card"
-            title="Gift Card"
-            description="Informasi gift card belum tersedia."
+            eyebrow={copy(pageCopy, "gift_card.hero.eyebrow")}
+            title={copy(pageCopy, "gift_card.missing_title")}
+            description={copy(pageCopy, "gift_card.missing_description")}
           />
         </main>
         <Footer />
@@ -54,13 +51,13 @@ export default async function GiftCardPage() {
       <Navigation />
       <main className="flex-1">
         <PublicPageHeader
-          eyebrow="Gift Card"
+          eyebrow={copy(pageCopy, "gift_card.hero.eyebrow")}
           title={giftCard.title}
           description={giftCard.subtitle}
         >
           <div>
             <WaLink href={waHref} context="gift">
-              Pesan via WhatsApp
+              {copy(pageCopy, "gift_card.order_label")}
             </WaLink>
           </div>
         </PublicPageHeader>
@@ -89,7 +86,7 @@ export default async function GiftCardPage() {
             {giftCard.termsHtml ? (
               <div className="mt-10 flex flex-col gap-3 border-t border-cocoa/15 pt-6">
                 <h2 className="font-display text-title-sm md:text-[1.375rem]">
-                  Syarat & ketentuan
+                  {copy(pageCopy, "gift_card.terms_title")}
                 </h2>
                 <div
                   className="text-rich-text max-w-[70ch] text-body text-cocoa/80"
@@ -105,17 +102,17 @@ export default async function GiftCardPage() {
             <div className="flex flex-col items-start gap-5 bg-cream-card px-6 py-10 md:flex-row md:items-center md:justify-between md:px-12 md:py-14">
               <div className="flex flex-col gap-2">
                 <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-                  Bingung pilih treatment?
+                  {copy(pageCopy, "gift_card.cta_title")}
                 </h2>
                 <p className="max-w-[52ch] text-body text-cocoa/70">
-                  Lihat seluruh menu dulu — gift card berlaku untuk semuanya.
+                  {copy(pageCopy, "gift_card.cta_description")}
                 </p>
               </div>
               <Link
                 href="/treatments"
                 className="btn btn-outline shrink-0 border-cocoa/40"
               >
-                Lihat Treatments
+                {copy(pageCopy, "gift_card.cta_label")}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>

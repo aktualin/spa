@@ -3,6 +3,7 @@ import { ArrowRight } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
 import { getActivePromos } from "@/lib/content/promos";
 import { getEventGroups } from "@/lib/content/events";
+import { copy, type PageCopy } from "@/lib/content/page-copy";
 import { formatEventDate } from "@/components/public/events/event-parts";
 
 /**
@@ -10,7 +11,7 @@ import { formatEventDate } from "@/components/public/events/event-parts";
  * datang bila tidak ada promo. Hanya dirender bila baris section-nya ada
  * di DB dan aktif.
  */
-export async function PromoHighlightSection() {
+export async function PromoHighlightSection({ copyBlocks }: { copyBlocks: PageCopy }) {
   const [promos, { upcoming }] = await Promise.all([
     getActivePromos(),
     getEventGroups(),
@@ -21,21 +22,26 @@ export async function PromoHighlightSection() {
 
   if (!promo && !event) return null;
 
+  const promoEyebrow = copy(copyBlocks, "home.promo.eyebrow");
+  const eventEyebrow = copy(copyBlocks, "home.promo.event_eyebrow");
+  const fallbackDescription = copy(copyBlocks, "home.promo.fallback_description");
+  const promoLabel = copy(copyBlocks, "home.promo.cta_label");
+  const eventLabel = copy(copyBlocks, "home.promo.event_cta_label");
+
   return (
     <Reveal as="section" className="bg-cream">
       <div className="container-kama py-14 md:py-16 lg:py-20">
         <div className="flex flex-col items-start gap-6 bg-cream-card px-6 py-10 md:flex-row md:items-center md:justify-between md:px-12 md:py-14">
           <div className="flex flex-col gap-3">
             <span className="eyebrow text-cocoa/60">
-              {promo ? "Promo" : "Upcoming Event"}
+              {promo ? promoEyebrow : eventEyebrow}
             </span>
             <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
               {promo ? promo.title : event?.title}
             </h2>
             <p className="max-w-[52ch] text-body text-cocoa/70">
               {promo
-                ? (promo.description ??
-                  "Promo sedang berjalan — cek detailnya di halaman promo.")
+                ? (promo.description ?? fallbackDescription)
                 : event
                   ? `${formatEventDate(event.startDate, event.endDate)}${
                       event.location ? ` · ${event.location}` : ""
@@ -44,13 +50,17 @@ export async function PromoHighlightSection() {
             </p>
           </div>
 
-          <Link
-            href={promo ? `/promos/${promo.slug}` : `/events/${event?.slug}`}
-            className="btn btn-primary shrink-0"
-          >
-            {promo ? "Lihat Promo" : "Lihat Event"}
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          {promo ? (
+            <Link href={`/promos/${promo.slug}`} className="btn btn-primary shrink-0">
+              {promoLabel}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          ) : event ? (
+            <Link href={`/events/${event.slug}`} className="btn btn-primary shrink-0">
+              {eventLabel}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          ) : null}
         </div>
       </div>
     </Reveal>

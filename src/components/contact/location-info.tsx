@@ -16,9 +16,17 @@ import {
 export function LocationInfo({
   loc,
   freshaUrl,
+  labels,
 }: {
   loc: Branch;
   freshaUrl?: string;
+  labels: {
+    addressMissing: string;
+    whatsappFallback: string;
+    whatsappCta: string;
+    directions: string;
+    fresha: string;
+  };
 }) {
   const waHref = waLink(
     loc.address ? locationMessage(loc.address) : RESERVE_MESSAGE,
@@ -36,7 +44,7 @@ export function LocationInfo({
         <span>
           {loc.address
             ? loc.address
-            : "Alamat belum diisi; hubungi kami untuk lokasi terdekat."}
+            : labels.addressMissing}
         </span>
       </div>
       {hourLines.length > 0 ? (
@@ -61,7 +69,7 @@ export function LocationInfo({
           target="_blank"
           rel="noopener noreferrer"
         >
-          {loc.phone || "WhatsApp"}
+          {loc.phone || labels.whatsappFallback}
         </a>
       </div>
       <div className="mt-auto flex flex-wrap gap-2 pt-3">
@@ -72,7 +80,7 @@ export function LocationInfo({
           rel="noopener noreferrer"
         >
           <WhatsApp className="h-4 w-4" aria-hidden="true" />
-          WhatsApp
+          {labels.whatsappCta}
         </a>
         {loc.mapsUrl ? (
           <a
@@ -81,7 +89,7 @@ export function LocationInfo({
             target="_blank"
             rel="noopener noreferrer"
           >
-            Dapatkan Rute
+            {labels.directions}
           </a>
         ) : null}
         {freshaUrl ? (
@@ -91,7 +99,7 @@ export function LocationInfo({
             target="_blank"
             rel="noopener noreferrer"
           >
-            Booking via Fresha
+            {labels.fresha}
             <ExternalLink className="h-4 w-4" aria-hidden="true" />
           </a>
         ) : null}

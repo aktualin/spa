@@ -9,19 +9,16 @@ import {
 } from "@/components/public/page-parts";
 import { GalleryGrid } from "@/components/public/gallery-grid";
 import { getGalleryAlbums } from "@/lib/content/gallery";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { photoAltText } from "@/lib/domain/gallery";
 import { withPageSeo } from "@/lib/content/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return withPageSeo("/gallery", {
-    title: "Gallery",
-    description:
-      "Foto ruang, ritual, dan detail kecil di KAMA Spa — supaya Anda tahu seperti apa suasananya sebelum datang.",
-  });
+  return withPageSeo("/gallery", {});
 }
 
 export default async function GalleryPage() {
-  const albums = await getGalleryAlbums();
+  const [albums, pageCopy] = await Promise.all([getGalleryAlbums(), getPageCopy()]);
   const withPhotos = albums.filter((album) => album.photos.length > 0);
 
   return (
@@ -29,17 +26,17 @@ export default async function GalleryPage() {
       <Navigation />
       <main className="flex-1">
         <PublicPageHeader
-          eyebrow="Gallery"
-          title="Suasana, sebelum Anda datang."
-          description="Ruang rawat, bahan yang kami pakai, dan detail yang membuat kunjungan terasa tenang."
+          eyebrow={copy(pageCopy, "gallery.hero.eyebrow")}
+          title={copy(pageCopy, "gallery.hero.title")}
+          description={copy(pageCopy, "gallery.hero.description")}
         />
 
         {withPhotos.length === 0 ? (
           <Reveal as="section" className="bg-cream">
             <div className="container-kama py-14 md:py-16 lg:py-20">
               <PublicEmptyState
-                title="Belum ada foto"
-                description="Album akan muncul di sini begitu foto diunggah dari dashboard admin."
+                title={copy(pageCopy, "gallery.empty_title")}
+                description={copy(pageCopy, "gallery.empty_description")}
               />
             </div>
           </Reveal>
@@ -53,7 +50,7 @@ export default async function GalleryPage() {
             >
               <div className="container-kama py-14 md:py-16 lg:py-20">
                 <PublicSectionHeader
-                  eyebrow={`${album.photos.length} foto`}
+                  eyebrow={`${album.photos.length} ${copy(pageCopy, "gallery.photo_count_suffix")}`}
                   title={album.name}
                   description={album.description ?? undefined}
                 />

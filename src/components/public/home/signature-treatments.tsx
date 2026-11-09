@@ -3,38 +3,56 @@ import { ArrowRight } from "@/components/icons";
 import { CatalogBadges } from "@/components/public/catalog-badges";
 import { Reveal } from "@/components/reveal";
 import { getSignatureTreatments, toPriceLabel } from "@/lib/content/catalog";
+import type { HomepageSection } from "@/lib/content/homepage";
+import { copy } from "@/lib/content/page-copy";
+import type { PageCopy } from "@/lib/content/page-copy";
+import { isSafeCtaHref } from "@/lib/domain/homepage-banner";
 
 /**
  * Section "Signature Treatments" — treatment yang ditandai best seller di
- * admin. Hanya dirender bila baris section-nya ada di DB dan aktif.
+ * admin. Judul, deskripsi, dan tombol berasal dari `HomepageSection`.
  */
-export async function SignatureTreatmentsSection() {
+export async function SignatureTreatmentsSection({
+  section,
+  copyBlocks,
+}: {
+  section?: HomepageSection | null;
+  copyBlocks: PageCopy;
+}) {
   const treatments = await getSignatureTreatments(6);
 
   if (treatments.length === 0) return null;
+
+  const eyebrow = section?.eyebrow?.trim() || "";
+  const title = section?.title?.trim() || "";
+  const subtitle = section?.subtitle?.trim() || "";
+  const ctaLabel = section?.ctaLabel?.trim() || "";
+  const ctaHrefRaw = section?.ctaHref?.trim() || "";
+  const ctaHref =
+    ctaLabel && ctaHrefRaw && isSafeCtaHref(ctaHrefRaw) ? ctaHrefRaw : "";
 
   return (
     <Reveal as="section" className="bg-cream">
       <div className="container-kama py-14 md:py-16 lg:py-20">
         <div className="flex flex-col items-start gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-10">
           <div className="flex flex-col gap-3">
-            <span className="eyebrow text-cocoa/60">Signature Treatments</span>
-            <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-              Our most-loved rituals
-            </h2>
-            <p className="max-w-[52ch] text-body text-cocoa/70">
-              Treatment yang paling sering dipilih tamu KAMA — pilihan yang selalu
-              tepat untuk membuat rileks.
-            </p>
+            {eyebrow ? <span className="eyebrow text-cocoa/60">{eyebrow}</span> : null}
+            {title ? (
+              <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
+                {title}
+              </h2>
+            ) : null}
+            {subtitle ? (
+              <p className="max-w-[52ch] text-body text-cocoa/70">{subtitle}</p>
+            ) : null}
           </div>
 
-          <Link
-            href="/menu"
-            className="btn btn-outline shrink-0 border-cocoa/40"
-          >
-            View The Menu
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          {ctaHref ? (
+            <Link href={ctaHref} className="btn btn-outline shrink-0 border-cocoa/40">
+              {ctaLabel}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          ) : null}
         </div>
 
         <ul className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3 lg:gap-8">
@@ -63,6 +81,8 @@ export async function SignatureTreatmentsSection() {
                     <CatalogBadges
                       isNew={treatment.isNew}
                       isBestSeller={treatment.isBestSeller}
+                      newLabel={copy(copyBlocks, "global.badge_new")}
+                      bestSellerLabel={copy(copyBlocks, "global.badge_best_seller")}
                     />
                     <h3 className="font-display text-title-sm md:text-[1.375rem] md:leading-[1.3]">
                       {treatment.name}

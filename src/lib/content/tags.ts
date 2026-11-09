@@ -22,6 +22,7 @@ export const CONTENT_TAGS = {
   settings: "content:settings", // SiteSettings, WhatsAppTemplate
   seo: "content:seo", // PageSeo
   pages: "content:pages", // StaticPage
+  pageCopy: "content:page-copy", // ContentBlock
   // Redirect dibaca proxy lewat cache memori ber-TTL (src/lib/redirects.ts),
   // bukan "use cache"; tag ini untuk bacaan halaman admin/sitemap saja.
   redirects: "content:redirects", // Redirect

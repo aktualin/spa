@@ -3,7 +3,10 @@ import { cacheLife } from "next/cache";
 import { ArrowRight, Instagram } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
 import { getGalleryAlbums } from "@/lib/content/gallery";
+import type { HomepageSection } from "@/lib/content/homepage";
+import { copy, type PageCopy } from "@/lib/content/page-copy";
 import { photoAltText } from "@/lib/domain/gallery";
+import { isSafeCtaHref } from "@/lib/domain/homepage-banner";
 import { getSiteSettings } from "@/lib/content/site";
 
 type InstagramPost = {
@@ -66,7 +69,13 @@ async function getInstagramFeed(): Promise<InstagramPost[]> {
  * Section "Gallery Teaser" — foto galeri + link Instagram. Feed Instagram
  * live dipakai bila token tersedia; kalau tidak, foto galeri yang tampil.
  */
-export async function GalleryTeaserSection() {
+export async function GalleryTeaserSection({
+  section,
+  copyBlocks,
+}: {
+  section?: HomepageSection | null;
+  copyBlocks: PageCopy;
+}) {
   const [albums, settings, instagramPosts] = await Promise.all([
     getGalleryAlbums(),
     getSiteSettings(),
@@ -84,8 +93,16 @@ export async function GalleryTeaserSection() {
     )
     .slice(0, 12);
 
-  // Kosong bila admin belum mengisi URL Instagram — tautannya disembunyikan.
   const instagramUrl = settings.instagramUrl || null;
+  const hashtag = copy(copyBlocks, "global.instagram_hashtag");
+  const hashtagHref = copy(copyBlocks, "global.instagram_hashtag_href");
+  const followLabel = copy(copyBlocks, "global.instagram_follow_label");
+  const galleryCtaLabel = section?.ctaLabel?.trim() || copy(copyBlocks, "global.gallery_cta_label");
+  const galleryCtaHrefRaw = section?.ctaHref?.trim() || "";
+  const galleryCtaHref =
+    galleryCtaLabel && galleryCtaHrefRaw && isSafeCtaHref(galleryCtaHrefRaw)
+      ? galleryCtaHrefRaw
+      : "";
   const items: { id: string; imageUrl: string; caption: string | null; href: string | null }[] =
     instagramPosts.length > 0
       ? instagramPosts.map((post) => ({
@@ -118,24 +135,26 @@ export async function GalleryTeaserSection() {
                 @{settings.instagramUsername}
               </a>
             ) : null}
-            <a
-              href="https://www.instagram.com/explore/search/keyword/?q=%23kamaspa"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-display text-title-sm"
-            >
-              #kamaspa
-            </a>
+            {hashtag && hashtagHref ? (
+              <a
+                href={hashtagHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-display text-title-sm"
+              >
+                {hashtag}
+              </a>
+            ) : null}
           </div>
 
-          {instagramUrl ? (
+          {instagramUrl && followLabel ? (
             <a
               href={instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-[0.9375rem] underline underline-offset-4 transition-opacity hover:opacity-70"
             >
-              Follow Us
+              {followLabel}
               <ArrowRight className="h-4 w-4" />
             </a>
           ) : null}
@@ -166,12 +185,14 @@ export async function GalleryTeaserSection() {
           ))}
         </ul>
 
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link href="/gallery" className="btn btn-outline border-cocoa/40">
-            Lihat Galeri Lengkap
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
+        {galleryCtaHref ? (
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href={galleryCtaHref} className="btn btn-outline border-cocoa/40">
+              {galleryCtaLabel}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        ) : null}
       </div>
     </Reveal>
   );

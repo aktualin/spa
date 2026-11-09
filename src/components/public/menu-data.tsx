@@ -10,9 +10,18 @@ import { getMenuEntries, getMenuPackages, getMenuTreatments } from "@/lib/conten
 import { MassageGrid, PackagesGrid } from "./menu-grids";
 
 /** Grid treatment bagian "Massage" — versi dari DB. */
-export async function MenuTreatmentsGrid() {
+export async function MenuTreatmentsGrid({
+  categoryLabels,
+}: {
+  categoryLabels: Record<string, string>;
+}) {
   const treatments = await getMenuTreatments();
-  return <MassageGrid items={treatments.filter((t) => t.category === "Massage")} />;
+  return (
+    <MassageGrid
+      items={treatments.filter((t) => t.category === "Massage")}
+      categoryLabels={categoryLabels}
+    />
+  );
 }
 
 /** Baris abu-abu sebagai penanda muat; jumlahnya sekadar menjaga tinggi area. */

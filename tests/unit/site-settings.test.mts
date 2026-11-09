@@ -42,6 +42,11 @@ const CURRENT_ROW: SiteSettingsRow = {
   bookNowHref: null,
   menuScanUrls: [],
   menuPdfUrl: null,
+  footerMembershipTitle: null,
+  footerMembershipLearnLabel: null,
+  footerMembershipJoinLabel: null,
+  partnershipIntro: null,
+  partnershipEmail: null,
 };
 
 const EMBED =
@@ -67,6 +72,11 @@ function input(overrides: Partial<SiteSettingsInput> = {}): SiteSettingsInput {
     bookNowHref: "",
     menuScanUrls: [],
     menuPdfUrl: "",
+    footerMembershipTitle: "",
+    footerMembershipLearnLabel: "",
+    footerMembershipJoinLabel: "",
+    partnershipIntro: "",
+    partnershipEmail: "",
     ...overrides,
   };
 }

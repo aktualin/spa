@@ -4,6 +4,7 @@
 import Link from "next/link";
 
 import type { CatalogPackage } from "@/lib/content/catalog";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { formatDuration } from "@/lib/domain/pricing";
 import { formatIdr } from "@/lib/format";
 
@@ -15,7 +16,8 @@ type PackageCardProps = {
   withCta?: boolean;
 };
 
-export function PackageCard({ pkg, withCta = false }: PackageCardProps) {
+export async function PackageCard({ pkg, withCta = false }: PackageCardProps) {
+  const pageCopy = await getPageCopy();
   return (
     <div className="package-card w-dyn-item">
       <Link href={`/treatments/packages/${pkg.slug}`} className="package-card_image image-container">
@@ -30,8 +32,13 @@ export function PackageCard({ pkg, withCta = false }: PackageCardProps) {
         ) : null}
       </Link>
       <div className="package-card_body">
-        <div className="eyebrow-s text-style-allcaps">Package</div>
-        <CatalogBadges isNew={pkg.isNew} isBestSeller={pkg.isBestSeller} />
+        <div className="eyebrow-s text-style-allcaps">{copy(pageCopy, "global.package_label")}</div>
+        <CatalogBadges
+          isNew={pkg.isNew}
+          isBestSeller={pkg.isBestSeller}
+          newLabel={copy(pageCopy, "global.badge_new")}
+          bestSellerLabel={copy(pageCopy, "global.badge_best_seller")}
+        />
         <h3 className="header-s">
           <Link href={`/treatments/packages/${pkg.slug}`}>{pkg.name}</Link>
         </h3>
@@ -51,7 +58,9 @@ export function PackageCard({ pkg, withCta = false }: PackageCardProps) {
 
         <div className="treatment-card_price-row">
           <span className="caption-s text-color-gray">
-            {pkg.durationMin ? formatDuration(pkg.durationMin) : "Duration"}
+            {pkg.durationMin
+              ? formatDuration(pkg.durationMin)
+              : copy(pageCopy, "global.duration_label")}
           </span>
           <span className="price-row_value">{formatIdr(pkg.priceIdr)}</span>
         </div>
@@ -67,7 +76,7 @@ export function PackageCard({ pkg, withCta = false }: PackageCardProps) {
                 price: formatIdr(pkg.priceIdr),
                 duration: pkg.durationMin ? formatDuration(pkg.durationMin) : null,
               }}
-              label="Book via WhatsApp"
+              label={copy(pageCopy, "global.book_via_whatsapp")}
               className="button is-secondary is-icon w-inline-block"
             />
           </>

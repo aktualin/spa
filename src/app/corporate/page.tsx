@@ -6,6 +6,7 @@ import { CorporateInquiryForm } from "@/components/public/corporate-inquiry-form
 import { CorporateClientLogos } from "@/components/public/corporate/corporate-client-logos";
 import { isCaptchaConfigured } from "@/lib/captcha";
 import { getCorporatePageData } from "@/lib/content/corporate";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { corporateWhatsApp } from "@/lib/whatsapp";
@@ -19,16 +20,12 @@ import { Reveal } from "@/components/reveal";
  * belum punya override sendiri.
  */
 export async function generateMetadata(): Promise<Metadata> {
-  const defaults: Metadata = {
-    title: "Corporate Wellness",
-    description:
-      "KAMA Corporate Wellness Solutions — program wellness di kantor, pengalaman wellness tim, dan benefit kesehatan karyawan.",
-  };
-  return withPageSeo("/corporate", await withPageSeo("/corporate-wellness", defaults));
+  return withPageSeo("/corporate", await withPageSeo("/corporate-wellness", {}));
 }
 
 export default async function CorporatePage() {
-  const { content, programs, steps, clients, collabPhotos } = await getCorporatePageData();
+  const [{ content, programs, steps, clients, collabPhotos }, pageCopy] =
+    await Promise.all([getCorporatePageData(), getPageCopy()]);
   const picWhatsApp = corporateWhatsApp(content.pic.phone);
   // Captcha wajib di production: tanpa key lengkap formulir diganti kontak langsung
   // (server juga menolak kiriman — fail-closed).
@@ -43,7 +40,7 @@ export default async function CorporatePage() {
           <div className="padding-global">
             <div className="container-large">
               <div className="section-header">
-                <div className="eyebrow-s text-style-allcaps">Corporate Wellness Solutions</div>
+                <div className="eyebrow-s text-style-allcaps">{copy(pageCopy, "corporate.hero.eyebrow")}</div>
                 <h1 className="header-xxl">{content.heroTitle}</h1>
               </div>
             </div>
@@ -78,22 +75,25 @@ export default async function CorporatePage() {
                   </div>
                 </div>
                 <div style={{ maxWidth: "34rem" }}>
-                  <h3 className="header-l">About Us</h3>
+                  <h3 className="header-l">{copy(pageCopy, "corporate.about_title")}</h3>
                   <div className="spacer-small" />
-                  <p className="body-m text-color-gray">
-                    <strong>KAMA Spa</strong> is a wellness sanctuary in the heart of South
-                    Jakarta.
-                  </p>
+                  {copy(pageCopy, "corporate.about_p1") ? (
+                    <p className="body-m text-color-gray">
+                      {copy(pageCopy, "corporate.about_p1")}
+                    </p>
+                  ) : null}
                   <div className="spacer-small" />
-                  <p className="body-m text-color-gray">
-                    Combining traditional healing techniques and modern wellness
-                    approaches, KAMA Spa offers thoughtfully curated treatments designed
-                    to restore balance, relaxation, and mindful presence.
-                  </p>
+                  {copy(pageCopy, "corporate.about_p2") ? (
+                    <p className="body-m text-color-gray">
+                      {copy(pageCopy, "corporate.about_p2")}
+                    </p>
+                  ) : null}
                   <div className="spacer-medium" />
-                  <p className="body-m text-style-italic">
-                    More than relaxation — we create meaningful reset experiences.
-                  </p>
+                  {copy(pageCopy, "corporate.about_quote") ? (
+                    <p className="body-m text-style-italic">
+                      {copy(pageCopy, "corporate.about_quote")}
+                    </p>
+                  ) : null}
                 </div>
               </div>
             </div>
@@ -105,7 +105,7 @@ export default async function CorporatePage() {
             <div className="container-large">
               <div className="section-header">
                 <h2 className="header-l">
-                  Healthy Employees Build Stronger Companies
+                  {copy(pageCopy, "corporate.benefits_title")}
                 </h2>
                 <p className="body-m text-color-gray">{content.intro}</p>
               </div>
@@ -123,9 +123,7 @@ export default async function CorporatePage() {
                 <div className="sizing-grow">
                   <div className="text-rich-text header-l w-richtext">
                     <p>
-                      <em>
-                        Wellness is not an expense. It&apos;s an investment in your people.
-                      </em>
+                      <em>{copy(pageCopy, "corporate.benefits_quote")}</em>
                     </p>
                   </div>
                 </div>
@@ -138,14 +136,15 @@ export default async function CorporatePage() {
           <div className="padding-global">
             <div className="container-large">
               <div className="section-header">
-                <div className="eyebrow-s text-style-allcaps">Why Partner with KAMA?</div>
+                <div className="eyebrow-s text-style-allcaps">{copy(pageCopy, "corporate.partner_eyebrow")}</div>
                 <h2 className="header-l">
-                  Thoughtfully designed wellness experiences that go beyond massage.
+                  {copy(pageCopy, "corporate.partner_title")}
                 </h2>
-                <p className="body-m text-color-gray">
-                  Our goal isn&apos;t simply to provide massage. We create meaningful wellness
-                  experiences for your people.
-                </p>
+                {copy(pageCopy, "corporate.partner_description") ? (
+                  <p className="body-m text-color-gray">
+                    {copy(pageCopy, "corporate.partner_description")}
+                  </p>
+                ) : null}
               </div>
 
               <div className="w-layout-grid whats-new_list">
@@ -175,11 +174,11 @@ export default async function CorporatePage() {
           <div className="padding-global">
             <div className="container-large">
               <div className="section-header">
-                <div className="eyebrow-s text-style-allcaps">In-Office Program</div>
+                <div className="eyebrow-s text-style-allcaps">{copy(pageCopy, "corporate.in_office_eyebrow")}</div>
                 <h2 className="header-l">
-                  A Restorative Wellness Experience at Your Workplace
+                  {copy(pageCopy, "corporate.in_office_title")}
                 </h2>
-                <p className="body-m text-color-gray">Sample Programs*</p>
+                <p className="body-m text-color-gray">{copy(pageCopy, "corporate.in_office_sample")}</p>
               </div>
 
               {programs.length > 0 ? (
@@ -234,9 +233,9 @@ export default async function CorporatePage() {
             <div className="container-large">
               <div className="corporate-split">
                 <div>
-                  <div className="eyebrow-s text-style-allcaps">In-Spa Corporate Experience</div>
+                  <div className="eyebrow-s text-style-allcaps">{copy(pageCopy, "corporate.in_spa_eyebrow")}</div>
                   <h2 className="header-l">
-                    Bring Your Team Together Through Wellness
+                    {copy(pageCopy, "corporate.in_spa_title")}
                   </h2>
                   {content.inSpaHtml ? (
                     <div
@@ -245,13 +244,11 @@ export default async function CorporatePage() {
                     />
                   ) : (
                     <p className="body-m text-color-gray">
-                      Treat your employees to a private wellness experience at KAMA
-                      Spa—designed to reward, reconnect, and recharge your team in a calm
-                      and premium environment.
+                      {copy(pageCopy, "corporate.in_spa_fallback")}
                     </p>
                   )}
                   <div className="spacer-small" />
-                  <h3 className="header-s">Ideal For:</h3>
+                  <h3 className="header-s">{copy(pageCopy, "corporate.ideal_for")}</h3>
                   <ul className="benefit-list">
                     {content.inSpaItems.map((i, ii) => (
                       <li key={`${ii}-${i}`} className="benefit-list_item">
@@ -283,14 +280,17 @@ export default async function CorporatePage() {
           <div className="padding-global">
             <div className="container-large">
               <div className="section-header">
-                <div className="eyebrow-s text-style-allcaps">From Consultation to Partnership</div>
-                <h2 className="header-l">A Simple {steps.length}-Step Collaboration Process</h2>
+                <div className="eyebrow-s text-style-allcaps">{copy(pageCopy, "corporate.steps_eyebrow")}</div>
+                <h2 className="header-l">
+                  {copy(pageCopy, "corporate.steps_title_prefix")} {steps.length}-{" "}
+                  {copy(pageCopy, "corporate.steps_title_suffix")}
+                </h2>
               </div>
               <div className="w-layout-grid whats-new_list">
                 {steps.map((step, idx) => (
                   <div key={step.id} className="package-card w-dyn-item">
                     <div className="package-card_body">
-                      <div className="eyebrow-s text-style-allcaps">Step {idx + 1}</div>
+                      <div className="eyebrow-s text-style-allcaps">{copy(pageCopy, "corporate.step_label")} {idx + 1}</div>
                       <h3 className="header-s">{step.title}</h3>
                       {step.body ? (
                         <div className="body-m text-color-gray">{step.body}</div>
@@ -318,8 +318,8 @@ export default async function CorporatePage() {
           <div className="padding-global">
             <div className="container-large">
               <div className="section-header">
-                <div className="eyebrow-s text-style-allcaps">Past Collaborations</div>
-                <h2 className="header-l">Wellness in action — on location</h2>
+                <div className="eyebrow-s text-style-allcaps">{copy(pageCopy, "corporate.collab_eyebrow")}</div>
+                <h2 className="header-l">{copy(pageCopy, "corporate.collab_title")}</h2>
               </div>
               {clients.length > 0 ? <CorporateClientLogos clients={clients} /> : null}
               {collabPhotos.length > 0 ? (
@@ -348,13 +348,14 @@ export default async function CorporatePage() {
             <div className="container-large">
               <div className="corporate-split">
                 <div style={{ maxWidth: "34rem" }}>
-                  <div className="eyebrow-s text-style-allcaps">Corporate Inquiry</div>
-                  <h2 className="header-l">Tell us about your team.</h2>
+                  <div className="eyebrow-s text-style-allcaps">{copy(pageCopy, "corporate.inquiry_eyebrow")}</div>
+                  <h2 className="header-l">{copy(pageCopy, "corporate.inquiry_title")}</h2>
                   <div className="spacer-small" />
-                  <p className="body-m text-color-gray">
-                    Share a few details and our corporate team will get back to you with a
-                    program tailored to your company.
-                  </p>
+                  {copy(pageCopy, "corporate.inquiry_description") ? (
+                    <p className="body-m text-color-gray">
+                      {copy(pageCopy, "corporate.inquiry_description")}
+                    </p>
+                  ) : null}
                 </div>
                 <div className="min-w-0">
                   <CorporateInquiryForm
@@ -362,6 +363,33 @@ export default async function CorporatePage() {
                     available={formAvailable}
                     whatsappHref={picWhatsApp}
                     contactEmail={content.pic.email}
+                    labels={{
+                      name: copy(pageCopy, "corporate_form.name"),
+                      company: copy(pageCopy, "corporate_form.company"),
+                      email: copy(pageCopy, "corporate_form.email"),
+                      phone: copy(pageCopy, "corporate_form.phone"),
+                      message: copy(pageCopy, "corporate_form.message"),
+                      messagePlaceholder: copy(pageCopy, "corporate_form.message_placeholder"),
+                      consentPrefix: copy(pageCopy, "corporate_form.consent_prefix"),
+                      privacyLabel: copy(pageCopy, "corporate_form.privacy_label"),
+                      consentSuffix: copy(pageCopy, "corporate_form.consent_suffix"),
+                      submit: copy(pageCopy, "corporate_form.submit"),
+                      submitting: copy(pageCopy, "corporate_form.submitting"),
+                      unavailable: copy(pageCopy, "corporate_form.unavailable"),
+                      whatsapp: copy(pageCopy, "corporate_form.whatsapp"),
+                      successTitle: copy(pageCopy, "corporate_form.success_title"),
+                      successBody: copy(pageCopy, "corporate_form.success_body"),
+                      errorName: copy(pageCopy, "corporate_form.error_name"),
+                      errorEmailRequired: copy(pageCopy, "corporate_form.error_email_required"),
+                      errorEmailFormat: copy(pageCopy, "corporate_form.error_email_format"),
+                      errorMessage: copy(pageCopy, "corporate_form.error_message"),
+                      errorConsent: copy(pageCopy, "corporate_form.error_consent"),
+                      errorCaptcha: copy(pageCopy, "corporate_form.error_captcha"),
+                      errorCaptchaLoad: copy(pageCopy, "corporate_form.error_captcha_load"),
+                      errorIncomplete: copy(pageCopy, "corporate_form.error_incomplete"),
+                      errorSend: copy(pageCopy, "corporate_form.error_send"),
+                      errorNetwork: copy(pageCopy, "corporate_form.error_network"),
+                    }}
                   />
                 </div>
               </div>
@@ -372,7 +400,7 @@ export default async function CorporatePage() {
         <Reveal as="section" className="section_get-in-touch is-top-off">
           <div className="get-in-touch_container">
             <div className="get-in-touch_banner">
-              <h4 className="header-l">Let&apos;s build your wellness program.</h4>
+              <h4 className="header-l">{copy(pageCopy, "corporate.banner_title")}</h4>
               <a
                 href={picWhatsApp}
                 target="_blank"
@@ -380,7 +408,8 @@ export default async function CorporatePage() {
                 className="button is-tertiary is-icon margin-left-auto-desktop w-inline-block"
               >
                 <div>
-                  Talk to {content.pic.name} · {content.pic.phone}
+                  {copy(pageCopy, "corporate.talk_prefix")} {content.pic.name} ·{" "}
+                  {content.pic.phone}
                 </div>
                 <div className="button_icon w-embed">
                   <ArrowRight />

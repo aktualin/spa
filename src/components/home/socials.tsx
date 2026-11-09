@@ -1,11 +1,24 @@
 import { ArrowRight, Instagram } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
-import { getInstagramPosts } from "@/lib/content/homepage";
+import { getInstagramPosts, type HomepageSection } from "@/lib/content/homepage";
+import { copy, type PageCopy } from "@/lib/content/page-copy";
 import { getSiteSettings } from "@/lib/content/site";
 
-export async function SocialsSection() {
+export async function SocialsSection({
+  section,
+  copyBlocks,
+}: {
+  section?: HomepageSection | null;
+  copyBlocks: PageCopy;
+}) {
   const [settings, posts] = await Promise.all([getSiteSettings(), getInstagramPosts()]);
   const instagramUrl = settings.instagramUrl;
+  const hashtag = copy(copyBlocks, "global.instagram_hashtag");
+  const hashtagHref = copy(copyBlocks, "global.instagram_hashtag_href");
+  const followLabel =
+    section?.ctaLabel?.trim() || copy(copyBlocks, "global.instagram_follow_label");
+  const emptyText =
+    copy(copyBlocks, "home.socials.empty") || copy(copyBlocks, "global.instagram_empty");
   const cells = (posts ?? []).map((post, i) => ({
     key: post.key,
     src: post.imageUrl,
@@ -31,22 +44,21 @@ export async function SocialsSection() {
                 @{settings.instagramUsername}
               </a>
             ) : null}
-            <a
-              href="https://www.instagram.com/explore/search/keyword/?q=%23kamaspa"
-              className="font-display text-title-sm"
-            >
-              #kamaspa
-            </a>
+            {hashtag && hashtagHref ? (
+              <a href={hashtagHref} className="font-display text-title-sm">
+                {hashtag}
+              </a>
+            ) : null}
           </div>
 
-          {instagramUrl ? (
+          {instagramUrl && followLabel ? (
             <a
               href={instagramUrl}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 text-[0.9375rem] underline underline-offset-4 transition-opacity hover:opacity-70"
             >
-              Follow Us
+              {followLabel}
               <ArrowRight className="h-4 w-4" />
             </a>
           ) : null}
@@ -54,9 +66,7 @@ export async function SocialsSection() {
 
         {/* Gallery grid */}
         {cells.length === 0 ? (
-          <p className="mt-8 text-body text-cocoa/60">
-            Belum ada foto Instagram. Tambahkan dari admin, modul Homepage &rarr; Feed Instagram.
-          </p>
+          emptyText ? <p className="mt-8 text-body text-cocoa/60">{emptyText}</p> : null
         ) : (
           <ul className="mt-8 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6 lg:gap-3">
             {cells.map((cell) => (

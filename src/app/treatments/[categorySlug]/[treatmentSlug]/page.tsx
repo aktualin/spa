@@ -9,6 +9,7 @@ import { Reveal } from "@/components/reveal";
 import { TreatmentCard } from "@/components/public/treatment-card";
 import { WaLink } from "@/components/public/wa-button";
 import { getCatalogSlugs, getCategory, getTreatment } from "@/lib/content/catalog";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
 import { formatDuration } from "@/lib/domain/pricing";
 import { formatIdr } from "@/lib/format";
@@ -30,7 +31,8 @@ export async function generateMetadata({
   const treatment = await getTreatment(categorySlug, treatmentSlug);
 
   if (!treatment) {
-    return { title: "Treatment tidak ditemukan" };
+    const pageCopy = await getPageCopy();
+    return { title: copy(pageCopy, "catalog.treatment.not_found_title") || undefined };
   }
 
   return withPageSeo(`/treatments/${categorySlug}/${treatmentSlug}`, {
@@ -42,12 +44,19 @@ export async function generateMetadata({
   });
 }
 
-export default function TreatmentPage({ params }: TreatmentPageProps) {
+export default async function TreatmentPage({ params }: TreatmentPageProps) {
   /* Slug adalah runtime data — dibaca di dalam Suspense boundary. */
+  const pageCopy = await getPageCopy();
   return (
     <>
       <Navigation />
-      <Suspense fallback={<TreatmentFallback />}>
+      <Suspense
+        fallback={
+          <TreatmentFallback
+            title={copy(pageCopy, "catalog.treatment.loading_title")}
+          />
+        }
+      >
         <TreatmentContent params={params} />
       </Suspense>
       <Footer />
@@ -55,13 +64,13 @@ export default function TreatmentPage({ params }: TreatmentPageProps) {
   );
 }
 
-function TreatmentFallback() {
+function TreatmentFallback({ title }: { title: string }) {
   return (
     <main className="flex-1">
       <Reveal as="section" className="bg-cream-soft">
         <div className="container-kama py-14 md:py-20 lg:py-24">
           <h1 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-            Memuat treatment…
+            {title}
           </h1>
         </div>
       </Reveal>
@@ -71,7 +80,10 @@ function TreatmentFallback() {
 
 async function TreatmentContent({ params }: TreatmentPageProps) {
   const { categorySlug, treatmentSlug } = await params;
-  const treatment = await getTreatment(categorySlug, treatmentSlug);
+  const [treatment, pageCopy] = await Promise.all([
+    getTreatment(categorySlug, treatmentSlug),
+    getPageCopy(),
+  ]);
 
   if (!treatment) notFound();
 
@@ -103,12 +115,12 @@ async function TreatmentContent({ params }: TreatmentPageProps) {
                   </span>
                   {treatment.isNew ? (
                     <span className="border border-cocoa/20 px-2 py-0.5 text-caption text-cocoa/60">
-                      New
+                      {copy(pageCopy, "global.badge_new")}
                     </span>
                   ) : null}
                   {treatment.isBestSeller ? (
                     <span className="border border-cocoa/20 px-2 py-0.5 text-caption text-cocoa/60">
-                      Best Seller
+                      {copy(pageCopy, "global.badge_best_seller")}
                     </span>
                   ) : null}
                 </div>
@@ -122,7 +134,7 @@ async function TreatmentContent({ params }: TreatmentPageProps) {
                 ) : null}
                 <div>
                   <WaLink href={waHref} context="treatment">
-                    Reservasi via WhatsApp
+                    {copy(pageCopy, "catalog.treatment.cta_whatsapp")}
                   </WaLink>
                 </div>
               </div>
@@ -145,7 +157,7 @@ async function TreatmentContent({ params }: TreatmentPageProps) {
           <Reveal as="section" className="bg-cream">
             <div className="container-kama py-14 md:py-16 lg:py-20">
               <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-                Durasi &amp; harga
+                {copy(pageCopy, "catalog.treatment.pricing_title")}
               </h2>
               <ul className="mt-8 flex max-w-[48rem] flex-col">
                 {treatment.options.map((option) => (
@@ -171,7 +183,8 @@ async function TreatmentContent({ params }: TreatmentPageProps) {
           <Reveal as="section" className="bg-cream-soft">
             <div className="container-kama py-14 md:py-16 lg:py-20">
               <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-                Treatment lain di {treatment.categoryName}
+                {copy(pageCopy, "catalog.treatment.related_prefix")}{" "}
+                {treatment.categoryName}
               </h2>
               <div className="w-layout-grid whats-new_list mt-8">
                 {related.map((other) => (

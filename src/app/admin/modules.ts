@@ -165,6 +165,14 @@ export const ADMIN_MODULES: readonly AdminModule[] = [
     ready: true,
   },
   {
+    // Modul tambahan di luar 14 modul Lampiran I; nomor 18 hanya penanda unik.
+    no: 18,
+    label: "Teks Halaman",
+    href: "/admin/page-copy",
+    roles: CONTENT_ROLES,
+    ready: true,
+  },
+  {
     no: 11,
     label: "Menu Navigasi",
     href: "/admin/menu",

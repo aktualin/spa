@@ -27,7 +27,9 @@ enum InquiryStatus {
   CLOSED
 }
 
-/* ---------- Modul 14: Pengguna Admin ---------- */
+/**
+ * ---------- Modul 14: Pengguna Admin ----------
+ */
 
 model AdminUser {
   id           String    @id @default(cuid())
@@ -56,19 +58,21 @@ model AdminUser {
   updatedAt DateTime @updatedAt
 }
 
-/* ---------- Modul 1 & 2: Treatments, Packages, Harga ---------- */
+/**
+ * ---------- Modul 1 & 2: Treatments, Packages, Harga ----------
+ */
 
 enum CategoryKind {
   TREATMENT // treatment utama
-  ADDON     // tambahan yang dipesan bersama treatment utama
+  ADDON // tambahan yang dipesan bersama treatment utama
 }
 
 // Letak add-on di halaman /menu.
 enum AddonSection {
-  BODY       // grid "Body" (scrub, mask)
-  FACE       // section Face Ritual
+  BODY // grid "Body" (scrub, mask)
+  FACE // section Face Ritual
   HEAD_SCALP // section Head & Scalp
-  BATH       // section Bath Ritual
+  BATH // section Bath Ritual
 }
 
 model TreatmentCategory {
@@ -91,15 +95,15 @@ model TreatmentCategory {
 }
 
 model Treatment {
-  id          String  @id @default(cuid())
-  slug        String  @unique
-  name        String
+  id           String        @id @default(cuid())
+  slug         String        @unique
+  name         String
   // Kalimat singkat di kartu /menu.
-  tagline     String?
-  description String?
+  tagline      String?
+  description  String?
   // Catatan kecil di halaman detail, mis. "tanpa minyak".
-  note        String?
-  imageUrl    String?
+  note         String?
+  imageUrl     String?
   // Hanya untuk treatment di kategori ADDON.
   addonSection AddonSection?
 
@@ -144,21 +148,21 @@ model TreatmentOption {
 }
 
 model Package {
-  id          String  @id @default(cuid())
-  slug        String  @unique
-  name        String
-  subtitle    String?
-  quote       String?
-  description String?
-  imageUrl    String?
-  durationMin Int?
+  id            String  @id @default(cuid())
+  slug          String  @unique
+  name          String
+  subtitle      String?
+  quote         String?
+  description   String?
+  imageUrl      String?
+  durationMin   Int?
   // Teks durasi yang ditampilkan, mis. "2 hours 30 minute"; kosong = dari durationMin.
   durationLabel String?
-  priceIdr    Int
-  isNew        Boolean @default(false)
-  isBestSeller Boolean @default(false)
-  isPublished Boolean @default(true)
-  sortOrder   Int     @default(0)
+  priceIdr      Int
+  isNew         Boolean @default(false)
+  isBestSeller  Boolean @default(false)
+  isPublished   Boolean @default(true)
+  sortOrder     Int     @default(0)
 
   seoTitle        String?
   seoDescription  String?
@@ -175,7 +179,7 @@ model PackageItem {
   sortOrder Int    @default(0)
 
   // Item bisa merujuk treatment yang ada, atau sekadar teks bebas.
-  label String?
+  label   String?
   minutes Int?
 
   packageId String
@@ -187,7 +191,9 @@ model PackageItem {
   @@index([packageId, sortOrder])
 }
 
-/* ---------- Modul 3: Foto & Gallery ---------- */
+/**
+ * ---------- Modul 3: Foto & Gallery ----------
+ */
 
 model GalleryAlbum {
   id          String  @id @default(cuid())
@@ -219,7 +225,9 @@ model GalleryPhoto {
   @@index([albumId, sortOrder])
 }
 
-/* ---------- Modul 4: Promos & Gift Card ---------- */
+/**
+ * ---------- Modul 4: Promos & Gift Card ----------
+ */
 
 model Promo {
   id          String  @id @default(cuid())
@@ -248,42 +256,44 @@ model Promo {
 
 // Singleton: konten halaman Gift Card.
 model GiftCardInfo {
-  id        String   @id @default("singleton")
-  title     String
+  id              String   @id @default("singleton")
+  title           String
   // Kalimat di bawah judul halaman /gift-card. Kosong = teks bawaan.
-  subtitle  String?
-  bodyHtml  String
-  imageUrl  String?
+  subtitle        String?
+  bodyHtml        String
+  imageUrl        String?
   // Syarat & ketentuan gift card (HTML tersanitasi).
-  termsHtml String?
+  termsHtml       String?
   // Teks awal chat WhatsApp tombol "Pesan via WhatsApp". Kosong = bawaan.
   whatsappMessage String?
-  updatedAt DateTime @updatedAt
+  updatedAt       DateTime @updatedAt
 }
 
-/* ---------- Modul 5: Membership ---------- */
+/**
+ * ---------- Modul 5: Membership ----------
+ */
 
 // Singleton: informasi program membership (halaman /membership dan banner
 // membership di homepage). Tier/paket ada di MembershipTier.
 model MembershipProgram {
-  id            String  @id @default("singleton")
-  eyebrow       String
-  title         String
-  intro         String
+  id             String  @id @default("singleton")
+  eyebrow        String
+  title          String
+  intro          String
   // Kalimat harga, contoh "Just Rp 1.5jt a month." — dipakai di homepage
   // dan di bagian Main Benefits halaman /membership.
-  priceHeadline String
+  priceHeadline  String
   // Deskripsi singkat di banner membership homepage, beserta tombolnya.
   bannerBody     String
   bannerCtaLabel String?
   bannerCtaHref  String?
   // [{ title, body }] — benefit utama program.
-  benefits      Json
-  servicesIntro String
+  benefits       Json
+  servicesIntro  String
   // [{ name, description }] — essential services yang bisa dipakai kredit.
-  services      Json
+  services       Json
   // Syarat & ketentuan program (HTML tersanitasi).
-  termsHtml     String?
+  termsHtml      String?
 
   updatedAt DateTime @updatedAt
 }
@@ -310,11 +320,13 @@ model MembershipTier {
   updatedAt DateTime @updatedAt
 }
 
-/* ---------- Modul 6: Journal ---------- */
+/**
+ * ---------- Modul 6: Journal ----------
+ */
 
 model JournalPost {
-  id       String  @id @default(cuid())
-  slug     String  @unique
+  id       String   @id @default(cuid())
+  slug     String   @unique
   title    String
   excerpt  String?
   bodyHtml String
@@ -322,7 +334,7 @@ model JournalPost {
   category String?
   tags     String[]
 
-  status PublishStatus @default(DRAFT)
+  status      PublishStatus @default(DRAFT)
   // Dipakai untuk penjadwalan publikasi: tampil publik bila <= now().
   publishedAt DateTime?
 
@@ -335,7 +347,9 @@ model JournalPost {
   @@index([status, publishedAt])
 }
 
-/* ---------- Modul 7: Events ---------- */
+/**
+ * ---------- Modul 7: Events ----------
+ */
 
 model EventItem {
   id          String  @id @default(cuid())
@@ -351,9 +365,9 @@ model EventItem {
   // Memisahkan "upcoming events" dari "past collaborations" (Lampiran I Bagian B).
   isCollaboration Boolean @default(false)
   // Mitra kolaborasi (past collaborations): nama, logo, dan tautan.
-  partnerName    String?
-  partnerLogoUrl String?
-  partnerUrl     String?
+  partnerName     String?
+  partnerLogoUrl  String?
+  partnerUrl      String?
   isPublished     Boolean @default(true)
   sortOrder       Int     @default(0)
 
@@ -380,7 +394,9 @@ model EventPhoto {
   @@index([eventId, sortOrder])
 }
 
-/* ---------- Modul 8: KAMA Retail ---------- */
+/**
+ * ---------- Modul 8: KAMA Retail ----------
+ */
 
 model RetailProduct {
   id          String  @id @default(cuid())
@@ -390,11 +406,11 @@ model RetailProduct {
   imageUrl    String?
   priceIdr    Int?
 
-  isHighlight Boolean @default(false)
+  isHighlight     Boolean @default(false)
   // Produk hasil kolaborasi, tampil di bagian terpisah dari highlight.
   isCollaboration Boolean @default(false)
-  isPublished Boolean @default(true)
-  sortOrder   Int     @default(0)
+  isPublished     Boolean @default(true)
+  sortOrder       Int     @default(0)
 
   // Tanpa keranjang/pembayaran online — pemesanan lewat WhatsApp (Lampiran I).
   whatsappMessage String?
@@ -403,26 +419,28 @@ model RetailProduct {
   updatedAt DateTime @updatedAt
 }
 
-/* ---------- Modul 9: Corporate Wellness ---------- */
+/**
+ * ---------- Modul 9: Corporate Wellness ----------
+ */
 
 // Singleton: konten program + PIC halaman Corporate Wellness.
 model CorporateContent {
-  id             String   @id @default("singleton")
-  heroTitle      String
-  intro          String?
-  inOfficeHtml   String?
-  inSpaHtml      String?
-  stepsHtml      String?
-  picName        String?
-  picEmail       String?
-  picPhone       String?
+  id           String   @id @default("singleton")
+  heroTitle    String
+  intro        String?
+  inOfficeHtml String?
+  inSpaHtml    String?
+  stepsHtml    String?
+  picName      String?
+  picEmail     String?
+  picPhone     String?
   // Daftar benefit ("Higher employee engagement", dst.).
-  benefits       String[] @default([])
+  benefits     String[] @default([])
   // [{ title, items: string[] }] — blok "solutions" halaman corporate.
-  solutions      Json?
+  solutions    Json?
   // Daftar "Ideal For" bagian In-Spa.
-  inSpaItems     String[] @default([])
-  updatedAt      DateTime @updatedAt
+  inSpaItems   String[] @default([])
+  updatedAt    DateTime @updatedAt
 }
 
 // Paket program corporate (Essential, Signature, Executive, ...).
@@ -441,10 +459,10 @@ model CorporateProgram {
 
 // Langkah "collaboration process".
 model CorporateStep {
-  id        String @id @default(cuid())
+  id        String  @id @default(cuid())
   title     String
   body      String?
-  sortOrder Int    @default(0)
+  sortOrder Int     @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -470,14 +488,14 @@ model CorporateClient {
 
 // Data pribadi (UU PDP, Pasal 11 ayat 7) — hanya dibaca lewat admin action ber-role.
 model CorporateInquiry {
-  id        String        @id @default(cuid())
-  name      String
-  company   String?
-  email     String
-  phone     String?
-  message   String
-  status    InquiryStatus @default(NEW)
-  notes     String?
+  id          String        @id @default(cuid())
+  name        String
+  company     String?
+  email       String
+  phone       String?
+  message     String
+  status      InquiryStatus @default(NEW)
+  notes       String?
   // Notifikasi email ke PIHAK PERTAMA: waktu terkirim, atau pesan galat.
   emailSentAt DateTime?
   emailError  String?
@@ -488,23 +506,26 @@ model CorporateInquiry {
   @@index([status, createdAt])
 }
 
-/* ---------- Modul 10: Homepage & Our Story ---------- */
+/**
+ * ---------- Modul 10: Homepage & Our Story ----------
+ */
 
 // Tiap section homepage bisa di-toggle & diurutkan dari dashboard.
 model HomepageSection {
-  id        String  @id @default(cuid())
-  key       String  @unique
-  title     String
-  subtitle  String?
-  bodyHtml  String?
-  imageUrl  String?
+  id             String  @id @default(cuid())
+  key            String  @unique
+  eyebrow        String?
+  title          String
+  subtitle       String?
+  bodyHtml       String?
+  imageUrl       String?
   // Banner/hero: gambar khusus layar kecil, teks alt, dan tombol ajakan.
   mobileImageUrl String?
   imageAlt       String?
   ctaLabel       String?
   ctaHref        String?
-  isEnabled Boolean @default(true)
-  sortOrder Int     @default(0)
+  isEnabled      Boolean @default(true)
+  sortOrder      Int     @default(0)
 
   updatedAt DateTime @updatedAt
 }
@@ -541,14 +562,16 @@ model OurStoryContent {
   updatedAt      DateTime @updatedAt
 }
 
-/* ---------- Modul 11: Menu Navigasi ---------- */
+/**
+ * ---------- Modul 11: Menu Navigasi ----------
+ */
 
 enum MenuLinkType {
-  PAGE         // halaman dari modul Halaman & URL; URL mengikuti slug-nya
+  PAGE // halaman dari modul Halaman & URL; URL mengikuti slug-nya
   INTERNAL_URL // path di situs ini, mis. /treatments
   EXTERNAL_URL // https://…, mailto:, tel:
-  ANCHOR       // #bagian atau /halaman#bagian
-  NO_LINK      // judul/kelompok tanpa tautan (mis. judul kolom mega menu)
+  ANCHOR // #bagian atau /halaman#bagian
+  NO_LINK // judul/kelompok tanpa tautan (mis. judul kolom mega menu)
 }
 
 enum MenuLocation {
@@ -560,15 +583,15 @@ enum MenuLocation {
 // Pohon menu maks. 3 level. Lokasi hanya dibaca dari item level 1; anak
 // mengikuti induknya.
 model MenuItem {
-  id        String       @id @default(cuid())
+  id        String         @id @default(cuid())
   label     String
-  linkType  MenuLinkType @default(INTERNAL_URL)
+  linkType  MenuLinkType   @default(INTERNAL_URL)
   // Dipakai INTERNAL_URL, EXTERNAL_URL, ANCHOR. Kosong untuk PAGE dan NO_LINK.
   url       String?
-  sortOrder Int          @default(0)
-  isVisible Boolean      @default(true)
+  sortOrder Int            @default(0)
+  isVisible Boolean        @default(true)
   // true = target="_blank"
-  openInNew Boolean      @default(false)
+  openInNew Boolean        @default(false)
   locations MenuLocation[] @default([HEADER, MOBILE])
 
   pageId String?
@@ -596,14 +619,16 @@ model MenuItem {
   @@index([parentId, sortOrder])
 }
 
-/* ---------- Modul 12: Informasi Kontak & Umum ---------- */
+/**
+ * ---------- Modul 12: Informasi Kontak & Umum ----------
+ */
 
 // Cabang: kartu di halaman kontak, penanda peta, dan pilihan di form
 // reservasi/newsletter. `tag` dipakai sebagai label kecil ("Flagship",
 // "Coming Soon"); koordinat dipakai penanda Leaflet.
 model Branch {
-  id      String @id @default(cuid())
-  slug    String @unique
+  id      String  @id @default(cuid())
+  slug    String  @unique
   name    String
   // Nama area, tampil di samping nama cabang: "South Jakarta | Kramat Pela".
   area    String
@@ -633,8 +658,8 @@ model Branch {
 
 // Singleton: dipakai footer, halaman kontak, dan embed maps.
 model SiteSettings {
-  id      String @id @default("singleton")
-  address String?
+  id           String  @id @default("singleton")
+  address      String?
   mapsEmbedUrl String?
 
   // Jam operasional disimpan sebagai teks per baris agar admin bebas mengaturnya.
@@ -660,12 +685,19 @@ model SiteSettings {
   defaultOgImageUrl String?
 
   // Catatan harga di halaman menu, contoh "Harga belum termasuk pajak".
-  priceDisclaimer String?
+  priceDisclaimer            String?
   // Tagline di footer.
-  footerTagline   String?
+  footerTagline              String?
+  // CTA membership di footer.
+  footerMembershipTitle      String?
+  footerMembershipLearnLabel String?
+  footerMembershipJoinLabel  String?
+  // Blok partnership di footer.
+  partnershipIntro           String?
+  partnershipEmail           String?
   // Tombol Book Now di header: teks dan tujuannya.
-  bookNowLabel String?
-  bookNowHref  String?
+  bookNowLabel               String?
+  bookNowHref                String?
 
   // Halaman scan menu (URL Media Library), urut sesuai tampil, dan berkas PDF-nya.
   menuScanUrls String[] @default([])
@@ -676,16 +708,18 @@ model SiteSettings {
 
 // Template pesan WhatsApp per konteks (default, treatment, promo, retail, dll).
 model WhatsAppTemplate {
-  id        String @id @default(cuid())
-  key       String @unique
-  label     String
+  id      String @id @default(cuid())
+  key     String @unique
+  label   String
   // Boleh memuat placeholder, mis. {{name}}.
-  message   String
+  message String
 
   updatedAt DateTime @updatedAt
 }
 
-/* ---------- Modul 13: SEO ---------- */
+/**
+ * ---------- Modul 13: SEO ----------
+ */
 
 model PageSeo {
   id          String  @id @default(cuid())
@@ -697,7 +731,20 @@ model PageSeo {
   updatedAt DateTime @updatedAt
 }
 
-/* ---------- Modul 14: Halaman & URL ---------- */
+// Teks halaman publik yang dapat diedit admin. `group` menentukan
+// pengelompokan di dashboard (mis. "home", "contact", "global").
+model ContentBlock {
+  key       String   @id
+  group     String
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@index([group])
+}
+
+/**
+ * ---------- Modul 14: Halaman & URL ----------
+ */
 
 enum PageStatus {
   DRAFT
@@ -707,7 +754,7 @@ enum PageStatus {
 // Tata letak halaman publik; menentukan komponen render di src/app/[slug].
 enum PageTemplate {
   STANDARD // judul + isi teks berformat
-  LEGAL    // tata letak dokumen panjang seperti Kebijakan Privasi
+  LEGAL // tata letak dokumen panjang seperti Kebijakan Privasi
 }
 
 // Halaman bebas yang dibuat admin, tampil di /<slug>.
@@ -748,7 +795,9 @@ model Redirect {
   updatedAt DateTime @updatedAt
 }
 
-/* ---------- Media Library ---------- */
+/**
+ * ---------- Media Library ----------
+ */
 
 // Satu baris per berkas di Supabase Storage. Konten lain tetap menyimpan URL
 // (bukan relasi), jadi pemakaian dihitung dengan mencocokkan URL.
@@ -775,11 +824,13 @@ model MediaAsset {
   @@index([folder, sortOrder])
 }
 
-/* ---------- Modul 19: Backup & Status ---------- */
+/**
+ * ---------- Modul 19: Backup & Status ----------
+ */
 
 enum BackupKind {
-  MANUAL   // diunduh admin dari dashboard
-  AUTO     // dijalankan terjadwal (mis. GitHub Actions mingguan)
+  MANUAL // diunduh admin dari dashboard
+  AUTO // dijalankan terjadwal (mis. GitHub Actions mingguan)
   HANDOVER // salinan lengkap saat serah terima
 }
 
@@ -790,25 +841,27 @@ enum BackupStatus {
 
 // Catatan setiap backup — isi backup TIDAK disimpan di sini.
 model BackupRun {
-  id         String       @id @default(cuid())
-  kind       BackupKind
-  status     BackupStatus
+  id            String       @id @default(cuid())
+  kind          BackupKind
+  status        BackupStatus
   // Format/isi, contoh "pg_dump .sql.gz" atau "JSON (tanpa data inquiry)".
-  format     String
-  sizeBytes  Int?
+  format        String
+  sizeBytes     Int?
   // Lokasi penyimpanan (mis. "GitHub Actions artifact #123"), tanpa kredensial.
-  location   String?
-  note       String?
+  location      String?
+  note          String?
   // Admin yang memicu (MANUAL/HANDOVER); null untuk AUTO.
   triggeredById String?
-  triggeredBy   AdminUser? @relation(fields: [triggeredById], references: [id], onDelete: SetNull)
+  triggeredBy   AdminUser?   @relation(fields: [triggeredById], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
 
   @@index([createdAt])
 }
 
-/* ---------- Konten section homepage ---------- */
+/**
+ * ---------- Konten section homepage ----------
+ */
 
 // Angka di section Brand Intro ("12 years of care", ...).
 model HomepageStat {
