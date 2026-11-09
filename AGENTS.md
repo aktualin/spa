@@ -57,7 +57,7 @@ node scripts/screenshot.mjs http://localhost:3000 /tmp/kama mobile   # one viewp
 - `src/components/copyright-year.tsx` — client component that prints the current year.
 - `src/components/home/reviews-carousel.tsx` — the swipeable reviews carousel.
 - `src/components/forms/*` — reservation + newsletter forms. They are **not wired to anything**: submit is `preventDefault()` + local `sent` state. Don't assume a backend/API route exists.
-- `public/fonts`, `public/img` — locally hosted fonts (Ft Regola Neue, Romie) and imagery. `@font-face` rules live in `src/app/kama.css`.
+- `public/fonts`, `public/img` — locally hosted fonts (Faesa Breages for display, POI Carbonic for body/labels) and imagery. `@font-face` rules live in `src/app/kama.css`; the old family names (`Romie trial`, `Ft regola neue trial`) are kept only as aliases because `hiatus.css` hardcodes them on legacy classes.
 - `references/` — source PDFs (menu, colour reference). PDFs are gitignored.
 - `.opencode/` — project tooling for opencode: `skills/` (nextjs-frontend, tailwind-kama-styling, kama-content-data, visual-verification), `agent/ui-reviewer`, `command/` (`/verify`, `/new-page`, `/new-treatment`, `/ui-review`), `plugins/kama-guardrails.js` (blocks edits to `hiatus.css`/`kama.css.bak`, protects the `@layer` order, enforces `<Navigation>`/`<main>`/`<Footer>` on route pages). See `.opencode/README.md`.
 

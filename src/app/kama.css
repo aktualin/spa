@@ -156,90 +156,227 @@
 }
 
 /* ---- Font faces ------------------------------------------------------ */
-
+/* Brand typefaces from the "Logo Direction" pack (Maja-inspired pairing):
+   Faesa Breages for display headings, POI Carbonic for body copy + labels. */
 @font-face {
-  font-family: "Ft regola neue trial";
-  src: url("/fonts/FTRegolaNeueTrial-Light.woff") format("woff");
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Ft regola neue trial";
-  src: url("/fonts/FTRegolaNeueTrial-Regular.woff") format("woff");
+  font-family: "Faesa Breages";
+  src: url("/fonts/FaesaBreages-Regular.otf") format("opentype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Ft regola neue trial";
-  src: url("/fonts/FTRegolaNeueTrial-Semibold.woff") format("woff");
-  font-weight: 600;
+  font-family: "POI Carbonic";
+  src: url("/fonts/POICarbonicTrial-Thin.otf") format("opentype");
+  font-weight: 100;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Ft regola neue trial";
-  src: url("/fonts/FTRegolaNeueTrial-Bold.woff") format("woff");
-  font-weight: 700;
+  font-family: "POI Carbonic";
+  src: url("/fonts/POICarbonicTrial-Light.otf") format("opentype");
+  font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Ft regola neue trial";
-  src: url("/fonts/FTRegolaNeueTrial-LightItalic.woff") format("woff");
+  font-family: "POI Carbonic";
+  src: url("/fonts/POICarbonicTrial-LightItalic.otf") format("opentype");
   font-weight: 300;
   font-style: italic;
   font-display: swap;
 }
 @font-face {
-  font-family: "Ft regola neue trial";
-  src: url("/fonts/FTRegolaNeueTrial-Heavy.woff") format("woff");
-  font-weight: 900;
+  font-family: "POI Carbonic";
+  src: url("/fonts/POICarbonicTrial-Regular.otf") format("opentype");
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
+  font-family: "POI Carbonic";
+  src: url("/fonts/POICarbonicTrial-Italic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "POI Carbonic";
+  src: url("/fonts/POICarbonicTrial-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "POI Carbonic";
+  src: url("/fonts/POICarbonicTrial-MediumItalic.otf") format("opentype");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "POI Carbonic";
+  src: url("/fonts/POICarbonicTrial-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "POI Carbonic";
+  src: url("/fonts/POICarbonicTrial-BoldItalic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* hiatus.css is vendored and hardcodes the old family names on its legacy
+   classes (body, h1–h6, .header-*, .heading-style-*, .badge, .eyebrow-s, …).
+   Re-point those slots at the new files so legacy markup follows the same
+   typography. Every weight/style hiatus declares is mirrored here — an
+   omitted one would fall back to the vendored face and download it again. */
+@font-face {
   font-family: "Romie trial";
-  src: url("/fonts/RomieTrial-Light.otf") format("opentype");
+  src: url("/fonts/FaesaBreages-Regular.otf") format("opentype");
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Romie trial";
-  src: url("/fonts/RomieTrial-Regular.otf") format("opentype");
+  src: url("/fonts/FaesaBreages-Regular.otf") format("opentype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Romie trial";
-  src: url("/fonts/RomieTrial-Medium.otf") format("opentype");
+  src: url("/fonts/FaesaBreages-Regular.otf") format("opentype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Romie trial";
-  src: url("/fonts/RomieTrial-Bold.otf") format("opentype");
+  src: url("/fonts/FaesaBreages-Regular.otf") format("opentype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Romie trial";
-  src: url("/fonts/RomieTrial-Heavy.otf") format("opentype");
+  src: url("/fonts/FaesaBreages-Regular.otf") format("opentype");
   font-weight: 900;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
-  font-family: "Romie trial";
-  src: url("/fonts/RomieTrial-Regular-Italic.otf") format("opentype");
+  font-family: "Ft regola neue trial";
+  src: url("/fonts/POICarbonicTrial-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Ft regola neue trial";
+  src: url("/fonts/POICarbonicTrial-LightItalic.otf") format("opentype");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Ft regola neue trial";
+  src: url("/fonts/POICarbonicTrial-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Ft regola neue trial";
+  src: url("/fonts/POICarbonicTrial-Italic.otf") format("opentype");
   font-weight: 400;
   font-style: italic;
   font-display: swap;
+}
+@font-face {
+  font-family: "Ft regola neue trial";
+  src: url("/fonts/POICarbonicTrial-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Ft regola neue trial";
+  src: url("/fonts/POICarbonicTrial-MediumItalic.otf") format("opentype");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Ft regola neue trial";
+  src: url("/fonts/POICarbonicTrial-BoldItalic.otf") format("opentype");
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Ft regola neue trial";
+  src: url("/fonts/POICarbonicTrial-Bold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Ft regola neue trial";
+  src: url("/fonts/POICarbonicTrial-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Ft regola neue trial";
+  src: url("/fonts/POICarbonicTrial-BoldItalic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Ft regola neue trial";
+  src: url("/fonts/POICarbonicTrial-Bold.otf") format("opentype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Ft regola neue trial";
+  src: url("/fonts/POICarbonicTrial-BoldItalic.otf") format("opentype");
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Faesa ships without an italic cut; route italic emphasis inside legacy
+   display headings to the new family so the browser draws a synthetic
+   oblique instead of fetching the old Romie italic file. */
+h1 em,
+h2 em,
+h3 em,
+h4 em,
+h5 em,
+h6 em,
+.header-xxl em,
+.header-xl em,
+.header-l em,
+.header-s em,
+.header-xs em,
+.counter_number em,
+.font-family-alternate em,
+.paragraph-6 em {
+  font-family: var(--font-display);
+}
+
+/* Legacy eyebrow label: keep the vendored class, swap in the label face. */
+.eyebrow-s {
+  font-family: var(--font-eyebrow);
 }
 
 /* ---- Base ------------------------------------------------------------ */
@@ -249,7 +386,7 @@ html {
 }
 
 body {
-  font-family: "Ft regola neue trial", sans-serif;
+  font-family: var(--font-sans);
   color: var(--kama-navy);
   background-color: #fff;
   -webkit-font-smoothing: antialiased;
@@ -257,7 +394,7 @@ body {
 
 /*
  * Heading styles are intentionally left to the design system stylesheet
- * (hiatus.css), which sets the Romie face and weight per heading level.
+ * (hiatus.css), whose legacy family slots are re-pointed above.
  */
 
 p {
@@ -423,7 +560,7 @@ video {
 }
 
 .price-row_value {
-  font-family: "Romie trial", serif;
+  font-family: var(--font-display);
   font-size: 1.125rem;
 }
 

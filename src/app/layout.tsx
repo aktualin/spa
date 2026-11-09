@@ -81,6 +81,22 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <head>
+        {/* Font utama dipreload agar heading (Faesa) dan body (POI Carbonic)
+            tidak berkedip saat `font-display: swap` berganti. */}
+        <link
+          rel="preload"
+          href="/fonts/FaesaBreages-Regular.otf"
+          as="font"
+          type="font/otf"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/POICarbonicTrial-Regular.otf"
+          as="font"
+          type="font/otf"
+          crossOrigin="anonymous"
+        />
         <link
           rel="stylesheet"
           href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"

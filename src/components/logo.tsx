@@ -2,7 +2,7 @@
  * KAMA Spa logo.
  *
  * The mark is drawn as SVG so it stays crisp at any size; the wordmark is
- * rendered with the Romie display face so it matches the site's typography.
+ * rendered with the site's display and label faces so the lockup matches.
  */
 export function Logo({
   className,
@@ -38,7 +38,7 @@ export function Logo({
         y="17"
         fill={fill}
         style={{
-          fontFamily: '"Romie trial", serif',
+          fontFamily: '"Faesa Breages", serif',
           fontSize: "20px",
           letterSpacing: "0.06em",
         }}
@@ -50,7 +50,7 @@ export function Logo({
         y="16.5"
         fill={fill}
         style={{
-          fontFamily: '"Ft regola neue trial", sans-serif',
+          fontFamily: '"POI Carbonic", sans-serif',
           fontSize: "9px",
           fontWeight: 500,
           letterSpacing: "0.28em",

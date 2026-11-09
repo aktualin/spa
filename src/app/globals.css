@@ -136,8 +136,9 @@
   --noise: 0;
 
   /* ---- Typography ----------------------------------------------------- */
-  --font-sans: "Ft regola neue trial", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Romie trial", ui-serif, Georgia, serif;
+  --font-sans: "POI Carbonic", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Faesa Breages", ui-serif, Georgia, serif;
+  --font-eyebrow: "POI Carbonic", ui-sans-serif, system-ui, sans-serif;
 
   /* Mobile-first scale; bigger steps are applied with `md:` / `lg:`. */
   --text-display: 2.5rem;
@@ -280,6 +281,7 @@
 
   /* Small uppercase label used across the site. */
   .eyebrow {
+    font-family: var(--font-eyebrow);
     font-size: var(--text-eyebrow);
     line-height: var(--text-eyebrow--line-height);
     letter-spacing: 0.14em;
