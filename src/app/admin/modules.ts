@@ -128,6 +128,7 @@ export const ADMIN_MODULES: readonly AdminModule[] = [
     hint: "Artikel di halaman Journal dan kartu What's New di homepage.",
     roles: CONTENT_ROLES,
     ready: true,
+    children: [{ label: "Kategori", href: "/admin/journal/categories" }],
   },
   {
     no: 7,

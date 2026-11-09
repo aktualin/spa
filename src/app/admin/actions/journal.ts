@@ -9,16 +9,13 @@ import { requireRole, requireSession } from "@/lib/auth";
 import { CONTENT_TAGS } from "@/lib/content/tags";
 import {
   JOURNAL_BASE_PATH,
-  JOURNAL_CATEGORY_MAX,
   JOURNAL_EXCERPT_MAX,
   JOURNAL_SEO_DESCRIPTION_MAX,
   JOURNAL_SEO_TITLE_MAX,
   JOURNAL_TITLE_MAX,
-  collectJournalCategories,
   collectJournalTags,
   isRichTextEmpty,
   journalPath,
-  normalizeJournalCategory,
   parseJournalTags,
   resolveJournalSchedule,
   resolveJournalSlug,
@@ -71,10 +68,8 @@ const postSchema = z.object({
     .transform((value) => sanitizeHtml(plainTextToHtml(value ?? "")))
     .refine((value) => !isRichTextEmpty(value), "Isi artikel wajib diisi."),
   coverUrl: optionalImageUrl,
-  category: optionalText.refine(
-    (value) => !value || value.length <= JOURNAL_CATEGORY_MAX,
-    `Kategori maksimal ${JOURNAL_CATEGORY_MAX} karakter.`,
-  ),
+  // Kategori kini baris JournalCategory; form mengirim id, kosong = tanpa kategori.
+  categoryId: optionalText,
   status: z.enum(JOURNAL_STATUSES, { message: "Status tidak dikenal." }),
   seoTitle: optionalText.refine(
     (value) => !value || value.length <= JOURNAL_SEO_TITLE_MAX,
@@ -123,7 +118,7 @@ export async function savePostAction(
     excerpt: text(formData, "excerpt"),
     bodyHtml: text(formData, "bodyHtml"),
     coverUrl: text(formData, "coverUrl"),
-    category: text(formData, "category"),
+    categoryId: text(formData, "categoryId"),
     status: text(formData, "status") ?? "DRAFT",
     seoTitle: text(formData, "seoTitle"),
     seoDescription: text(formData, "seoDescription"),
@@ -156,16 +151,15 @@ export async function savePostAction(
   });
   if (clash) return { error: SLUG_TAKEN(data.slug) };
 
-  // Kategori yang sama beda huruf besar/kecil memakai ejaan yang sudah ada.
-  const existingCategories = await prisma.journalPost.findMany({
-    where: { category: { not: null }, ...(id ? { NOT: { id } } : {}) },
-    select: { category: true },
-    distinct: ["category"],
-  });
-  const category = normalizeJournalCategory(
-    data.category,
-    existingCategories.map((row) => row.category ?? ""),
-  );
+  // Kategori yang dipilih harus benar-benar ada; id karangan ditolak.
+  const categoryId = data.categoryId || null;
+  if (categoryId) {
+    const exists = await prisma.journalCategory.findUnique({
+      where: { id: categoryId },
+      select: { id: true },
+    });
+    if (!exists) return { error: "Kategori tidak ditemukan. Muat ulang halaman lalu pilih lagi." };
+  }
 
   const payload = {
     slug: data.slug,
@@ -173,7 +167,7 @@ export async function savePostAction(
     excerpt: data.excerpt,
     bodyHtml: data.bodyHtml,
     coverUrl: data.coverUrl,
-    category,
+    categoryId,
     tags: tags.tags,
     status: schedule.status,
     publishedAt: schedule.publishedAt,
@@ -279,28 +273,40 @@ export async function listPosts() {
 
   return prisma.journalPost.findMany({
     orderBy: [{ publishedAt: { sort: "desc", nulls: "first" } }, { createdAt: "desc" }],
+    include: { category: { select: { name: true } } },
   });
 }
 
 export async function getPost(id: string) {
   await requireSession();
 
-  return prisma.journalPost.findUnique({ where: { id } });
+  return prisma.journalPost.findUnique({
+    where: { id },
+    include: { category: { select: { name: true } } },
+  });
 }
 
-/** Kategori & tag yang sudah dipakai (termasuk draf), untuk saran di form. */
+/**
+ * Pilihan kategori (urut sesuai admin) dan tag yang sudah dipakai, untuk form
+ * artikel. Kategori yang belum terbit tetap ditawarkan — admin bisa menyiapkan
+ * artikel sebelum kategorinya ditampilkan di situs.
+ */
 export async function listJournalTaxonomy(): Promise<{
-  categories: string[];
+  categories: { id: string; name: string; isPublished: boolean }[];
   tags: string[];
 }> {
   await requireSession();
 
-  const rows = await prisma.journalPost.findMany({
-    select: { category: true, tags: true },
-    orderBy: [{ updatedAt: "desc" }],
-  });
-  return {
-    categories: collectJournalCategories(rows).sort((a, b) => a.localeCompare(b, "id")),
-    tags: collectJournalTags(rows),
-  };
+  const [categories, rows] = await Promise.all([
+    prisma.journalCategory.findMany({
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      select: { id: true, name: true, isPublished: true },
+    }),
+    prisma.journalPost.findMany({
+      select: { tags: true },
+      orderBy: [{ updatedAt: "desc" }],
+    }),
+  ]);
+
+  return { categories, tags: collectJournalTags(rows) };
 }

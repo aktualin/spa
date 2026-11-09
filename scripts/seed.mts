@@ -233,7 +233,30 @@ async function seedMembership() {
 }
 
 async function seedJournal() {
+  // Kategori dulu: artikel menunjuk barisnya, bukan menulis namanya sendiri.
+  // Urutan awal mengikuti kemunculan pertama di data artikel.
+  const categoryNames: string[] = [];
   for (const post of journalPosts) {
+    const name = post.tag?.trim();
+    if (name && !categoryNames.some((n) => n.toLowerCase() === name.toLowerCase())) {
+      categoryNames.push(name);
+    }
+  }
+
+  const categoryIdByName = new Map<string, string>();
+  for (const [index, name] of categoryNames.entries()) {
+    const row = await prisma.journalCategory.upsert({
+      where: { slug: slugify(name) },
+      create: { slug: slugify(name), name, sortOrder: index },
+      // Nama & urutan tidak ditimpa: suntingan admin menang.
+      update: {},
+      select: { id: true },
+    });
+    categoryIdByName.set(name.toLowerCase(), row.id);
+  }
+
+  for (const post of journalPosts) {
+    const categoryId = categoryIdByName.get(post.tag?.trim().toLowerCase() ?? "") ?? null;
     await prisma.journalPost.upsert({
       where: { slug: post.slug },
       create: {
@@ -243,7 +266,7 @@ async function seedJournal() {
         // Konten penuh belum ada di data statis — admin melengkapinya nanti.
         bodyHtml: `<p>${post.excerpt}</p>`,
         coverUrl: post.image,
-        category: post.tag,
+        categoryId,
         status: "PUBLISHED",
         publishedAt: new Date(),
       },
@@ -251,11 +274,12 @@ async function seedJournal() {
         title: post.title,
         excerpt: post.excerpt,
         coverUrl: post.image,
-        category: post.tag,
       },
     });
   }
-  console.log(`✔ ${journalPosts.length} artikel journal`);
+  console.log(
+    `✔ ${journalPosts.length} artikel journal, ${categoryNames.length} kategori journal`,
+  );
 }
 
 async function seedSiteSettings() {

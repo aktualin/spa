@@ -14,6 +14,7 @@ import { cacheLife, cacheTag } from "next/cache";
 
 import {
   collectJournalCategories,
+  orderJournalCategories,
   collectJournalTags,
   filterJournalPosts,
   type JournalFilter,
@@ -37,7 +38,15 @@ export type JournalPost = {
   seoDescription: string | null;
 };
 
-type JournalRow = Omit<JournalPost, "bodyHtml"> & { bodyHtml: string };
+/**
+ * Baris Prisma: kategori ikut lewat relasi `category`, bukan kolom teks.
+ * `JournalPost.category` di luar sini tetap berupa nama kategori (string),
+ * supaya filter `?category=` dan tampilan kartu tidak berubah.
+ */
+type JournalRow = Omit<JournalPost, "bodyHtml" | "category"> & {
+  bodyHtml: string;
+  category: { name: string } | null;
+};
 
 function toJournalPost(row: JournalRow): JournalPost {
   return {
@@ -46,7 +55,7 @@ function toJournalPost(row: JournalRow): JournalPost {
     excerpt: row.excerpt,
     bodyHtml: row.bodyHtml,
     coverUrl: row.coverUrl,
-    category: row.category,
+    category: row.category?.name ?? null,
     tags: row.tags,
     publishedAt: row.publishedAt,
     updatedAt: row.updatedAt,
@@ -75,6 +84,7 @@ async function getVisibleJournalPosts(): Promise<JournalPost[]> {
         OR: [{ publishedAt: null }, { publishedAt: { lte: now } }],
       },
       orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+      include: { category: { select: { name: true } } },
     });
     const visible = rows.filter((row) => isJournalVisible(row, now));
     return sortJournalByDate(visible).map(toJournalPost);
@@ -110,7 +120,10 @@ export async function getJournalPost(slug: string): Promise<JournalPost | null> 
   const { data } = await safeQueryWithMeta<JournalPost | null>(
     async () => {
       const { prisma } = await import("@/lib/prisma");
-      const row = await prisma.journalPost.findUnique({ where: { slug } });
+      const row = await prisma.journalPost.findUnique({
+        where: { slug },
+        include: { category: { select: { name: true } } },
+      });
       if (!row || !isJournalVisible(row, new Date())) return null;
       return toJournalPost(row);
     },
@@ -120,9 +133,36 @@ export async function getJournalPost(slug: string): Promise<JournalPost | null> 
   return data;
 }
 
-/** Kategori yang dipakai artikel publik, untuk filter daftar. */
+/**
+ * Kategori untuk filter daftar: urutannya mengikuti `sortOrder` yang diatur
+ * admin, dan hanya kategori yang benar-benar punya artikel terlihat yang
+ * ditampilkan supaya tidak ada chip filter yang hasilnya kosong.
+ */
 export async function getJournalCategories(): Promise<string[]> {
-  return collectJournalCategories(await getVisibleJournalPosts());
+  const [ordered, posts] = await Promise.all([
+    getJournalCategoryNames(),
+    getVisibleJournalPosts(),
+  ]);
+  return orderJournalCategories(ordered, collectJournalCategories(posts));
+}
+
+/** Nama kategori terbit, urut `sortOrder` lalu nama. */
+async function getJournalCategoryNames(): Promise<string[]> {
+  "use cache";
+  cacheTag(CONTENT_TAGS.journal);
+  cacheLife("hours");
+
+  const { data } = await safeQueryWithMeta<string[]>(async () => {
+    const { prisma } = await import("@/lib/prisma");
+    const rows = await prisma.journalCategory.findMany({
+      where: { isPublished: true },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      select: { name: true },
+    });
+    return rows.map((row) => row.name);
+  }, []);
+
+  return data;
 }
 
 /** Tag yang dipakai artikel publik (paling sering dulu), untuk filter daftar. */

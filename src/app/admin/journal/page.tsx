@@ -94,7 +94,7 @@ export default async function AdminJournalPage({
                       </div>
                       <p className="mt-0.5 truncate text-xs text-neutral-500">
                         {journalPath(post.slug)}
-                        {post.category ? ` · ${post.category}` : ""}
+                        {post.category ? ` · ${post.category.name}` : ""}
                         {post.tags.length > 0 ? ` · ${post.tags.map((t) => `#${t}`).join(" ")}` : ""}
                       </p>
                     </div>

@@ -35,7 +35,7 @@ export type JournalFormData = {
   excerpt: string;
   bodyHtml: string;
   coverUrl: string;
-  category: string;
+  categoryId: string;
   tags: string;
   status: "DRAFT" | "SCHEDULED" | "PUBLISHED";
   publishedAt: string;
@@ -89,7 +89,10 @@ export function JournalForm({
   taxonomy,
 }: {
   post: JournalFormData;
-  taxonomy: { categories: string[]; tags: string[] };
+  taxonomy: {
+    categories: { id: string; name: string; isPublished: boolean }[];
+    tags: string[];
+  };
 }) {
   const [state, formAction] = useActionState(savePostAction, initialState);
   const [status, setStatus] = useState<JournalFormData["status"]>(post.status);
@@ -99,11 +102,10 @@ export function JournalForm({
   const [tags, setTags] = useState(post.tags);
   // Field dibuat terkendali supaya isian tidak hilang ketika simpan ditolak
   // (React mengosongkan field tak terkendali setelah form action selesai).
-  const [category, setCategory] = useState(post.category);
+  const [categoryId, setCategoryId] = useState(post.categoryId);
   const [publishedAt, setPublishedAt] = useState(post.publishedAt);
   const [seoTitle, setSeoTitle] = useState(post.seoTitle);
   const [seoDescription, setSeoDescription] = useState(post.seoDescription);
-  const categoryListId = useId();
 
   const effectiveSlug = resolveJournalSlug(slug, title);
   const slugChanged = post.isPublic && post.slug !== "" && effectiveSlug !== post.slug;
@@ -212,25 +214,30 @@ export function JournalForm({
 
         <Field
           label="Kategori"
-          htmlFor="category"
-          hint="Pilih kategori yang sudah ada atau ketik kategori baru. Satu artikel satu kategori."
+          htmlFor="categoryId"
+          hint="Satu artikel satu kategori. Daftar dan urutannya diatur di Journal › Kategori."
         >
-          <input
-            id="category"
-            name="category"
-            value={category}
-            onChange={(event) => setCategory(event.target.value)}
-            list={categoryListId}
-            maxLength={50}
-            placeholder="Contoh: Wellness"
-            autoComplete="off"
+          <select
+            id="categoryId"
+            name="categoryId"
+            value={categoryId}
+            onChange={(event) => setCategoryId(event.target.value)}
             className={inputClass}
-          />
-          <datalist id={categoryListId}>
+          >
+            <option value="">Tanpa kategori</option>
             {taxonomy.categories.map((category) => (
-              <option key={category} value={category} />
+              <option key={category.id} value={category.id}>
+                {category.name}
+                {category.isPublished ? "" : " (belum terbit)"}
+              </option>
             ))}
-          </datalist>
+          </select>
+          {taxonomy.categories.length === 0 ? (
+            <p className="mt-1 text-xs text-neutral-500">
+              Belum ada kategori. Buat dulu di Journal › Kategori bila artikel
+              ini perlu dikelompokkan.
+            </p>
+          ) : null}
         </Field>
 
         <Field

@@ -225,6 +225,28 @@ export function collectJournalCategories(
   return [...seen.values()];
 }
 
+/**
+ * Kategori untuk chip filter: urutan `ordered` (sortOrder dari admin) yang
+ * dipakai, dibatasi pada kategori yang benar-benar punya artikel terlihat.
+ * Kategori yang masih menempel di artikel tapi tidak ada di daftar admin —
+ * misalnya karena baru dihapus — tetap muncul di belakang supaya artikelnya
+ * tidak kehilangan filter.
+ */
+export function orderJournalCategories(
+  ordered: readonly string[],
+  used: readonly string[],
+): string[] {
+  const usedByKey = new Map(used.map((name) => [name.toLowerCase(), name]));
+  const result: string[] = [];
+  for (const name of ordered) {
+    const match = usedByKey.get(name.toLowerCase());
+    if (!match) continue;
+    result.push(name);
+    usedByKey.delete(name.toLowerCase());
+  }
+  return [...result, ...usedByKey.values()];
+}
+
 /** Tag unik, paling sering dipakai dulu, lalu urut abjad. */
 export function collectJournalTags(posts: readonly { tags: string[] }[]): string[] {
   const counts = new Map<string, number>();

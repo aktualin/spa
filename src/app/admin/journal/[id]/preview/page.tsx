@@ -26,7 +26,10 @@ export default async function JournalPreviewPage({
 
   const { id } = await params;
 
-  const post = await prisma.journalPost.findUnique({ where: { id } });
+  const post = await prisma.journalPost.findUnique({
+    where: { id },
+    include: { category: { select: { name: true } } },
+  });
   if (!post) notFound();
 
   const meta = journalStatusMeta[effectiveJournalStatus(post, new Date())];
@@ -52,7 +55,7 @@ export default async function JournalPreviewPage({
             <Badge tone={meta.tone}>{meta.label}</Badge>
             {post.category ? (
               <span className="text-xs uppercase tracking-wide text-neutral-500">
-                {post.category}
+                {post.category.name}
               </span>
             ) : null}
           </div>

@@ -12,6 +12,7 @@ import {
   journalListHref,
   journalPath,
   normalizeJournalCategory,
+  orderJournalCategories,
   parseJournalFilter,
   parseJournalTags,
   resolveJournalSchedule,
@@ -192,5 +193,31 @@ describe("filter daftar publik", () => {
       journalListHref({ category: "Ritual Pagi", tag: "pijat" }),
       "/our-story/journal?category=Ritual+Pagi&tag=pijat",
     );
+  });
+});
+
+describe("urutan kategori journal", () => {
+  it("mengikuti urutan admin, bukan urutan artikel terbaru", () => {
+    const ordered = ["Wellness", "Promo", "Event"];
+    const used = ["Event", "Wellness"];
+    assert.deepEqual(orderJournalCategories(ordered, used), ["Wellness", "Event"]);
+  });
+
+  it("kategori yang tidak dipakai artikel mana pun tidak ditampilkan", () => {
+    assert.deepEqual(orderJournalCategories(["Wellness", "Promo"], []), []);
+  });
+
+  it("kategori yang masih menempel di artikel tapi hilang dari daftar tetap muncul di belakang", () => {
+    const hasil = orderJournalCategories(["Wellness"], ["Lama", "Wellness"]);
+    assert.deepEqual(hasil, ["Wellness", "Lama"]);
+  });
+
+  it("pencocokan tidak membedakan huruf besar/kecil dan memakai ejaan admin", () => {
+    assert.deepEqual(orderJournalCategories(["Wellness"], ["wellness"]), ["Wellness"]);
+  });
+
+  it("tidak pernah menghasilkan duplikat", () => {
+    const hasil = orderJournalCategories(["A", "A"], ["a"]);
+    assert.deepEqual(hasil, ["A"]);
   });
 });

@@ -324,6 +324,26 @@ model MembershipTier {
  * ---------- Modul 6: Journal ----------
  */
 
+/**
+ * Kategori artikel Journal. Dulu kolom teks bebas di JournalPost: tidak bisa
+ * diurutkan admin dan salah ketik membuat kategori baru. Sekarang tabel
+ * sendiri dengan sortOrder, sama seperti TreatmentCategory dan GalleryAlbum.
+ */
+model JournalCategory {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  name        String
+  isPublished Boolean @default(true)
+  sortOrder   Int     @default(0)
+
+  posts JournalPost[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sortOrder])
+}
+
 model JournalPost {
   id       String   @id @default(cuid())
   slug     String   @unique
@@ -331,8 +351,11 @@ model JournalPost {
   excerpt  String?
   bodyHtml String
   coverUrl String?
-  category String?
   tags     String[]
+
+  // Kategori dihapus → artikel kehilangan kategorinya, tidak ikut terhapus.
+  categoryId String?
+  category   JournalCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
   status      PublishStatus @default(DRAFT)
   // Dipakai untuk penjadwalan publikasi: tampil publik bila <= now().
@@ -345,6 +368,7 @@ model JournalPost {
   updatedAt DateTime @updatedAt
 
   @@index([status, publishedAt])
+  @@index([categoryId])
 }
 
 /**
