@@ -1,14 +1,23 @@
 import { config as loadEnv } from "dotenv";
-import { defineConfig, env } from "prisma/config";
+import { defineConfig } from "prisma/config";
 
-// Next.js stores secrets in .env.local; load it for the Prisma CLI too.
+// Next.js menyimpan rahasia di .env.local; muat juga untuk Prisma CLI.
 loadEnv({ path: ".env.local" });
+
+/**
+ * Migrate/CLI memakai koneksi langsung (port 5432), bukan transaction pooler;
+ * aplikasi sendiri terhubung lewat DATABASE_URL di adapter saat runtime.
+ *
+ * Sengaja TIDAK memakai `env("DIRECT_URL")`: helper itu melempar saat berkas
+ * konfigurasi ini dimuat kalau variabelnya kosong, sehingga `prisma generate`
+ * ikut gagal di lingkungan build yang memang tidak punya kredensial database.
+ * Akibatnya Prisma Client tidak pernah dibuat dan `@prisma/client` jadi kosong.
+ * Perintah yang benar-benar menyentuh database (migrate, db execute) tetap
+ * gagal dengan jelas bila URL-nya tidak ada.
+ */
+const datasourceUrl = process.env.DIRECT_URL ?? process.env.DATABASE_URL;
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
-  datasource: {
-    // Session-mode pooler: Migrate/CLI needs a direct (non-pgbouncer) connection.
-    // The app itself connects via DATABASE_URL (transaction pooler) in the adapter.
-    url: env("DIRECT_URL"),
-  },
+  ...(datasourceUrl ? { datasource: { url: datasourceUrl } } : {}),
 });
