@@ -5,7 +5,8 @@ import { redirect } from "next/navigation";
 import { EXPIRED_LOGIN_PATH, getSession, hasSessionCookie } from "@/lib/auth";
 import { CHANGE_PASSWORD_PATH } from "@/lib/domain/admin-redirect";
 
-import { modulesForRole, type AdminModule } from "./modules";
+import { AdminModuleHint, AdminNav } from "./admin-nav";
+import { groupedModulesForRole } from "./modules";
 
 export const metadata: Metadata = {
   title: "Dashboard — KAMA Spa",
@@ -31,7 +32,7 @@ export default async function AdminLayout({
     return <div data-admin-shell>{children}</div>;
   }
 
-  const modules = modulesForRole(session.role);
+  const groups = groupedModulesForRole(session.role);
 
   return (
     <div data-admin-shell className="flex min-h-screen bg-neutral-50">
@@ -48,7 +49,7 @@ export default async function AdminLayout({
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 py-4">
-          <ModuleList modules={modules} />
+          <AdminNav groups={groups} />
         </nav>
 
         <div className="border-t border-neutral-200 px-5 py-4">
@@ -91,58 +92,17 @@ export default async function AdminLayout({
               Menu modul
             </summary>
             <div className="mt-2">
-              <ModuleList modules={modules} />
+              <AdminNav groups={groups} />
             </div>
           </details>
         </header>
 
-        <main className="flex-1 px-5 py-6 lg:px-8 lg:py-8">{children}</main>
+        <main className="flex-1 px-5 py-6 lg:px-8 lg:py-8">
+          <AdminModuleHint />
+          {children}
+        </main>
       </div>
     </div>
-  );
-}
-
-function ModuleList({ modules }: { modules: readonly AdminModule[] }) {
-  return (
-    <ul className="space-y-0.5">
-      {modules.map((m) => (
-        <li key={m.no}>
-          {m.ready ? (
-            <Link
-              href={m.href}
-              className="flex items-center justify-between rounded-md px-3 py-2 text-sm text-neutral-700 transition hover:bg-neutral-100"
-            >
-              <span>{m.label}</span>
-            </Link>
-          ) : (
-            <span
-              aria-disabled="true"
-              title="Modul ini belum dibangun"
-              className="flex cursor-not-allowed items-center justify-between rounded-md px-3 py-2 text-sm text-neutral-400"
-            >
-              <span>{m.label}</span>
-              <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] uppercase tracking-wide">
-                segera
-              </span>
-            </span>
-          )}
-          {m.ready && m.children?.length ? (
-            <ul className="mb-1 ml-3 border-l border-neutral-200 pl-2">
-              {m.children.map((child) => (
-                <li key={child.href}>
-                  <Link
-                    href={child.href}
-                    className="block rounded-md px-3 py-1.5 text-xs text-neutral-600 transition hover:bg-neutral-100"
-                  >
-                    {child.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-        </li>
-      ))}
-    </ul>
   );
 }
 

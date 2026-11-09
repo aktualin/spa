@@ -2,14 +2,19 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
+  ADMIN_GROUPS,
   ADMIN_MODULES,
+  activeHrefForPath,
   canAccessPath,
+  groupedModulesForRole,
+  moduleHintForPath,
   moduleLabelForPath,
   modulesForRole,
   rolesForPath,
 } from "../../src/app/admin/modules.ts";
 import {
   findAccessRule,
+  groupModules,
   isSharedAdminPath,
   normalizeAdminPath,
   validateAccessMatrix,
@@ -178,5 +183,60 @@ describe("BUILD-17 — kata sandi akun admin", () => {
       validatePasswordStrength("Editor.Kama.Spa", { email: "editor.kama.spa@example.com" }) ?? "",
       /email/,
     );
+  });
+});
+
+describe("Sidebar admin berkelompok", () => {
+  it("setiap modul punya kelompok yang terdaftar dan petunjuk konteks", () => {
+    const ids = new Set(ADMIN_GROUPS.map((g) => g.id));
+    for (const m of ADMIN_MODULES) {
+      assert.ok(ids.has(m.group), `Modul "${m.label}" memakai kelompok tak dikenal: ${m.group}`);
+      assert.ok(m.hint.trim().length > 0, `Modul "${m.label}" belum punya petunjuk.`);
+    }
+  });
+
+  it("pengelompokan tidak menghilangkan modul dan mengikuti urutan kelompok", () => {
+    for (const role of ["ADMIN", "EDITOR"] as const) {
+      const groups = groupedModulesForRole(role);
+      const flat = groups.flatMap((g) => g.modules);
+      assert.deepEqual(
+        [...flat].map((m) => m.no).sort((a, b) => a - b),
+        [...modulesForRole(role)].map((m) => m.no).sort((a, b) => a - b),
+      );
+      const order = groups.map((g) => g.id);
+      const expected = ADMIN_GROUPS.map((g) => g.id).filter((id) => order.includes(id));
+      assert.deepEqual(order, expected);
+      for (const g of groups) assert.ok(g.modules.length > 0, `Kelompok ${g.id} kosong.`);
+    }
+  });
+
+  it("EDITOR tidak melihat kelompok pengaturan sistem", () => {
+    assert.ok(!groupedModulesForRole("EDITOR").some((g) => g.id === "sistem"));
+    assert.ok(groupedModulesForRole("ADMIN").some((g) => g.id === "sistem"));
+  });
+
+  it("modul berkelompok tak dikenal tetap muncul di akhir", () => {
+    const grouped = groupModules(
+      [{ group: "katalog", label: "A" }, { group: "entah", label: "B" }],
+      ADMIN_GROUPS,
+    );
+    assert.deepEqual(grouped.map((g) => g.id), ["katalog", "entah"]);
+  });
+
+  it("penanda aktif memilih awalan terpanjang, bukan modul induk", () => {
+    assert.equal(activeHrefForPath("/admin/treatments/prices"), "/admin/treatments/prices");
+    assert.equal(activeHrefForPath("/admin/treatments"), "/admin/treatments");
+    assert.equal(activeHrefForPath("/admin/treatments/categories/new"), "/admin/treatments/categories");
+    assert.equal(activeHrefForPath("/admin/settings/whatsapp"), "/admin/settings/whatsapp");
+    assert.equal(activeHrefForPath("/admin"), null);
+  });
+
+  it("petunjuk sub-menu memakai petunjuk modul induknya", () => {
+    const harga = ADMIN_MODULES.find((m) => m.href === "/admin/treatments/prices");
+    const treatments = ADMIN_MODULES.find((m) => m.href === "/admin/treatments");
+    assert.equal(moduleHintForPath("/admin/treatments/prices"), harga?.hint);
+    assert.equal(moduleHintForPath("/admin/treatments/categories"), treatments?.hint);
+    assert.equal(moduleHintForPath("/admin"), null);
+    assert.equal(moduleHintForPath("/admin/account"), null);
   });
 });

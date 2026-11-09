@@ -3,7 +3,12 @@ import Link from "next/link";
 import { requireSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-import { modulesForRole, moduleLabelForPath, rolesForPath } from "./modules";
+import {
+  groupedModulesForRole,
+  modulesForRole,
+  moduleLabelForPath,
+  rolesForPath,
+} from "./modules";
 
 export const instant = false;
 
@@ -24,6 +29,7 @@ export default async function AdminDashboardPage({
 }) {
   const session = await requireSession();
   const modules = modulesForRole(session.role);
+  const groups = groupedModulesForRole(session.role);
   const ready = modules.filter((m) => m.ready).length;
   const params = await searchParams;
   // Nilai `forbidden` berasal dari URL: hanya dipakai untuk mencari nama modul
@@ -128,24 +134,32 @@ export default async function AdminDashboardPage({
       <h2 className="mt-6 text-sm font-semibold text-neutral-800">
         Modul yang bisa Anda buka
       </h2>
-      <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-        {modules.map((m) => (
-          <li key={m.no}>
-            {m.ready ? (
-              <Link
-                href={m.href}
-                className="block rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-800 hover:border-neutral-400"
-              >
-                {m.label}
-              </Link>
-            ) : (
-              <span className="block rounded-md border border-dashed border-neutral-200 px-3 py-2 text-sm text-neutral-400">
-                {m.label} (segera)
-              </span>
-            )}
-          </li>
-        ))}
-      </ul>
+      {groups.map((group) => (
+        <section key={group.id} className="mt-4">
+          <h3 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-500">
+            {group.label}
+          </h3>
+          <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {group.modules.map((m) => (
+              <li key={m.no}>
+                {m.ready ? (
+                  <Link
+                    href={m.href}
+                    className="block h-full rounded-md border border-neutral-200 bg-white px-3 py-2 hover:border-neutral-400"
+                  >
+                    <span className="block text-sm text-neutral-800">{m.label}</span>
+                    <span className="mt-0.5 block text-xs text-neutral-500">{m.hint}</span>
+                  </Link>
+                ) : (
+                  <span className="block h-full rounded-md border border-dashed border-neutral-200 px-3 py-2 text-sm text-neutral-400">
+                    {m.label} (segera)
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard label="Treatment published" value={summary.treatmentsPublished} />
