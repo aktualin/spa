@@ -16,6 +16,7 @@ import {
   parseGscVerification,
   seoPathError,
 } from "../../src/lib/domain/seo.ts";
+import { ADMIN_MODULES } from "../../src/app/admin/modules.ts";
 
 /** BUILD-16 — aturan SEO murni. */
 
@@ -177,6 +178,41 @@ describe("favicon, robots, sitemap", () => {
     for (const path of paths) {
       assert.equal(isSeoFriendlyPath(path), true, path);
       assert.equal(seoPathError(path), null, path);
+    }
+  });
+});
+
+describe("halaman bawaan punya rumahnya di admin", () => {
+  it("setiap route bawaan menyebut minimal satu modul pengisi", () => {
+    for (const route of PUBLIC_STATIC_ROUTES) {
+      assert.ok(
+        route.contentModules.length > 0,
+        `Route ${route.path} belum menunjuk modul admin mana pun.`,
+      );
+    }
+  });
+
+  it("modul yang ditunjuk benar-benar ada di matriks admin", () => {
+    const known = new Set<string>();
+    for (const m of ADMIN_MODULES) {
+      known.add(m.href);
+      for (const child of m.children ?? []) known.add(child.href);
+    }
+
+    for (const route of PUBLIC_STATIC_ROUTES) {
+      for (const mod of route.contentModules) {
+        assert.ok(
+          known.has(mod.href),
+          `Route ${route.path} menunjuk ${mod.href} yang bukan modul admin.`,
+        );
+      }
+    }
+  });
+
+  it("tidak ada modul yang disebut dua kali untuk satu halaman", () => {
+    for (const route of PUBLIC_STATIC_ROUTES) {
+      const hrefs = route.contentModules.map((m) => m.href);
+      assert.equal(new Set(hrefs).size, hrefs.length, `Modul ganda di ${route.path}.`);
     }
   });
 });

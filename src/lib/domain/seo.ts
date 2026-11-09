@@ -323,18 +323,89 @@ export type PublicStaticRoute = {
   group: SitemapStampKey;
   /** Halaman yang juga punya field SEO di modul kontennya. */
   contentEditor?: { label: string; href: string };
+  /**
+   * Modul admin yang mengisi isi halaman ini. Route bawaan punya template
+   * sendiri di kode, jadi tidak bisa jadi baris `StaticPage`; daftar ini yang
+   * memberi tahu admin ke mana harus pergi untuk mengubah isinya.
+   */
+  contentModules: readonly { label: string; href: string }[];
 };
 
 /** Route publik tetap (urutan = prioritas). /corporate-wellness redirect ke /corporate. */
 export const PUBLIC_STATIC_ROUTES: readonly PublicStaticRoute[] = [
-  { path: "/", label: "Beranda", priority: 1, changeFrequency: "weekly", group: "home" },
-  { path: "/treatments", label: "Treatments", priority: 0.9, changeFrequency: "monthly", group: "catalog" },
-  { path: "/treatments/packages", label: "Packages", priority: 0.8, changeFrequency: "monthly", group: "catalog" },
-  { path: "/menu", label: "Menu", priority: 0.8, changeFrequency: "monthly", group: "catalog" },
-  { path: "/promos", label: "Promos", priority: 0.8, changeFrequency: "weekly", group: "promos" },
-  { path: "/membership", label: "Membership", priority: 0.7, changeFrequency: "monthly", group: "membership" },
-  { path: "/promos/membership", label: "Promo Membership", priority: 0.7, changeFrequency: "monthly", group: "membership" },
-  { path: "/corporate", label: "Corporate Wellness", priority: 0.7, changeFrequency: "monthly", group: "corporate" },
+  {
+    path: "/",
+    label: "Beranda",
+    priority: 1,
+    changeFrequency: "weekly",
+    group: "home",
+    contentModules: [
+      { label: "Homepage & Our Story", href: "/admin/homepage" },
+      { label: "Teks Halaman", href: "/admin/page-copy" },
+    ],
+  },
+  {
+    path: "/treatments",
+    label: "Treatments",
+    priority: 0.9,
+    changeFrequency: "monthly",
+    group: "catalog",
+    contentModules: [
+      { label: "Treatments & Packages", href: "/admin/treatments" },
+      { label: "Kategori", href: "/admin/treatments/categories" },
+    ],
+  },
+  {
+    path: "/treatments/packages",
+    label: "Packages",
+    priority: 0.8,
+    changeFrequency: "monthly",
+    group: "catalog",
+    contentModules: [{ label: "Packages", href: "/admin/treatments/packages" }],
+  },
+  {
+    path: "/menu",
+    label: "Menu",
+    priority: 0.8,
+    changeFrequency: "monthly",
+    group: "catalog",
+    contentModules: [
+      { label: "Treatments & Packages", href: "/admin/treatments" },
+      { label: "Harga", href: "/admin/treatments/prices" },
+    ],
+  },
+  {
+    path: "/promos",
+    label: "Promos",
+    priority: 0.8,
+    changeFrequency: "weekly",
+    group: "promos",
+    contentModules: [{ label: "Promos & Gift Card", href: "/admin/promos" }],
+  },
+  {
+    path: "/membership",
+    label: "Membership",
+    priority: 0.7,
+    changeFrequency: "monthly",
+    group: "membership",
+    contentModules: [{ label: "Membership", href: "/admin/membership" }],
+  },
+  {
+    path: "/promos/membership",
+    label: "Promo Membership",
+    priority: 0.7,
+    changeFrequency: "monthly",
+    group: "membership",
+    contentModules: [{ label: "Membership", href: "/admin/membership" }],
+  },
+  {
+    path: "/corporate",
+    label: "Corporate Wellness",
+    priority: 0.7,
+    changeFrequency: "monthly",
+    group: "corporate",
+    contentModules: [{ label: "Konten halaman", href: "/admin/corporate/content" }],
+  },
   {
     path: "/our-story",
     label: "Our Story",
@@ -342,12 +413,68 @@ export const PUBLIC_STATIC_ROUTES: readonly PublicStaticRoute[] = [
     changeFrequency: "monthly",
     group: "story",
     contentEditor: { label: "Modul Our Story", href: "/admin/our-story" },
+    contentModules: [{ label: "Our Story", href: "/admin/our-story" }],
   },
-  { path: "/our-story/journal", label: "Journal", priority: 0.6, changeFrequency: "weekly", group: "journal" },
-  { path: "/gallery", label: "Gallery", priority: 0.6, changeFrequency: "monthly", group: "gallery" },
-  { path: "/events", label: "Events", priority: 0.6, changeFrequency: "weekly", group: "events" },
-  { path: "/events/collaborations", label: "Kolaborasi", priority: 0.5, changeFrequency: "monthly", group: "events" },
-  { path: "/retail", label: "KAMA Retail", priority: 0.5, changeFrequency: "monthly", group: "retail" },
-  { path: "/gift-card", label: "Gift Card", priority: 0.5, changeFrequency: "monthly", group: "giftCard" },
-  { path: "/contact", label: "Contact", priority: 0.7, changeFrequency: "monthly", group: "contact" },
+  {
+    path: "/our-story/journal",
+    label: "Journal",
+    priority: 0.6,
+    changeFrequency: "weekly",
+    group: "journal",
+    contentModules: [
+      { label: "Journal", href: "/admin/journal" },
+      { label: "Kategori", href: "/admin/journal/categories" },
+    ],
+  },
+  {
+    path: "/gallery",
+    label: "Gallery",
+    priority: 0.6,
+    changeFrequency: "monthly",
+    group: "gallery",
+    contentModules: [{ label: "Foto & Gallery", href: "/admin/gallery" }],
+  },
+  {
+    path: "/events",
+    label: "Events",
+    priority: 0.6,
+    changeFrequency: "weekly",
+    group: "events",
+    contentModules: [{ label: "Events", href: "/admin/events" }],
+  },
+  {
+    path: "/events/collaborations",
+    label: "Kolaborasi",
+    priority: 0.5,
+    changeFrequency: "monthly",
+    group: "events",
+    contentModules: [{ label: "Events", href: "/admin/events" }],
+  },
+  {
+    path: "/retail",
+    label: "KAMA Retail",
+    priority: 0.5,
+    changeFrequency: "monthly",
+    group: "retail",
+    contentModules: [{ label: "KAMA Retail", href: "/admin/retail" }],
+  },
+  {
+    path: "/gift-card",
+    label: "Gift Card",
+    priority: 0.5,
+    changeFrequency: "monthly",
+    group: "giftCard",
+    contentModules: [{ label: "Gift Card", href: "/admin/gift-card" }],
+  },
+  {
+    path: "/contact",
+    label: "Contact",
+    priority: 0.7,
+    changeFrequency: "monthly",
+    group: "contact",
+    contentModules: [
+      { label: "Cabang", href: "/admin/branches" },
+      { label: "Kontak & Umum", href: "/admin/settings/contact" },
+    ],
+  },
 ];
