@@ -122,6 +122,10 @@ export const STATIC_PIC: CorporatePic = {
   phone: "+62 813-1485-6565",
 };
 
+/**
+ * Isi awal untuk SEED dan form admin — bukan untuk dirender ke pengunjung.
+ * Jalur render membaca database saja; tabel kosong → bagian itu disembunyikan.
+ */
 export function staticCorporateContent(): CorporatePageContent {
   return {
     heroTitle: STATIC_HERO_TITLE,
@@ -194,39 +198,53 @@ export function readSolutions(value: unknown): CorporateSolution[] {
  * kosong) memakai isi bawaan, sehingga tampilan tidak berubah sampai admin
  * benar-benar mengisinya.
  */
-export function resolveCorporateContent(row: CorporateContentRow | null): CorporatePageContent {
-  const base = staticCorporateContent();
-  if (!row) return base;
+/** Konten kosong: belum disimpan admin → halaman menyembunyikan bagiannya. */
+export function emptyCorporateContent(): CorporatePageContent {
+  return {
+    heroTitle: "",
+    intro: "",
+    benefits: [],
+    solutions: [],
+    inSpaItems: [],
+    inSpaHtml: null,
+    inOfficeHtml: null,
+    stepsHtml: null,
+    pic: { name: "", email: "", phone: "" },
+  };
+}
 
-  const solutions = readSolutions(row.solutions);
-  const benefits = (row.benefits ?? []).filter((b) => b.trim() !== "");
-  const inSpaItems = (row.inSpaItems ?? []).filter((b) => b.trim() !== "");
+/**
+ * Baris `CorporateContent` → isi halaman. Tanpa fallback statis: kolom yang
+ * belum diisi admin tetap kosong dan halaman menyembunyikan bagian itu.
+ */
+export function resolveCorporateContent(row: CorporateContentRow | null): CorporatePageContent {
+  if (!row) return emptyCorporateContent();
 
   return {
-    heroTitle: nonEmpty(row.heroTitle) ?? base.heroTitle,
-    intro: nonEmpty(row.intro) ?? base.intro,
-    benefits: benefits.length > 0 ? benefits : base.benefits,
-    solutions: solutions.length > 0 ? solutions : base.solutions,
-    inSpaItems: inSpaItems.length > 0 ? inSpaItems : base.inSpaItems,
+    heroTitle: nonEmpty(row.heroTitle) ?? "",
+    intro: nonEmpty(row.intro) ?? "",
+    benefits: (row.benefits ?? []).filter((b) => b.trim() !== ""),
+    solutions: readSolutions(row.solutions),
+    inSpaItems: (row.inSpaItems ?? []).filter((b) => b.trim() !== ""),
     inSpaHtml: hasVisibleText(row.inSpaHtml) ? row.inSpaHtml : null,
     inOfficeHtml: hasVisibleText(row.inOfficeHtml) ? row.inOfficeHtml : null,
     stepsHtml: hasVisibleText(row.stepsHtml) ? row.stepsHtml : null,
     pic: {
-      name: nonEmpty(row.picName) ?? base.pic.name,
-      email: nonEmpty(row.picEmail) ?? base.pic.email,
-      phone: nonEmpty(row.picPhone) ?? base.pic.phone,
+      name: nonEmpty(row.picName) ?? "",
+      email: nonEmpty(row.picEmail) ?? "",
+      phone: nonEmpty(row.picPhone) ?? "",
     },
   };
 }
 
 /**
- * Foto "Past Collaborations": belum ada klien sama sekali → 3 foto bawaan;
- * sudah ada klien → foto dokumentasi klien yang tayang, berurutan.
+ * Foto "Past Collaborations" dari dokumentasi klien yang tayang, berurutan.
+ * Belum ada klien → daftar kosong dan bagiannya disembunyikan.
  */
 export function collabPhotosFor(
   clients: readonly CorporateClientItem[] | null,
 ): CollabPhoto[] {
-  if (clients === null) return staticCollabPhotos();
+  if (clients === null) return [];
   return clients.flatMap((client) =>
     client.photoUrls.map((src) => ({
       src,

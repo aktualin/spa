@@ -26,6 +26,11 @@ import { buildStaticCatalogSeed } from "../src/lib/domain/catalog-seed.ts";
 import { escapeHtml } from "../src/lib/domain/corporate.ts";
 import { buildStaticMenuSeed } from "../src/lib/domain/menu-seed.ts";
 import { slugify } from "../src/lib/domain/slug.ts";
+import {
+  staticCorporateContent,
+  staticCorporatePrograms,
+  staticCorporateSteps,
+} from "../src/lib/domain/corporate.ts";
 import { seedContent } from "./seed-content.mts";
 
 loadEnv({ path: ".env.local", quiet: true });
@@ -279,6 +284,57 @@ async function seedJournal() {
   }
   console.log(
     `✔ ${journalPosts.length} artikel journal, ${categoryNames.length} kategori journal`,
+  );
+}
+
+async function seedCorporate() {
+  const content = staticCorporateContent();
+
+  await prisma.corporateContent.upsert({
+    where: { id: "singleton" },
+    create: {
+      id: "singleton",
+      heroTitle: content.heroTitle,
+      intro: content.intro,
+      benefits: content.benefits,
+      solutions: content.solutions,
+      inSpaItems: content.inSpaItems,
+      picName: content.pic.name,
+      picEmail: content.pic.email,
+      picPhone: content.pic.phone,
+    },
+    // Tidak menimpa: suntingan admin menang.
+    update: {},
+  });
+
+  // Program & langkah hanya diisi bila tabelnya benar-benar kosong, supaya
+  // baris yang sengaja dihapus admin tidak muncul lagi tiap seed dijalankan.
+  const programCount = await prisma.corporateProgram.count();
+  if (programCount === 0) {
+    await prisma.corporateProgram.createMany({
+      data: staticCorporatePrograms().map((item, index) => ({
+        name: item.name,
+        description: item.description,
+        features: item.features,
+        isPublished: true,
+        sortOrder: index,
+      })),
+    });
+  }
+
+  const stepCount = await prisma.corporateStep.count();
+  if (stepCount === 0) {
+    await prisma.corporateStep.createMany({
+      data: staticCorporateSteps().map((item, index) => ({
+        title: item.title,
+        body: item.body,
+        sortOrder: index,
+      })),
+    });
+  }
+
+  console.log(
+    `✔ konten corporate (program: ${programCount === 0 ? "diisi" : "sudah ada"}, langkah: ${stepCount === 0 ? "diisi" : "sudah ada"})`,
   );
 }
 
@@ -570,6 +626,7 @@ try {
     await seedSiteSettings();
     await seedWhatsAppTemplates();
     await seedBranches();
+    await seedCorporate();
     await seedContent(prisma);
     await seedLegalPages();
     await seedMenu();

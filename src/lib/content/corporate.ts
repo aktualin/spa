@@ -5,11 +5,9 @@
  * `CorporateStep`, dan `CorporateClient` yang tayang. `CorporateInquiry` berisi
  * data pribadi (UU PDP) dan TIDAK BOLEH diakses dari kode publik/cache publik.
  *
- * Fallback per bagian (DB kosong/bermasalah) = isi desain asli, sehingga
- * tampilan tidak berubah sebelum admin mengisi apa pun:
- * - konten belum disimpan / kolom kosong → teks & daftar bawaan;
- * - tabel program/langkah kosong → program/langkah bawaan;
- * - tabel klien kosong → 3 foto "Past Collaborations" bawaan.
+ * Tanpa fallback statis: tabel kosong atau database tidak terbaca → bagian
+ * itu kosong dan halaman menyembunyikannya. Isi awalnya dipasang lewat
+ * `scripts/seed.mts`, bukan ditanam di kode render.
  */
 import { cacheLife, cacheTag } from "next/cache";
 
@@ -20,11 +18,8 @@ import {
   type CorporateProgramItem,
   type CorporateStepItem,
   collabPhotosFor,
+  emptyCorporateContent,
   resolveCorporateContent,
-  staticCollabPhotos,
-  staticCorporateContent,
-  staticCorporatePrograms,
-  staticCorporateSteps,
 } from "@/lib/domain/corporate";
 import { safeQueryWithMeta } from "@/lib/safe-query";
 
@@ -77,12 +72,10 @@ export async function getCorporatePageData(): Promise<CorporatePageData> {
         },
       });
       return resolveCorporateContent(row);
-    }, staticCorporateContent()),
+    }, emptyCorporateContent()),
 
     safeQueryWithMeta<CorporateProgramItem[]>(async () => {
       const rows = await (await db()).corporateProgram.findMany({ orderBy: ORDER });
-      // Bawaan hanya bila tabel benar-benar kosong; semua draf = tidak tampil.
-      if (rows.length === 0) return staticCorporatePrograms();
       return rows
         .filter((row) => row.isPublished)
         .map((row) => ({
@@ -92,13 +85,12 @@ export async function getCorporatePageData(): Promise<CorporatePageData> {
           features: row.features ?? [],
           imageUrl: row.imageUrl,
         }));
-    }, staticCorporatePrograms()),
+    }, []),
 
     safeQueryWithMeta<CorporateStepItem[]>(async () => {
       const rows = await (await db()).corporateStep.findMany({ orderBy: ORDER });
-      if (rows.length === 0) return staticCorporateSteps();
       return rows.map((row) => ({ id: row.id, title: row.title, body: row.body ?? "" }));
-    }, staticCorporateSteps()),
+    }, []),
 
     safeQueryWithMeta<CorporateClientItem[] | null>(async () => {
       const rows = await (await db()).corporateClient.findMany({ orderBy: ORDER });
@@ -125,6 +117,6 @@ export async function getCorporatePageData(): Promise<CorporatePageData> {
     programs: programs.data,
     steps: steps.data,
     clients: clients.data ?? [],
-    collabPhotos: clients.data === null ? staticCollabPhotos() : collabPhotosFor(clients.data),
+    collabPhotos: collabPhotosFor(clients.data),
   };
 }

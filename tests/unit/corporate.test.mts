@@ -25,6 +25,7 @@ import {
   resolveCaptchaPolicy,
   resolveCorporateContent,
   resolveInquiryRecipients,
+  emptyCorporateContent,
   staticCorporateContent,
   staticCorporatePrograms,
   staticCorporateSteps,
@@ -73,20 +74,23 @@ describe("isi bawaan = desain asli /corporate", () => {
     assert.equal(staticCorporateSteps()[0].title, "Discovery & Consultation");
   });
 
-  it("baris DB null → seluruhnya bawaan", () => {
-    assert.deepEqual(resolveCorporateContent(null), staticCorporateContent());
+  it("baris DB null → seluruhnya kosong, tanpa fallback statis", () => {
+    assert.deepEqual(resolveCorporateContent(null), emptyCorporateContent());
   });
 
-  it("kolom kosong memakai bawaan per kolom; yang terisi menimpa", () => {
+  it("kolom kosong tetap kosong; tidak diam-diam diisi teks bawaan", () => {
     const c = resolveCorporateContent(
       row({ heroTitle: "Baru", benefits: ["A", " "], picName: "Sari", picEmail: "  " }),
     );
     assert.equal(c.heroTitle, "Baru");
     assert.deepEqual(c.benefits, ["A"]);
-    assert.deepEqual(c.solutions, corporateSolutions);
-    assert.equal(c.intro, staticCorporateContent().intro);
     assert.equal(c.pic.name, "Sari");
-    assert.equal(c.pic.email, STATIC_PIC.email);
+    // Kolom yang dikosongkan admin tidak boleh kembali ke isi statis.
+    assert.deepEqual(c.solutions, []);
+    assert.equal(c.intro, "");
+    assert.equal(c.pic.email, "");
+    assert.notEqual(c.intro, staticCorporateContent().intro);
+    assert.notEqual(c.pic.email, STATIC_PIC.email);
   });
 
   it("HTML tanpa teks terlihat dianggap kosong", () => {
@@ -230,11 +234,8 @@ describe("urutan ↑/↓", () => {
 });
 
 describe("Past Collaborations", () => {
-  it("belum ada klien → 3 foto bawaan", () => {
-    assert.deepEqual(
-      collabPhotosFor(null).map((p) => p.src),
-      [...STATIC_COLLAB_PHOTOS],
-    );
+  it("belum ada klien → tidak ada foto kolaborasi sama sekali", () => {
+    assert.deepEqual(collabPhotosFor(null), []);
   });
 
   it("ada klien → foto dokumentasi klien berurutan", () => {
