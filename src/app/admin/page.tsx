@@ -3,14 +3,20 @@ import Link from "next/link";
 import { requireSession } from "@/lib/auth";
 import { autoBackupHealth } from "@/lib/domain/backup";
 import {
-  CONTENT_SPOTS,
   dashboardAlerts,
   emptyContentSpots,
+  journalStatusSegments,
+  monthBuckets,
+  monthlyTrend,
   promoEndingSoonRange,
   type DashboardAlert,
+  type JournalStatusKey,
+  type JournalStatusSegment,
+  type TrendPoint,
 } from "@/lib/domain/admin-dashboard";
 import { prisma } from "@/lib/prisma";
 
+import { StatusDonut, TrendArea, TrendBars } from "./_components/dashboard-charts";
 import {
   groupedModulesForRole,
   modulesForRole,
@@ -45,6 +51,10 @@ export default async function AdminDashboardPage({
     : null;
   const forbiddenRoles = forbiddenLabel ? rolesForPath(params.forbidden!) : [];
 
+  const now = new Date();
+  const buckets = monthBuckets(now, 6);
+  const chartSince = buckets[0]!.start;
+
   // Ringkasan tidak boleh membuat dashboard kosong saat DB bermasalah —
   // dashboard tetap tampil dengan nilai 0 dan catatan error.
   let summary: Summary = {
@@ -55,10 +65,16 @@ export default async function AdminDashboardPage({
     eventsUpcoming: 0,
   };
   let alerts: DashboardAlert[] = [];
+  let journalTrend: TrendPoint[] = monthlyTrend([], buckets);
+  let inquiryTrend: TrendPoint[] = monthlyTrend([], buckets);
+  let statusSegments: JournalStatusSegment[] = journalStatusSegments({
+    PUBLISHED: 0,
+    SCHEDULED: 0,
+    DRAFT: 0,
+  });
   let summaryError = false;
 
   try {
-    const now = new Date();
     const endingSoon = promoEndingSoonRange(now);
     // Status backup hanya diambil untuk ADMIN: modul Backup & Status memang
     // tertutup untuk EDITOR, jadi EDITOR tidak perlu diberi tahu soal itu.
@@ -76,6 +92,9 @@ export default async function AdminDashboardPage({
       promosEndingSoon,
       spotCounts,
       lastAutoBackup,
+      journalDates,
+      inquiryDates,
+      journalStatusRows,
     ] = await Promise.all([
       prisma.treatment.count({ where: { isPublished: true } }),
       prisma.package.count({ where: { isPublished: true } }),
@@ -111,6 +130,18 @@ export default async function AdminDashboardPage({
             select: { createdAt: true },
           })
         : Promise.resolve(null),
+      prisma.journalPost.findMany({
+        where: { status: "PUBLISHED", publishedAt: { gte: chartSince } },
+        select: { publishedAt: true },
+      }),
+      prisma.corporateInquiry.findMany({
+        where: { createdAt: { gte: chartSince } },
+        select: { createdAt: true },
+      }),
+      prisma.journalPost.groupBy({
+        by: ["status"],
+        _count: { _all: true },
+      }),
     ]);
 
     summary = {
@@ -129,16 +160,50 @@ export default async function AdminDashboardPage({
       emptyContent: emptyContentSpots(spotCounts),
       backup: isAdmin ? autoBackupHealth(lastAutoBackup?.createdAt ?? null, now) : null,
     });
+
+    journalTrend = monthlyTrend(
+      journalDates
+        .map((row) => row.publishedAt)
+        .filter((date): date is Date => date !== null),
+      buckets,
+    );
+    inquiryTrend = monthlyTrend(
+      inquiryDates.map((row) => row.createdAt),
+      buckets,
+    );
+
+    const statusCounts: Record<JournalStatusKey, number> = {
+      PUBLISHED: 0,
+      SCHEDULED: 0,
+      DRAFT: 0,
+    };
+    for (const row of journalStatusRows) {
+      statusCounts[row.status] = row._count._all;
+    }
+    statusSegments = journalStatusSegments(statusCounts);
   } catch {
     summaryError = true;
   }
 
+  const journalTotal = journalTrend.reduce((sum, point) => sum + point.value, 0);
+  const inquiryTotal = inquiryTrend.reduce((sum, point) => sum + point.value, 0);
+  const formattedDate = new Intl.DateTimeFormat("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "Asia/Jakarta",
+  }).format(now);
+  const roleNote =
+    session.role === "ADMIN"
+      ? "Akses penuh, termasuk pengaturan sistem dan akun admin."
+      : "Mengelola konten situs. Pengaturan sistem hanya bisa dibuka ADMIN.";
+
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-6xl">
       {params.forbidden ? (
         <p
           role="alert"
-          className="mb-4 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800"
+          className="mb-4 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800"
         >
           {forbiddenLabel
             ? `Anda tidak punya akses ke modul “${forbiddenLabel}”. Modul ini hanya bisa dibuka role ${forbiddenRoles.join(" atau ")}.`
@@ -149,98 +214,163 @@ export default async function AdminDashboardPage({
       {params.password === "changed" ? (
         <p
           role="status"
-          className="mb-4 rounded-md bg-green-50 px-3 py-2 text-sm text-green-800"
+          className="mb-4 rounded-xl bg-green-50 px-4 py-3 text-sm text-green-800"
         >
           Kata sandi berhasil diganti. Sesi di perangkat lain sudah dikeluarkan.
         </p>
       ) : null}
 
-      <h1 className="text-xl font-semibold text-neutral-900">
-        Selamat datang, {session.email}
-      </h1>
-      <p className="mt-1 text-sm text-neutral-600">
-        Anda masuk sebagai <strong>{session.role}</strong>.{" "}
-        {session.role === "ADMIN"
-          ? "Anda dapat mengelola seluruh modul, termasuk pengaturan sistem dan akun admin."
-          : "Anda dapat mengelola modul konten website KAMA Spa. Pengaturan sistem (akun admin, kontak & umum, backup) hanya untuk role ADMIN."}
-      </p>
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">
+            Dashboard
+          </p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-neutral-900">
+            Ringkasan
+          </h1>
+          <p className="mt-1 text-sm text-neutral-500">
+            <span className="font-medium text-neutral-700">{session.email}</span>
+            {" · "}
+            {session.role}
+          </p>
+          <p className="mt-0.5 text-xs text-neutral-400">{roleNote}</p>
+        </div>
+        <p className="text-xs text-neutral-400">Data per {formattedDate}</p>
+      </header>
 
-      <h2 className="mt-6 text-sm font-semibold text-neutral-800">
-        Perlu perhatian
-      </h2>
-      <AlertList alerts={alerts} />
+      <section className="mt-7">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <StatCard label="Treatment terbit" value={summary.treatmentsPublished} />
+          <StatCard label="Package terbit" value={summary.packages} />
+          <StatCard label="Promo aktif" value={summary.promosActive} />
+          <StatCard label="Journal terbit" value={summary.journalPublished} />
+          <StatCard label="Event mendatang" value={summary.eventsUpcoming} />
+        </div>
+      </section>
 
-      <h2 className="mt-6 text-sm font-semibold text-neutral-800">
-        Modul yang bisa Anda buka
-      </h2>
-      {groups.map((group) => (
-        <section key={group.id} className="mt-4">
-          <h3 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-500">
-            {group.label}
-          </h3>
-          <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {group.modules.map((m) => (
-              <li key={m.no}>
-                {m.ready ? (
-                  <Link
-                    href={m.href}
-                    className="block h-full rounded-md border border-neutral-200 bg-white px-3 py-2 hover:border-neutral-400"
-                  >
-                    <span className="block text-sm text-neutral-800">{m.label}</span>
-                    <span className="mt-0.5 block text-xs text-neutral-500">{m.hint}</span>
-                  </Link>
-                ) : (
-                  <span className="block h-full rounded-md border border-dashed border-neutral-200 px-3 py-2 text-sm text-neutral-400">
-                    {m.label} (segera)
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
+      <section className="mt-8">
+        <div>
+          <h2 className="text-sm font-semibold text-neutral-900">Tren konten</h2>
+          <p className="mt-0.5 text-xs text-neutral-400">
+            Enam bulan terakhir · waktu Jakarta
+          </p>
+        </div>
+        <div className="mt-3 grid gap-3 lg:grid-cols-3">
+          <ChartCard
+            title="Journal terbit"
+            subtitle={`${journalTotal} artikel`}
+          >
+            <TrendBars
+              points={journalTrend}
+              label="Journal terbit per bulan"
+              suffix=" artikel"
+            />
+          </ChartCard>
+          <ChartCard
+            title="Inquiry corporate"
+            subtitle={`${inquiryTotal} inquiry`}
+          >
+            <TrendArea
+              points={inquiryTrend}
+              label="Inquiry corporate per bulan"
+              suffix=" inquiry"
+            />
+          </ChartCard>
+          <ChartCard
+            title="Status journal"
+            subtitle={`${summary.journalPublished} terbit`}
+          >
+            <StatusDonut
+              segments={statusSegments}
+              label="Komposisi status journal"
+            />
+          </ChartCard>
+        </div>
+      </section>
 
-      <h2 className="mt-8 text-sm font-semibold text-neutral-800">
-        Isi situs saat ini
-      </h2>
-      <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <StatCard label="Treatment published" value={summary.treatmentsPublished} />
-        <StatCard label="Package published" value={summary.packages} />
-        <StatCard label="Promo aktif" value={summary.promosActive} />
-        <StatCard
-          label="Artikel journal published"
-          value={summary.journalPublished}
-        />
-        <StatCard label="Event mendatang" value={summary.eventsUpcoming} />
-      </div>
+      <section className="mt-8">
+        <div className="flex items-center gap-2">
+          <h2 className="text-sm font-semibold text-neutral-900">
+            Perlu perhatian
+          </h2>
+          {alerts.length > 0 ? (
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold tabular-nums text-amber-700">
+              {alerts.length}
+            </span>
+          ) : null}
+        </div>
+        <AlertList alerts={alerts} />
+      </section>
+
+      <section className="mt-8">
+        <h2 className="text-sm font-semibold text-neutral-900">Modul</h2>
+        <p className="mt-0.5 text-xs text-neutral-400">
+          Dikelompokkan mengikuti alur kerja: katalog, konten, halaman, lalu
+          pengaturan sistem.
+        </p>
+        {groups.map((group) => (
+          <div key={group.id} className="mt-4">
+            <div className="flex items-center gap-3">
+              <h3 className="text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-400">
+                {group.label}
+              </h3>
+              <span aria-hidden className="h-px flex-1 bg-neutral-200/80" />
+            </div>
+            <ul className="mt-2 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+              {group.modules.map((m) => (
+                <li key={m.no}>
+                  {m.ready ? (
+                    <Link
+                      href={m.href}
+                      className="group flex h-full flex-col rounded-xl border border-neutral-200/80 bg-white px-4 py-3 transition hover:border-cocoa/40 hover:shadow-sm"
+                    >
+                      <span className="text-[13px] font-medium text-neutral-800 group-hover:text-cocoa">
+                        {m.label}
+                      </span>
+                      <span className="mt-0.5 line-clamp-2 text-[11px] leading-relaxed text-neutral-400">
+                        {m.hint}
+                      </span>
+                    </Link>
+                  ) : (
+                    <span className="flex h-full flex-col rounded-xl border border-dashed border-neutral-200 px-4 py-3 text-[13px] text-neutral-400">
+                      {m.label} (segera)
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </section>
 
       {summaryError ? (
-        <p className="mt-4 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">
+        <p className="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
           Ringkasan konten tidak dapat dimuat karena kesalahan database. Halaman
           dashboard tetap bisa digunakan.
         </p>
       ) : null}
 
-      <div className="mt-6 rounded-lg border border-neutral-200 bg-white p-5">
-        <p className="text-sm text-neutral-700">
-          Progres modul: <strong>{ready}</strong> dari{" "}
-          <strong>{modules.length}</strong> modul siap digunakan.
+      <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-neutral-200/80 bg-white px-4 py-3">
+        <p className="text-xs text-neutral-500">
+          Progres modul{" "}
+          <strong className="font-semibold text-neutral-800">{ready}</strong>{" "}
+          dari <strong className="font-semibold text-neutral-800">{modules.length}</strong>
         </p>
         <div
-          className="mt-3 h-2 w-full overflow-hidden rounded-full bg-neutral-100"
+          className="h-1.5 min-w-24 flex-1 overflow-hidden rounded-full bg-neutral-100"
           role="progressbar"
           aria-valuenow={ready}
           aria-valuemin={0}
           aria-valuemax={modules.length}
         >
           <div
-            className="h-full bg-neutral-900 transition-all"
+            className="h-full rounded-full bg-cocoa transition-all"
             style={{ width: `${(ready / modules.length) * 100}%` }}
           />
         </div>
-        <p className="mt-3 text-xs text-neutral-500">
-          Modul bertanda “segera” pada menu samping sedang dalam pengerjaan
-          (Tahap 2 — target 30 November 2026).
+        <p className="text-[11px] text-neutral-400">
+          Modul “segera” sedang dalam pengerjaan (Tahap 2 — target 30 November
+          2026).
         </p>
       </div>
     </div>
@@ -293,7 +423,7 @@ async function contentSpotCounts(): Promise<Record<string, number>> {
 function AlertList({ alerts }: { alerts: DashboardAlert[] }) {
   if (alerts.length === 0) {
     return (
-      <p className="mt-2 rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-600">
+      <p className="mt-3 rounded-xl border border-neutral-200/80 bg-white px-4 py-3 text-sm text-neutral-500">
         Tidak ada yang perlu ditindaklanjuti. Semua bagian situs sudah terisi,
         tidak ada inquiry baru, dan tidak ada promo yang segera berakhir.
       </p>
@@ -301,26 +431,36 @@ function AlertList({ alerts }: { alerts: DashboardAlert[] }) {
   }
 
   return (
-    <ul className="mt-2 space-y-2">
+    <ul className="mt-3 space-y-2">
       {alerts.map((alert) => (
         <li key={alert.id}>
           <Link
             href={alert.href}
-            className={`flex items-start gap-3 rounded-lg border px-4 py-3 transition hover:border-neutral-400 ${
+            className={`flex items-start gap-3 rounded-xl border px-4 py-3 transition ${
               alert.tone === "attention"
-                ? "border-amber-200 bg-amber-50"
-                : "border-neutral-200 bg-white"
+                ? "border-amber-200 bg-amber-50/60 hover:border-amber-300"
+                : "border-neutral-200/80 bg-white hover:border-neutral-300"
             }`}
           >
+            <span
+              aria-hidden
+              className={`mt-1.5 size-1.5 shrink-0 rounded-full ${
+                alert.tone === "attention" ? "bg-amber-500" : "bg-neutral-300"
+              }`}
+            />
+            <span className="min-w-0 flex-1">
+              <span className="block text-[13px] font-medium text-neutral-900">
+                {alert.label}
+              </span>
+              <span className="mt-0.5 block text-xs leading-relaxed text-neutral-500">
+                {alert.detail}
+              </span>
+            </span>
             {alert.count === undefined ? null : (
-              <span className="mt-0.5 shrink-0 rounded-md bg-neutral-900 px-2 py-0.5 text-xs font-semibold text-white">
+              <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold tabular-nums text-neutral-700 ring-1 ring-neutral-200">
                 {alert.count}
               </span>
             )}
-            <span className="min-w-0">
-              <span className="block text-sm font-medium text-neutral-900">{alert.label}</span>
-              <span className="block text-xs text-neutral-600">{alert.detail}</span>
-            </span>
           </Link>
         </li>
       ))}
@@ -330,9 +470,35 @@ function AlertList({ alerts }: { alerts: DashboardAlert[] }) {
 
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-lg border border-neutral-200 bg-white p-4">
-      <p className="text-sm text-neutral-600">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-neutral-900">{value}</p>
+    <div className="rounded-xl border border-neutral-200/80 bg-white px-4 py-4">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-400">
+        {label}
+      </p>
+      <p className="mt-2 text-3xl font-semibold tabular-nums tracking-tight text-neutral-900">
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function ChartCard({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-xl border border-neutral-200/80 bg-white p-4 sm:p-5">
+      <div className="flex items-baseline justify-between gap-2">
+        <h3 className="text-xs font-semibold text-neutral-700">{title}</h3>
+        <span className="text-[11px] tabular-nums text-neutral-400">
+          {subtitle}
+        </span>
+      </div>
+      <div className="mt-3">{children}</div>
     </div>
   );
 }

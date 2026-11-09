@@ -64,10 +64,16 @@ export type AdminModule = {
 export const ADMIN_GROUPS: readonly AccessGroup[] = [
   { id: "katalog", label: "Katalog & Harga" },
   { id: "konten", label: "Konten Situs" },
-  { id: "struktur", label: "Struktur & Halaman" },
+  { id: "struktur", label: "Halaman & Navigasi" },
   { id: "sistem", label: "Pengaturan Sistem" },
 ];
 
+/**
+ * Urutan array = urutan tampil di sidebar dan kartu dashboard. Disusun
+ * mengikuti alur kerja admin: kenali katalog dulu, isi konten yang tampil di
+ * situs, atur halaman & navigasi, lalu pengaturan sistem. Nomor `no` tetap
+ * nomor modul kontrak, bukan urutan tampil.
+ */
 export const ADMIN_MODULES: readonly AdminModule[] = [
   {
     no: 1,
@@ -78,9 +84,9 @@ export const ADMIN_MODULES: readonly AdminModule[] = [
     roles: CONTENT_ROLES,
     ready: true,
     children: [
-      { label: "Add-on", href: "/admin/treatments/addons" },
       { label: "Kategori", href: "/admin/treatments/categories" },
       { label: "Packages", href: "/admin/treatments/packages" },
+      { label: "Add-on", href: "/admin/treatments/addons" },
     ],
   },
   {
@@ -109,6 +115,22 @@ export const ADMIN_MODULES: readonly AdminModule[] = [
     hint: "Produk yang tampil di halaman KAMA Retail.",
     roles: CONTENT_ROLES,
     ready: true,
+  },
+  {
+    no: 10,
+    label: "Homepage & Our Story",
+    href: "/admin/homepage",
+    group: "konten",
+    hint: "Susunan section homepage, hero, statistik, ulasan, feed Instagram, dan halaman Our Story.",
+    roles: CONTENT_ROLES,
+    ready: true,
+    children: [
+      { label: "Highlight", href: "/admin/homepage/highlights" },
+      { label: "Statistik", href: "/admin/homepage/stats" },
+      { label: "Ulasan", href: "/admin/homepage/reviews" },
+      { label: "Feed Instagram", href: "/admin/homepage/instagram" },
+      { label: "Our Story", href: "/admin/our-story" },
+    ],
   },
   {
     no: 4,
@@ -149,6 +171,20 @@ export const ADMIN_MODULES: readonly AdminModule[] = [
     ready: true,
   },
   {
+    no: 9,
+    label: "Corporate Wellness",
+    href: "/admin/corporate",
+    group: "konten",
+    hint: "Halaman Corporate Wellness beserta form dan daftar inquiry yang masuk.",
+    roles: CONTENT_ROLES,
+    ready: true,
+    children: [
+      { label: "Inquiries", href: "/admin/corporate/inquiries" },
+      { label: "PIC", href: "/admin/corporate/pic" },
+      { label: "Konten halaman", href: "/admin/corporate/content" },
+    ],
+  },
+  {
     // Modul tambahan di luar 14 modul Lampiran I; nomor 16 hanya penanda unik.
     no: 16,
     label: "Media Library",
@@ -159,34 +195,13 @@ export const ADMIN_MODULES: readonly AdminModule[] = [
     ready: true,
   },
   {
-    no: 9,
-    label: "Corporate Wellness",
-    href: "/admin/corporate",
-    group: "konten",
-    hint: "Halaman Corporate Wellness beserta form dan daftar inquiry yang masuk.",
-    roles: CONTENT_ROLES,
-    ready: true,
-    children: [
-      { label: "Konten halaman", href: "/admin/corporate/content" },
-      { label: "PIC", href: "/admin/corporate/pic" },
-      { label: "Inquiries", href: "/admin/corporate/inquiries" },
-    ],
-  },
-  {
-    no: 10,
-    label: "Homepage & Our Story",
-    href: "/admin/homepage",
+    no: 11,
+    label: "Menu Navigasi",
+    href: "/admin/menu",
     group: "struktur",
-    hint: "Susunan section homepage, hero, statistik, ulasan, feed Instagram, dan halaman Our Story.",
+    hint: "Tautan di header, mega-menu, menu mobile, dan footer.",
     roles: CONTENT_ROLES,
     ready: true,
-    children: [
-      { label: "Highlight", href: "/admin/homepage/highlights" },
-      { label: "Statistik", href: "/admin/homepage/stats" },
-      { label: "Ulasan", href: "/admin/homepage/reviews" },
-      { label: "Feed Instagram", href: "/admin/homepage/instagram" },
-      { label: "Our Story", href: "/admin/our-story" },
-    ],
   },
   {
     // Modul tambahan di luar 14 modul Lampiran I; nomor 15 hanya penanda unik.
@@ -206,15 +221,6 @@ export const ADMIN_MODULES: readonly AdminModule[] = [
     href: "/admin/page-copy",
     group: "struktur",
     hint: "Judul section, label tombol, dan teks pendek yang tersebar di seluruh halaman.",
-    roles: CONTENT_ROLES,
-    ready: true,
-  },
-  {
-    no: 11,
-    label: "Menu Navigasi",
-    href: "/admin/menu",
-    group: "struktur",
-    hint: "Tautan di header, mega-menu, menu mobile, dan footer.",
     roles: CONTENT_ROLES,
     ready: true,
   },

@@ -158,3 +158,129 @@ export function promoEndingSoonRange(
 ): { gte: Date; lte: Date } {
   return { gte: now, lte: new Date(now.getTime() + days * 24 * 60 * 60 * 1000) };
 }
+
+/* ── Grafik dashboard ──────────────────────────────────────────────────── */
+
+/** Satu bulan kalender WIB (UTC+7) yang dipakai sebagai keranjang grafik. */
+export type MonthBucket = {
+  key: string;
+  label: string;
+  /** Batas awal & akhir dalam UTC; `end` eksklusif. */
+  start: Date;
+  end: Date;
+};
+
+export type TrendPoint = {
+  key: string;
+  label: string;
+  value: number;
+};
+
+const WIB_OFFSET_MS = 7 * 60 * 60 * 1000;
+const MONTH_LABELS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "Mei",
+  "Jun",
+  "Jul",
+  "Agu",
+  "Sep",
+  "Okt",
+  "Nov",
+  "Des",
+] as const;
+
+/**
+ * `count` bulan terakhir sampai bulan berjalan (WIB), urut dari terlama ke
+ * terbaru. Dipakai untuk sumbu-x grafik dashboard.
+ */
+export function monthBuckets(now: Date, count = 6): MonthBucket[] {
+  if (count <= 0) return [];
+  const wibNow = new Date(now.getTime() + WIB_OFFSET_MS);
+  const lastYear = wibNow.getUTCFullYear();
+  const lastMonth = wibNow.getUTCMonth();
+  const buckets: MonthBucket[] = [];
+
+  for (let offset = count - 1; offset >= 0; offset -= 1) {
+    const rawMonth = lastMonth - offset;
+    const year = lastYear + Math.floor(rawMonth / 12);
+    const month = ((rawMonth % 12) + 12) % 12;
+    const nextYear = month === 11 ? year + 1 : year;
+    const nextMonth = month === 11 ? 0 : month + 1;
+
+    buckets.push({
+      key: `${year}-${String(month + 1).padStart(2, "0")}`,
+      label: MONTH_LABELS[month]!,
+      start: new Date(Date.UTC(year, month, 1) - WIB_OFFSET_MS),
+      end: new Date(Date.UTC(nextYear, nextMonth, 1) - WIB_OFFSET_MS),
+    });
+  }
+
+  return buckets;
+}
+
+/** Menghitung jumlah `values` per keranjang bulan; nilai di luar rentang diabaikan. */
+export function monthlyTrend(
+  values: readonly Date[],
+  buckets: readonly MonthBucket[],
+): TrendPoint[] {
+  const counts = buckets.map(() => 0);
+
+  for (const value of values) {
+    const time = value.getTime();
+    for (let index = 0; index < buckets.length; index += 1) {
+      const bucket = buckets[index]!;
+      if (time >= bucket.start.getTime() && time < bucket.end.getTime()) {
+        counts[index] += 1;
+        break;
+      }
+    }
+  }
+
+  return buckets.map((bucket, index) => ({
+    key: bucket.key,
+    label: bucket.label,
+    value: counts[index]!,
+  }));
+}
+
+export type JournalStatusKey = "PUBLISHED" | "SCHEDULED" | "DRAFT";
+
+export type JournalStatusSegment = {
+  key: JournalStatusKey;
+  label: string;
+  value: number;
+  /** Porsi 0–1 terhadap total; 0 saat total masih kosong. */
+  share: number;
+};
+
+const JOURNAL_STATUS_META: readonly {
+  key: JournalStatusKey;
+  label: string;
+}[] = [
+  { key: "PUBLISHED", label: "Terbit" },
+  { key: "SCHEDULED", label: "Terjadwal" },
+  { key: "DRAFT", label: "Draf" },
+];
+
+/** Komposisi status Journal untuk donut chart; urut terbit → terjadwal → draf. */
+export function journalStatusSegments(
+  counts: Readonly<Record<JournalStatusKey, number>>,
+): JournalStatusSegment[] {
+  const total = JOURNAL_STATUS_META.reduce(
+    (sum, item) => sum + Math.max(0, counts[item.key] ?? 0),
+    0,
+  );
+
+  return JOURNAL_STATUS_META.map((item) => {
+    const value = Math.max(0, counts[item.key] ?? 0);
+    return {
+      key: item.key,
+      label: item.label,
+      value,
+      share: total === 0 ? 0 : value / total,
+    };
+  });
+}
