@@ -163,3 +163,29 @@ describe("SEC-05/06 — pemeriksaan same-origin", () => {
     assert.equal(isStateChangingMethod("delete"), true);
   });
 });
+
+/**
+ * Saklar `ADMIN_AUTH_DISABLED` membuka /admin dan /api/admin/* untuk publik —
+ * termasuk data inquiry (UU PDP) dan unduhan backup database. Boleh dinyalakan
+ * sementara di mesin sendiri, tapi tidak boleh ikut ter-commit.
+ *
+ * Nilainya dibaca dari sumbernya sebagai teks, bukan diimpor: src/lib/session.ts
+ * menarik dependensi runtime Next.js yang tidak tersedia di `node --test`.
+ */
+describe("saklar login admin", () => {
+  it("ADMIN_AUTH_DISABLED harus false di repositori", async () => {
+    const { readFile } = await import("node:fs/promises");
+    const source = await readFile(
+      new URL("../../src/lib/session.ts", import.meta.url),
+      "utf8",
+    );
+    const match = /export const ADMIN_AUTH_DISABLED = (true|false);/.exec(source);
+
+    assert.ok(match, "Deklarasi ADMIN_AUTH_DISABLED tidak ditemukan di src/lib/session.ts.");
+    assert.equal(
+      match[1],
+      "false",
+      "ADMIN_AUTH_DISABLED bernilai true: /admin dan /api/admin/* terbuka tanpa login. Kembalikan ke false sebelum commit.",
+    );
+  });
+});
