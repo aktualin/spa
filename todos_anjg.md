@@ -25,13 +25,21 @@ Legenda: ⏳ belum · 🔄 sedang jalan · ⚠️ butuh aksi/keputusan user
 4. **Reviews kosong** — `TestimonialsSection` sekarang `return null` bila tidak ada ulasan terbit; judul "Reviews" tidak lagi tampil tanpa kartu.
 5. **Login admin dimatikan sementara** — `ADMIN_AUTH_DISABLED = true` di `src/lib/session.ts`; proxy membebaskan `/admin` + `/api/admin`, `getSession()` memakai akun ADMIN aktif pertama (email `admin@kamaspa.id`).
 
-Verifikasi terakhir: `npx tsc --noEmit` lolos, `node --test tests/unit/*.test.mts` 503/503 lolos, `npm run build` sukses. Seed **belum** dijalankan.
+6. **Sisa hardcode** — selesai lewat modul **Teks Halaman** (`ContentBlock` + `/admin/page-copy`). Seluruh teks di tabel "sisa hardcode" lama (label KAMA Journal, #kamaspa, Follow Us, Want to experience KAMA first, Main Benefits, Essential Services, Membership Plans) sekarang dari DB.
+7. **Sidebar admin berkelompok** — 19 modul dibagi jadi Katalog & Harga, Konten Situs, Struktur & Halaman, Pengaturan Sistem; bisa diciutkan (tersimpan di localStorage), halaman aktif ditandai dengan aturan awalan terpanjang.
+8. **Petunjuk konteks per modul** — tiap modul punya `hint` "konten ini tampil di mana", dipakai tooltip sidebar, kartu dashboard, dan banner di atas isi modul.
+9. **Dashboard ringkasan** — panel "Perlu perhatian": artikel terjadwal lewat waktu, backup otomatis terlambat/belum pernah sukses (ADMIN saja), inquiry baru, promo berakhir ≤7 hari, dan tiap bagian situs yang tabelnya masih kosong.
+10. **Kategori Journal jadi tabel sendiri** — `JournalCategory` (slug, isPublished, sortOrder) + modul Journal › Kategori dengan geser urutan ↑/↓. Migrasi `20261109120000_journal_categories` mengisi dari kolom teks lama lalu membuangnya. Form artikel memakai dropdown.
+11. **Halaman bawaan terdaftar di modul Halaman & URL** — 16 route bawaan ditampilkan lengkap dengan modul pengisi isinya dan tautan ke entri SEO-nya.
+
+Verifikasi terakhir: `npx tsc --noEmit` lolos, `node --test tests/unit/*.test.mts` 526/526 lolos, `npm run build` sukses. Seed **belum** dijalankan, migrasi `20261109120000_journal_categories` **belum** dijalankan ke database.
 
 ---
 
 ## ⚠️ Aksi user / langkah manual
 
 - [ ] **Aktifkan kembali login sebelum deploy** — ubah `ADMIN_AUTH_DISABLED` menjadi `false` di `src/lib/session.ts`. Selama `true`, siapa pun bisa membuka `/admin` dan memanggil `/api/admin/*` (tanpa login).
+- [ ] **Jalankan `npx prisma migrate deploy`** — migrasi `20261109120000_journal_categories` memindahkan kategori Journal ke tabel sendiri dan membuang kolom `JournalPost.category`. Jalankan sebelum seed.
 - [ ] **Jalankan `node scripts/seed.mts`** setelah pekerjaan di atas selesai. User sudah menyetujui ("konten halaman utama dijadikan seed di admin"). Dampak bila belum dijalankan:
   - `/privacy-policy` & `/terms-conditions` **404** (isinya sudah pindah ke `StaticPage`)
   - Judul & paragraf "What's New" dan judul "Reviews" kosong di homepage
@@ -71,32 +79,29 @@ Catatan: `src/data/content.ts` tinggal dipakai sebagai tipe/fallback statis terb
 ## ⏳ Permintaan user 9 Nov 2026 yang belum dikerjakan
 
 ### 1. Rombak layout admin (keempat area dipilih user)
-- [ ] **Sidebar berkelompok** — 19+ modul dikelompokkan (Konten, Katalog, Pengaturan, Sistem), tandai halaman aktif, bisa diciutkan.
-- [ ] **Dashboard ringkasan yang berguna** — inquiry baru, artikel terjadwal, promo akan berakhir, section yang masih kosong, status backup.
-- [ ] **Konsistensi form & daftar** — samakan pola tombol simpan, pesan sukses/galat, konfirmasi hapus, dan kontrol urutan (↑/↓) di seluruh modul.
-- [ ] **Petunjuk konteks per modul** — tiap modul menjelaskan singkat konten itu tampil di mana pada situs. Berguna untuk training & serah terima.
+- [x] **Sidebar berkelompok** — selesai. `ADMIN_GROUPS` di `src/app/admin/modules.ts`, render di `src/app/admin/admin-nav.tsx`.
+- [x] **Dashboard ringkasan yang berguna** — selesai. Logika murni di `src/lib/domain/admin-dashboard.ts`.
+- [ ] **Konsistensi form & daftar** — samakan pola tombol simpan, pesan sukses/galat, konfirmasi hapus, dan kontrol urutan (↑/↓) di seluruh modul. Catatan: ada dua kit yang hidup berdampingan — `admin/settings/_components/form-ui` dan `admin/promos/_kit/list-ui`; satukan dulu sebelum menyapu modul.
+- [x] **Petunjuk konteks per modul** — selesai lewat field `hint` tiap modul.
 
 ### 2. Audit "dinamis + ada urutannya"
-- [ ] Pastikan **kategori** (treatment, gallery, journal) benar-benar dari DB dan `sortOrder`-nya tercermin di web.
-- [ ] Pastikan **menu** dinamis dan berurutan di header, footer, dan mobile (3 level). Sudah diaudit OK sebelumnya — verifikasi ulang setelah perubahan mega-menu selesai.
+- [x] **Kategori** — treatment (`catalog.ts`) dan gallery (`gallery.ts`) sudah `orderBy: [{ sortOrder }, { name }]`. Journal dulu tidak punya urutan sama sekali; sekarang sudah lewat tabel `JournalCategory`.
+- [x] **Menu** — `buildMenuTree` mengurutkan per `sortOrder` lalu label lalu id, batas 3 level dijaga `validateParent`, dan HEADER/MOBILE/FOOTER dibangun dari pohon yang sama. Tercakup `tests/unit/menu.test.mts`.
 
 ### 3. Setiap halaman dibuat di admin
-- [ ] Pastikan **setiap halaman publik punya barisnya di modul Halaman** (`StaticPage`), bukan hanya halaman legal. Periksa: Home, Our Story, Treatments, Gallery, Events, Promos, Gift Card, Corporate Wellness, Journal, KAMA Retail.
-- [ ] Setiap halaman bisa diatur slug, judul, meta title/description, OG image, dan status draft/published dari admin.
+- [x] **Setiap halaman publik punya barisnya di modul Halaman** — selesai, tapi tidak sebagai baris `StaticPage`. Halaman bawaan (Home, Our Story, Treatments, Gallery, Events, Promos, Gift Card, Corporate, Journal, Retail, Contact, dst.) adalah route dengan template sendiri dan slug-nya ada di `RESERVED_ROOT_SEGMENTS`, jadi tidak bisa dipindahkan ke `StaticPage` tanpa membuang tata letaknya. Modul Halaman & URL kini menampilkannya di tabel "Halaman bawaan situs" lengkap dengan modul pengisi isi dan tautan SEO-nya.
+- [x] **Meta title/description + OG image** — sudah bisa diatur per halaman lewat modul SEO (`PageSeo.ogImageUrl`), termasuk untuk halaman bawaan.
+- [ ] **Slug & status draft/published untuk halaman bawaan** — belum ada dan butuh keputusan: alamatnya hardcode di `src/app/`, dan menyembunyikan mis. `/gallery` akan mematikan tautan menu yang menunjuk ke sana. Halaman bebas (`StaticPage`) sudah punya keduanya.
 
 ---
 
-## ⏳ Sisa hardcode yang belum punya rumah di DB
+## ✅ Sisa hardcode — sudah punya rumah di DB
 
-| Teks | Lokasi | Catatan |
-|---|---|---|
-| Label "KAMA Journal" per kartu | `src/components/home/sections.tsx:36` | Milik `HomepageHighlight`, bukan `HomepageSection`. Butuh kolom `sourceLabel`, atau cukup andalkan `tag` yang sudah ada |
-| "#kamaspa", "Follow Us" | `src/components/home/socials.tsx:57,69` | Butuh kolom teks |
-| "Want to experience KAMA first?" | `src/app/contact/page.tsx:86` | Butuh kolom teks |
-| "Main Benefits", "KAMA Essential Services", "Membership Plans", "Syarat & Ketentuan" | `src/app/membership/page.tsx:65,92,137-138,195` | Butuh kolom teks di `MembershipProgram` |
-| Banner membership homepage | `src/components/home/hero.tsx:170-192` | Teks/potongan statis `src/data/content` dipakai sebagai fallback bila `HomepageSection`/`MembershipProgram` kosong |
-
----
+Semua teks di daftar lama sekarang berasal dari `ContentBlock` lewat modul
+**Teks Halaman** (`/admin/page-copy`); definisi kuncinya di
+`src/lib/domain/page-copy.ts`. `src/data/content.ts` tinggal dipakai sebagai
+tipe dan isi awal form admin (mis. `staticOurStory()`), bukan untuk dirender
+ke pengunjung.
 
 ## ⏳ Hutang teknis & verifikasi
 
