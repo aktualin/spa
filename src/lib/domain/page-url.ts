@@ -27,6 +27,7 @@ export const RESERVED_ROOT_SEGMENTS: readonly string[] = [
   "gift-card",
   "membership",
   "menu",
+  "newsletter",
   "our-story",
   "promos",
   "retail",

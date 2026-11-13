@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ArrowRight, Email, Facebook, Instagram, TikTok } from "./icons";
 import { CopyrightYear } from "./copyright-year";
+import { NewsletterForm } from "./forms/newsletter-form";
+import { getBranches } from "@/lib/content/branches";
 import { getNavigationData } from "@/lib/content/navigation";
 import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { getSiteSettings, getWhatsAppTemplate } from "@/lib/content/site";
@@ -17,14 +19,19 @@ const socialIcons = {
 } as const;
 
 export async function Footer() {
-  const [{ footer: footerLinks }, settings, memberTemplate, pageCopy] = await Promise.all([
+  const [{ footer: footerLinks }, settings, memberTemplate, pageCopy, branches] = await Promise.all([
     getNavigationData(),
     getSiteSettings(),
     getWhatsAppTemplate("membership"),
     getPageCopy(),
+    getBranches(),
   ]);
   const copyright = copy(pageCopy, "global.copyright");
   const connectEyebrow = copy(pageCopy, "global.connect_eyebrow");
+  const newsletterTitle = copy(pageCopy, "global.newsletter_title") || "Newsletter";
+  const newsletterDescription =
+    copy(pageCopy, "global.newsletter_description") ||
+    "Dapatkan info promo dan penawaran terbaru KAMA Spa.";
   const partnershipIntro = settings.partnershipIntro || copy(pageCopy, "global.partnership_intro");
   const privacyLabel = copy(pageCopy, "global.privacy_label");
   const termsLabel = copy(pageCopy, "global.terms_label");
@@ -124,6 +131,16 @@ export async function Footer() {
                       {settings.partnershipEmail}
                     </a>
                   </p>
+                ) : null}
+
+                {branches.length > 0 ? (
+                  <div className="flex flex-col gap-3 pt-2">
+                    <div className="flex flex-col gap-1">
+                      <span className="eyebrow text-cream-soft/60">{newsletterTitle}</span>
+                      <p className="text-caption text-cream-soft/70">{newsletterDescription}</p>
+                    </div>
+                    <NewsletterForm branches={branches} />
+                  </div>
                 ) : null}
               </div>
             </div>

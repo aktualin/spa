@@ -64,6 +64,12 @@ export const corporateInquiryLimiter = createRateLimiter({
   windowMs: 10 * 60 * 1000, // 5 permintaan per 10 menit per IP
 });
 
+/** Limitir yang dipakai endpoint signup newsletter. */
+export const newsletterSubscribeLimiter = createRateLimiter({
+  limit: 5,
+  windowMs: 10 * 60 * 1000, // 5 permintaan per 10 menit per IP
+});
+
 /** Limitir login admin — lapis kedua setelah penguncian akun di database. */
 export const loginLimiter = createRateLimiter({
   limit: 10,

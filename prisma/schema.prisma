@@ -52,6 +52,7 @@ model AdminUser {
   passwordChangedAt  DateTime?
 
   mediaUploads MediaAsset[]
+  newsletterCampaigns NewsletterCampaign[]
   backupRuns   BackupRun[]
 
   createdAt DateTime @default(now())
@@ -715,6 +716,8 @@ model Branch {
   isPublished Boolean @default(true)
   sortOrder   Int     @default(0)
 
+  newsletterSubscribers NewsletterSubscriber[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -983,4 +986,105 @@ model PageView {
   @@index([createdAt])
   @@index([path, createdAt])
   @@index([visitorId, createdAt])
+}
+
+/**
+ * ---------- Modul 21: Newsletter ----------
+ */
+
+enum NewsletterSubscriberStatus {
+  ACTIVE
+  UNSUBSCRIBED
+}
+
+enum NewsletterCampaignStatus {
+  DRAFT
+  SENDING
+  SENT
+  FAILED
+}
+
+enum NewsletterSendStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+// Satu baris per email; re-subscribe setelah unsubscribe meng-upsert baris
+// ini (bukan baris baru) — email tetap unik secara global.
+model NewsletterSubscriber {
+  id       String                     @id @default(cuid())
+  email    String                     @unique
+  branchId String?
+  branch   Branch?                    @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  status   NewsletterSubscriberStatus @default(ACTIVE)
+
+  // Token acak, tidak bisa ditebak — satu-satunya "kredensial" unsubscribe
+  // tanpa login. Tidak dirotasi otomatis supaya tautan di email lama tetap jalan.
+  unsubscribeToken String @unique
+
+  subscribedAt   DateTime  @default(now())
+  unsubscribedAt DateTime?
+
+  sends NewsletterSend[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+// Singleton: header/footer global + pengaturan pengirim, dipakai semua campaign.
+model NewsletterSettings {
+  id                String  @id @default("singleton")
+  headerHtml        String?
+  footerHtml        String?
+  senderName        String?
+  replyTo           String?
+  physicalAddress   String?
+  unsubscribeNotice String?
+
+  updatedAt DateTime @updatedAt
+}
+
+model NewsletterCampaign {
+  id          String                   @id @default(cuid())
+  subject     String
+  previewText String?
+  bodyHtml    String
+  status      NewsletterCampaignStatus @default(DRAFT)
+
+  createdById String?
+  createdBy   AdminUser? @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  sentAt         DateTime?
+  recipientCount Int       @default(0)
+  successCount   Int       @default(0)
+  failureCount   Int       @default(0)
+
+  sends NewsletterSend[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, createdAt])
+}
+
+// Log per-penerima: membuat pengiriman idempotent/resumable (retry tidak
+// mengirim ganda) dan daftar kegagalan untuk ditelusuri admin.
+model NewsletterSend {
+  id           String               @id @default(cuid())
+  campaignId   String
+  campaign     NewsletterCampaign   @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  subscriberId String
+  subscriber   NewsletterSubscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  status       NewsletterSendStatus @default(PENDING)
+  error        String?
+  sentAt       DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([campaignId, subscriberId])
+  @@index([campaignId, status])
 }

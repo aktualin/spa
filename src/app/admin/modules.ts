@@ -265,6 +265,20 @@ export const ADMIN_MODULES: readonly AdminModule[] = [
     children: [{ label: "Template WhatsApp", href: "/admin/settings/whatsapp" }],
   },
   {
+    // Modul tambahan di luar 14 modul Lampiran I; nomor 21 hanya penanda unik.
+    no: 21,
+    label: "Newsletter",
+    href: "/admin/newsletter",
+    group: "konten",
+    hint: "Formulir newsletter di footer dan kampanye email ke subscriber.",
+    roles: CONTENT_ROLES,
+    ready: true,
+    children: [
+      { label: "Subscriber", href: "/admin/newsletter/subscribers" },
+      { label: "Pengaturan", href: "/admin/newsletter/settings" },
+    ],
+  },
+  {
     no: 14,
     label: "Pengguna Admin",
     href: "/admin/users",
