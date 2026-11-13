@@ -2,18 +2,22 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { Navigation } from "@/components/navigation";
+import { DeferredNavigation } from "@/components/public/deferred-navigation";
 import { Footer } from "@/components/footer";
 import { ArrowLeft, Check } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
 import { PackageCard } from "@/components/public/package-card";
 import { WaLink } from "@/components/public/wa-button";
+import { ImageCarousel } from "@/components/image-carousel";
 import { getCatalogSlugs, getPackage, getPackages } from "@/lib/content/catalog";
+import { getCatalogImagesBySlug } from "@/lib/content/content-images";
 import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
 import { formatDuration } from "@/lib/domain/pricing";
 import { formatIdr } from "@/lib/format";
 import { whatsAppHref } from "@/lib/content/whatsapp";
+import { RichText } from "@/components/rich-text";
+import { toPlainText } from "@/lib/domain/rich-text";
 
 type PackagePageProps = {
   params: Promise<{ slug: string }>;
@@ -39,7 +43,7 @@ export async function generateMetadata({
     title: pkg.seoTitle ?? pkg.name,
     description:
       pkg.seoDescription ??
-      pkg.description ??
+      (toPlainText(pkg.description, 160) || null) ??
       `${pkg.name} di KAMA Spa — isi paket, durasi, dan harga.`,
   });
 }
@@ -49,7 +53,7 @@ export default async function PackagePage({ params }: PackagePageProps) {
   const pageCopy = await getPageCopy();
   return (
     <>
-      <Navigation />
+      <DeferredNavigation />
       <Suspense
         fallback={<PackageFallback title={copy(pageCopy, "catalog.package.loading_title")} />}
       >
@@ -76,9 +80,20 @@ function PackageFallback({ title }: { title: string }) {
 
 async function PackageContent({ params }: PackagePageProps) {
   const { slug } = await params;
-  const [pkg, pageCopy] = await Promise.all([getPackage(slug), getPageCopy()]);
+  const [pkg, pageCopy, galleryImages] = await Promise.all([
+    getPackage(slug),
+    getPageCopy(),
+    getCatalogImagesBySlug(slug),
+  ]);
 
   if (!pkg) notFound();
+
+  // Gambar utama selalu jadi slide pertama; galeri admin menyusul. Satu
+  // gambar dirender <img> biasa, lebih dari satu jadi carousel.
+  const gallery = [
+    ...(pkg.imageUrl ? [{ imageUrl: pkg.imageUrl, altText: null }] : []),
+    ...galleryImages,
+  ];
 
   const others = (await getPackages()).filter((p) => p.slug !== slug).slice(0, 3);
   const waHref = await whatsAppHref("package", {
@@ -107,11 +122,7 @@ async function PackageContent({ params }: PackagePageProps) {
                 <h1 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
                   {pkg.name}
                 </h1>
-                {pkg.description ? (
-                  <p className="max-w-[52ch] text-lead text-cocoa/70">
-                    {pkg.description}
-                  </p>
-                ) : null}
+                <RichText value={pkg.description} className="max-w-[52ch] text-lead text-cocoa/70" />
                 <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
                   {pkg.durationMin ? (
                     <span className="text-caption text-cocoa/60">
@@ -129,13 +140,12 @@ async function PackageContent({ params }: PackagePageProps) {
                 </div>
               </div>
 
-              {pkg.imageUrl ? (
+              {gallery.length > 0 ? (
                 <div className="image-container aspect-[4/3] w-full overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={pkg.imageUrl}
+                  <ImageCarousel
+                    images={gallery}
                     alt={pkg.name}
-                    className="image-cover"
+                    imageClassName="image-cover"
                   />
                 </div>
               ) : null}

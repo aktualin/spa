@@ -11,6 +11,7 @@ import {
   SaveButton,
   inputClass,
 } from "../../promos/_kit/form-ui";
+import { RichTextField } from "../../rich-text-field";
 
 export type StepFormData = { id: string | null; title: string; body: string };
 
@@ -47,16 +48,14 @@ export function CorporateStepForm({ step }: { step: StepFormData }) {
           />
         </Field>
 
-        <Field label="Keterangan" htmlFor="body" hint="Contoh: Understand your goals.">
-          <textarea
-            id="body"
-            name="body"
-            defaultValue={step.body}
-            rows={3}
-            maxLength={500}
-            className={inputClass}
-          />
-        </Field>
+        <RichTextField
+          name="body"
+          label="Keterangan"
+          defaultValue={step.body}
+          folder="corporate"
+          hint="Contoh: Understand your goals."
+          compact
+        />
 
         <ErrorAlert message={state.error} />
 

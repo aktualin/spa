@@ -11,7 +11,7 @@ test("AUTH-12: halaman admin tanpa login dialihkan ke login dengan next", async 
 }) => {
   await page.goto("/admin/treatments");
   await expect(page).toHaveURL(/\/admin\/login\?next=%2Fadmin%2Ftreatments$/);
-  await expect(page.getByRole("heading", { name: "Dashboard Admin" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
 });
 
 test("AUTH-13: cookie sesi palsu diperlakukan seperti belum login", async ({
@@ -47,8 +47,8 @@ test("halaman login terpisah dari frontend publik dan tidak diindeks", async ({
 test("AUTH-02/03: kredensial salah memberi pesan umum", async ({ page }) => {
   await page.goto("/admin/login");
   await page.getByLabel("Email").fill(`tidak-ada-${Date.now()}@contoh.test`);
-  await page.getByLabel("Kata Sandi").fill("kata-sandi-salah-sekali");
-  await page.getByRole("button", { name: "Masuk" }).click();
+  await page.getByLabel("Password").fill("kata-sandi-salah-sekali");
+  await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page.getByText("Email atau kata sandi salah.")).toBeVisible();
 });
 

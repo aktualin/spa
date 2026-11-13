@@ -9,6 +9,7 @@ import type { PrismaClient } from "@prisma/client";
 import { membership as homeMembership, priceDisclaimer } from "../src/data/content.ts";
 import { membership as pageMembership } from "../src/data/pages.ts";
 import { staticMembershipProgram } from "../src/lib/domain/membership.ts";
+import { asset } from "../src/lib/asset-url.ts";
 
 type SectionSeed = {
   key: string;
@@ -27,7 +28,7 @@ const HOMEPAGE_SECTIONS: SectionSeed[] = [
     key: "hero",
     title: "Relax. Refresh. (Repeat).",
     subtitle: "Massage • Spa • Corporate Wellness",
-    imageUrl: "/img/kama/incense-smoke-poster.jpg",
+    imageUrl: asset("img/kama/incense-smoke-poster.jpg"),
     ctaLabel: "Book Now",
     ctaHref: "/contact",
     legacyTitles: ["Hero"],
@@ -36,7 +37,7 @@ const HOMEPAGE_SECTIONS: SectionSeed[] = [
     key: "membership-banner",
     title: homeMembership.title,
     subtitle: homeMembership.body,
-    imageUrl: "/img/kama/07-flower-bowl.jpg",
+    imageUrl: asset("img/kama/07-flower-bowl.jpg"),
     imageAlt: "KAMA Spa treatment room",
     ctaLabel: homeMembership.cta,
     ctaHref: homeMembership.href,
@@ -589,10 +590,22 @@ export async function seedContent(prisma: PrismaClient): Promise<void> {
     }
     if (!settings.bookNowLabel?.trim()) update.bookNowLabel = "Book Now";
     if (!settings.bookNowHref?.trim()) update.bookNowHref = "/contact";
-    if (Object.keys(update).length > 0) {
-      await prisma.siteSettings.update({ where: { id: "singleton" }, data: update });
+    // Galeri menu book (section #gallery di /menu): 10 halaman scan + PDF di
+    // bucket S3 — dulu statis di public/img, kini dikelola dari Pengaturan.
+    const menuScans =
+      (settings.menuScanUrls ?? []).length === 0
+        ? Array.from({ length: 10 }, (_, i) =>
+            asset(`img/kama/menu/menu-page-${String(i + 1).padStart(2, "0")}.jpg`),
+          )
+        : null;
+    if (!settings.menuPdfUrl?.trim()) update.menuPdfUrl = asset("img/kama/menu/kama-menu-2026.pdf");
+    if (Object.keys(update).length > 0 || menuScans) {
+      await prisma.siteSettings.update({
+        where: { id: "singleton" },
+        data: { ...update, ...(menuScans ? { menuScanUrls: menuScans } : {}) },
+      });
     }
-    console.log("✔ pengaturan teks footer/partnership");
+    console.log("✔ pengaturan teks footer/partnership & galeri menu");
   }
 
   console.log(

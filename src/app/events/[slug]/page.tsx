@@ -19,6 +19,8 @@ import { getEvent } from "@/lib/content/events";
 import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
 import { whatsAppHref } from "@/lib/content/whatsapp";
+import { RichText } from "@/components/rich-text";
+import { toPlainText } from "@/lib/domain/rich-text";
 
 export async function generateMetadata({
   params,
@@ -33,7 +35,7 @@ export async function generateMetadata({
   }
   return withPageSeo(`/events/${event.slug}`, {
     title: event.seoTitle ?? event.title,
-    description: event.seoDescription ?? event.description ?? undefined,
+    description: event.seoDescription ?? (toPlainText(event.description, 160) || undefined),
     openGraph: event.coverUrl
       ? { images: [{ url: event.coverUrl, alt: event.title }] }
       : undefined,
@@ -95,7 +97,7 @@ async function EventContent({
       <PublicPageHeader
         eyebrow={formatEventDate(event.startDate, event.endDate)}
         title={event.title}
-        description={event.description ?? undefined}
+        description={toPlainText(event.description, 220) || undefined}
       >
         <div className="button-group mt-4 flex flex-wrap gap-3">
           {/* Pendaftaran hanya untuk event yang belum lewat. */}
@@ -139,9 +141,7 @@ async function EventContent({
               {copy(pageCopy, "events.detail.title")}
             </h2>
             {event.description ? (
-              <p className="max-w-[70ch] text-lead text-cocoa/80">
-                {event.description}
-              </p>
+              <RichText value={event.description} className="max-w-[70ch] text-lead text-cocoa/80" />
             ) : (
               <PublicEmptyState
                 title={copy(pageCopy, "events.detail.empty_title")}

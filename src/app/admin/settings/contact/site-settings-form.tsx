@@ -365,7 +365,7 @@ export function SiteSettingsForm({
           <Field
             label="Gambar halaman menu"
             htmlFor="menuScanUrls"
-            hint={`Satu URL gambar per baris, urut sesuai tampil (maks. ${MAX_MENU_SCANS}). Ambil URL dari Media Library atau isi path internal /img/...`}
+            hint={`Satu URL gambar per baris, urut sesuai tampil (maks. ${MAX_MENU_SCANS}). Ambil URL https:// dari Media Library.`}
           >
             <textarea
               id="menuScanUrls"
@@ -380,7 +380,7 @@ export function SiteSettingsForm({
           <Field
             label="Berkas PDF menu"
             htmlFor="menuPdfUrl"
-            hint="URL https:// atau path internal (/img/...). Kosongkan bila tidak ada PDF."
+            hint="URL https:// (unggah PDF ke Media Library atau tautan Google Drive). Kosongkan bila tidak ada PDF."
           >
             <input
               id="menuPdfUrl"

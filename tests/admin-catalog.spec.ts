@@ -19,7 +19,7 @@ loadEnv({ path: ".env.local", quiet: true });
 const connectionString = process.env.DATABASE_URL;
 let prisma: PrismaClient | null = null;
 function db(): PrismaClient {
-  prisma ??= new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
+  prisma ??= new PrismaClient({ adapter: new PrismaPg({ connectionString }, { schema: process.env.DATABASE_SCHEMA || "public" }) });
   return prisma;
 }
 
@@ -71,8 +71,8 @@ test.afterAll(async () => {
 async function login(page: Page) {
   await page.goto("/admin/login?next=/admin/treatments");
   await page.getByLabel("Email").fill(EMAIL);
-  await page.getByLabel("Kata Sandi").fill(PASSWORD);
-  await page.getByRole("button", { name: "Masuk" }).click();
+  await page.getByLabel("Password").fill(PASSWORD);
+  await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page).toHaveURL((url) => url.pathname === "/admin/treatments", { timeout: SAVE_TIMEOUT });
 }
 

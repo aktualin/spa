@@ -9,6 +9,7 @@ import { version as reactVersion } from "react";
 import rootPackage from "../../../package.json";
 
 import { envPresence, shortCommit, siteUrlInfo, type EnvPresence } from "@/lib/domain/backup";
+import { dbTable } from "@/lib/db-schema";
 import { prisma } from "@/lib/prisma";
 import { getSiteUrl } from "@/lib/site-url";
 
@@ -245,7 +246,7 @@ export async function getMigrationInfo(): Promise<MigrationInfo> {
   try {
     const rows = await prisma.$queryRaw<
       { migration_name: string; finished_at: Date | null; rolled_back_at: Date | null }[]
-    >`SELECT migration_name, finished_at, rolled_back_at FROM _prisma_migrations ORDER BY started_at DESC`;
+    >`SELECT migration_name, finished_at, rolled_back_at FROM ${dbTable("_prisma_migrations")} ORDER BY started_at DESC`;
     const applied = rows.filter((r) => r.finished_at && !r.rolled_back_at);
     const pending = rows.filter((r) => !r.finished_at && !r.rolled_back_at);
     return {

@@ -14,6 +14,7 @@ import {
   SaveButton,
   inputClass,
 } from "../../settings/_components/form-ui";
+import { RichTextField } from "../../rich-text-field";
 
 export type CategoryFormData = {
   id: string | null;
@@ -122,16 +123,13 @@ export function CategoryForm({
           </select>
         </Field>
 
-        <Field label="Deskripsi" htmlFor="description">
-          <textarea
-            id="description"
-            name="description"
-            defaultValue={category.description}
-            rows={4}
-            maxLength={2000}
-            className={inputClass}
-          />
-        </Field>
+        <RichTextField
+          name="description"
+          label="Deskripsi"
+          defaultValue={category.description}
+          folder="categories"
+          compact
+        />
 
         <ImageField name="imageUrl" label="Foto" folder="categories" defaultValue={category.imageUrl} />
 

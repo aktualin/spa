@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { requireRole, requireSession } from "@/lib/auth";
 import { CONTENT_TAGS } from "@/lib/content/tags";
+import { parseContentImageRows } from "@/lib/domain/content-image";
 import {
   InvalidPriceError,
   parseDurationMin,
@@ -16,6 +17,9 @@ import { SLUG_PATTERN } from "@/lib/domain/slug";
 import { packagePath, recordPathMoves } from "@/lib/path-moves";
 import { prisma } from "@/lib/prisma";
 import { deleteImageByUrl } from "@/lib/storage";
+import { richTextInput } from "@/lib/domain/rich-text";
+
+import { deleteContentImages, syncContentImages } from "./content-images";
 
 export type ActionState = { error: string | null; ok?: boolean };
 
@@ -86,7 +90,7 @@ function readForm(formData: FormData) {
     slug: formData.get("slug"),
     subtitle: formData.get("subtitle") ?? undefined,
     quote: formData.get("quote") ?? undefined,
-    description: formData.get("description") ?? undefined,
+    description: richTextInput(formData.get("description")),
     imageUrl: formData.get("imageUrl") ?? undefined,
     priceIdr: formData.get("priceIdr") ?? "",
     durationMin: formData.get("durationMin") ?? "",
@@ -223,6 +227,10 @@ export async function savePackageAction(
     return { pkg: saved, redirectsChanged: moved };
   });
 
+  // Galeri gambar tambahan (0..N); bila lebih dari satu, halaman detail
+  // menampilkannya sebagai carousel.
+  await syncContentImages("package", pkg.id, parseContentImageRows(formData));
+
   revalidatePackages(pkg.slug, redirectsChanged);
   if (previousSlug && previousSlug !== pkg.slug) {
     revalidatePath(`/treatments/packages/${previousSlug}`);
@@ -241,6 +249,7 @@ export async function deletePackageAction(formData: FormData) {
   if (pkg.imageUrl) {
     await deleteImageByUrl(pkg.imageUrl).catch(() => {});
   }
+  await deleteContentImages("package", pkg.id);
 
   revalidatePackages(pkg.slug);
   redirect("/admin/treatments/packages?deleted=1");

@@ -13,7 +13,7 @@ import {
   validateProgramInput,
 } from "@/lib/domain/membership";
 import { parsePriceLabel } from "@/lib/domain/pricing";
-import { plainTextToHtml } from "@/lib/domain/rich-text";
+import { plainTextToHtml, richTextInput } from "@/lib/domain/rich-text";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 
@@ -75,7 +75,7 @@ export async function saveTierAction(
     name: text(formData, "name"),
     priceLabel: text(formData, "priceLabel"),
     billingNote: text(formData, "billingNote"),
-    summary: text(formData, "summary"),
+    summary: richTextInput(formData.get("summary")),
     benefits: parseBenefits(formData),
     terms: text(formData, "terms"),
     isPublished: checked(formData, "isPublished"),
@@ -163,10 +163,10 @@ export async function saveProgramAction(
   const result = validateProgramInput({
     eyebrow: String(formData.get("eyebrow") ?? ""),
     title: String(formData.get("title") ?? ""),
-    intro: String(formData.get("intro") ?? ""),
+    intro: richTextInput(formData.get("intro")),
     priceHeadline: String(formData.get("priceHeadline") ?? ""),
     bannerBody: String(formData.get("bannerBody") ?? ""),
-    servicesIntro: String(formData.get("servicesIntro") ?? ""),
+    servicesIntro: richTextInput(formData.get("servicesIntro")),
     benefitTitles: all("benefitTitle"),
     benefitBodies: all("benefitBody"),
     serviceNames: all("serviceName"),

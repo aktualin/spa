@@ -7,6 +7,7 @@ import { z } from "zod";
 
 import { requireRole, requireSession } from "@/lib/auth";
 import { CONTENT_TAGS } from "@/lib/content/tags";
+import { dbTable } from "@/lib/db-schema";
 import {
   MEDIA_HTML_COLUMNS,
   MEDIA_URL_ARRAY_COLUMNS,
@@ -420,7 +421,7 @@ export async function replaceMediaAction(
       }
 
       for (const column of MEDIA_URL_ARRAY_COLUMNS) {
-        const table = Prisma.raw(`"${column.table}"`);
+        const table = dbTable(column.table);
         const field = Prisma.raw(`"${column.field}"`);
         await tx.$executeRaw`UPDATE ${table} SET ${field} = array_replace(${field}, ${oldUrl}, ${newUrl}) WHERE ${oldUrl} = ANY(${field})`;
       }
@@ -428,7 +429,7 @@ export async function replaceMediaAction(
       // Identifier tabel/kolom berasal dari konstanta MEDIA_HTML_COLUMNS;
       // nilai URL dikirim sebagai parameter terikat.
       for (const column of MEDIA_HTML_COLUMNS) {
-        const table = Prisma.raw(`"${column.table}"`);
+        const table = dbTable(column.table);
         const field = Prisma.raw(`"${column.field}"`);
         await tx.$executeRaw`UPDATE ${table} SET ${field} = REPLACE(${field}, ${oldUrl}, ${newUrl}) WHERE strpos(${field}, ${oldUrl}) > 0`;
       }

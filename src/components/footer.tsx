@@ -6,6 +6,7 @@ import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { getSiteSettings, getWhatsAppTemplate } from "@/lib/content/site";
 import { footerSocials } from "@/lib/domain/site-settings";
 import { MEMBER_MESSAGE, waLink } from "@/lib/whatsapp";
+import { asset } from "@/lib/asset-url";
 
 /* One icon per social platform — never a generic link glyph. */
 const socialIcons = {
@@ -76,6 +77,13 @@ export async function Footer() {
             {/* Brand + tagline */}
             <div className="lg:col-span-5">
               <div className="flex flex-col gap-5">
+                <img
+                  src={asset("img/kama/logo-kama-light.png")}
+                  alt="KAMA Spa"
+                  loading="lazy"
+                  className="h-9 w-auto self-start md:h-10"
+                />
+
                 {connectEyebrow ? (
                   <span className="eyebrow text-cream-soft/70">{connectEyebrow}</span>
                 ) : null}

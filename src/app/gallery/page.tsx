@@ -12,6 +12,7 @@ import { getGalleryAlbums } from "@/lib/content/gallery";
 import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { photoAltText } from "@/lib/domain/gallery";
 import { withPageSeo } from "@/lib/content/seo";
+import { toPlainText } from "@/lib/domain/rich-text";
 
 export async function generateMetadata(): Promise<Metadata> {
   return withPageSeo("/gallery", {});
@@ -52,7 +53,7 @@ export default async function GalleryPage() {
                 <PublicSectionHeader
                   eyebrow={`${album.photos.length} ${copy(pageCopy, "gallery.photo_count_suffix")}`}
                   title={album.name}
-                  description={album.description ?? undefined}
+                  description={toPlainText(album.description) || undefined}
                 />
                 <div className="mt-8">
                   <GalleryGrid

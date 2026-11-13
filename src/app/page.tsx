@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { BookingBanner, Hero, HeroStats, MembershipBanner } from "@/components/home/hero";
+import { CustomSection } from "@/components/home/custom-section";
 import { TestimonialsSection, WhatsNewSection } from "@/components/home/sections";
 import { SocialsSection } from "@/components/home/socials";
 import { SignatureTreatmentsSection } from "@/components/public/home/signature-treatments";
@@ -75,6 +76,8 @@ export default async function Home() {
     "signature-treatments",
     "promo-highlight",
     "gallery-teaser",
+    // Section konten bebas buatan admin ikut diurutkan bersama section bawaan.
+    ...Object.keys(sections).filter((key) => key.startsWith("custom-")),
   ];
 
   const visible = order
@@ -142,7 +145,9 @@ export default async function Home() {
             case "gallery-teaser":
               return <GalleryTeaserSection key={key} section={section} copyBlocks={pageCopy} />;
             default:
-              return null;
+              return key.startsWith("custom-") && section ? (
+                <CustomSection key={key} section={section} />
+              ) : null;
           }
         })}
       </main>

@@ -10,6 +10,8 @@ import {
   type ActionState,
 } from "../../actions/packages";
 import { ImageField } from "../../image-field";
+import { MultiImageField } from "../../multi-image-field";
+import { RichTextField } from "../../rich-text-field";
 
 export type PackageItemRow = {
   treatmentId: string;
@@ -36,6 +38,7 @@ export type PackageFormData = {
   seoDescription: string;
   whatsappMessage: string;
   items: PackageItemRow[];
+  contentImages: { imageUrl: string; altText: string | null }[];
 };
 
 export type TreatmentOption = {
@@ -137,15 +140,13 @@ export function PackageForm({
           />
         </Field>
 
-        <Field label="Deskripsi" htmlFor="description">
-          <textarea
-            id="description"
-            name="description"
-            defaultValue={pkg.description}
-            rows={5}
-            className={inputClass}
-          />
-        </Field>
+        <RichTextField
+          name="description"
+          label="Deskripsi"
+          defaultValue={pkg.description}
+          folder="packages"
+          compact
+        />
 
         <Field label="Kutipan" htmlFor="quote" hint="Opsional, tampil miring di halaman detail paket.">
           <input
@@ -159,9 +160,15 @@ export function PackageForm({
 
         <ImageField
           name="imageUrl"
-          label="Gambar"
+          label="Gambar utama"
           folder="packages"
           defaultValue={pkg.imageUrl}
+        />
+
+        <MultiImageField
+          label="Galeri halaman detail"
+          folder="packages"
+          defaultImages={pkg.contentImages}
         />
 
         <div className="grid gap-4 sm:grid-cols-2">

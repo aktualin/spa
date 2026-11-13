@@ -32,7 +32,7 @@ const BANNER_DEFAULTS: Record<BannerKey, BannerDefaults> = {
 export default async function AdminHomepagePage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string }>;
+  searchParams: Promise<{ saved?: string; deleted?: string; error?: string }>;
 }) {
   await requireRole(CONTENT_ROLES);
 
@@ -89,7 +89,12 @@ export default async function AdminHomepagePage({
         </Link>
       </p>
 
-      <StatusBanner saved={params.saved} />
+      <StatusBanner saved={params.saved} deleted={params.deleted} deletedText="Section konten dihapus." />
+      {params.error === "custom-name" ? (
+        <p role="alert" className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+          Nama section konten wajib berisi huruf atau angka.
+        </p>
+      ) : null}
 
       {sections.length === 0 ? (
         <p className="mt-6 text-sm text-neutral-500">

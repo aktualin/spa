@@ -10,6 +10,8 @@ import {
   type ActionState,
 } from "../actions/treatments";
 import { ImageField } from "../image-field";
+import { MultiImageField } from "../multi-image-field";
+import { RichTextField } from "../rich-text-field";
 
 type OptionRow = { label: string; durationMin: string; priceIdr: string };
 
@@ -44,6 +46,7 @@ export type TreatmentFormData = {
   isBestSeller: boolean;
   isPublished: boolean;
   options: OptionRow[];
+  contentImages: { imageUrl: string; altText: string | null }[];
 };
 
 const initialState: ActionState = { error: null };
@@ -186,15 +189,13 @@ export function TreatmentForm({
           </Field>
         )}
 
-        <Field label="Deskripsi" htmlFor="description">
-          <textarea
-            id="description"
-            name="description"
-            defaultValue={treatment.description}
-            rows={5}
-            className={inputClass}
-          />
-        </Field>
+        <RichTextField
+          name="description"
+          label="Deskripsi"
+          defaultValue={treatment.description}
+          folder="treatments"
+          compact
+        />
 
         {isAddon ? null : (
           <Field
@@ -214,9 +215,15 @@ export function TreatmentForm({
 
         <ImageField
           name="imageUrl"
-          label="Gambar"
+          label="Gambar utama"
           folder="treatments"
           defaultValue={treatment.imageUrl}
+        />
+
+        <MultiImageField
+          label="Galeri halaman detail"
+          folder="treatments"
+          defaultImages={treatment.contentImages}
         />
 
         <fieldset className="space-y-3">

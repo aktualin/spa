@@ -5,6 +5,7 @@
  * sesi database.
  */
 
+import { dbTable } from "@/lib/db-schema";
 import { prisma } from "@/lib/prisma";
 import {
   dayBuckets,
@@ -51,7 +52,7 @@ export async function getTrafficOverview(
         to_char(("createdAt" + INTERVAL '7 hours')::date, 'YYYY-MM-DD') AS "day",
         COUNT(*)::int AS "views",
         COUNT(DISTINCT "visitorId")::int AS "visitors"
-      FROM "PageView"
+      FROM ${dbTable("PageView")}
       WHERE "createdAt" >= (to_timestamp(${since}) AT TIME ZONE 'UTC')
         AND "createdAt" < (to_timestamp(${until}) AT TIME ZONE 'UTC')
       GROUP BY 1
@@ -61,7 +62,7 @@ export async function getTrafficOverview(
       SELECT
         COUNT(DISTINCT "visitorId")::int AS "visitors",
         COUNT(DISTINCT "path")::int AS "paths"
-      FROM "PageView"
+      FROM ${dbTable("PageView")}
       WHERE "createdAt" >= (to_timestamp(${since}) AT TIME ZONE 'UTC')
         AND "createdAt" < (to_timestamp(${until}) AT TIME ZONE 'UTC')
     `,
@@ -94,7 +95,7 @@ export async function getTopPages(
       "path",
       COUNT(*)::int AS "views",
       COUNT(DISTINCT "visitorId")::int AS "uniqueVisitors"
-    FROM "PageView"
+    FROM ${dbTable("PageView")}
     WHERE "createdAt" >= (to_timestamp(${since}) AT TIME ZONE 'UTC')
       AND "createdAt" < (to_timestamp(${until}) AT TIME ZONE 'UTC')
     GROUP BY "path"

@@ -9,6 +9,7 @@ import type { HomepageSection } from "@/lib/content/homepage";
 import type { HeroSlideView } from "@/lib/domain/hero-slide";
 import { HERO_SLIDE_INTERVAL_MS } from "@/lib/domain/hero-slide";
 import { isSafeCtaHref, MOBILE_MEDIA_QUERY } from "@/lib/domain/homepage-banner";
+import { asset } from "@/lib/asset-url";
 
 type HeroSliderLabels = {
   cardEyebrow: string;
@@ -174,6 +175,14 @@ export function HeroSlider({ section, labels, slides }: HeroSliderProps) {
         <div className="container-kama relative">
           <div className="relative flex min-h-[92svh] flex-col items-center justify-center pb-12 pt-28 text-center lg:pb-44 lg:pt-36">
             <div className="flex max-w-[52rem] flex-col items-center">
+              {/* Lockup brand — momen logo utama di atas judul hero. */}
+              <img
+                src={asset("img/kama/logo-kama-light.png")}
+                alt="KAMA Spa"
+                fetchPriority="high"
+                className="mb-7 h-11 w-auto md:mb-9 md:h-14"
+              />
+
               {subtitle ? (
                 <h2 className="eyebrow text-white/85">
                   <Link href="/menu" className="transition-opacity hover:opacity-70">

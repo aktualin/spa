@@ -106,12 +106,12 @@ describe("selectHighlightCards", () => {
 describe("highlightToCard", () => {
   it("isian kosong memakai nilai bawaan kartu lama", () => {
     const card = highlightToCard(
-      row({ id: "a", title: "  Karuna  ", eyebrow: "Package", href: "/menu#packages", imageUrl: "/img/kama/06-bride.jpg" }),
+      row({ id: "a", title: "  Karuna  ", eyebrow: "Package", href: "/menu#packages", imageUrl: "https://cdn.example.com/img/kama/06-bride.jpg" }),
     );
     assert.deepEqual(card, {
       key: "a",
       href: "/menu#packages",
-      image: "/img/kama/06-bride.jpg",
+      image: "https://cdn.example.com/img/kama/06-bride.jpg",
       imageAlt: "",
       tag: "Package",
       title: "Karuna",
@@ -164,7 +164,7 @@ describe("validateHighlightInput", () => {
 
   it("menolak gambar tidak aman", () => {
     assert.equal(validateHighlightInput({ title: "A", imageUrl: "javascript:x" }).ok, false);
-    assert.equal(validateHighlightInput({ title: "A", imageUrl: "/img/kama/a.jpg" }).ok, true);
+    assert.equal(validateHighlightInput({ title: "A", imageUrl: "https://cdn.example.com/img/kama/a.jpg" }).ok, true);
   });
 
   it("label tombol tanpa tautan ditolak", () => {
@@ -239,14 +239,14 @@ describe("statistik, ulasan, feed Instagram", () => {
   it("Instagram: gambar tak aman dibuang, tautan tak aman jadi profil, maks 12", () => {
     const rows = Array.from({ length: 14 }, (_, i) => ({
       id: String(i),
-      imageUrl: "/img/a.jpg",
+      imageUrl: "https://cdn.example.com/img/a.jpg",
       isPublished: true,
       sortOrder: i,
     }));
     assert.equal(selectInstagramPosts(rows)?.length, INSTAGRAM_LIMITS.max);
     const out = selectInstagramPosts([
       { id: "x", imageUrl: "javascript:alert(1)", isPublished: true, sortOrder: 0 },
-      { id: "y", imageUrl: "/img/a.jpg", href: "javascript:alert(1)", isPublished: true, sortOrder: 1 },
+      { id: "y", imageUrl: "https://cdn.example.com/img/a.jpg", href: "javascript:alert(1)", isPublished: true, sortOrder: 1 },
     ]);
     assert.equal(out?.length, 1);
     assert.equal(out?.[0].href, null);
@@ -270,7 +270,7 @@ describe("statistik, ulasan, feed Instagram", () => {
   it("validasi Instagram", () => {
     assert.equal(validateInstagramInput({ imageUrl: "" }).ok, false);
     assert.equal(validateInstagramInput({ imageUrl: "javascript:x" }).ok, false);
-    assert.equal(validateInstagramInput({ imageUrl: "/img/a.jpg", href: "javascript:x" }).ok, false);
-    assert.equal(validateInstagramInput({ imageUrl: "/img/a.jpg", href: "https://instagram.com/p/1" }).ok, true);
+    assert.equal(validateInstagramInput({ imageUrl: "https://cdn.example.com/img/a.jpg", href: "javascript:x" }).ok, false);
+    assert.equal(validateInstagramInput({ imageUrl: "https://cdn.example.com/img/a.jpg", href: "https://instagram.com/p/1" }).ok, true);
   });
 });

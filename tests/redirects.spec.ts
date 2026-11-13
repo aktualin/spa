@@ -17,7 +17,7 @@ const connectionString = process.env.DATABASE_URL;
 let prisma: PrismaClient | null = null;
 
 function db(): PrismaClient {
-  prisma ??= new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
+  prisma ??= new PrismaClient({ adapter: new PrismaPg({ connectionString }, { schema: process.env.DATABASE_SCHEMA || "public" }) });
   return prisma;
 }
 

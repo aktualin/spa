@@ -2,13 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { Navigation } from "@/components/navigation";
+import { DeferredNavigation } from "@/components/public/deferred-navigation";
 import { Footer } from "@/components/footer";
 import { Check } from "@/components/icons";
+import { ImageCarousel } from "@/components/image-carousel";
 import { getCatalogSlugs, getMenuEntry } from "@/lib/content/catalog";
+import { getCatalogImagesBySlug } from "@/lib/content/content-images";
 import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { getSiteSettings } from "@/lib/content/site";
 import { withPageSeo } from "@/lib/content/seo";
+import { RichText } from "@/components/rich-text";
+import { toPlainText } from "@/lib/domain/rich-text";
 
 // Slug untuk prerender saat build diambil dari database, bukan daftar statis.
 export async function generateStaticParams() {
@@ -33,8 +37,8 @@ export async function generateMetadata({
     title: entry.name,
     description:
       entry.kind === "package"
-        ? `${entry.subtitle}. ${entry.description}`
-        : [entry.tagline, entry.description].filter(Boolean).join(". "),
+        ? toPlainText(`${entry.subtitle}. ${toPlainText(entry.description)}`, 160)
+        : toPlainText([entry.tagline, toPlainText(entry.description)].filter(Boolean).join(". "), 160),
   });
 }
 
@@ -50,7 +54,7 @@ export default async function TreatmentPage({
   const pageCopy = await getPageCopy();
   return (
     <>
-      <Navigation />
+      <DeferredNavigation />
       <Suspense
         fallback={
           <TreatmentFallback
@@ -87,15 +91,23 @@ async function TreatmentContent({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [entry, pageCopy, settings] = await Promise.all([
+  const [entry, pageCopy, settings, galleryImages] = await Promise.all([
     getMenuEntry(slug),
     getPageCopy(),
     getSiteSettings(),
+    getCatalogImagesBySlug(slug),
   ]);
 
   if (!entry) {
     notFound();
   }
+
+  // Gambar utama selalu jadi slide pertama; galeri admin menyusul. Satu
+  // gambar dirender <img> biasa, lebih dari satu jadi carousel.
+  const gallery = [
+    ...(entry.image ? [{ imageUrl: entry.image, altText: null }] : []),
+    ...galleryImages,
+  ];
 
   return (
     <main className="main-wrapper">
@@ -125,22 +137,22 @@ async function TreatmentContent({
               <div className="layout-row gap-xlarge">
                 <div className="sizing-grow">
                   <div className="page-hero_image image-container">
-                    <img
-                      src={entry.image}
+                    <ImageCarousel
+                      images={gallery}
                       alt={entry.name}
-                      className="image-cover"
-                      loading="eager"
+                      imageClassName="image-cover"
+                      eager
                     />
                   </div>
 
                   <div className="spacer-large" />
 
-                  <p className="body-l">{entry.description}</p>
+                  <RichText value={entry.description} className="body-l" />
 
                   {entry.kind === "package" ? (
                     <>
                       <div className="spacer-large" />
-                      <div className="text-rich-text header-l w-richtext">
+                      <div className="kama-prose text-rich-text header-l w-richtext">
                         <p>
                           <em>“{entry.quote}”</em>
                         </p>

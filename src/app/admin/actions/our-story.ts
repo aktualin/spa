@@ -19,7 +19,7 @@ const ourStorySchema = z.object({
     .trim()
     .min(1, "Judul hero wajib diisi.")
     .max(160, "Judul hero maksimal 160 karakter."),
-  // URL Supabase Storage (https://…) atau path gambar bawaan situs (/img/…).
+  // Hanya URL bucket S3 (https://…); path lokal /img/… ditolak.
   heroImageUrl: z
     .string()
     .trim()

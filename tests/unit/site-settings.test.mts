@@ -166,7 +166,7 @@ describe("siteSettingsInputSchema", () => {
         footerTagline: "  Your ritual, your pace.  ",
         bookNowLabel: " Book Now ",
         bookNowHref: "/contact",
-        menuScanUrls: [" https://cdn.example.com/menu-01.jpg ", "", "/img/menu-02.jpg"],
+        menuScanUrls: [" https://cdn.example.com/menu-01.jpg ", "", "https://cdn.example.com/img/menu-02.jpg"],
       }),
     );
     assert.equal(parsed.whatsappNumber, "6281316052040");
@@ -179,7 +179,7 @@ describe("siteSettingsInputSchema", () => {
     assert.equal(parsed.bookNowLabel, "Book Now");
     assert.deepEqual(parsed.menuScanUrls, [
       "https://cdn.example.com/menu-01.jpg",
-      "/img/menu-02.jpg",
+      "https://cdn.example.com/img/menu-02.jpg",
     ]);
     const write = toSiteSettingsWrite(parsed);
     assert.equal(write.facebookUrl, null);

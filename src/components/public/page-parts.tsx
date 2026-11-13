@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Reveal } from "@/components/reveal";
 import { ArrowRight } from "@/components/icons";
+import { RichText } from "@/components/rich-text";
 
 /**
  * Header halaman publik baru — mengikuti pola `page-hero` di halaman lama
@@ -28,7 +29,7 @@ export function PublicPageHeader({
         {title}
       </h1>
       {description ? (
-        <p className="text-lead text-cocoa/70">{description}</p>
+        <RichText value={description} className="text-lead text-cocoa/70" />
       ) : null}
       {children}
     </div>
@@ -92,7 +93,7 @@ export function PublicSectionHeader({
           {title}
         </h2>
         {description ? (
-          <p className="text-body text-cocoa/70">{description}</p>
+          <RichText value={description} className="text-body text-cocoa/70" />
         ) : null}
       </div>
       {action ? (
@@ -120,7 +121,7 @@ export function PublicEmptyState({
     <div className="flex flex-col items-start gap-2 border border-cocoa/15 bg-cream px-6 py-10">
       <h3 className="font-display text-title-sm">{title}</h3>
       {description ? (
-        <p className="text-body text-cocoa/70">{description}</p>
+        <RichText value={description} className="text-body text-cocoa/70" />
       ) : null}
     </div>
   );

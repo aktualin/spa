@@ -54,20 +54,14 @@ export function CorporateContentForm({
         />
       </Field>
 
-      <Field
+      <RichTextField
+        name="intro"
         label="Intro"
-        htmlFor="intro"
+        defaultValue={content.intro}
+        folder="corporate"
         hint='Paragraf di bawah judul "Healthy Employees Build Stronger Companies". Kosongkan untuk memakai teks bawaan.'
-      >
-        <textarea
-          id="intro"
-          name="intro"
-          defaultValue={content.intro}
-          rows={4}
-          maxLength={1000}
-          className={inputClass}
-        />
-      </Field>
+        compact
+      />
 
       <StringListField
         name="benefits"

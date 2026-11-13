@@ -39,9 +39,11 @@ describe("isSafeCtaHref", () => {
 });
 
 describe("isSafeImageUrl", () => {
-  it("menerima https dan path internal saja", () => {
+  it("hanya menerima https (bucket S3), path lokal ditolak", () => {
     assert.equal(isSafeImageUrl("https://x.supabase.co/storage/v1/a.webp"), true);
-    assert.equal(isSafeImageUrl("/img/kama/07-flower-bowl.jpg"), true);
+    assert.equal(isSafeImageUrl("https://cdn.example.com/img/kama/07-flower-bowl.jpg"), true);
+    // Path lokal ditolak: gambar hanya dari bucket S3.
+    assert.equal(isSafeImageUrl("/img/kama/07-flower-bowl.jpg"), false);
     assert.equal(isSafeImageUrl("//cdn.evil.com/a.jpg"), false);
     assert.equal(isSafeImageUrl("http://x.com/a.jpg"), false);
     assert.equal(isSafeImageUrl("data:image/png;base64,AAAA"), false);
@@ -193,7 +195,7 @@ describe("resolveBanner", () => {
   });
 
   it("alt bawaan dipakai untuk gambar bawaan, alt admin bila diisi", () => {
-    const defaults = { ...HERO_DEFAULTS, imageUrl: "/img/a.jpg", imageAlt: "Bawaan" };
+    const defaults = { ...HERO_DEFAULTS, imageUrl: "https://cdn.example.com/img/a.jpg", imageAlt: "Bawaan" };
     assert.equal(resolveBanner(legacyHero, defaults).imageAlt, "Bawaan");
     assert.equal(
       resolveBanner({ ...legacyHero, imageUrl: "https://x.co/a.webp" }, defaults).imageAlt,

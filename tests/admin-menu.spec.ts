@@ -19,7 +19,7 @@ loadEnv({ path: ".env.local", quiet: true });
 const connectionString = process.env.DATABASE_URL;
 let prisma: PrismaClient | null = null;
 function db(): PrismaClient {
-  prisma ??= new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
+  prisma ??= new PrismaClient({ adapter: new PrismaPg({ connectionString }, { schema: process.env.DATABASE_SCHEMA || "public" }) });
   return prisma;
 }
 
@@ -90,8 +90,8 @@ test.afterAll(async () => {
 async function login(page: Page) {
   await page.goto("/admin/login?next=/admin/menu");
   await page.getByLabel("Email").fill(EMAIL);
-  await page.getByLabel("Kata Sandi").fill(PASSWORD);
-  await page.getByRole("button", { name: "Masuk" }).click();
+  await page.getByLabel("Password").fill(PASSWORD);
+  await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page).toHaveURL((url) => url.pathname === "/admin/menu", { timeout: SAVE_TIMEOUT });
 }
 
@@ -105,7 +105,7 @@ async function addItem(
   fields: { label: string; type: string; url?: string; page?: boolean; locations?: string[] },
 ) {
   await opener();
-  await page.getByLabel("Label").fill(fields.label);
+  await page.getByLabel("Label", { exact: true }).fill(fields.label);
   await page.getByLabel("Tipe tautan").selectOption({ label: fields.type });
   if (fields.url) await page.getByLabel("Alamat").fill(fields.url);
   if (fields.page) await page.getByLabel("Halaman tujuan").selectOption(pageId);
@@ -148,7 +148,7 @@ test("membuat menu 3 level lewat tombol, dengan validasi", async ({ page }) => {
 
   // URL berbahaya ditolak (pesan langsung di form, dan oleh server).
   await page.getByRole("button", { name: "+ Tambah menu utama" }).click();
-  await page.getByLabel("Label").fill(`${P} Jahat`);
+  await page.getByLabel("Label", { exact: true }).fill(`${P} Jahat`);
   await page.getByLabel("Tipe tautan").selectOption({ label: "URL eksternal" });
   await page.getByLabel("Alamat").fill("javascript:alert(1)");
   await expect(page.getByText("URL eksternal harus diawali https://")).toBeVisible();
@@ -211,7 +211,7 @@ test("drag-and-drop dengan pratinjau sebelum disimpan", async ({ page }) => {
 
   await page.getByRole("button", { name: "Simpan susunan" }).click();
   // URL sudah ?saved=1 sejak langkah sebelumnya; tanda selesai = bar konfirmasi hilang.
-  await expect(page.getByText("Susunan menu berubah")).toHaveCount(0);
+  await expect(page.getByText("Susunan menu berubah")).toHaveCount(0, { timeout: SAVE_TIMEOUT });
 
   const induk = await db().menuItem.findFirst({ where: { label: L.induk } });
   const after = await db().menuItem.findFirst({ where: { label: L.seret } });

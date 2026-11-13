@@ -50,9 +50,12 @@ describe("appendSortOrders", () => {
 });
 
 describe("isPhotoUrl", () => {
-  it("menerima URL http(s) dan path lokal", () => {
+  it("hanya menerima URL https (bucket S3)", () => {
     assert.equal(isPhotoUrl("https://x.supabase.co/storage/v1/object/public/media/a.jpg"), true);
-    assert.equal(isPhotoUrl("/img/kama/01-incense.jpg"), true);
+    assert.equal(isPhotoUrl("https://cdn.example.com/img/kama/01-incense.jpg"), true);
+    // Semua media dari bucket S3: path lokal dan http polos ditolak.
+    assert.equal(isPhotoUrl("/img/kama/01-incense.jpg"), false);
+    assert.equal(isPhotoUrl("http://a/1.jpg"), false);
   });
 
   it("menolak skema lain, protocol-relative, dan kosong", () => {
@@ -65,9 +68,9 @@ describe("isPhotoUrl", () => {
 
 describe("parseBatchPhotoUrls", () => {
   it("merapikan spasi dan membuang URL kembar", () => {
-    assert.deepEqual(parseBatchPhotoUrls([" https://a/1.jpg ", "https://a/1.jpg", "/img/2.jpg"]), {
+    assert.deepEqual(parseBatchPhotoUrls([" https://a/1.jpg ", "https://a/1.jpg", "https://cdn.example.com/img/2.jpg"]), {
       ok: true,
-      urls: ["https://a/1.jpg", "/img/2.jpg"],
+      urls: ["https://a/1.jpg", "https://cdn.example.com/img/2.jpg"],
     });
   });
 

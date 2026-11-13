@@ -117,15 +117,13 @@ export function MembershipTierForm({ tier }: { tier: TierFormData }) {
           />
         </Field>
 
-        <Field label="Ringkasan" htmlFor="summary">
-          <textarea
-            id="summary"
-            name="summary"
-            defaultValue={tier.summary}
-            rows={3}
-            className={inputClass}
-          />
-        </Field>
+        <RichTextField
+          name="summary"
+          label="Ringkasan"
+          defaultValue={tier.summary}
+          folder="membership"
+          compact
+        />
 
         <fieldset className="space-y-3">
           <legend className="text-sm font-medium text-neutral-700">Benefit</legend>

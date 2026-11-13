@@ -15,6 +15,8 @@ import {
   corporateSolutions,
 } from "../../data/content.ts";
 import { moveInList } from "./media.ts";
+import { richTextLength } from "./rich-text.ts";
+import { asset } from "../asset-url.ts";
 
 /* ------------------------------------------------------------------ */
 /* Tipe data                                                           */
@@ -110,9 +112,9 @@ export const STATIC_STEPS: readonly { title: string; body: string }[] = [
 export const STATIC_COLLAB_ALT = "KAMA corporate wellness collaboration";
 
 export const STATIC_COLLAB_PHOTOS: readonly string[] = [
-  "/img/kama/corporate/06-collab-1.jpg",
-  "/img/kama/corporate/07-collab-2.jpg",
-  "/img/kama/corporate/08-collab-3.jpg",
+  asset("img/kama/corporate/06-collab-1.jpg"),
+  asset("img/kama/corporate/07-collab-2.jpg"),
+  asset("img/kama/corporate/08-collab-3.jpg"),
 ];
 
 /** Kontak PIC di banner "Let's build your wellness program." */
@@ -356,7 +358,7 @@ export function validateContentInput(input: ContentInput): Validation<ContentDat
     return { ok: false, error: `Judul hero maksimal ${CORPORATE_LIMITS.heroTitle} karakter.` };
   }
   const intro = input.intro.trim();
-  if (intro.length > CORPORATE_LIMITS.intro) {
+  if (richTextLength(intro) > CORPORATE_LIMITS.intro) {
     return { ok: false, error: `Intro maksimal ${CORPORATE_LIMITS.intro} karakter.` };
   }
 
@@ -438,11 +440,12 @@ export type ProgramData = {
 };
 
 /** URL gambar dari ImageField: http(s) atau path lokal "/…". Kosong → null. */
+/** URL gambar: hanya https:// dari bucket S3; path lokal (`/img/…`) ditolak. */
 export function readImageUrl(value: string): Validation<string | null> {
   const url = value.trim();
   if (!url) return { ok: true, data: null };
-  if (/^https?:\/\/\S+$/.test(url) || /^\/[^/\s]\S*$/.test(url)) return { ok: true, data: url };
-  return { ok: false, error: "URL gambar tidak valid." };
+  if (/^https:\/\/\S+$/.test(url)) return { ok: true, data: url };
+  return { ok: false, error: "URL gambar harus https:// (unggah lewat Media Library)." };
 }
 
 export function validateProgramInput(input: {
@@ -458,7 +461,7 @@ export function validateProgramInput(input: {
     return { ok: false, error: `Nama program maksimal ${CORPORATE_LIMITS.programName} karakter.` };
   }
   const description = input.description.trim();
-  if (description.length > CORPORATE_LIMITS.programDescription) {
+  if (richTextLength(description) > CORPORATE_LIMITS.programDescription) {
     return {
       ok: false,
       error: `Deskripsi maksimal ${CORPORATE_LIMITS.programDescription} karakter.`,
@@ -492,7 +495,7 @@ export function validateStepInput(input: {
   if (title.length > CORPORATE_LIMITS.stepTitle) {
     return { ok: false, error: `Judul langkah maksimal ${CORPORATE_LIMITS.stepTitle} karakter.` };
   }
-  if (body.length > CORPORATE_LIMITS.stepBody) {
+  if (richTextLength(body) > CORPORATE_LIMITS.stepBody) {
     return { ok: false, error: `Keterangan langkah maksimal ${CORPORATE_LIMITS.stepBody} karakter.` };
   }
   return { ok: true, data: { title, body: body || null } };

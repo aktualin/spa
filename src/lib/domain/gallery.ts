@@ -27,9 +27,9 @@ export function appendSortOrders(last: number | null, count: number): number[] {
   return Array.from({ length: Math.max(0, count) }, (_, i) => start + i);
 }
 
-/** URL foto yang sah: http(s) dari Supabase Storage atau path lokal ("/img/…"). */
+/** URL foto yang sah: hanya https:// dari bucket S3 (Supabase Storage). */
 export function isPhotoUrl(value: string): boolean {
-  return /^https?:\/\/\S+$/.test(value) || /^\/[^/\s]\S*$/.test(value);
+  return /^https:\/\/\S+$/.test(value);
 }
 
 /**

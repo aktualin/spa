@@ -66,12 +66,20 @@ export default async function EditTreatmentPage({
       isBestSeller: false,
       isPublished: true,
       options: [],
+      contentImages: [],
     };
   } else {
-    const treatment = await prisma.treatment.findUnique({
-      where: { id },
-      include: { options: { orderBy: { sortOrder: "asc" } } },
-    });
+    const [treatment, contentImages] = await Promise.all([
+      prisma.treatment.findUnique({
+        where: { id },
+        include: { options: { orderBy: { sortOrder: "asc" } } },
+      }),
+      prisma.contentImage.findMany({
+        where: { entityType: "treatment", entityId: id },
+        orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }, { id: "asc" }],
+        select: { imageUrl: true, altText: true },
+      }),
+    ]);
     if (!treatment) notFound();
 
     data = {
@@ -96,6 +104,7 @@ export default async function EditTreatmentPage({
         durationMin: String(option.durationMin),
         priceIdr: String(option.priceIdr),
       })),
+      contentImages,
     };
   }
 

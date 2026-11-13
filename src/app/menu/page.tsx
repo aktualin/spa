@@ -15,6 +15,7 @@ import {
   MenuTreatmentsGridFallback,
 } from "@/components/public/menu-data";
 import { Reveal } from "@/components/reveal";
+import { toPlainText } from "@/lib/domain/rich-text";
 
 export async function generateMetadata(): Promise<Metadata> {
   return withPageSeo("/menu", {});
@@ -115,7 +116,7 @@ export default async function MenuPage() {
                     <div className="treatment-card_body">
                       <div className="eyebrow-s text-style-allcaps">{categoryLabels[s.category]}</div>
                       <h3 className="header-s">{s.name}</h3>
-                      <div className="body-m text-color-gray">{s.description}</div>
+                      <div className="body-m text-color-gray">{toPlainText(s.description)}</div>
                       <div className="treatment-card_price-row">
                         <span className="caption-s text-color-gray">{copy(pageCopy, "menu.addon_label")}</span>
                         <span className="price-row_value">{s.price}</span>
@@ -142,7 +143,7 @@ export default async function MenuPage() {
 
           const content = (
             <div className="treatment-card_body">
-              <div className="body-m text-color-gray">{service.description}</div>
+              <div className="body-m text-color-gray">{toPlainText(service.description)}</div>
               <div className="treatment-card_price-row">
                 <span className="caption-s text-color-gray">{copy(pageCopy, "menu.addon_label")}</span>
                 <span className="price-row_value">{service.price}</span>

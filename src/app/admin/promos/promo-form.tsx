@@ -77,15 +77,13 @@ export function PromoForm({ promo }: { promo: PromoFormData }) {
           />
         </Field>
 
-        <Field label="Deskripsi" htmlFor="description">
-          <textarea
-            id="description"
-            name="description"
-            defaultValue={promo.description}
-            rows={4}
-            className={inputClass}
-          />
-        </Field>
+        <RichTextField
+          name="description"
+          label="Deskripsi"
+          defaultValue={promo.description}
+          folder="promos"
+          compact
+        />
 
         <ImageField
           name="bannerUrl"

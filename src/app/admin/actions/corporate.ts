@@ -19,6 +19,7 @@ import { CONTENT_ROLES } from "@/lib/domain/roles";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { notifyCorporateInquiry } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
+import { richTextInput } from "@/lib/domain/rich-text";
 
 export type ActionState = { error: string | null; ok?: boolean };
 
@@ -59,7 +60,7 @@ export async function saveCorporateContentAction(
 
   const result = validateContentInput({
     heroTitle: str(formData, "heroTitle"),
-    intro: str(formData, "intro"),
+    intro: richTextInput(formData.get("intro")),
     benefits: all(formData, "benefits"),
     solutionTitles: all(formData, "solutionTitle"),
     solutionItems: all(formData, "solutionItems"),

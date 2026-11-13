@@ -5,6 +5,7 @@
  */
 import { membership as homeMembership } from "../../data/content.ts";
 import { membership as pageMembership } from "../../data/pages.ts";
+import { richTextLength } from "./rich-text.ts";
 
 export type ProgramBenefit = { title: string; body: string };
 export type ProgramService = { name: string; description: string };
@@ -140,7 +141,9 @@ export function validateProgramInput(input: ProgramInput): Result {
     const value = String(input[key] ?? "").trim();
     if (!value) return { ok: false, error: `${label} wajib diisi.` };
     const max = PROGRAM_LIMITS[key];
-    if (value.length > max) {
+    // Field berformat (intro) dihitung dari teks terlihat, bukan markup HTML.
+    if (richTextLength(value) === 0) return { ok: false, error: `${label} wajib diisi.` };
+    if (richTextLength(value) > max) {
       return { ok: false, error: `${label} maksimal ${max} karakter.` };
     }
     text[key] = value;

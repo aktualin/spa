@@ -7,6 +7,10 @@
  * Tidak pernah menghapus data — konten yang sudah diedit lewat dashboard
  * akan ditimpa hanya pada field yang diseed, bukan dihapus.
  */
+// Harus import pertama: env dimuat sebelum data konten dievaluasi.
+import "./load-env.mts";
+
+import "./load-env.mts";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 import { config as loadEnv } from "dotenv";
@@ -42,7 +46,7 @@ if (!connectionString) {
   process.exit(1);
 }
 
-const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
+const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }, { schema: process.env.DATABASE_SCHEMA || "public" }) });
 
 // Katalog (kategori, treatment, add-on, package) disusun dari konten statis
 // lewat src/lib/domain/catalog-seed.ts. Seed hanya MEMBUAT yang belum ada —
@@ -188,8 +192,11 @@ async function migrateLegacyCatalog() {
     if (remaining === 0) {
       await prisma.treatmentCategory.delete({ where: { id: legacyCategory.id } });
     }
+  }
 
-    // URL lama dari halaman /treatments/all-day-spa/* tetap hidup lewat 301.
+  // URL lama dari halaman /treatments/all-day-spa/* tetap hidup lewat 301 —
+  // juga di database baru, karena tautan lama itu sudah tersebar di luar situs.
+  {
     const rules = [
       { fromPath: "/treatments/all-day-spa", toPath: "/treatments/packages" },
       ...catalogSeed.packages.map((p) => ({
@@ -534,7 +541,9 @@ async function seedMenu() {
       });
       idByKey.set(item.key, created.id);
     }
-  });
+    // Puluhan insert berurutan ke database di region lain melewati batas
+    // default 5 detik transaksi interaktif.
+  }, { timeout: 60_000, maxWait: 10_000 });
   console.log(`✔ ${items.length} item menu`);
 }
 

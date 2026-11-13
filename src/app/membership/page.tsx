@@ -15,6 +15,7 @@ import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { whatsAppHref } from "@/lib/content/whatsapp";
 import { Reveal } from "@/components/reveal";
 import { PublicEmptyState } from "@/components/public/page-parts";
+import { RichText } from "@/components/rich-text";
 
 export async function generateMetadata(): Promise<Metadata> {
   return withPageSeo("/membership", {});
@@ -61,7 +62,7 @@ export default async function MembershipPage() {
                 <div className="eyebrow-s text-style-allcaps">{membership.eyebrow}</div>
                 <h1 className="header-xxl">{membership.title}</h1>
                 <div className="spacer-medium" />
-                <p className="body-l text-color-gray">{membership.intro}</p>
+                <RichText value={membership.intro} className="body-l text-color-gray" />
                 <div className="spacer-large" />
                 <div className="button-group">
                   {joinHref ? (
@@ -118,7 +119,7 @@ export default async function MembershipPage() {
               <div className="dropdowns_content">
                 <div className="dropdowns_group-wrapper">
                   <h4 className="header-l">{copy(pageCopy, "membership.services_title")}</h4>
-                  <div className="body-m text-color-gray">{membership.servicesIntro}</div>
+                  <RichText value={membership.servicesIntro} className="body-m text-color-gray" />
                 </div>
                 <div className="dropdowns_group">
                   {membership.services.map((service) => (
@@ -183,7 +184,7 @@ export default async function MembershipPage() {
                         </span>
                         <span className="price-row_value">{plan.billingNote}</span>
                       </div>
-                      <div className="body-m text-color-gray">{plan.summary}</div>
+                      <RichText value={plan.summary} className="body-m text-color-gray" />
                       <ul className="benefit-list">
                         {plan.benefits.map((feature) => (
                           <li key={feature} className="benefit-list_item">
@@ -196,7 +197,7 @@ export default async function MembershipPage() {
                       </ul>
                       {plan.terms ? (
                         <div
-                          className="caption-s text-color-gray text-rich-text"
+                          className="kama-prose caption-s text-color-gray text-rich-text"
                           dangerouslySetInnerHTML={{
                             __html: sanitizeHtml(plainTextToHtml(plan.terms)),
                           }}
@@ -234,7 +235,7 @@ export default async function MembershipPage() {
                   <h2 className="header-l">{copy(pageCopy, "membership.terms_title")}</h2>
                   <div className="spacer-medium" />
                   <div
-                    className="body-m text-color-gray text-rich-text"
+                    className="kama-prose body-m text-color-gray text-rich-text"
                     dangerouslySetInnerHTML={{ __html: sanitizeHtml(membership.termsHtml) }}
                   />
                 </div>

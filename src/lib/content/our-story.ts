@@ -12,6 +12,7 @@ import { footerTagline, site } from "@/data/content";
 import { safeQueryWithMeta } from "@/lib/safe-query";
 
 import { CONTENT_TAGS } from "./tags";
+import { asset } from "@/lib/asset-url";
 
 export type OurStory = {
   heroTitle: string;
@@ -29,7 +30,7 @@ export type OurStory = {
 export function staticOurStory(): OurStory {
   return {
     heroTitle: "A sanctuary for deep rest.",
-    heroImageUrl: "/img/kama/07-flower-bowl.jpg",
+    heroImageUrl: asset("img/kama/07-flower-bowl.jpg"),
     philosophyHtml: `<p>${site.description}</p><p>${footerTagline}</p>`,
     valuesHtml:
       "<ul><li>Traditional healing wisdom</li><li>High-touch, unrushed service</li><li>Deep exhale, real reset</li></ul>",

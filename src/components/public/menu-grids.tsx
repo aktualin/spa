@@ -8,6 +8,7 @@ import Link from "next/link";
 
 import { Check } from "@/components/icons";
 import type { Package as StaticPackage, Treatment as StaticTreatment } from "@/data/content";
+import { toPlainText } from "@/lib/domain/rich-text";
 
 export function MassageGrid({
   items,
@@ -49,7 +50,7 @@ export function PackagesGrid({ items }: { items: StaticPackage[] }) {
           <div className="package-card_body">
             <div className="eyebrow-s text-style-allcaps">{p.subtitle}</div>
             <h3 className="header-s">{p.name}</h3>
-            <div className="body-m text-color-gray">{p.description}</div>
+            <div className="body-m text-color-gray">{toPlainText(p.description)}</div>
             <div className="package-includes">
               {p.includes.map((inc) => (
                 <span key={inc.label} className="package-includes_item">

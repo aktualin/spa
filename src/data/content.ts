@@ -1,3 +1,5 @@
+import { asset } from "../lib/asset-url.ts";
+
 export const site = {
   name: "KAMA Spa",
   tagline: "Relax. Refresh. (Repeat).",
@@ -98,14 +100,14 @@ export const nav: {
       ],
       highlights: [
         {
-          image: "/img/kama/03-oil-bowl.jpg",
+          image: asset("img/kama/03-oil-bowl.jpg"),
           badge: "new",
           eyebrow: "Just Rp 1.5jt a month",
           label: "Join KAMA Now",
           href: "/membership",
         },
         {
-          image: "/img/kama/06-bride.jpg",
+          image: asset("img/kama/06-bride.jpg"),
           badge: "new",
           eyebrow: "2 – 4 hour rituals",
           label: "All Day Spa",
@@ -131,14 +133,14 @@ export const nav: {
       ],
       highlights: [
         {
-          image: "/img/kama/05-foot-bath.jpg",
+          image: asset("img/kama/05-foot-bath.jpg"),
           badge: "new",
           eyebrow: "Wellness at work",
           label: "In-Office Program",
           href: "/corporate#in-office",
         },
         {
-          image: "/img/kama/corporate/05-lounge.jpg",
+          image: asset("img/kama/corporate/05-lounge.jpg"),
           badge: "team",
           eyebrow: "Bring your team",
           label: "In-Spa Experience",
@@ -212,7 +214,7 @@ export const treatments: Treatment[] = [
       { duration: "90 min", price: "195k" },
       { duration: "120 min", price: "245k" },
     ],
-    image: "/img/kama/02-bottle-shadows.jpg",
+    image: asset("img/kama/02-bottle-shadows.jpg"),
   },
   {
     kind: "treatment",
@@ -228,7 +230,7 @@ export const treatments: Treatment[] = [
       { duration: "90 min", price: "225k" },
       { duration: "120 min", price: "285k" },
     ],
-    image: "/img/kama/01-incense.jpg",
+    image: asset("img/kama/01-incense.jpg"),
   },
   {
     kind: "treatment",
@@ -240,7 +242,7 @@ export const treatments: Treatment[] = [
       "A focused recovery treatment designed for active bodies and everyday tension. Combining deep muscle release, targeted trigger-point pressure, assisted stretching, and a warm compress, helping to ease tight muscles, support mobility, and leave the body feeling lighter and restored.",
     note: "This treatment is not intended for injury treatment or rehabilitation.",
     prices: [{ duration: "75 min", price: "399k" }],
-    image: "/img/kama/09-leaf-drop.jpg",
+    image: asset("img/kama/09-leaf-drop.jpg"),
   },
   {
     kind: "treatment",
@@ -255,7 +257,7 @@ export const treatments: Treatment[] = [
       { duration: "60 min", price: "375k" },
       { duration: "90 min", price: "449k" },
     ],
-    image: "/img/kama/03-oil-bowl.jpg",
+    image: asset("img/kama/03-oil-bowl.jpg"),
   },
   {
     kind: "treatment",
@@ -270,7 +272,7 @@ export const treatments: Treatment[] = [
       { duration: "60 min", price: "375k" },
       { duration: "90 min", price: "449k" },
     ],
-    image: "/img/kama/04-turmeric-scrub.jpg",
+    image: asset("img/kama/04-turmeric-scrub.jpg"),
   },
   {
     kind: "treatment",
@@ -285,7 +287,7 @@ export const treatments: Treatment[] = [
       { duration: "60 min", price: "375k" },
       { duration: "90 min", price: "449k" },
     ],
-    image: "/img/kama/08-water-drop.jpg",
+    image: asset("img/kama/08-water-drop.jpg"),
   },
 ];
 
@@ -320,7 +322,7 @@ export const packages: Package[] = [
     ],
     duration: "2 hours",
     price: "650k",
-    image: "/img/kama/03-oil-bowl.jpg",
+    image: asset("img/kama/03-oil-bowl.jpg"),
   },
   {
     kind: "package",
@@ -338,7 +340,7 @@ export const packages: Package[] = [
     ],
     duration: "2 hours 30 minute",
     price: "765k",
-    image: "/img/kama/04-turmeric-scrub.jpg",
+    image: asset("img/kama/04-turmeric-scrub.jpg"),
   },
   {
     kind: "package",
@@ -358,7 +360,7 @@ export const packages: Package[] = [
     ],
     duration: "3 hours 30 minute",
     price: "1000k",
-    image: "/img/kama/05-foot-bath.jpg",
+    image: asset("img/kama/05-foot-bath.jpg"),
   },
   {
     kind: "package",
@@ -379,7 +381,7 @@ export const packages: Package[] = [
     ],
     duration: "4 hours",
     price: "1500k",
-    image: "/img/kama/06-bride.jpg",
+    image: asset("img/kama/06-bride.jpg"),
   },
 ];
 
@@ -404,7 +406,7 @@ export const additionalServices: AdditionalService[] = [
     price: "120k",
     description:
       "A gentle exfoliation that buffs away dullness and renew skin radiance. Comes in selected of home-special-blend scrubs.",
-    image: "/img/kama/04-turmeric-scrub.jpg",
+    image: asset("img/kama/04-turmeric-scrub.jpg"),
   },
   {
     name: "Body Mask",
@@ -413,7 +415,7 @@ export const additionalServices: AdditionalService[] = [
     price: "120k",
     description:
       "A nourishing body wrap that deeply hydrates and restores balance. Comes in choices of classic body mask ingredients.",
-    image: "/img/kama/06-bride.jpg",
+    image: asset("img/kama/06-bride.jpg"),
   },
   {
     name: "Bath Ritual",
@@ -422,7 +424,7 @@ export const additionalServices: AdditionalService[] = [
     price: "115k",
     description:
       "A soothing soak in the bathtub, infused with our special tea bag blend for deep relaxation and renewal.",
-    image: "/img/kama/07-flower-bowl.jpg",
+    image: asset("img/kama/07-flower-bowl.jpg"),
   },
   {
     name: "Head & Scalp Treatment",
@@ -431,7 +433,7 @@ export const additionalServices: AdditionalService[] = [
     price: "100k",
     description:
       "A calming therapy that soothes the scalp and eases stress. Using argan oil and natural ingredients.",
-    image: "/img/kama/05-foot-bath.jpg",
+    image: asset("img/kama/05-foot-bath.jpg"),
   },
   {
     name: "Face Ritual",
@@ -440,7 +442,7 @@ export const additionalServices: AdditionalService[] = [
     price: "250k",
     description:
       "An elevated acupressure-inspired treatment for the face, designed to release tension, awaken circulation, and restore natural glow.",
-    image: "/img/kama/02-bottle-shadows.jpg",
+    image: asset("img/kama/02-bottle-shadows.jpg"),
   },
 ];
 
@@ -527,7 +529,7 @@ export const locations: Location[] = [
     email: "hello@kamaspa.id",
     hours: "Mon – Sun. 10 AM – 8 PM",
     tag: "Flagship",
-    image: "/img/kama/01-incense.jpg",
+    image: asset("img/kama/01-incense.jpg"),
     mapEmbed:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d17291.65315048694!2d106.7869294620315!3d-6.249199087412654!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f1287a31b10f%3A0x76b148862b90ff6!2sKAMA%20SPA!5e0!3m2!1sid!2sid!4v1793659097369!5m2!1sid!2sid",
     mapDirections:
@@ -543,7 +545,7 @@ export const locations: Location[] = [
     email: "sudirman@kamaspa.id",
     hours: "Mon – Sun. 10 AM – 8 PM",
     tag: "Coming Soon",
-    image: "/img/kama/08-water-drop.jpg",
+    image: asset("img/kama/08-water-drop.jpg"),
     mapEmbed:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d247.89351757514058!2d106.81060279840318!3d-6.224610072272575!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f1513c917d01%3A0x7410034730367e7f!2sJl.%20Jend.%20Sudirman%20kav%2052-53%2C%20RT.5%2FRW.3%2C%20Senayan%2C%20Kec.%20Kby.%20Baru%2C%20Kota%20Jakarta%20Selatan%2C%20Daerah%20Khusus%20Ibukota%20Jakarta%2012190!5e0!3m2!1sid!2sid!4v1793659237436!5m2!1sid!2sid",
     mapDirections:
@@ -559,7 +561,7 @@ export const locations: Location[] = [
     email: "kebayoran@kamaspa.id",
     hours: "Mon – Sun. 10 AM – 8 PM",
     tag: "Coming Soon",
-    image: "/img/kama/05-foot-bath.jpg",
+    image: asset("img/kama/05-foot-bath.jpg"),
     mapEmbed:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d247.89262029726356!2d106.80129111934542!3d-6.226511218491336!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f14f3c555555%3A0x80c4367e6df44efb!2sJl.%20Asia%20Afrika%20No.8%2C%20RT.1%2FRW.3%2C%20Gelora%2C%20Kecamatan%20Tanah%20Abang%2C%20Kota%20Jakarta%20Pusat%2C%20Daerah%20Khusus%20Ibukota%20Jakarta%2010270!5e0!3m2!1sid!2sid!4v1793659291124!5m2!1sid!2sid",
     mapDirections:
@@ -584,7 +586,7 @@ export const journalPosts = [
     title: "The Roots of Javanese Healing: Sukma Laya",
     excerpt:
       "Discover the ancient rhythm of Javanese massage — deep rhythmic pressure, acupressure, and a philosophy of restoring the body's natural balance.",
-    image: "/img/kama/corporate/11-footwash.jpg",
+    image: asset("img/kama/corporate/11-footwash.jpg"),
   },
   {
     kind: "treatment",
@@ -594,7 +596,7 @@ export const journalPosts = [
     title: "Wellness at Work: A Guide to Corporate Wellness in Jakarta",
     excerpt:
       "Employee wellness is no longer just a benefit. Here is how leading teams in Jakarta build engagement, focus, and retention through meaningful reset experiences.",
-    image: "/img/kama/corporate/10-inoffice-massage.jpg",
+    image: asset("img/kama/corporate/10-inoffice-massage.jpg"),
   },
   {
     kind: "treatment",
@@ -604,7 +606,7 @@ export const journalPosts = [
     title: "Karuna: A Soulful Pre-Wedding Journey",
     excerpt:
       "A four-hour ritual designed to comfort the body, calm the mind, and illuminate the inner glow of every bride-to-be.",
-    image: "/img/kama/06-bride.jpg",
+    image: asset("img/kama/06-bride.jpg"),
   },
 ];
 

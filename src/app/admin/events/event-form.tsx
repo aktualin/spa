@@ -21,6 +21,7 @@ import {
   inputClass,
 } from "../promos/_kit/form-ui";
 import { EventStatusRules } from "./status-rules";
+import { RichTextField } from "../rich-text-field";
 
 export type EventFormData = {
   id: string | null;
@@ -155,15 +156,13 @@ function EventFields({
         />
       </Field>
 
-      <Field label="Deskripsi" htmlFor="description">
-        <textarea
-          id="description"
-          name="description"
-          defaultValue={values.description}
-          rows={5}
-          className={inputClass}
-        />
-      </Field>
+      <RichTextField
+        name="description"
+        label="Deskripsi"
+        defaultValue={values.description}
+        folder="events"
+        compact
+      />
 
       <ImageField
         name="coverUrl"

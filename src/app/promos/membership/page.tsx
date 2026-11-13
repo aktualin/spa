@@ -15,6 +15,7 @@ import { withPageSeo } from "@/lib/content/seo";
 import { plainTextToHtml } from "@/lib/domain/rich-text";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { whatsAppHref } from "@/lib/content/whatsapp";
+import { RichText } from "@/components/rich-text";
 
 export async function generateMetadata(): Promise<Metadata> {
   return withPageSeo("/promos/membership", {});
@@ -77,7 +78,7 @@ export default async function PromosMembershipPage() {
                         ) : null}
                       </div>
                       {tier.summary ? (
-                        <p className="text-body text-cocoa/70">{tier.summary}</p>
+                        <RichText value={tier.summary} className="text-body text-cocoa/70" />
                       ) : null}
                     </div>
 
@@ -96,7 +97,7 @@ export default async function PromosMembershipPage() {
 
                     {tier.terms ? (
                       <div
-                        className="mt-5 border-t border-cocoa/15 pt-4 text-body text-cocoa/70"
+                        className="kama-prose mt-5 border-t border-cocoa/15 pt-4 text-body text-cocoa/70"
                         dangerouslySetInnerHTML={{ __html: sanitizeHtml(plainTextToHtml(tier.terms)) }}
                       />
                     ) : null}

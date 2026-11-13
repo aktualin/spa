@@ -61,7 +61,7 @@ export default async function GiftCardPage() {
           <div className="container-kama py-14 md:py-16 lg:py-20">
             <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
               <div
-                className="text-rich-text max-w-[60ch] text-body text-cocoa/80"
+                className="kama-prose text-rich-text max-w-[60ch] text-body text-cocoa/80"
                 dangerouslySetInnerHTML={{
                   __html: sanitizeHtml(giftCard.bodyHtml),
                 }}
@@ -84,7 +84,7 @@ export default async function GiftCardPage() {
                   {copy(pageCopy, "gift_card.terms_title")}
                 </h2>
                 <div
-                  className="text-rich-text max-w-[70ch] text-body text-cocoa/80"
+                  className="kama-prose text-rich-text max-w-[70ch] text-body text-cocoa/80"
                   dangerouslySetInnerHTML={{ __html: sanitizeHtml(giftCard.termsHtml) }}
                 />
               </div>

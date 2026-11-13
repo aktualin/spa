@@ -14,9 +14,10 @@ import { formatEventDate } from "@/components/public/events/event-parts";
 import { getActivePromo } from "@/lib/content/promos";
 import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
-import { plainTextToHtml } from "@/lib/domain/rich-text";
+import { plainTextToHtml, toPlainText } from "@/lib/domain/rich-text";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { whatsAppHref } from "@/lib/content/whatsapp";
+import { RichText } from "@/components/rich-text";
 
 export async function generateMetadata({
   params,
@@ -34,7 +35,7 @@ export async function generateMetadata({
   }
   return withPageSeo(`/promos/${promo.slug}`, {
     title: promo.seoTitle ?? promo.title,
-    description: promo.seoDescription ?? promo.description ?? undefined,
+    description: promo.seoDescription ?? (toPlainText(promo.description, 160) || undefined),
     openGraph: promo.bannerUrl
       ? { images: [{ url: promo.bannerUrl, alt: promo.title }] }
       : undefined,
@@ -100,7 +101,7 @@ async function PromoContent({
       <PublicPageHeader
         eyebrow={formatEventDate(promo.startDate, promo.endDate)}
         title={promo.title}
-        description={promo.description ?? undefined}
+        description={toPlainText(promo.description, 220) || undefined}
       >
         <div className="button-group mt-4 flex flex-wrap gap-3">
           {waHref ? (
@@ -144,9 +145,7 @@ async function PromoContent({
                 {copy(pageCopy, "promos.detail.title")}
               </h2>
               {promo.description ? (
-                <p className="max-w-[70ch] text-lead text-cocoa/80">
-                  {promo.description}
-                </p>
+                <RichText value={promo.description} className="max-w-[70ch] text-lead text-cocoa/80" />
               ) : (
                 <PublicEmptyState
                   title={copy(pageCopy, "promos.detail.empty_title")}
@@ -161,7 +160,7 @@ async function PromoContent({
                   {copy(pageCopy, "promos.detail.terms_title")}
                 </h3>
                 <div
-                  className="text-rich-text max-w-[70ch] text-body text-cocoa/80"
+                  className="kama-prose text-rich-text max-w-[70ch] text-body text-cocoa/80"
                   dangerouslySetInnerHTML={{
                     __html: sanitizeHtml(plainTextToHtml(promo.terms)),
                   }}

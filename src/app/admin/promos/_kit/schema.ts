@@ -31,15 +31,15 @@ export const optionalText = z
   .transform((value) => (value ? value : null));
 
 /**
- * URL gambar hasil ImageField. Selain URL http(s) dari Supabase Storage,
- * path lokal ("/images/…") dari data seed juga diterima. Kosong → null.
+ * URL gambar hasil ImageField: hanya https:// dari bucket S3 (Supabase
+ * Storage); path lokal ditolak. Kosong → null.
  */
 export const optionalImageUrl = z
   .string()
   .trim()
   .optional()
   .refine(
-    (value) => !value || /^https?:\/\//.test(value) || value.startsWith("/"),
+    (value) => !value || /^https:\/\/\S+$/.test(value),
     "URL gambar tidak valid.",
   )
   .transform((value) => (value ? value : null));
@@ -49,7 +49,7 @@ export const requiredImageUrl = z
   .trim()
   .min(1, "Gambar wajib diunggah.")
   .refine(
-    (value) => /^https?:\/\//.test(value) || value.startsWith("/"),
+    (value) => /^https:\/\/\S+$/.test(value),
     "URL gambar tidak valid.",
   );
 

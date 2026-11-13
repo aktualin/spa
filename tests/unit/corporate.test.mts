@@ -193,12 +193,12 @@ describe("validasi admin", () => {
   });
 
   it("klien: foto kembar dibuang, URL tidak valid ditolak", () => {
-    const base = { name: "PT A", logoUrl: "", websiteUrl: "", photoUrls: ["/img/a.jpg", "/img/a.jpg", ""], isPublished: true };
+    const base = { name: "PT A", logoUrl: "", websiteUrl: "", photoUrls: ["https://cdn.example.com/img/a.jpg", "https://cdn.example.com/img/a.jpg", ""], isPublished: true };
     const r = validateClientInput(base);
     assert.ok(r.ok && r.data.photoUrls.length === 1);
     assert.equal(validateClientInput({ ...base, photoUrls: ["data:image/png;base64,xx"] }).ok, false);
     assert.equal(
-      validateClientInput({ ...base, photoUrls: Array.from({ length: 31 }, (_, i) => `/img/${i}.jpg`) }).ok,
+      validateClientInput({ ...base, photoUrls: Array.from({ length: 31 }, (_, i) => `https://cdn.example.com/img/${i}.jpg`) }).ok,
       false,
     );
   });

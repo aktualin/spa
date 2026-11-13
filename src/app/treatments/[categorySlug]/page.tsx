@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { Navigation } from "@/components/navigation";
+import { DeferredNavigation } from "@/components/public/deferred-navigation";
 import { Footer } from "@/components/footer";
 import { ArrowLeft } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
@@ -14,6 +14,7 @@ import { TreatmentCard } from "@/components/public/treatment-card";
 import { getCatalogSlugs, getCategory } from "@/lib/content/catalog";
 import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
+import { toPlainText } from "@/lib/domain/rich-text";
 
 type CategoryPageProps = {
   params: Promise<{ categorySlug: string }>;
@@ -39,7 +40,7 @@ export async function generateMetadata({
     title: category.seoTitle ?? category.name,
     description:
       category.seoDescription ??
-      category.description ??
+      (toPlainText(category.description, 160) || null) ??
       `${category.name} di KAMA Spa — durasi dan harga lengkap.`,
   });
 }
@@ -49,7 +50,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const pageCopy = await getPageCopy();
   return (
     <>
-      <Navigation />
+      <DeferredNavigation />
       <Suspense
         fallback={
           <CategoryFallback

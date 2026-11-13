@@ -4,6 +4,7 @@ import { Reveal } from "@/components/reveal";
 import type { PublicEvent } from "@/lib/content/events";
 import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { formatEventDateRange } from "@/lib/domain/events";
+import { toPlainText } from "@/lib/domain/rich-text";
 
 /**
  * Format tanggal event — Bahasa Indonesia, selalu dalam WIB (server Vercel
@@ -78,7 +79,7 @@ export async function EventCard({ event }: { event: PublicEvent }) {
         ) : null}
         <EventPartner event={event} />
         {event.description ? (
-          <p className="line-clamp-3 text-body text-cocoa/70">{event.description}</p>
+          <p className="line-clamp-3 text-body text-cocoa/70">{toPlainText(event.description)}</p>
         ) : null}
         <span className="mt-auto inline-flex items-center gap-2 pt-2 text-[0.9375rem] underline underline-offset-4 transition-opacity group-hover:opacity-70">
           {copy(pageCopy, "global.view_detail_label")}

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "@/components/icons";
 import { ReviewsCarousel } from "@/components/home/reviews-carousel";
 import { Reveal } from "@/components/reveal";
+import { RichText } from "@/components/rich-text";
 import type { HomepageSection } from "@/lib/content/homepage";
 import { copy, type PageCopy } from "@/lib/content/page-copy";
 import { isSafeCtaHref } from "@/lib/domain/homepage-banner";
@@ -113,6 +114,7 @@ export function WhatsNewSection({
             {description ? (
               <p className="max-w-[52ch] text-body text-cocoa/70">{description}</p>
             ) : null}
+            <RichText value={section?.bodyHtml} className="max-w-[60ch] text-body text-cocoa/70" />
           </div>
 
           {showCta ? (
@@ -165,6 +167,10 @@ export function TestimonialsSection({
             {heading}
           </h2>
         ) : null}
+        {section?.subtitle?.trim() ? (
+          <p className="mt-3 max-w-[52ch] text-body text-cocoa/70">{section.subtitle.trim()}</p>
+        ) : null}
+        <RichText value={section?.bodyHtml} className="mt-3 max-w-[60ch] text-body text-cocoa/70" />
 
         <ReviewsCarousel reviews={reviews} />
       </div>

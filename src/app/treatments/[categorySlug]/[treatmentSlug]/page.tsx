@@ -2,18 +2,22 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { Navigation } from "@/components/navigation";
+import { DeferredNavigation } from "@/components/public/deferred-navigation";
 import { Footer } from "@/components/footer";
 import { ArrowLeft } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
 import { TreatmentCard } from "@/components/public/treatment-card";
 import { WaLink } from "@/components/public/wa-button";
+import { ImageCarousel } from "@/components/image-carousel";
 import { getCatalogSlugs, getCategory, getTreatment } from "@/lib/content/catalog";
+import { getCatalogImagesBySlug } from "@/lib/content/content-images";
 import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
 import { formatDuration } from "@/lib/domain/pricing";
 import { formatIdr } from "@/lib/format";
 import { whatsAppHref } from "@/lib/content/whatsapp";
+import { RichText } from "@/components/rich-text";
+import { toPlainText } from "@/lib/domain/rich-text";
 
 type TreatmentPageProps = {
   params: Promise<{ categorySlug: string; treatmentSlug: string }>;
@@ -39,7 +43,7 @@ export async function generateMetadata({
     title: treatment.seoTitle ?? treatment.name,
     description:
       treatment.seoDescription ??
-      treatment.description ??
+      (toPlainText(treatment.description, 160) || null) ??
       `${treatment.name} di KAMA Spa — durasi dan harga lengkap.`,
   });
 }
@@ -49,7 +53,7 @@ export default async function TreatmentPage({ params }: TreatmentPageProps) {
   const pageCopy = await getPageCopy();
   return (
     <>
-      <Navigation />
+      <DeferredNavigation />
       <Suspense
         fallback={
           <TreatmentFallback
@@ -80,12 +84,20 @@ function TreatmentFallback({ title }: { title: string }) {
 
 async function TreatmentContent({ params }: TreatmentPageProps) {
   const { categorySlug, treatmentSlug } = await params;
-  const [treatment, pageCopy] = await Promise.all([
+  const [treatment, pageCopy, galleryImages] = await Promise.all([
     getTreatment(categorySlug, treatmentSlug),
     getPageCopy(),
+    getCatalogImagesBySlug(treatmentSlug),
   ]);
 
   if (!treatment) notFound();
+
+  // Gambar utama selalu jadi slide pertama; galeri admin menyusul. Satu
+  // gambar dirender <img> biasa, lebih dari satu jadi carousel.
+  const gallery = [
+    ...(treatment.imageUrl ? [{ imageUrl: treatment.imageUrl, altText: null }] : []),
+    ...galleryImages,
+  ];
 
   const category = await getCategory(categorySlug);
   const related = (category?.treatments ?? [])
@@ -127,11 +139,7 @@ async function TreatmentContent({ params }: TreatmentPageProps) {
                 <h1 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
                   {treatment.name}
                 </h1>
-                {treatment.description ? (
-                  <p className="max-w-[52ch] text-lead text-cocoa/70">
-                    {treatment.description}
-                  </p>
-                ) : null}
+                <RichText value={treatment.description} className="max-w-[52ch] text-lead text-cocoa/70" />
                 <div>
                   <WaLink href={waHref} context="treatment">
                     {copy(pageCopy, "catalog.treatment.cta_whatsapp")}
@@ -139,13 +147,12 @@ async function TreatmentContent({ params }: TreatmentPageProps) {
                 </div>
               </div>
 
-              {treatment.imageUrl ? (
+              {gallery.length > 0 ? (
                 <div className="image-container aspect-[4/3] w-full overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={treatment.imageUrl}
+                  <ImageCarousel
+                    images={gallery}
                     alt={treatment.name}
-                    className="image-cover"
+                    imageClassName="image-cover"
                   />
                 </div>
               ) : null}

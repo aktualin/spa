@@ -18,10 +18,11 @@ test("hero menampilkan slide video + foto dan kontrol titik", async ({ page }) =
   await expect(dots.nth(0)).toHaveAttribute("aria-current", "true");
 
   const video = page.locator("header video").first();
-  await expect(video).toHaveAttribute("poster", "/img/kama/incense-smoke-poster.jpg");
+  // Media dilayani dari bucket S3 (bukan public/), jadi cocokkan akhiran key-nya.
+  await expect(video).toHaveAttribute("poster", /\/img\/kama\/incense-smoke-poster\.jpg$/);
   await expect(page.locator("header video source").first()).toHaveAttribute(
     "src",
-    "/video/incense-smoke.mp4",
+    /\/video\/incense-smoke\.mp4$/,
   );
 
   await dots.nth(2).click();

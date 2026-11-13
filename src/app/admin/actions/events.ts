@@ -19,6 +19,7 @@ import { normalizePath } from "@/lib/domain/page-url";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 import { recordPathMoves } from "@/lib/path-moves";
 import { deleteImageByUrl } from "@/lib/storage";
+import { richTextInput } from "@/lib/domain/rich-text";
 
 import type { EventFormData } from "../events/event-form";
 import {
@@ -92,7 +93,7 @@ function readFormValues(formData: FormData): EventFormData {
     id: id || null,
     slug: text(formData, "slug")?.trim() ?? "",
     title: text(formData, "title") ?? "",
-    description: text(formData, "description") ?? "",
+    description: richTextInput(formData.get("description")),
     coverUrl: text(formData, "coverUrl") ?? "",
     location: text(formData, "location") ?? "",
     startDate: text(formData, "startDate") ?? "",

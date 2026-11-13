@@ -51,7 +51,7 @@ if (!connectionString) {
   process.exit(1);
 }
 
-const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
+const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }, { schema: process.env.DATABASE_SCHEMA || "public" }) });
 
 try {
   const normalizedEmail = email.trim().toLowerCase();

@@ -15,7 +15,18 @@ loadEnv({ path: ".env.local" });
  * Perintah yang benar-benar menyentuh database (migrate, db execute) tetap
  * gagal dengan jelas bila URL-nya tidak ada.
  */
-const datasourceUrl = process.env.DIRECT_URL ?? process.env.DATABASE_URL;
+const rawUrl = process.env.DIRECT_URL ?? process.env.DATABASE_URL;
+
+// Tabel KAMA hidup di schema sendiri (DATABASE_SCHEMA, lihat src/lib/db-schema.ts)
+// karena project Supabase-nya dipakai bersama aplikasi lain. Migrate membaca
+// schema dari parameter `?schema=` di URL dan membuatnya bila belum ada.
+const datasourceUrl = (() => {
+  const schema = process.env.DATABASE_SCHEMA?.trim();
+  if (!rawUrl || !schema) return rawUrl;
+  const url = new URL(rawUrl);
+  url.searchParams.set("schema", schema);
+  return url.toString();
+})();
 
 export default defineConfig({
   schema: "prisma/schema.prisma",

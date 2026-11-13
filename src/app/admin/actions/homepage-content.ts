@@ -19,6 +19,7 @@ import { prisma } from "@/lib/prisma";
 import { deleteImageByUrl } from "@/lib/storage";
 
 import { checked, text } from "../promos/_kit/schema";
+import { asset } from "@/lib/asset-url";
 
 /**
  * Server Action statistik Brand Intro (`HomepageStat`), ulasan
@@ -258,18 +259,18 @@ export async function importDefaultReviewsAction() {
  * `src/components/home/socials.tsx` (file itu tidak mengekspornya).
  */
 const DEFAULT_INSTAGRAM_IMAGES = [
-  "/img/kama/01-incense.jpg",
-  "/img/kama/02-bottle-shadows.jpg",
-  "/img/kama/03-oil-bowl.jpg",
-  "/img/kama/04-turmeric-scrub.jpg",
-  "/img/kama/05-foot-bath.jpg",
-  "/img/kama/06-bride.jpg",
-  "/img/kama/07-flower-bowl.jpg",
-  "/img/kama/08-water-drop.jpg",
-  "/img/kama/09-leaf-drop.jpg",
-  "/img/kama/corporate/02-massage.jpg",
-  "/img/kama/corporate/05-lounge.jpg",
-  "/img/kama/corporate/12-guest-lounge.jpg",
+  asset("img/kama/01-incense.jpg"),
+  asset("img/kama/02-bottle-shadows.jpg"),
+  asset("img/kama/03-oil-bowl.jpg"),
+  asset("img/kama/04-turmeric-scrub.jpg"),
+  asset("img/kama/05-foot-bath.jpg"),
+  asset("img/kama/06-bride.jpg"),
+  asset("img/kama/07-flower-bowl.jpg"),
+  asset("img/kama/08-water-drop.jpg"),
+  asset("img/kama/09-leaf-drop.jpg"),
+  asset("img/kama/corporate/02-massage.jpg"),
+  asset("img/kama/corporate/05-lounge.jpg"),
+  asset("img/kama/corporate/12-guest-lounge.jpg"),
 ];
 
 export async function listInstagramPosts() {

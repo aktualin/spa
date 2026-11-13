@@ -174,7 +174,7 @@ async function JournalPostContent({ params }: JournalPostPageProps) {
           <div className="container-kama pb-14 md:pb-16 lg:pb-20">
             {post.bodyHtml ? (
               <div
-                className="text-rich-text max-w-[70ch] text-body text-cocoa/80"
+                className="kama-prose text-rich-text max-w-[70ch] text-body text-cocoa/80"
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.bodyHtml) }}
               />
             ) : (

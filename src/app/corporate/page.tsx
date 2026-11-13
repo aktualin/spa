@@ -11,6 +11,8 @@ import { withPageSeo } from "@/lib/content/seo";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { corporateWhatsApp } from "@/lib/whatsapp";
 import { Reveal } from "@/components/reveal";
+import { asset } from "@/lib/asset-url";
+import { RichText } from "@/components/rich-text";
 
 /*
  * Halaman Corporate Wellness (desain asli). Isi dibaca dari database lewat
@@ -53,7 +55,7 @@ export default async function CorporatePage() {
           <div className="container-large">
             <div className="image-container" style={{ aspectRatio: "16 / 9" }}>
               <img
-                src="/img/kama/corporate/01-corporate-sign.jpg"
+                src={asset("img/kama/corporate/01-corporate-sign.jpg")}
                 alt="KAMA Spa — Corporate Wellness Solutions"
                 className="image-cover"
                 loading="eager"
@@ -69,7 +71,7 @@ export default async function CorporatePage() {
                 <div>
                   <div className="image-container" style={{ aspectRatio: "4 / 5" }}>
                     <img
-                      src="/img/kama/corporate/02-massage.jpg"
+                      src={asset("img/kama/corporate/02-massage.jpg")}
                       alt="Corporate wellness session"
                       className="image-cover"
                       loading="eager"
@@ -111,7 +113,7 @@ export default async function CorporatePage() {
                   {copy(pageCopy, "corporate.benefits_title")}
                 </h2>
                 {content.intro ? (
-                  <p className="body-m text-color-gray">{content.intro}</p>
+                  <RichText value={content.intro} className="body-m text-color-gray" />
                 ) : null}
               </div>
               <div className="layout-row gap-large">
@@ -126,7 +128,7 @@ export default async function CorporatePage() {
                   ))}
                 </ul>
                 <div className="sizing-grow">
-                  <div className="text-rich-text header-l w-richtext">
+                  <div className="kama-prose text-rich-text header-l w-richtext">
                     <p>
                       <em>{copy(pageCopy, "corporate.benefits_quote")}</em>
                     </p>
@@ -205,9 +207,7 @@ export default async function CorporatePage() {
                     ) : null}
                     <div className="package-card_body">
                       <div className="eyebrow-s text-style-allcaps">{prog.name}</div>
-                      {prog.description ? (
-                        <div className="body-m text-color-gray">{prog.description}</div>
-                      ) : null}
+                      <RichText value={prog.description} className="body-m text-color-gray" />
                       <ul className="benefit-list">
                         {prog.features.map((f, fi) => (
                           <li key={`${fi}-${f}`} className="benefit-list_item">
@@ -227,7 +227,7 @@ export default async function CorporatePage() {
                 <>
                   <div className="spacer-medium" />
                   <div
-                    className="text-rich-text body-m text-color-gray w-richtext"
+                    className="kama-prose text-rich-text body-m text-color-gray w-richtext"
                     dangerouslySetInnerHTML={{ __html: sanitizeHtml(content.inOfficeHtml) }}
                   />
                 </>
@@ -247,7 +247,7 @@ export default async function CorporatePage() {
                   </h2>
                   {content.inSpaHtml ? (
                     <div
-                      className="text-rich-text body-m text-color-gray w-richtext"
+                      className="kama-prose text-rich-text body-m text-color-gray w-richtext"
                       dangerouslySetInnerHTML={{ __html: sanitizeHtml(content.inSpaHtml) }}
                     />
                   ) : (
@@ -271,7 +271,7 @@ export default async function CorporatePage() {
                 <div>
                   <div className="image-container" style={{ aspectRatio: "4 / 5" }}>
                     <img
-                      src="/img/kama/corporate/05-lounge.jpg"
+                      src={asset("img/kama/corporate/05-lounge.jpg")}
                       alt="KAMA Spa lounge with team enjoying refreshments"
                       className="image-cover"
                       loading="lazy"
@@ -301,7 +301,7 @@ export default async function CorporatePage() {
                       <div className="eyebrow-s text-style-allcaps">{copy(pageCopy, "corporate.step_label")} {idx + 1}</div>
                       <h3 className="header-s">{step.title}</h3>
                       {step.body ? (
-                        <div className="body-m text-color-gray">{step.body}</div>
+                        <RichText value={step.body} className="body-m text-color-gray" />
                       ) : null}
                     </div>
                   </div>
@@ -311,7 +311,7 @@ export default async function CorporatePage() {
                 <>
                   <div className="spacer-medium" />
                   <div
-                    className="text-rich-text body-m text-color-gray w-richtext"
+                    className="kama-prose text-rich-text body-m text-color-gray w-richtext"
                     dangerouslySetInnerHTML={{ __html: sanitizeHtml(content.stepsHtml) }}
                   />
                 </>

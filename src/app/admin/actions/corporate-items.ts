@@ -17,6 +17,7 @@ import {
 } from "@/lib/domain/corporate";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 import { prisma } from "@/lib/prisma";
+import { richTextInput } from "@/lib/domain/rich-text";
 
 /**
  * Daftar berurutan modul Corporate Wellness: program In-Office, langkah
@@ -83,7 +84,7 @@ export async function saveProgramAction(
   const id = str(formData, "id");
   const result = validateProgramInput({
     name: str(formData, "name"),
-    description: str(formData, "description"),
+    description: richTextInput(formData.get("description")),
     features: all(formData, "features"),
     imageUrl: str(formData, "imageUrl"),
     isPublished: formData.get("isPublished") === "on",
@@ -169,7 +170,7 @@ export async function saveStepAction(
   await requireRole(CONTENT_ROLES);
 
   const id = str(formData, "id");
-  const result = validateStepInput({ title: str(formData, "title"), body: str(formData, "body") });
+  const result = validateStepInput({ title: str(formData, "title"), body: richTextInput(formData.get("body")) });
   if (!result.ok) return { error: result.error };
 
   if (id) {

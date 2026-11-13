@@ -4,6 +4,7 @@ import { Reveal } from "@/components/reveal";
 import type { PublicPromo } from "@/lib/content/promos";
 import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { formatEventDate } from "@/components/public/events/event-parts";
+import { toPlainText } from "@/lib/domain/rich-text";
 
 export async function PromoCard({ promo }: { promo: PublicPromo }) {
   const pageCopy = await getPageCopy();
@@ -27,7 +28,7 @@ export async function PromoCard({ promo }: { promo: PublicPromo }) {
           {promo.title}
         </h3>
         {promo.description ? (
-          <p className="line-clamp-3 text-body text-cocoa/70">{promo.description}</p>
+          <p className="line-clamp-3 text-body text-cocoa/70">{toPlainText(promo.description)}</p>
         ) : null}
         <span className="mt-auto inline-flex items-center gap-2 pt-2 text-[0.9375rem] underline underline-offset-4 transition-opacity group-hover:opacity-70">
           {copy(pageCopy, "global.view_detail_label")}

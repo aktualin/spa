@@ -44,12 +44,20 @@ export default async function EditPackagePage({
       seoDescription: "",
       whatsappMessage: "",
       items: [],
+      contentImages: [],
     };
   } else {
-    const pkg = await prisma.package.findUnique({
-      where: { id },
-      include: { items: { orderBy: { sortOrder: "asc" } } },
-    });
+    const [pkg, contentImages] = await Promise.all([
+      prisma.package.findUnique({
+        where: { id },
+        include: { items: { orderBy: { sortOrder: "asc" } } },
+      }),
+      prisma.contentImage.findMany({
+        where: { entityType: "package", entityId: id },
+        orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }, { id: "asc" }],
+        select: { imageUrl: true, altText: true },
+      }),
+    ]);
     if (!pkg) notFound();
 
     data = {
@@ -75,6 +83,7 @@ export default async function EditPackagePage({
         label: item.label ?? "",
         minutes: item.minutes ? String(item.minutes) : "",
       })),
+      contentImages,
     };
   }
 

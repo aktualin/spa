@@ -407,7 +407,7 @@ export function NavigationClient({
             aria-current={pathname === "/" ? "page" : undefined}
             className="shrink-0 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cocoa"
           >
-            <Logo className="h-[22px] w-auto" />
+            <Logo />
           </Link>
 
           {/* Mobile toggle */}

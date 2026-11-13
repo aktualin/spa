@@ -19,11 +19,14 @@ import {
   isToggleOnlySection,
 } from "@/lib/domain/homepage";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
-import { sanitizeHtml } from "@/lib/domain/sanitize";
+import { richTextInput } from "@/lib/domain/rich-text";
 import { prisma } from "@/lib/prisma";
+import { deleteImageByUrl } from "@/lib/storage";
 
 import {
   HOMEPAGE_SECTION_KEYS,
+  customSectionKey,
+  isCustomSectionKey,
   sectionKeyLabel,
 } from "../homepage/homepage-sections";
 
@@ -228,7 +231,7 @@ export async function saveHomepageSectionAction(
     data: {
       title,
       subtitle: subtitle || null,
-      bodyHtml: bodyHtml ? sanitizeHtml(bodyHtml) : null,
+      bodyHtml: richTextInput(bodyHtml) || null,
       imageUrl: imageUrl || null,
       ctaLabel: ctaLabel || null,
       ctaHref: ctaHref || null,
@@ -278,4 +281,52 @@ export async function createHomepageSectionAction(formData: FormData) {
   revalidatePath("/admin/homepage");
   revalidatePath("/");
   redirect("/admin/homepage?saved=1");
+}
+
+/** Buat section konten bebas (key `custom-<slug>`), mati sampai admin menyalakannya. */
+export async function createCustomSectionAction(formData: FormData) {
+  await requireRole(CONTENT_ROLES);
+
+  const name = String(formData.get("name") ?? "").trim().slice(0, 120);
+  const baseKey = customSectionKey(name);
+  if (!name || !baseKey) redirect("/admin/homepage?error=custom-name");
+
+  // Nama kembar mendapat akhiran angka supaya key tetap unik.
+  let key = baseKey;
+  for (let n = 2; await prisma.homepageSection.findUnique({ where: { key }, select: { id: true } }); n++) {
+    key = `${baseKey}-${n}`;
+  }
+
+  const last = await prisma.homepageSection.findFirst({
+    orderBy: { sortOrder: "desc" },
+    select: { sortOrder: true },
+  });
+
+  await prisma.homepageSection.create({
+    data: { key, title: name, isEnabled: false, sortOrder: (last?.sortOrder ?? 0) + 1 },
+  });
+
+  updateTag(CONTENT_TAGS.homepage);
+  revalidatePath("/admin/homepage");
+  revalidatePath("/");
+  redirect("/admin/homepage?saved=1");
+}
+
+/** Hapus section konten bebas. Section bawaan tidak bisa dihapus (hanya dimatikan). */
+export async function deleteCustomSectionAction(formData: FormData) {
+  await requireRole(CONTENT_ROLES);
+
+  const id = String(formData.get("id") ?? "");
+  const section = id
+    ? await prisma.homepageSection.findUnique({ where: { id }, select: { key: true, imageUrl: true } })
+    : null;
+  if (!section || !isCustomSectionKey(section.key)) return;
+
+  await prisma.homepageSection.delete({ where: { id } });
+  if (section.imageUrl) await deleteImageByUrl(section.imageUrl).catch(() => {});
+
+  updateTag(CONTENT_TAGS.homepage);
+  revalidatePath("/admin/homepage");
+  revalidatePath("/");
+  redirect("/admin/homepage?deleted=1");
 }

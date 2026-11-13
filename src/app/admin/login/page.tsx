@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { BrandMark } from "./brand-mark";
 import { LoginForm } from "./login-form";
+import { asset } from "@/lib/asset-url";
 
 export const metadata: Metadata = {
   title: "Masuk Dashboard — KAMASPA",
@@ -70,10 +71,12 @@ export default async function AdminLoginPage({
             <div className="absolute right-[26%] top-[-12%] h-[150%] w-px rotate-[18deg] bg-gradient-to-b from-clay/25 to-transparent" />
           </div>
 
-          {/* Monogram besar sebagai latar. */}
-          <BrandMark
-            className="pointer-events-none absolute left-1/2 top-16 h-56 w-56 -translate-x-1/2 text-cream/[0.08] xl:h-64 xl:w-64"
-            title=""
+          {/* Mark besar sebagai latar. */}
+          <img
+            src={asset("img/kama/mark-kama-light.png")}
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute left-1/2 top-16 h-56 w-56 -translate-x-1/2 object-contain opacity-[0.08] xl:h-64 xl:w-64"
           />
 
           <div className="relative p-10 xl:p-12">

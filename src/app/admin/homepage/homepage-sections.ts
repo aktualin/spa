@@ -42,7 +42,32 @@ const KEY_LABEL: Record<string, string> = {
   footer: "Footer",
 };
 
+/**
+ * Section konten bebas buatan admin: key `custom-<slug>`. Isinya judul,
+ * subjudul, isi HTML, gambar, dan tombol (form umum), dirender di homepage
+ * sesuai urutan, dan — berbeda dengan section bawaan — boleh dihapus.
+ */
+export const CUSTOM_SECTION_PREFIX = "custom-";
+
+export function isCustomSectionKey(key: string): boolean {
+  return /^custom-[a-z0-9]+(?:-[a-z0-9]+)*$/.test(key);
+}
+
+/** "Promo Ramadan 2026!" → "custom-promo-ramadan-2026" (null bila tidak ada huruf/angka). */
+export function customSectionKey(name: string): string | null {
+  const slug = name
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 48)
+    .replace(/-+$/g, "");
+  return slug ? `${CUSTOM_SECTION_PREFIX}${slug}` : null;
+}
+
 export function sectionKeyLabel(key: string): string {
+  if (isCustomSectionKey(key)) return "Section konten";
   return KEY_LABEL[key] ?? key;
 }
 

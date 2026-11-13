@@ -225,6 +225,23 @@ model GalleryPhoto {
   @@index([albumId, sortOrder])
 }
 
+/// Gambar tambahan untuk entitas konten apa pun (treatment, package, event,
+/// promo, journal, produk retail, program corporate). Gambar pertama tetap
+/// di kolom `imageUrl` entitasnya; baris di sini adalah foto tambahan —
+/// halaman publik menampilkan semuanya sebagai carousel bila lebih dari satu.
+model ContentImage {
+  id         String   @id @default(cuid())
+  entityType String
+  entityId   String
+  imageUrl   String
+  altText    String?
+  sortOrder  Int      @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([entityType, entityId, sortOrder])
+}
+
 /**
  * ---------- Modul 4: Promos & Gift Card ----------
  */

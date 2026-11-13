@@ -10,6 +10,7 @@ import { formatIdr } from "@/lib/format";
 
 import { CatalogBadges } from "./catalog-badges";
 import { WaButton } from "./wa-button";
+import { toPlainText } from "@/lib/domain/rich-text";
 
 type PackageCardProps = {
   pkg: CatalogPackage;
@@ -43,7 +44,7 @@ export async function PackageCard({ pkg, withCta = false }: PackageCardProps) {
           <Link href={`/treatments/packages/${pkg.slug}`}>{pkg.name}</Link>
         </h3>
         {pkg.description ? (
-          <div className="body-m text-color-gray">{pkg.description}</div>
+          <div className="body-m text-color-gray">{toPlainText(pkg.description)}</div>
         ) : null}
 
         {pkg.items.length > 0 ? (

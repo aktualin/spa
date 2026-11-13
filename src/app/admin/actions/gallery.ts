@@ -16,6 +16,7 @@ import {
 import { moveInList } from "@/lib/domain/media";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 import { deleteImageByUrl } from "@/lib/storage";
+import { richTextInput } from "@/lib/domain/rich-text";
 
 import {
   checked,
@@ -70,7 +71,7 @@ export async function saveAlbumAction(
   const parsed = albumSchema.safeParse({
     slug: text(formData, "slug"),
     name: text(formData, "name"),
-    description: text(formData, "description"),
+    description: richTextInput(formData.get("description")),
     coverUrl: text(formData, "coverUrl"),
     isPublished: checked(formData, "isPublished"),
     sortOrder: text(formData, "sortOrder") ?? 0,

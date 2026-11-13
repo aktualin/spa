@@ -14,8 +14,18 @@ const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
 ];
 
+/**
+ * Base URL aset statis di bucket S3 (lihat src/lib/asset-url.ts). Diturunkan
+ * dari konfigurasi storage yang sudah ada supaya tidak perlu env tambahan.
+ */
+const assetBaseUrl =
+  process.env.NEXT_PUBLIC_ASSET_BASE_URL ??
+  (process.env.NEXT_PUBLIC_SUPABASE_PUBLIC_URL && process.env.SUPABASE_S3_BUCKET
+    ? `${process.env.NEXT_PUBLIC_SUPABASE_PUBLIC_URL.replace(/\/$/, "")}/${process.env.SUPABASE_S3_BUCKET}`
+    : "");
+
 const nextConfig: NextConfig = {
-  /* config options here */
+  env: { NEXT_PUBLIC_ASSET_BASE_URL: assetBaseUrl },
   cacheComponents: true,
   partialPrefetching: true,
   reactCompiler: true,

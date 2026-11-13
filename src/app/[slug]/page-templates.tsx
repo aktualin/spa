@@ -29,7 +29,7 @@ export async function StandardPageTemplate({ page }: { page: PublicPage }) {
         <div className="container-kama py-14 md:py-16 lg:py-20">
           {page.bodyHtml ? (
             <div
-              className="text-rich-text max-w-[70ch] text-body text-cocoa/80"
+              className="kama-prose text-rich-text max-w-[70ch] text-body text-cocoa/80"
               dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.bodyHtml) }}
             />
           ) : (
@@ -75,7 +75,7 @@ export async function LegalPageTemplate({ page }: { page: PublicPage }) {
 
               {page.bodyHtml ? (
                 <div
-                  className="terms-n-policy w-richtext text-rich-text"
+                  className="kama-prose terms-n-policy w-richtext text-rich-text"
                   dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.bodyHtml) }}
                 />
               ) : (

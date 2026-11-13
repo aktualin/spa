@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useActionState } from "react";
 
 import {
+  createCustomSectionAction,
   createHomepageSectionAction,
+  deleteCustomSectionAction,
   saveHomepageSectionAction,
   toggleHomepageSectionAction,
   moveHomepageSectionAction,
@@ -34,6 +36,7 @@ import {
   SECTION_SOURCE,
   hasEditableCta,
   hasEditableText,
+  isCustomSectionKey,
   sectionKeyLabel,
 } from "./homepage-sections";
 
@@ -119,6 +122,34 @@ export function HomepageSectionList({
           </ul>
         </section>
       ) : null}
+
+      <section className="rounded-lg border border-dashed border-neutral-300 bg-neutral-50 p-4">
+        <h2 className="text-sm font-semibold text-neutral-800">Tambah section konten</h2>
+        <p className="mt-1 text-xs text-neutral-600">
+          Section bebas berisi judul, subjudul, isi berformat (HTML), gambar, dan tombol.
+          Dibuat dalam keadaan <strong>mati</strong> — isi dulu, lalu nyalakan dan atur
+          urutannya. Section konten bisa dihapus kapan saja.
+        </p>
+        <form action={createCustomSectionAction} className="mt-3 flex flex-wrap gap-2">
+          <label htmlFor="custom-section-name" className="sr-only">
+            Nama section
+          </label>
+          <input
+            id="custom-section-name"
+            name="name"
+            required
+            maxLength={120}
+            placeholder="mis. Ritual Musim Hujan"
+            className={`${inputClass} max-w-xs`}
+          />
+          <button
+            type="submit"
+            className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-neutral-700"
+          >
+            Tambah section
+          </button>
+        </form>
+      </section>
     </div>
   );
 }
@@ -148,6 +179,7 @@ function HomepageSectionCard({
         <div>
           <h2 className="text-sm font-semibold text-neutral-900">
             {sectionKeyLabel(section.key)}
+            {isCustomSectionKey(section.key) ? `: ${section.title}` : null}
           </h2>
           <p className="text-xs text-neutral-500">
             key: {section.key} ·{" "}
@@ -156,6 +188,24 @@ function HomepageSectionCard({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          {isCustomSectionKey(section.key) ? (
+            <form
+              action={deleteCustomSectionAction}
+              onSubmit={(event) => {
+                if (!window.confirm(`Hapus section "${section.title}"? Tindakan ini tidak bisa dibatalkan.`)) {
+                  event.preventDefault();
+                }
+              }}
+            >
+              <input type="hidden" name="id" value={section.id} />
+              <button
+                type="submit"
+                className="rounded-md border border-red-200 px-3 py-1.5 text-xs text-red-700 hover:bg-red-50"
+              >
+                Hapus
+              </button>
+            </form>
+          ) : null}
           <form action={toggleHomepageSectionAction}>
             <input type="hidden" name="id" value={section.id} />
             {/* Nilai yang dikirim adalah status yang DIINGINKAN setelah
@@ -238,7 +288,7 @@ function HomepageSectionCard({
           {!SECTION_SOURCE[section.key] || hasEditableText(section.key) ? (
             <GenericSectionForm
               section={section}
-              withCta={hasEditableCta(section.key)}
+              withCta={hasEditableCta(section.key) || isCustomSectionKey(section.key)}
             />
           ) : null}
         </>

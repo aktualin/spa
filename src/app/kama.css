@@ -1362,3 +1362,72 @@ html[data-js="true"] .kama-reveal.is-visible {
 .hero_locations_map_layout {
   position: relative;
 }
+
+/* ---------------------------------------------------------------------------
+   Konten HTML dari admin (src/components/rich-text.tsx, editor admin).
+   Reset Tailwind membuang gaya list/heading bawaan; aturan ini memulihkannya
+   untuk semua blok `.kama-prose`, dengan :where() agar utilitas Tailwind di
+   pemanggil (warna, ukuran teks, max-width) tetap menang.
+   --------------------------------------------------------------------------- */
+.kama-prose :where(p, ul, ol, dl, blockquote, table, figure, hr) {
+  margin-block: 0 1em;
+}
+.kama-prose > :where(:last-child) {
+  margin-bottom: 0;
+}
+.kama-prose :where(h2, h3, h4, h5) {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.25;
+  margin-block: 1.5em 0.6em;
+}
+.kama-prose > :where(h2, h3, h4, h5):first-child {
+  margin-top: 0;
+}
+.kama-prose :where(h2) { font-size: 1.6em; }
+.kama-prose :where(h3) { font-size: 1.3em; }
+.kama-prose :where(h4) { font-size: 1.12em; }
+.kama-prose :where(h5) { font-size: 1em; }
+.kama-prose :where(ul) { list-style: disc; padding-left: 1.4em; }
+.kama-prose :where(ol) { list-style: decimal; padding-left: 1.4em; }
+.kama-prose :where(li) { margin-block: 0.3em; }
+.kama-prose :where(li > ul, li > ol) { margin-block: 0.3em 0; }
+.kama-prose :where(strong, b) { font-weight: 600; }
+.kama-prose :where(a) {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.kama-prose :where(a):hover { opacity: 0.7; }
+.kama-prose :where(blockquote) {
+  border-left: 2px solid var(--kama-clay);
+  padding-left: 1em;
+  font-family: var(--font-display);
+  font-style: italic;
+}
+.kama-prose :where(img) {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.kama-prose :where(figcaption) {
+  margin-top: 0.5em;
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+.kama-prose :where(hr) {
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+}
+.kama-prose :where(table) {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+.kama-prose :where(th, td) {
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  padding: 0.45em 0.75em;
+  text-align: left;
+  vertical-align: top;
+}
+.kama-prose :where(th) { font-weight: 600; }

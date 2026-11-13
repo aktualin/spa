@@ -11,6 +11,7 @@ import { getRetailCatalog, type RetailCatalogItem } from "@/lib/content/retail";
 import { copy, getPageCopy, type PageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
 import { formatIdr } from "@/lib/format";
+import { RichText } from "@/components/rich-text";
 
 function ProductCard({
   product,
@@ -33,9 +34,7 @@ function ProductCard({
         </div>
       ) : null}
       <h2 className="font-display text-title-sm">{product.name}</h2>
-      {product.description ? (
-        <p className="whitespace-pre-line text-body text-cocoa/70">{product.description}</p>
-      ) : null}
+      <RichText value={product.description} className="text-body text-cocoa/70" />
       {product.priceIdr !== null ? (
         <span className="font-display text-title-sm">{formatIdr(product.priceIdr)}</span>
       ) : (

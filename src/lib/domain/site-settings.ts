@@ -490,8 +490,8 @@ export const siteSettingsInputSchema = z.object({
     .string()
     .trim()
     .refine(
-      (value) => blank(value) || isSafeCtaHref(value),
-      "PDF menu harus berupa URL https:// atau path internal (/img/...).",
+      (value) => blank(value) || (isSafeCtaHref(value) && value.startsWith("https://")),
+      "PDF menu harus berupa URL https:// (unggah ke bucket S3 atau tautan Google Drive).",
     ),
 });
 

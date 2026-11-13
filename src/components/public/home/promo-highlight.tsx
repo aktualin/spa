@@ -5,6 +5,7 @@ import { getActivePromos } from "@/lib/content/promos";
 import { getEventGroups } from "@/lib/content/events";
 import { copy, type PageCopy } from "@/lib/content/page-copy";
 import { formatEventDate } from "@/components/public/events/event-parts";
+import { toPlainText } from "@/lib/domain/rich-text";
 
 /**
  * Section "Promo Highlight" — promo aktif, atau event terdekat yang akan
@@ -41,7 +42,7 @@ export async function PromoHighlightSection({ copyBlocks }: { copyBlocks: PageCo
             </h2>
             <p className="max-w-[52ch] text-body text-cocoa/70">
               {promo
-                ? (promo.description ?? fallbackDescription)
+                ? (toPlainText(promo.description) || fallbackDescription)
                 : event
                   ? `${formatEventDate(event.startDate, event.endDate)}${
                       event.location ? ` · ${event.location}` : ""

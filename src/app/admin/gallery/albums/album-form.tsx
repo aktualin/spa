@@ -17,6 +17,7 @@ import {
   SaveButton,
   inputClass,
 } from "../../promos/_kit/form-ui";
+import { RichTextField } from "../../rich-text-field";
 
 export type AlbumFormData = {
   id: string | null;
@@ -71,15 +72,13 @@ export function AlbumForm({ album }: { album: AlbumFormData }) {
           />
         </Field>
 
-        <Field label="Deskripsi" htmlFor="description">
-          <textarea
-            id="description"
-            name="description"
-            defaultValue={album.description}
-            rows={4}
-            className={inputClass}
-          />
-        </Field>
+        <RichTextField
+          name="description"
+          label="Deskripsi"
+          defaultValue={album.description}
+          folder="gallery"
+          compact
+        />
 
         <ImageField
           name="coverUrl"

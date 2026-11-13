@@ -144,9 +144,14 @@ export function MembershipProgramForm({
         <Field label="Judul" htmlFor="title">
           <textarea id="title" name="title" defaultValue={program.title} required maxLength={PROGRAM_LIMITS.title} rows={2} className={inputClass} />
         </Field>
-        <Field label="Intro" htmlFor="intro">
-          <textarea id="intro" name="intro" defaultValue={program.intro} required maxLength={PROGRAM_LIMITS.intro} rows={3} className={inputClass} />
-        </Field>
+        <RichTextField
+          name="intro"
+          label="Intro"
+          defaultValue={program.intro}
+          folder="membership"
+          hint={`Wajib diisi, maksimal ${PROGRAM_LIMITS.intro} karakter teks (format/HTML tidak dihitung).`}
+          compact
+        />
         <Field
           label="Kalimat harga"
           htmlFor="priceHeadline"
@@ -172,9 +177,14 @@ export function MembershipProgramForm({
           max={PROGRAM_LIMITS.maxBenefits}
         />
 
-        <Field label="Intro essential services" htmlFor="servicesIntro">
-          <textarea id="servicesIntro" name="servicesIntro" defaultValue={program.servicesIntro} required maxLength={PROGRAM_LIMITS.servicesIntro} rows={2} className={inputClass} />
-        </Field>
+        <RichTextField
+          name="servicesIntro"
+          label="Intro essential services"
+          defaultValue={program.servicesIntro}
+          folder="membership"
+          hint={`Wajib diisi, maksimal ${PROGRAM_LIMITS.servicesIntro} karakter teks (format/HTML tidak dihitung).`}
+          compact
+        />
 
         <RowList
           legend="Essential services"

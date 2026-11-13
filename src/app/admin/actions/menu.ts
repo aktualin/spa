@@ -188,7 +188,7 @@ export async function saveMenuItemAction(
   const highlightHref = isRoot ? input.highlightHref || null : null;
 
   if (highlightImageUrl && !isSafeImageUrl(highlightImageUrl)) {
-    return { error: "Gambar kartu promo harus berupa alamat https:// atau path /img/…" };
+    return { error: "Gambar kartu promo harus berupa alamat https:// (unggah lewat Media Library)." };
   }
   if (highlightHref && !isSafeCtaHref(highlightHref)) {
     return { error: "Tujuan kartu promo harus berupa path internal (/menu), anchor (#promo), atau https://…" };

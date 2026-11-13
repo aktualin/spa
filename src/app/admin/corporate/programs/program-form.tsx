@@ -18,6 +18,7 @@ import {
   inputClass,
 } from "../../promos/_kit/form-ui";
 import { StringListField } from "../_components/string-list-field";
+import { RichTextField } from "../../rich-text-field";
 
 export type ProgramFormData = {
   id: string | null;
@@ -63,16 +64,13 @@ export function CorporateProgramForm({
           />
         </Field>
 
-        <Field label="Deskripsi" htmlFor="description">
-          <textarea
-            id="description"
-            name="description"
-            defaultValue={program.description}
-            rows={4}
-            maxLength={1000}
-            className={inputClass}
-          />
-        </Field>
+        <RichTextField
+          name="description"
+          label="Deskripsi"
+          defaultValue={program.description}
+          folder="corporate"
+          compact
+        />
 
         <StringListField
           name="features"

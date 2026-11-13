@@ -9,7 +9,7 @@ import { CONTENT_TAGS } from "@/lib/content/tags";
 import { normalizePath } from "@/lib/domain/page-url";
 import { recordPathMoves } from "@/lib/path-moves";
 import { prisma } from "@/lib/prisma";
-import { plainTextToHtml } from "@/lib/domain/rich-text";
+import { plainTextToHtml, richTextInput } from "@/lib/domain/rich-text";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { deleteImageByUrl } from "@/lib/storage";
@@ -78,7 +78,7 @@ export async function savePromoAction(
   const parsed = promoSchema.safeParse({
     slug: text(formData, "slug"),
     title: text(formData, "title"),
-    description: text(formData, "description"),
+    description: richTextInput(formData.get("description")),
     bannerUrl: text(formData, "bannerUrl"),
     terms: text(formData, "terms"),
     startDate,

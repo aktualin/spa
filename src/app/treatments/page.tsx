@@ -11,6 +11,7 @@ import { TreatmentCard } from "@/components/public/treatment-card";
 import { getCatalog } from "@/lib/content/catalog";
 import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
+import { toPlainText } from "@/lib/domain/rich-text";
 
 export async function generateMetadata(): Promise<Metadata> {
   return withPageSeo("/treatments", {});
@@ -52,7 +53,7 @@ export default async function TreatmentsPage() {
                   <PublicSectionHeader
                     eyebrow={`${category.treatments.length} ${copy(pageCopy, "catalog.treatments.count_suffix")}`}
                     title={category.name}
-                    description={category.description ?? undefined}
+                    description={toPlainText(category.description) || undefined}
                     imageUrl={category.imageUrl}
                     action={{
                       label: copy(pageCopy, "catalog.treatments.category_cta"),

@@ -6,9 +6,13 @@ import { z } from "zod";
 
 import { requireRole, requireSession } from "@/lib/auth";
 import { CONTENT_TAGS } from "@/lib/content/tags";
+import { parseContentImageRows } from "@/lib/domain/content-image";
 import { recordPathMoves, treatmentPath } from "@/lib/path-moves";
 import { prisma } from "@/lib/prisma";
 import { deleteImageByUrl } from "@/lib/storage";
+import { richTextInput } from "@/lib/domain/rich-text";
+
+import { deleteContentImages, syncContentImages } from "./content-images";
 
 const CONTENT_ROLES = ["ADMIN", "EDITOR"] as const;
 
@@ -79,7 +83,7 @@ function readForm(formData: FormData) {
     slug: formData.get("slug"),
     categoryId: formData.get("categoryId"),
     tagline: formData.get("tagline") ?? undefined,
-    description: formData.get("description") ?? undefined,
+    description: richTextInput(formData.get("description")),
     note: formData.get("note") ?? undefined,
     addonSection: String(formData.get("addonSection") ?? "") || undefined,
     imageUrl: formData.get("imageUrl") ?? undefined,
@@ -179,6 +183,10 @@ export async function saveTreatmentAction(
     })),
   });
 
+  // Galeri gambar tambahan (0..N); bila lebih dari satu, /menu/[slug]
+  // menampilkannya sebagai carousel.
+  await syncContentImages("treatment", treatment.id, parseContentImageRows(formData));
+
   // URL publik lama tetap hidup (301) bila slug atau kategorinya berubah.
   const wasPublic = previous?.isPublished && previous.category.isPublished;
   const redirectsChanged =
@@ -229,6 +237,7 @@ export async function deleteTreatmentAction(formData: FormData) {
   if (treatment.imageUrl) {
     await deleteImageByUrl(treatment.imageUrl).catch(() => {});
   }
+  await deleteContentImages("treatment", treatment.id);
 
   revalidateCatalog(false);
   redirect(

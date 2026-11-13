@@ -16,6 +16,7 @@ import {
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 import { prisma } from "@/lib/prisma";
 import { deleteImageByUrl } from "@/lib/storage";
+import { richTextInput, richTextLength } from "@/lib/domain/rich-text";
 
 import { firstIssue, optionalImageUrl, slugSchema } from "../promos/_kit/schema";
 
@@ -31,11 +32,12 @@ const retailSchema = z.object({
   description: z
     .string()
     .trim()
-    .max(
-      RETAIL_LIMITS.description,
+    .optional()
+    // Batas dihitung dari teks terlihat, bukan markup HTML editor.
+    .refine(
+      (value) => !value || richTextLength(value) <= RETAIL_LIMITS.description,
       `Deskripsi maksimal ${RETAIL_LIMITS.description} karakter.`,
-    )
-    .optional(),
+    ),
   // Hanya URL yang disimpan; file-nya ada di Supabase Storage/Media Library.
   imageUrl: optionalImageUrl,
   // Harga opsional: kosong berarti "Hubungi kami" (tanya via WhatsApp).
@@ -71,7 +73,7 @@ function readForm(formData: FormData) {
   return {
     name: text(formData, "name") ?? "",
     slug: text(formData, "slug") ?? "",
-    description: text(formData, "description"),
+    description: richTextInput(formData.get("description")),
     imageUrl: text(formData, "imageUrl"),
     priceIdr: text(formData, "priceIdr"),
     whatsappMessage: text(formData, "whatsappMessage"),

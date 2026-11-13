@@ -13,6 +13,7 @@ import { formatIdr } from "@/lib/format";
 
 import { CatalogBadges } from "./catalog-badges";
 import { WaButton } from "./wa-button";
+import { toPlainText } from "@/lib/domain/rich-text";
 
 type TreatmentCardProps = {
   treatment: CatalogTreatment;
@@ -54,7 +55,7 @@ export async function TreatmentCard({ treatment, withCta = false }: TreatmentCar
           </Link>
         </h3>
         {treatment.description ? (
-          <div className="body-m text-color-gray">{treatment.description}</div>
+          <div className="body-m text-color-gray">{toPlainText(treatment.description)}</div>
         ) : null}
 
         {treatment.options.length > 0 ? (

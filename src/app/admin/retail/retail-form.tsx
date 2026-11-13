@@ -19,6 +19,7 @@ import {
   SaveButton,
   inputClass,
 } from "../settings/_components/form-ui";
+import { RichTextField } from "../rich-text-field";
 
 export type RetailFormData = {
   id: string | null;
@@ -78,16 +79,13 @@ export function RetailForm({ product }: { product: RetailFormData }) {
           />
         </Field>
 
-        <Field label="Deskripsi" htmlFor="description">
-          <textarea
-            id="description"
-            name="description"
-            defaultValue={product.description}
-            rows={5}
-            maxLength={RETAIL_LIMITS.description}
-            className={inputClass}
-          />
-        </Field>
+        <RichTextField
+          name="description"
+          label="Deskripsi"
+          defaultValue={product.description}
+          folder="retail"
+          compact
+        />
 
         <ImageField name="imageUrl" label="Foto produk" folder="retail" defaultValue={product.imageUrl} />
 

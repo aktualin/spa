@@ -1,3 +1,5 @@
+import { asset } from "../asset-url.ts";
+
 /**
  * Aturan banner/hero homepage (section `hero`, `membership-banner`,
  * `booking-banner`).
@@ -157,10 +159,12 @@ export function isSafeCtaHref(value: string): boolean {
   return isHttpsUrl(value);
 }
 
-/** URL gambar: `https://…` (Supabase Storage) atau path internal (`/img/…`). */
+/**
+ * URL gambar: hanya `https://…` (bucket S3 Supabase Storage). Path lokal
+ * (`/img/…`) ditolak — tidak ada lagi media yang dilayani dari `public/`.
+ */
 export function isSafeImageUrl(value: string): boolean {
   if (!value || value.length > BANNER_LIMITS.imageUrl) return false;
-  if (value.startsWith("/")) return isInternalPath(value);
   return isHttpsUrl(value);
 }
 
@@ -330,7 +334,7 @@ export function resolveBanner(
 export const HERO_DEFAULTS: BannerDefaults = {
   title: "Relax. Refresh. (Repeat).",
   subtitle: "Massage • Spa • Corporate Wellness",
-  imageUrl: "/img/kama/incense-smoke-poster.jpg",
+  imageUrl: asset("img/kama/incense-smoke-poster.jpg"),
   imageAlt: "",
   ctaLabel: "Book Now",
   ctaHref: "/contact",

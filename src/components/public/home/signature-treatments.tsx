@@ -7,6 +7,7 @@ import type { HomepageSection } from "@/lib/content/homepage";
 import { copy } from "@/lib/content/page-copy";
 import type { PageCopy } from "@/lib/content/page-copy";
 import { isSafeCtaHref } from "@/lib/domain/homepage-banner";
+import { toPlainText } from "@/lib/domain/rich-text";
 
 /**
  * Section "Signature Treatments" — treatment yang ditandai best seller di
@@ -89,7 +90,7 @@ export async function SignatureTreatmentsSection({
                     </h3>
                     {treatment.description ? (
                       <p className="line-clamp-3 text-body text-cocoa/70">
-                        {treatment.description}
+                        {toPlainText(treatment.description)}
                       </p>
                     ) : null}
                     {price ? (

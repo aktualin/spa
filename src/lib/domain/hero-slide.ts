@@ -53,26 +53,19 @@ function clean(value: string | null | undefined): string {
   return (value ?? "").trim();
 }
 
-function isInternalPath(value: string): boolean {
-  return /^\/(?![/\\])[^\s]*$/.test(value);
-}
-
 function hasVideoExtension(path: string): boolean {
   const pathname = path.split(/[?#]/, 1)[0] ?? path;
   return /\.(mp4|webm)$/i.test(pathname);
 }
 
 /**
- * URL video: path internal (`/video/…mp4`) atau `https://…` dengan ekstensi
- * `.mp4`/`.webm`. URL halaman YouTube/Vimeo bukan direct file dan ditolak.
+ * URL video: hanya `https://…` (bucket S3) dengan ekstensi `.mp4`/`.webm`.
+ * Path lokal (`/video/…`) dan halaman YouTube/Vimeo (bukan direct file) ditolak.
  */
 export function isSafeVideoUrl(value: string): boolean {
   if (!value || value.length > HERO_SLIDE_LIMITS.videoUrl) return false;
   if (/\s/.test(value)) return false;
 
-  if (value.startsWith("/")) {
-    return isInternalPath(value) && hasVideoExtension(value);
-  }
 
   try {
     const url = new URL(value);
@@ -141,7 +134,7 @@ export function validateHeroSlideInput(raw: HeroSlideRawInput): HeroSlideValidat
   if (mediaType === "VIDEO") {
     if (!videoUrl) return fail("URL video wajib diisi.");
     if (!isSafeVideoUrl(videoUrl)) {
-      return fail("URL video harus berupa file langsung .mp4/.webm (https atau /video/…).");
+      return fail("URL video harus berupa file langsung .mp4/.webm dari https:// (bucket S3).");
     }
   }
   if (imageAlt.length > HERO_SLIDE_LIMITS.imageAlt) {

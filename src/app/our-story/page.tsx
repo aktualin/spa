@@ -80,7 +80,7 @@ export default async function OurStoryPage() {
               title={copy(pageCopy, "our_story.philosophy_title")}
             />
             <div
-              className="text-rich-text mt-8 max-w-[70ch] text-body text-cocoa/80"
+              className="kama-prose text-rich-text mt-8 max-w-[70ch] text-body text-cocoa/80"
               dangerouslySetInnerHTML={{
                 __html: sanitizeHtml(story.philosophyHtml),
               }}
@@ -95,7 +95,7 @@ export default async function OurStoryPage() {
               title={copy(pageCopy, "our_story.values_title")}
             />
             <div
-              className="text-rich-text mt-8 max-w-[70ch] text-body text-cocoa/80"
+              className="kama-prose text-rich-text mt-8 max-w-[70ch] text-body text-cocoa/80"
               dangerouslySetInnerHTML={{
                 __html: sanitizeHtml(story.valuesHtml),
               }}
