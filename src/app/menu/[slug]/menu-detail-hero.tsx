@@ -1,3 +1,4 @@
+import { Reveal } from "@/components/reveal";
 import { copy, type PageCopy } from "@/lib/content/page-copy";
 import type { Package, Treatment } from "@/data/content";
 
@@ -10,7 +11,7 @@ export function MenuDetailHero({
   pageCopy: PageCopy;
 }) {
   return (
-    <section className="page-hero">
+    <Reveal as="section" className="page-hero">
       <div className="padding-global">
         <div className="container-large">
           <div className="layout-row gap-large">
@@ -28,6 +29,6 @@ export function MenuDetailHero({
           </div>
         </div>
       </div>
-    </section>
+    </Reveal>
   );
 }

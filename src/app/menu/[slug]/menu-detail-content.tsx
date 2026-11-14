@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { carouselLabels } from "@/components/carousel-labels";
 import { ImageCarousel } from "@/components/image-carousel";
+import { Reveal } from "@/components/reveal";
 import { getMenuEntry } from "@/lib/content/catalog";
 import { getCatalogImagesBySlug } from "@/lib/content/content-images";
 import { getPageCopy } from "@/lib/content/page-copy";
@@ -34,7 +35,7 @@ export async function MenuDetailContent({ params }: TreatmentPageProps) {
     <main className="main-wrapper">
       <MenuDetailHero entry={entry} pageCopy={pageCopy} />
 
-      <section className="padding-section-global">
+      <Reveal as="section" className="padding-section-global">
         <div className="padding-global">
           <div className="container-large">
             <div className="layout-row gap-xlarge">
@@ -80,7 +81,7 @@ export async function MenuDetailContent({ params }: TreatmentPageProps) {
             </div>
           </div>
         </div>
-      </section>
+      </Reveal>
     </main>
   );
 }
