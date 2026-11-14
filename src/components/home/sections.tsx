@@ -17,17 +17,17 @@ export { TestimonialsSection } from "./testimonials-section";
  *
  * `cards` berasal dari `getWhatsNewCards()` (modul Highlight Homepage).
  * Tombol ajakan biasanya menuju `#footer`, jadi disembunyikan bila footer
- * homepage dimatikan admin (`showNewsletterLink = false`).
+ * homepage dimatikan admin (`showFooterCta = false`).
  */
 export function WhatsNewSection({
   cards,
   section,
-  showNewsletterLink = true,
+  showFooterCta = true,
   copyBlocks,
 }: {
   cards: HighlightCard[];
   section?: HomepageSection | null;
-  showNewsletterLink?: boolean;
+  showFooterCta?: boolean;
   copyBlocks: PageCopy;
 }) {
   const eyebrow = section?.eyebrow?.trim() || null;
@@ -41,7 +41,7 @@ export function WhatsNewSection({
   // Tautan hanya dipakai bila tujuannya aman (pertahanan bila DB diisi di
   // luar admin), dan tombolnya ikut disembunyikan saat footer dimatikan.
   const showCta =
-    showNewsletterLink && ctaLabel && ctaHref && isSafeCtaHref(ctaHref);
+    showFooterCta && ctaLabel && ctaHref && isSafeCtaHref(ctaHref);
 
   return (
     <Reveal

@@ -40,16 +40,8 @@ export const MICROCOPY_GROUPS: readonly PageCopyGroup[] = [
   },
   {
     group: "forms",
-    label: "Formulir (newsletter & reservasi)",
+    label: "Formulir (reservasi)",
     fields: [
-      { key: "forms.newsletter.title", label: "Newsletter — judul", type: "text", maxLength: 80 },
-      { key: "forms.newsletter.description", label: "Newsletter — deskripsi", type: "textarea", maxLength: 240 },
-      { key: "forms.newsletter.email_label", label: "Newsletter — label email", type: "text", maxLength: 60 },
-      { key: "forms.newsletter.name_label", label: "Newsletter — label nama", type: "text", maxLength: 60 },
-      { key: "forms.newsletter.branch_label", label: "Newsletter — label cabang", type: "text", maxLength: 60 },
-      { key: "forms.newsletter.submit_label", label: "Newsletter — label tombol", type: "text", maxLength: 40 },
-      { key: "forms.newsletter.success", label: "Newsletter — pesan sukses", type: "textarea", maxLength: 240 },
-      { key: "forms.newsletter.error", label: "Newsletter — pesan gagal", type: "textarea", maxLength: 240 },
       { key: "forms.reservation.title", label: "Reservasi — judul", type: "text", maxLength: 80 },
       { key: "forms.reservation.description", label: "Reservasi — deskripsi", type: "textarea", maxLength: 240 },
       { key: "forms.reservation.name_label", label: "Reservasi — label nama", type: "text", maxLength: 60 },

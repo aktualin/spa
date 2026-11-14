@@ -3,20 +3,10 @@ import { describe, it } from "node:test";
 
 import {
   isBotSubmission,
-  validateNewsletter,
   validateReservation,
 } from "../../src/lib/domain/forms.ts";
 
-/** Formulir publik newsletter & reservasi: validasi murni + pertahanan bot. */
-
-function newsletter(overrides: Record<string, unknown> = {}) {
-  return {
-    email: "tamu@contoh.id",
-    website: "",
-    elapsedMs: 5000,
-    ...overrides,
-  };
-}
+/** Formulir publik reservasi: validasi murni + pertahanan bot. */
 
 function reservation(overrides: Record<string, unknown> = {}) {
   return {
@@ -27,65 +17,6 @@ function reservation(overrides: Record<string, unknown> = {}) {
     ...overrides,
   };
 }
-
-describe("validateNewsletter", () => {
-  it("menerima isian minimal dan mengisi data yang sudah dirapikan", () => {
-    const result = validateNewsletter(newsletter());
-    assert.ok(result.ok);
-    if (!result.ok) return;
-    assert.equal(result.data.email, "tamu@contoh.id");
-    assert.equal(result.data.name, undefined);
-    assert.equal(result.data.branchSlug, undefined);
-  });
-
-  it("trim email, nama, dan cabang; nama & cabang opsional", () => {
-    const result = validateNewsletter(
-      newsletter({ email: "  Tamu@Contoh.id  ", name: "  Budi  ", branchSlug: " kemang " }),
-    );
-    assert.ok(result.ok);
-    if (!result.ok) return;
-    assert.equal(result.data.email, "Tamu@Contoh.id");
-    assert.equal(result.data.name, "Budi");
-    assert.equal(result.data.branchSlug, "kemang");
-  });
-
-  it("menolak email kosong atau salah format", () => {
-    for (const email of ["", "   ", "bukan-email", "a@b", "@contoh.id"]) {
-      const result = validateNewsletter(newsletter({ email }));
-      assert.equal(result.ok, false, email);
-      if (!result.ok) assert.equal(result.error, "Format email tidak valid.");
-    }
-    assert.equal(validateNewsletter({ website: "", elapsedMs: 5000 }).ok, false);
-  });
-
-  it("menolak nama lebih dari 120 karakter dan cabang lebih dari 60", () => {
-    assert.equal(validateNewsletter(newsletter({ name: "x".repeat(120) })).ok, true);
-    const nama = validateNewsletter(newsletter({ name: "x".repeat(121) }));
-    assert.equal(nama.ok, false);
-    if (!nama.ok) assert.equal(nama.error, "Nama maks. 120 karakter.");
-    assert.equal(validateNewsletter(newsletter({ branchSlug: "x".repeat(61) })).ok, false);
-  });
-
-  it("honeypot terisi ditolak dengan pesan generik", () => {
-    const result = validateNewsletter(newsletter({ website: "http://spam.example" }));
-    assert.equal(result.ok, false);
-    if (!result.ok) assert.equal(result.error, "Terjadi kesalahan. Coba lagi.");
-  });
-
-  it("elapsedMs wajib angka bulat 0..86_400_000", () => {
-    assert.equal(validateNewsletter(newsletter({ elapsedMs: 0 })).ok, true);
-    assert.equal(validateNewsletter(newsletter({ elapsedMs: 86_400_000 })).ok, true);
-    for (const elapsedMs of [undefined, -1, 1.5, 86_400_001, "5000", NaN]) {
-      assert.equal(validateNewsletter(newsletter({ elapsedMs })).ok, false, String(elapsedMs));
-    }
-  });
-
-  it("bukan objek → ditolak, tidak melempar", () => {
-    for (const raw of [null, undefined, "x", 42, []]) {
-      assert.equal(validateNewsletter(raw).ok, false);
-    }
-  });
-});
 
 describe("validateReservation", () => {
   it("menerima isian minimal (nama + telepon)", () => {

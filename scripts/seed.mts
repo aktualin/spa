@@ -524,8 +524,6 @@ const HOMEPAGE_SECTIONS: {
     title: "What’s New",
     subtitle:
       "We believe authentic beauty reaches far beyond the superficial, through consistent self-care you let the beauty shine both externally and internally.",
-    ctaLabel: "Subscribe to Newsletter",
-    ctaHref: "#footer",
     keepText: true,
   },
   { key: "reviews", title: "Reviews", keepText: true },

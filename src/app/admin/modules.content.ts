@@ -73,16 +73,6 @@ export const CONTENT_MODULES: readonly AdminModule[] = [
     ],
   },
   {
-    // Modul tambahan di luar 14 modul Lampiran I; nomor 21 hanya penanda unik.
-    no: 21,
-    label: "Newsletter",
-    href: "/admin/newsletter",
-    group: "konten",
-    hint: "Daftar pendaftar newsletter dari form di footer situs. Tidak tampil di situs publik.",
-    roles: CONTENT_ROLES,
-    ready: true,
-  },
-  {
     // Modul tambahan di luar 14 modul Lampiran I; nomor 22 hanya penanda unik.
     no: 22,
     label: "Reservasi",

@@ -1,17 +1,17 @@
 /**
- * Bacaan teks formulir newsletter & reservasi dari ContentBlock
+ * Bacaan teks formulir reservasi dari ContentBlock
  * (grup "forms" di /admin/page-copy). Tanpa fallback statis: blok yang
  * belum diisi bernilai kosong dan form menampilkan label kosong sampai
  * admin mengisinya (seed mengisi nilai awal berbahasa Indonesia).
  */
 import { cacheLife, cacheTag } from "next/cache";
 
-import type { NewsletterCopy, ReservationCopy } from "@/lib/domain/forms";
+import type { ReservationCopy } from "@/lib/domain/forms";
 
 import { copy, getPageCopy } from "./page-copy";
 import { CONTENT_TAGS } from "./tags";
 
-export type FormsCopy = { newsletter: NewsletterCopy; reservation: ReservationCopy };
+export type FormsCopy = { reservation: ReservationCopy };
 
 export async function getFormsCopy(): Promise<FormsCopy> {
   "use cache";
@@ -20,16 +20,6 @@ export async function getFormsCopy(): Promise<FormsCopy> {
   const text = (key: string) => copy(blocks, key);
   cacheLife("hours");
   return {
-    newsletter: {
-      title: text("forms.newsletter.title"),
-      description: text("forms.newsletter.description"),
-      emailLabel: text("forms.newsletter.email_label"),
-      nameLabel: text("forms.newsletter.name_label"),
-      branchLabel: text("forms.newsletter.branch_label"),
-      submitLabel: text("forms.newsletter.submit_label"),
-      success: text("forms.newsletter.success"),
-      error: text("forms.newsletter.error"),
-    },
     reservation: {
       title: text("forms.reservation.title"),
       description: text("forms.reservation.description"),

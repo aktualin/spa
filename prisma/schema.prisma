@@ -555,10 +555,12 @@ model CorporateInquiry {
 }
 
 /**
- * ---------- Modul 9b: Formulir publik (newsletter & reservasi) ----------
+ * ---------- Modul 9b: Formulir publik (reservasi) ----------
  */
 
-// Pendaftar newsletter dari footer. Inbox admin: /admin/newsletter.
+// Pendaftar newsletter dari footer. Tidak dipakai di branch main —
+// fitur newsletter hanya ada di branch feat/newsletter. Tabel dipertahankan
+// supaya data pendaftar tidak hilang saat branch dipakai bergantian.
 model NewsletterSignup {
   id         String   @id @default(cuid())
   email      String

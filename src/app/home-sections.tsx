@@ -49,7 +49,7 @@ export function HomeSection({
         <WhatsNewSection
           cards={whatsNewCards}
           section={section}
-          showNewsletterLink={showFooter}
+          showFooterCta={showFooter}
           copyBlocks={pageCopy}
         />
       );

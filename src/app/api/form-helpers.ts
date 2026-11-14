@@ -8,7 +8,7 @@ import type { RateLimiter } from "@/lib/domain/rate-limit";
 import { isSameOrigin } from "@/lib/domain/same-origin";
 
 /**
- * Pertahanan bersama endpoint formulir publik (reservation, newsletter,
+ * Pertahanan bersama endpoint formulir publik (reservation,
  * corporate-inquiry, backup/report): respons JSON no-store, kunci rate limit
  * hash IP, origin check, dan parsing body. Data pribadi pengirim tidak pernah
  * ditulis ke log.

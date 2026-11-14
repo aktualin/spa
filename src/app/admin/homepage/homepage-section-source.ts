@@ -36,6 +36,6 @@ export const SECTION_SOURCE: Record<
     link: { href: "/admin/gallery", label: "Buka Gallery" },
   },
   footer: {
-    text: "Isi footer berlaku untuk seluruh situs (tautan footer diatur di Menu Navigasi). Saklar ini hanya menyembunyikan footer DI HOMEPAGE — halaman lain tetap menampilkan footer. Saat footer homepage dimatikan, tombol “Subscribe to Newsletter” di What’s New ikut disembunyikan karena tujuannya ada di footer. Footer selalu berada di paling bawah, jadi tidak ikut diurutkan.",
+    text: "Isi footer berlaku untuk seluruh situs (tautan footer diatur di Menu Navigasi). Saklar ini hanya menyembunyikan footer DI HOMEPAGE — halaman lain tetap menampilkan footer. Saat footer homepage dimatikan, tombol ajakan di What’s New ikut disembunyikan karena tujuannya ada di footer. Footer selalu berada di paling bawah, jadi tidak ikut diurutkan.",
   },
 };

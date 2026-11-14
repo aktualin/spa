@@ -20,14 +20,9 @@ export default async function AdminBranchesPage({
           <h1 className="text-xl font-semibold text-neutral-900">Cabang</h1>
           <p className="mt-1 text-sm text-neutral-600">
             {branches.length} cabang. Tampil di halaman Kontak dan menjadi pilihan
-            lokasi pada form reservasi di /contact serta form newsletter di footer.
-            Kiriman kedua form masuk ke inbox{" "}
+            lokasi pada form reservasi di /contact. Kiriman form masuk ke inbox{" "}
             <Link href="/admin/reservations" className="underline">
               Reservasi
-            </Link>{" "}
-            dan{" "}
-            <Link href="/admin/newsletter" className="underline">
-              Newsletter
             </Link>
             . Nomor WhatsApp dan jam operasional yang dikosongkan mengikuti
             Kontak &amp; Umum.

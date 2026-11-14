@@ -37,8 +37,7 @@ export function revalidateBranches() {
   updateTag(CONTENT_TAGS.branches);
   revalidatePath("/admin/branches");
   revalidatePath("/contact");
-  // Daftar cabang adalah pilihan lokasi form reservasi (/contact) dan form
-  // newsletter di footer setiap halaman; kirimannya masuk ke inbox admin
-  // /admin/reservations dan /admin/newsletter.
+  // Daftar cabang adalah pilihan lokasi form reservasi (/contact);
+  // kirimannya masuk ke inbox admin /admin/reservations.
   revalidatePath("/", "layout");
 }

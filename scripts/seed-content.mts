@@ -48,8 +48,6 @@ const HOMEPAGE_SECTIONS: SectionSeed[] = [
     title: "What’s New",
     subtitle:
       "We believe authentic beauty reaches far beyond the superficial, through consistent self-care you let the beauty shine both externally and internally.",
-    ctaLabel: "Subscribe to Newsletter",
-    ctaHref: "#footer",
     legacyTitles: [
       "Promo / Event Highlight",
       "Promo/Event Highlight",
@@ -485,7 +483,7 @@ const EXTRA_CONTENT_BLOCKS: { key: string; value: string }[] = [
 
 
 // Grup registry baru: links (href CTA), microcopy (alt & aria), forms
-// (newsletter & reservasi). Nilai = teks yang selama ini hardcoded di
+// (reservasi). Nilai = teks yang selama ini hardcoded di
 // komponen publik, supaya tampilan tidak berubah. Placeholder {n}/{m}/
 // {name}/{title} diganti saat render.
 const LINKS_MICROCOPY_FORMS_BLOCKS: { key: string; value: string }[] = [
@@ -530,14 +528,6 @@ const LINKS_MICROCOPY_FORMS_BLOCKS: { key: string; value: string }[] = [
   { key: "carousel.aria_next", value: "Gambar berikutnya" },
   { key: "carousel.aria_counter", value: "Gambar {n} dari {m}" },
   { key: "corporate.collab_alt_suffix", value: "KAMA corporate wellness collaboration" },
-  { key: "forms.newsletter.title", value: "Newsletter" },
-  { key: "forms.newsletter.description", value: "Dapatkan kabar ritual & promo terbaru dari KAMA Spa." },
-  { key: "forms.newsletter.email_label", value: "Alamat email" },
-  { key: "forms.newsletter.name_label", value: "Nama (opsional)" },
-  { key: "forms.newsletter.branch_label", value: "Cabang favorit" },
-  { key: "forms.newsletter.submit_label", value: "Daftar" },
-  { key: "forms.newsletter.success", value: "Terima kasih! Anda terdaftar newsletter KAMA Spa." },
-  { key: "forms.newsletter.error", value: "Oops! Terjadi kesalahan. Coba lagi." },
   { key: "forms.reservation.title", value: "Reservasi" },
   {
     key: "forms.reservation.description",
