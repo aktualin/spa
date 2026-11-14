@@ -16,8 +16,11 @@ export function AdminSidebar({
   email: string;
   role: string;
 }) {
+  // Sidebar setinggi shell (lg:h-full — shell-nya lg:h-screen, lihat
+  // layout.tsx) dan tidak ikut menggulir. Daftar nav menggulir internal
+  // (min-h-0 + overflow-y-auto) supaya blok akun tetap terjepit di bawah.
   return (
-    <aside className="hidden w-64 shrink-0 flex-col border-r border-neutral-200/70 bg-white lg:flex">
+    <aside className="hidden w-64 shrink-0 flex-col border-r border-neutral-200/70 bg-white lg:flex lg:h-full">
       <div className="px-4 py-5">
         <Link
           href="/admin"
@@ -37,7 +40,7 @@ export function AdminSidebar({
         </Link>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 pb-4">
+      <nav className="min-h-0 flex-1 overflow-y-auto px-3 pb-4">
         <AdminNav groups={groups} />
       </nav>
 

@@ -34,11 +34,17 @@ export default async function AdminLayout({
 
   const groups = groupedModulesForRole(session.role);
 
+  // App-shell: di layar besar tinggi shell dikunci (lg:h-screen + overflow
+  // hidden) sehingga sidebar diam dan HANYA kolom konten yang menggulir
+  // (lg:overflow-y-auto). Di layar kecil tetap scroll dokumen normal.
   return (
-    <div data-admin-shell className="flex min-h-screen bg-neutral-50">
+    <div
+      data-admin-shell
+      className="flex min-h-screen bg-white lg:h-screen lg:overflow-hidden"
+    >
       <AdminSidebar groups={groups} email={session.email} role={session.role} />
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col lg:h-full lg:overflow-y-auto">
         <AdminMobileHeader groups={groups} />
 
         <main className="flex-1 px-4 py-6 sm:px-5 lg:px-10 lg:py-10">
