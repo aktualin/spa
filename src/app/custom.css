@@ -250,9 +250,6 @@ a,
  			 margin-left: auto!important;
  			 border: none !important;
   } 
-  .newsletter_component {
- 			 flex-direction: column;
-  }
 .padding-global.is-double, .padding-global.is-double.padding-section-global {
 	padding-left: calc(var(--utilities--padding-global) * 4);
 	padding-right: calc(var(--utilities--padding-global) * 4);
