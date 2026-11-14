@@ -142,8 +142,7 @@
   background-color: var(--kama-cream);
 }
 
-.form_input,
-.newsletter_dropdown {
+.form_input {
   background-color: #f6f1e9bf;
 }
 
@@ -1271,24 +1270,60 @@ html[data-js="true"] .kama-reveal.is-visible {
   }
 }
 
-/* ---- Reviews carousel -------------------------------------------------- */
-/* A slim, warm scrollbar so the track reads as scrollable. */
+/* ---- Reviews marquee ---------------------------------------------------
+   Track berjalan terus ke kiri; hover/fokus/sentuh menjedanya. Konten
+   digandakan (translateX -50% = satu salinan) supaya loopnya mulus. */
 
-.kama-reviews-track {
-  scrollbar-width: thin;
-  scrollbar-color: var(--kama-periwinkle-100) transparent;
+.kama-marquee {
+  overflow: hidden;
 }
 
-.kama-reviews-track::-webkit-scrollbar {
-  height: 4px;
+.kama-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: kama-marquee-scroll var(--kama-marquee-duration, 40s) linear infinite;
 }
 
-.kama-reviews-track::-webkit-scrollbar-thumb {
-  background: var(--kama-periwinkle-100);
+.kama-marquee:hover .kama-marquee-track,
+.kama-marquee:focus-within .kama-marquee-track,
+.kama-marquee:active .kama-marquee-track {
+  animation-play-state: paused;
 }
 
-.kama-reviews-track::-webkit-scrollbar-track {
-  background: transparent;
+@keyframes kama-marquee-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Reduced motion: tanpa animasi, track jadi daftar statis yang bisa
+   digeser manual; salinan duplikat disembunyikan. */
+@media (prefers-reduced-motion: reduce) {
+  .kama-marquee {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--kama-periwinkle-100) transparent;
+  }
+
+  .kama-marquee::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .kama-marquee::-webkit-scrollbar-thumb {
+    background: var(--kama-periwinkle-100);
+  }
+
+  .kama-marquee::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .kama-marquee-track {
+    animation: none;
+  }
+
+  .kama-marquee-copy {
+    display: none;
+  }
 }
 
 /* ---- Card consistency -------------------------------------------------

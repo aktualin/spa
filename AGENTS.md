@@ -55,7 +55,7 @@ node scripts/screenshot.mjs http://localhost:3000 /tmp/kama mobile   # one viewp
 - `src/components/reveal.tsx` — client component that reveals a block when it scrolls into view.
 - `src/components/whatsapp-button.tsx` — the floating WhatsApp button (used by `src/app/layout.tsx`).
 - `src/components/copyright-year.tsx` — client component that prints the current year.
-- `src/components/home/reviews-carousel.tsx` — the swipeable reviews carousel.
+- `src/components/home/reviews-marquee.tsx` — the reviews marquee (auto-scrolling, pauses on hover/focus/touch).
 - `src/components/home/hero.tsx` — server wrapper for the homepage hero/banners; `src/components/home/hero-slider.tsx` is the client hero media slider.
 - `src/lib/domain/hero-slide.ts` — pure media URL validation + `HeroSlide` fallback/resolve rules (unit tested).
 - `src/components/forms/*` — reservation + newsletter forms, wired to `POST /api/reservation` / `/api/newsletter` with admin inboxes (see `## Architecture decisions`). They take `{ branches, copy }` props; copy comes from `getFormsCopy()`.
@@ -146,7 +146,7 @@ Numbers and messages live in the database (`SiteSettings` + `WhatsAppTemplate`),
 - Anti-FOUC contract: content is **visible by default**. `src/app/layout.tsx` sets `document.documentElement.dataset.js = "true"` from a tiny inline script; CSS hides `.kama-reveal` **only** when that flag is present (`html[data-js="true"] .kama-reveal`). If JS fails, the page still shows everything.
 - `prefers-reduced-motion: reduce` disables every animation (reveal, WhatsApp pulse, carousel auto-motion).
 - Custom animations live in `src/app/kama.css` (or `@theme { --animate-* }` + `@keyframes` in `globals.css` for Tailwind v4 utilities) — never in `hiatus.css`.
-- The reviews carousel (`src/components/home/reviews-carousel.tsx`) uses CSS scroll-snap so a native swipe works on touch devices; the arrows are an enhancement, not the only way to move.
+- The reviews section is a marquee (`src/components/home/reviews-marquee.tsx`): the track scrolls continuously and pauses on hover/focus/touch; `prefers-reduced-motion` turns it into a static swipeable list (duplicate copy hidden). When there are no published reviews the whole section — heading included — is hidden.
 
 ### Homepage hero media
 

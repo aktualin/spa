@@ -6,11 +6,3 @@ export type Review = {
   location: string;
   role: string;
 };
-
-/** Aria ulasan dari CB (home.reviews.aria_*); dot memakai {name}. */
-export type ReviewsLabels = {
-  prev: string;
-  next: string;
-  list: string;
-  dot: string;
-};
