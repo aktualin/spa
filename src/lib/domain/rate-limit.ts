@@ -69,3 +69,15 @@ export const loginLimiter = createRateLimiter({
   limit: 10,
   windowMs: 15 * 60 * 1000,
 });
+
+/** Limitir endpoint newsletter footer — 5 permintaan per 10 menit per IP. */
+export const newsletterLimiter = createRateLimiter({
+  limit: 5,
+  windowMs: 10 * 60 * 1000,
+});
+
+/** Limitir endpoint reservasi halaman kontak — 5 permintaan per 10 menit per IP. */
+export const reservationLimiter = createRateLimiter({
+  limit: 5,
+  windowMs: 10 * 60 * 1000,
+});

@@ -4,92 +4,20 @@
  *
  * Semua keranjang hari memakai kalender WIB (UTC+7 tetap, tanpa DST) supaya
  * angka "hari ini" sama dengan tanggal yang dilihat admin di Jakarta.
+ * Implementasinya dipecah ke `traffic.period.ts` dan `traffic.buckets.ts`;
+ * berkas ini mengekspor ulangnya plus agregat grafiknya.
  */
 
 import type { TrendPoint } from "./admin-dashboard.ts";
+import type { DayBucket } from "./traffic.buckets.ts";
 
-const DAY_MS = 24 * 60 * 60 * 1000;
-const WIB_OFFSET_MS = 7 * 60 * 60 * 1000;
-const MONTH_LABELS = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "Mei",
-  "Jun",
-  "Jul",
-  "Agu",
-  "Sep",
-  "Okt",
-  "Nov",
-  "Des",
-] as const;
-
-/** Periode yang boleh dipilih di halaman Pengunjung & Halaman. */
-export const TRAFFIC_PERIOD_DAYS = [7, 30, 90] as const;
-export type TrafficPeriodDays = (typeof TRAFFIC_PERIOD_DAYS)[number];
-export const DEFAULT_TRAFFIC_PERIOD_DAYS: TrafficPeriodDays = 30;
-
-/** "30" → 30; nilai asing/negatif → default 30 hari. */
-export function parseTrafficPeriod(
-  value: string | undefined,
-): TrafficPeriodDays {
-  const days = Number.parseInt(value ?? "", 10);
-  return (TRAFFIC_PERIOD_DAYS as readonly number[]).includes(days)
-    ? (days as TrafficPeriodDays)
-    : DEFAULT_TRAFFIC_PERIOD_DAYS;
-}
-
-/** Satu hari kalender WIB; `end` eksklusif. */
-export type DayBucket = {
-  key: string;
-  label: string;
-  start: Date;
-  end: Date;
-};
-
-function pad2(value: number): string {
-  return String(value).padStart(2, "0");
-}
-
-/** Tanggal WIB dalam bentuk "YYYY-MM-DD" — kunci yang dipakai query SQL. */
-export function dayKeyWib(date: Date): string {
-  const shifted = new Date(date.getTime() + WIB_OFFSET_MS);
-  return `${shifted.getUTCFullYear()}-${pad2(shifted.getUTCMonth() + 1)}-${pad2(
-    shifted.getUTCDate(),
-  )}`;
-}
-
-/**
- * `days` keranjang hari terakhir termasuk hari ini, urut lama → baru.
- * Batas hari dihitung dari tengah malam WIB lalu dikembalikan ke UTC.
- */
-export function dayBuckets(now: Date, days: number): DayBucket[] {
-  const count = Math.min(365, Math.max(1, Math.trunc(days)));
-  const shifted = new Date(now.getTime() + WIB_OFFSET_MS);
-  const todayStartUtc =
-    Date.UTC(
-      shifted.getUTCFullYear(),
-      shifted.getUTCMonth(),
-      shifted.getUTCDate(),
-    ) - WIB_OFFSET_MS;
-
-  const buckets: DayBucket[] = [];
-  for (let index = count - 1; index >= 0; index -= 1) {
-    const start = new Date(todayStartUtc - index * DAY_MS);
-    const end = new Date(start.getTime() + DAY_MS);
-    const wib = new Date(start.getTime() + WIB_OFFSET_MS);
-    buckets.push({
-      key: `${wib.getUTCFullYear()}-${pad2(wib.getUTCMonth() + 1)}-${pad2(
-        wib.getUTCDate(),
-      )}`,
-      label: `${wib.getUTCDate()} ${MONTH_LABELS[wib.getUTCMonth()]}`,
-      start,
-      end,
-    });
-  }
-  return buckets;
-}
+export {
+  TRAFFIC_PERIOD_DAYS,
+  type TrafficPeriodDays,
+  DEFAULT_TRAFFIC_PERIOD_DAYS,
+  parseTrafficPeriod,
+} from "./traffic.period.ts";
+export { type DayBucket, dayKeyWib, dayBuckets } from "./traffic.buckets.ts";
 
 /** Satu baris agregat harian dari database. */
 export type DailyTrafficRow = {

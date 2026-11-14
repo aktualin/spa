@@ -11,6 +11,14 @@ import { expect, test } from "@playwright/test";
 const DESKTOP = "desktop";
 
 test.beforeEach(async ({ page }) => {
+  // Test nav butuh DOM + JS (header/drawer/mega menu), bukan media. Tanpa ini
+  // event load/networkidle tersandera unduhan hero dari S3 saat worker paralel
+  // dan beforeEach timeout sebelum test sempat jalan.
+  await page.route("**/*", (route) => {
+    const type = route.request().resourceType();
+    if (type === "image" || type === "media") return route.abort();
+    return route.continue();
+  });
   await page.goto("/");
   await page.waitForLoadState("networkidle");
 });

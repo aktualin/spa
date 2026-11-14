@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 
-import { inputClass, secondaryButtonClass } from "../../promos/_kit/form-ui";
-
-type Block = { key: string; title: string; items: string };
+import { secondaryButtonClass } from "../../promos/_kit/form-ui";
+import { SolutionBlock, type Block } from "./solutions-block";
 
 /**
  * Editor blok "Why Partner with KAMA?" (solutions): judul + poin (satu poin
@@ -51,54 +50,15 @@ export function SolutionsField({
       </p>
 
       {blocks.map((block, index) => (
-        <div key={block.key} className="space-y-2 rounded-md border border-neutral-200 p-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <input
-              aria-label={`Judul blok ${index + 1}`}
-              name="solutionTitle"
-              value={block.title}
-              maxLength={200}
-              onChange={(event) => patch(block.key, { title: event.target.value })}
-              placeholder="Judul blok, mis. In-Office Wellness Program"
-              className={`${inputClass} min-w-48 flex-1`}
-            />
-            <button
-              type="button"
-              onClick={() => move(index, -1)}
-              disabled={index === 0}
-              aria-label={`Naikkan blok ${index + 1}`}
-              className={secondaryButtonClass}
-            >
-              ↑
-            </button>
-            <button
-              type="button"
-              onClick={() => move(index, 1)}
-              disabled={index === blocks.length - 1}
-              aria-label={`Turunkan blok ${index + 1}`}
-              className={secondaryButtonClass}
-            >
-              ↓
-            </button>
-            <button
-              type="button"
-              onClick={() => setBlocks((current) => current.filter((b) => b.key !== block.key))}
-              aria-label={`Hapus blok ${index + 1}`}
-              className={`${secondaryButtonClass} text-red-700`}
-            >
-              Hapus
-            </button>
-          </div>
-          <textarea
-            aria-label={`Poin blok ${index + 1} (satu per baris)`}
-            name="solutionItems"
-            value={block.items}
-            onChange={(event) => patch(block.key, { items: event.target.value })}
-            rows={4}
-            placeholder={"Satu poin per baris"}
-            className={inputClass}
-          />
-        </div>
+        <SolutionBlock
+          key={block.key}
+          block={block}
+          index={index}
+          count={blocks.length}
+          patch={patch}
+          move={move}
+          remove={(key) => setBlocks((current) => current.filter((b) => b.key !== key))}
+        />
       ))}
 
       <button

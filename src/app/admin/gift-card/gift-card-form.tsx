@@ -2,11 +2,9 @@
 
 import { useActionState } from "react";
 
-
 import { saveGiftCardAction, type ActionState } from "../actions/gift-card";
-import { ImageField } from "../image-field";
-import { RichTextField } from "../rich-text-field";
-import { ErrorAlert, Field, SaveButton, inputClass } from "../promos/_kit/form-ui";
+import { ErrorAlert, SaveButton } from "../promos/_kit/form-ui";
+import { GiftCardFields } from "./gift-card-form-fields";
 
 export type GiftCardFormData = {
   title: string;
@@ -44,64 +42,7 @@ export function GiftCardForm({
       ) : null}
 
       <form action={formAction} className="mt-6 space-y-5">
-        <Field label="Judul" htmlFor="title">
-          <input
-            id="title"
-            name="title"
-            defaultValue={giftCard.title}
-            required
-            className={inputClass}
-          />
-        </Field>
-
-        <Field
-          label="Subjudul"
-          htmlFor="subtitle"
-          hint="Kalimat di bawah judul. Dikosongkan → baris ini tidak tampil di halaman."
-        >
-          <input
-            id="subtitle"
-            name="subtitle"
-            defaultValue={giftCard.subtitle}
-            maxLength={200}
-            className={inputClass}
-          />
-        </Field>
-
-        <RichTextField
-          name="bodyHtml"
-          label="Isi gift card"
-          folder="gift-card"
-          defaultValue={giftCard.bodyHtml}
-        />
-
-        <ImageField
-          name="imageUrl"
-          label="Gambar gift card"
-          folder="gift-card"
-          defaultValue={giftCard.imageUrl}
-        />
-
-        <RichTextField
-          name="termsHtml"
-          label="Syarat & ketentuan (opsional)"
-          folder="gift-card"
-          defaultValue={giftCard.termsHtml}
-        />
-
-        <Field
-          label="Pesan WhatsApp"
-          htmlFor="whatsappMessage"
-          hint='Teks awal chat tombol "Pesan via WhatsApp". Dikosongkan → memakai Template WhatsApp konteks "gift".'
-        >
-          <input
-            id="whatsappMessage"
-            name="whatsappMessage"
-            defaultValue={giftCard.whatsappMessage}
-            maxLength={500}
-            className={inputClass}
-          />
-        </Field>
+        <GiftCardFields giftCard={giftCard} />
 
         <ErrorAlert message={state.error} />
 

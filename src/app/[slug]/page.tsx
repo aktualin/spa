@@ -3,11 +3,11 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { DeferredNavigation } from "@/components/public/deferred-navigation";
 import { Footer } from "@/components/footer";
-import { PublicPageHeader } from "@/components/public/page-parts";
 import { getPublishedPage } from "@/lib/content/pages";
 import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
 import { pagePath, validatePageSlug } from "@/lib/domain/page-url";
+import { HeaderFallback } from "../_components/detail-parts";
 import { LegalPageTemplate, StandardPageTemplate } from "./page-templates";
 
 type StaticPageProps = {
@@ -48,7 +48,7 @@ export default async function StaticPageRoute({ params }: StaticPageProps) {
       <DeferredNavigation />
       <Suspense
         fallback={
-          <StaticPageFallback
+          <HeaderFallback
             eyebrow={copy(pageCopy, "pages.header_eyebrow")}
             title={copy(pageCopy, "pages.loading_title")}
           />
@@ -58,14 +58,6 @@ export default async function StaticPageRoute({ params }: StaticPageProps) {
       </Suspense>
       <Footer />
     </>
-  );
-}
-
-function StaticPageFallback({ eyebrow, title }: { eyebrow: string; title: string }) {
-  return (
-    <main className="flex-1">
-      <PublicPageHeader eyebrow={eyebrow} title={title} />
-    </main>
   );
 }
 

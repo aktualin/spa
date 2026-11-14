@@ -1,7 +1,3 @@
-import { createHash } from "node:crypto";
-
-import { NextResponse } from "next/server";
-
 import { backupReportLimiter } from "@/lib/backup/limits";
 import {
   REPORT_MAX_BODY_BYTES,
@@ -11,6 +7,8 @@ import {
 } from "@/lib/domain/backup";
 import { extractClientIp } from "@/lib/domain/inquiry";
 import { prisma } from "@/lib/prisma";
+
+import { json, rateLimitKey } from "../../form-helpers";
 
 /**
  * `POST /api/backup/report` — dipanggil workflow GitHub Actions
@@ -25,24 +23,13 @@ import { prisma } from "@/lib/prisma";
 
 // Tanpa `runtime`/`dynamic`: `cacheComponents` menolak route segment config.
 
-function json(body: Record<string, unknown>, status: number, headers?: HeadersInit) {
-  return NextResponse.json(body, {
-    status,
-    headers: { "cache-control": "no-store", ...(headers ?? {}) },
-  });
-}
-
-function rateLimitKey(ip: string): string {
-  return createHash("sha256").update(`backup-report:${ip}`).digest("hex").slice(0, 32);
-}
-
 export async function POST(request: Request) {
   const secret = process.env.BACKUP_REPORT_SECRET;
   if (!isReportSecretConfigured(secret)) {
     return json({ error: "Pencatatan backup belum dikonfigurasi." }, 503);
   }
 
-  const limit = backupReportLimiter.check(rateLimitKey(extractClientIp(request.headers)));
+  const limit = backupReportLimiter.check(rateLimitKey("backup-report", extractClientIp(request.headers)));
   if (!limit.allowed) {
     return json({ error: "Terlalu banyak permintaan." }, 429, {
       "retry-after": String(Math.ceil(limit.retryAfterMs / 1000)),

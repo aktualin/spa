@@ -11,6 +11,8 @@ import { CONTENT_ROLES } from "@/lib/domain/roles";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 import { prisma } from "@/lib/prisma";
 
+import { firstIssue } from "../promos/_kit/schema";
+
 export type ActionState = { error: string | null; ok?: boolean };
 
 const ourStorySchema = z.object({
@@ -41,10 +43,6 @@ function richHtml(value: string | undefined): string | null {
   const html = sanitizeHtml(value);
   const textOnly = html.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ");
   return /\S/.test(textOnly) || /<img\b/i.test(html) ? html : null;
-}
-
-function firstIssue(error: z.ZodError): string {
-  return error.issues[0]?.message ?? "Input tidak valid.";
 }
 
 export async function saveOurStoryAction(

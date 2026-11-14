@@ -3,33 +3,19 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 
-import { slugify, SLUG_PATTERN } from "@/lib/domain/slug";
-import { JOURNAL_CATEGORY_MAX } from "@/lib/domain/journal";
-
 import {
   deleteJournalCategoryAction,
   saveJournalCategoryAction,
-  type ActionState,
 } from "../../actions/journal-categories";
 import {
   ConfirmSubmit,
   ErrorMessage,
-  Field,
   SaveButton,
-  inputClass,
 } from "../../settings/_components/form-ui";
+import { CategoryOrderFields, NameSlugFields } from "./category-form-fields";
+import { LIST_PATH, initialState, type JournalCategoryFormData } from "./category-form.types";
 
-export type JournalCategoryFormData = {
-  id: string | null;
-  name: string;
-  slug: string;
-  sortOrder: number;
-  isPublished: boolean;
-  postCount: number;
-};
-
-const LIST_PATH = "/admin/journal/categories";
-const initialState: ActionState = { error: null };
+export type { JournalCategoryFormData } from "./category-form.types";
 
 export function JournalCategoryForm({
   category,
@@ -42,8 +28,6 @@ export function JournalCategoryForm({
   const isNew = category.id === null;
   const [slug, setSlug] = useState(category.slug);
   const [slugEdited, setSlugEdited] = useState(!isNew);
-
-  const slugValid = slug === "" || SLUG_PATTERN.test(slug);
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -64,64 +48,15 @@ export function JournalCategoryForm({
       <form action={formAction} className="mt-6 space-y-5">
         {category.id ? <input type="hidden" name="id" value={category.id} /> : null}
 
-        <Field label="Nama" htmlFor="name" hint="Tampil sebagai chip filter dan label di kartu artikel.">
-          <input
-            id="name"
-            name="name"
-            defaultValue={category.name}
-            required
-            maxLength={JOURNAL_CATEGORY_MAX}
-            onChange={(event) => {
-              if (!slugEdited) setSlug(slugify(event.target.value));
-            }}
-            className={inputClass}
-          />
-        </Field>
+        <NameSlugFields
+          category={category}
+          slug={slug}
+          setSlug={setSlug}
+          slugEdited={slugEdited}
+          setSlugEdited={setSlugEdited}
+        />
 
-        <Field
-          label="Slug"
-          htmlFor="slug"
-          hint="Dipakai sebagai penanda internal. Kosongkan untuk mengikuti nama."
-        >
-          <input
-            id="slug"
-            name="slug"
-            value={slug}
-            maxLength={80}
-            onChange={(event) => {
-              setSlug(event.target.value);
-              setSlugEdited(true);
-            }}
-            className={`${inputClass} font-mono`}
-          />
-          {slugValid ? null : (
-            <p className="mt-1 text-xs text-red-700">
-              Slug hanya boleh huruf kecil, angka, dan tanda hubung.
-            </p>
-          )}
-        </Field>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Urutan" htmlFor="sortOrder" hint="Makin kecil makin kiri pada baris filter.">
-            <input
-              id="sortOrder"
-              name="sortOrder"
-              type="number"
-              min={0}
-              defaultValue={category.sortOrder}
-              className={inputClass}
-            />
-          </Field>
-          <label className="flex items-center gap-2 self-end pb-2 text-sm text-neutral-700">
-            <input
-              type="checkbox"
-              name="isPublished"
-              defaultChecked={category.isPublished}
-              className="size-4 rounded border-neutral-300"
-            />
-            Tampilkan di situs
-          </label>
-        </div>
+        <CategoryOrderFields category={category} />
 
         <ErrorMessage error={state.error} />
 

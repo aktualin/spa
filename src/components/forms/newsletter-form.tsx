@@ -1,21 +1,47 @@
 "use client";
 
-import { useState } from "react";
-import type { BranchOption } from "./reservation-form";
+import { useRef, useState } from "react";
 
-export function NewsletterForm({ branches }: { branches: readonly BranchOption[] }) {
-  const [sent, setSent] = useState(false);
+import type { BranchOption, NewsletterCopy } from "@/lib/domain/forms";
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+/** Form newsletter footer; submit sungguhan ke /api/newsletter. */
+export function NewsletterForm({
+  branches,
+  copy,
+}: {
+  branches: readonly BranchOption[];
+  copy: NewsletterCopy;
+}) {
+  const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const startedAt = useRef(Date.now());
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSent(true);
+    const data = new FormData(e.currentTarget);
+    setState("sending");
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: String(data.get("email") ?? ""),
+          name: String(data.get("name") ?? ""),
+          branchSlug: String(data.get("branchSlug") ?? ""),
+          website: String(data.get("website") ?? ""),
+          elapsedMs: Date.now() - startedAt.current,
+        }),
+      });
+      setState(res.ok ? "sent" : "error");
+    } catch {
+      setState("error");
+    }
   }
 
-  if (sent) {
+  if (state === "sent") {
     return (
       <div className="footer-form-block-newsletter w-form">
         <div className="w-form-done" style={{ display: "block" }}>
-          <div>Thank you! Your submission has been received!</div>
+          <div>{copy.success}</div>
         </div>
       </div>
     );
@@ -26,44 +52,48 @@ export function NewsletterForm({ branches }: { branches: readonly BranchOption[]
       <form
         id="form-newsletter"
         name="form-newsletter"
-        method="get"
+        method="post"
         className="newsletter"
-        aria-label="Newsletter signup"
+        aria-label={copy.title}
         data-track-form="newsletter"
         onSubmit={onSubmit}
       >
         <input
           className="form_input w-input"
           maxLength={256}
-          name="Email-adress-2"
-          placeholder="Email address"
+          name="email"
+          placeholder={copy.emailLabel}
+          aria-label={copy.emailLabel}
           type="email"
-          id="Email-adress-2"
           required
         />
         <select
-          name="Locations"
+          name="branchSlug"
           className="form_input is-select"
           defaultValue=""
-          aria-label="Preferred location"
+          aria-label={copy.branchLabel}
           required
         >
           <option disabled value="">
-            Locations
+            {copy.branchLabel}
           </option>
           {branches.map((branch) => (
-            <option key={branch.slug} value={`${branch.name} | ${branch.area}`}>
+            <option key={branch.slug} value={branch.slug}>
               {branch.name} | {branch.area}
             </option>
           ))}
         </select>
-        <button type="submit" className="button is-tertiary w-button">
-          Sign Me Up
+        {/* Honeypot: tidak terlihat manusia, bot mengisinya → ditolak server. */}
+        <input name="website" type="text" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
+        <button type="submit" className="button is-tertiary w-button" disabled={state === "sending"}>
+          {copy.submitLabel}
         </button>
       </form>
-      <div className="w-form-fail">
-        <div>Oops! Something went wrong while submitting the form.</div>
-      </div>
+      {state === "error" && (
+        <div className="w-form-fail" style={{ display: "block" }}>
+          <div>{copy.error}</div>
+        </div>
+      )}
     </div>
   );
 }

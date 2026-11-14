@@ -1,4 +1,6 @@
-import { ArrowRight, Instagram } from "@/components/icons";
+import { fillCopy } from "@/components/copy-text";
+import { ArrowRight } from "@/components/icons";
+import { InstagramGrid } from "@/components/instagram-grid";
 import { Reveal } from "@/components/reveal";
 import { getInstagramPosts, type HomepageSection } from "@/lib/content/homepage";
 import { copy, type PageCopy } from "@/lib/content/page-copy";
@@ -19,12 +21,14 @@ export async function SocialsSection({
     section?.ctaLabel?.trim() || copy(copyBlocks, "global.instagram_follow_label");
   const emptyText =
     copy(copyBlocks, "home.socials.empty") || copy(copyBlocks, "global.instagram_empty");
+  const postAria =
+    copy(copyBlocks, "global.socials_post_aria") || "Instagram post {n}";
   const cells = (posts ?? []).map((post, i) => ({
     key: post.key,
     src: post.imageUrl,
     alt: post.imageAlt,
     href: post.href ?? instagramUrl,
-    label: `Instagram post ${i + 1}`,
+    label: fillCopy(postAria, { n: i + 1 }),
   }));
 
   // Tanpa URL Instagram maupun foto dari admin, bagian ini tidak punya isi.
@@ -68,30 +72,7 @@ export async function SocialsSection({
         {cells.length === 0 ? (
           emptyText ? <p className="mt-8 text-body text-cocoa/60">{emptyText}</p> : null
         ) : (
-          <ul className="mt-8 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6 lg:gap-3">
-            {cells.map((cell) => (
-              <li key={cell.key} className="group relative aspect-square overflow-hidden bg-cream">
-                {cell.href ? (
-                  <a
-                    href={cell.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={cell.label}
-                    className="absolute inset-0 z-10"
-                  />
-                ) : null}
-                <img
-                  src={cell.src}
-                  alt={cell.alt}
-                  loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-cocoa/0 opacity-0 transition-opacity duration-300 group-hover:bg-cocoa/40 group-hover:opacity-100">
-                  <Instagram className="h-6 w-6 text-white" />
-                </span>
-              </li>
-            ))}
-          </ul>
+          <InstagramGrid items={cells} rel="noreferrer" />
         )}
       </div>
     </Reveal>

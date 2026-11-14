@@ -5,15 +5,14 @@ import {
   groupModules,
   rolesForAdminPath,
   visibleModules,
-  type AccessChild,
-  type AccessGroup,
   type GroupedModules,
 } from "../../lib/domain/admin-access.ts";
-import {
-  ADMIN_ONLY_ROLES,
-  CONTENT_ROLES,
-  type AdminRoleName,
-} from "../../lib/domain/roles.ts";
+import type { AdminRoleName } from "../../lib/domain/roles.ts";
+
+import { CATALOG_MODULES } from "./modules.catalog.ts";
+import { CONTENT_MODULES } from "./modules.content.ts";
+import { SYSTEM_MODULES } from "./modules.system.ts";
+import { ADMIN_GROUPS, type AdminModule } from "./modules.types.ts";
 
 /**
  * Modul dashboard (14 modul Lampiran I Bagian D kontrak 01/PKS/XI/KAMA/2026
@@ -41,33 +40,8 @@ import {
  * (fail-closed) — daftarkan halaman baru di sini. Logika pencocokan path:
  * src/lib/domain/admin-access.ts.
  */
-export type AdminModule = {
-  /** Nomor modul di Lampiran I Bagian D (15+ = modul tambahan). Harus unik. */
-  no: number;
-  label: string;
-  href: string;
-  /** Kelompok sidebar; id harus ada di `ADMIN_GROUPS`. */
-  group: string;
-  /**
-   * Satu kalimat: konten modul ini tampil di mana pada situs publik. Dipakai
-   * sidebar (tooltip), kartu dashboard, dan petunjuk di atas halaman modul.
-   */
-  hint: string;
-  /** Role yang boleh membuka modul ini (sidebar + halaman + Server Action). */
-  roles: readonly AdminRoleName[];
-  /** false selama halamannya belum dibangun — sidebar menandainya "segera". */
-  ready: boolean;
-  /** Sub-halaman modul; `roles` kosong = ikut modul induk. */
-  children?: AccessChild[];
-};
-
-export const ADMIN_GROUPS: readonly AccessGroup[] = [
-  { id: "katalog", label: "Katalog & Harga" },
-  { id: "konten", label: "Konten Situs" },
-  { id: "struktur", label: "Halaman & Navigasi" },
-  { id: "analitik", label: "Analitik" },
-  { id: "sistem", label: "Pengaturan Sistem" },
-];
+export type { AdminModule } from "./modules.types.ts";
+export { ADMIN_GROUPS };
 
 /**
  * Urutan array = urutan tampil di sidebar dan kartu dashboard. Disusun
@@ -76,214 +50,9 @@ export const ADMIN_GROUPS: readonly AccessGroup[] = [
  * nomor modul kontrak, bukan urutan tampil.
  */
 export const ADMIN_MODULES: readonly AdminModule[] = [
-  {
-    no: 1,
-    label: "Treatments & Packages",
-    href: "/admin/treatments",
-    group: "katalog",
-    hint: "Tampil di halaman Treatments, Menu, dan Signature Treatments di homepage.",
-    roles: CONTENT_ROLES,
-    ready: true,
-    children: [
-      { label: "Kategori", href: "/admin/treatments/categories" },
-      { label: "Packages", href: "/admin/treatments/packages" },
-      { label: "Add-on", href: "/admin/treatments/addons" },
-    ],
-  },
-  {
-    no: 2,
-    label: "Harga",
-    href: "/admin/treatments/prices",
-    group: "katalog",
-    hint: "Harga yang tampil di kartu treatment, paket, dan halaman Menu.",
-    roles: CONTENT_ROLES,
-    ready: true,
-  },
-  {
-    no: 5,
-    label: "Membership",
-    href: "/admin/membership",
-    group: "katalog",
-    hint: "Halaman Membership, banner membership di homepage, dan tautan di footer.",
-    roles: CONTENT_ROLES,
-    ready: true,
-  },
-  {
-    no: 8,
-    label: "KAMA Retail",
-    href: "/admin/retail",
-    group: "katalog",
-    hint: "Produk yang tampil di halaman KAMA Retail.",
-    roles: CONTENT_ROLES,
-    ready: true,
-  },
-  {
-    no: 10,
-    label: "Homepage & Our Story",
-    href: "/admin/homepage",
-    group: "konten",
-    hint: "Susunan section homepage, hero, statistik, ulasan, feed Instagram, dan halaman Our Story.",
-    roles: CONTENT_ROLES,
-    ready: true,
-    children: [
-      { label: "Highlight", href: "/admin/homepage/highlights" },
-      { label: "Statistik", href: "/admin/homepage/stats" },
-      { label: "Ulasan", href: "/admin/homepage/reviews" },
-      { label: "Feed Instagram", href: "/admin/homepage/instagram" },
-      { label: "Our Story", href: "/admin/our-story" },
-    ],
-  },
-  {
-    no: 4,
-    label: "Promos & Gift Card",
-    href: "/admin/promos",
-    group: "konten",
-    hint: "Halaman Promos, Gift Card, dan section Promo Highlight di homepage.",
-    roles: CONTENT_ROLES,
-    ready: true,
-    children: [{ label: "Gift Card", href: "/admin/gift-card" }],
-  },
-  {
-    no: 6,
-    label: "Journal",
-    href: "/admin/journal",
-    group: "konten",
-    hint: "Artikel di halaman Journal dan kartu What's New di homepage.",
-    roles: CONTENT_ROLES,
-    ready: true,
-    children: [{ label: "Kategori", href: "/admin/journal/categories" }],
-  },
-  {
-    no: 7,
-    label: "Events",
-    href: "/admin/events",
-    group: "konten",
-    hint: "Halaman Events dan Collaborations.",
-    roles: CONTENT_ROLES,
-    ready: true,
-  },
-  {
-    no: 3,
-    label: "Foto & Gallery",
-    href: "/admin/gallery",
-    group: "konten",
-    hint: "Halaman Gallery dan section Gallery Teaser di homepage.",
-    roles: CONTENT_ROLES,
-    ready: true,
-  },
-  {
-    no: 9,
-    label: "Corporate Wellness",
-    href: "/admin/corporate",
-    group: "konten",
-    hint: "Halaman Corporate Wellness beserta form dan daftar inquiry yang masuk.",
-    roles: CONTENT_ROLES,
-    ready: true,
-    children: [
-      { label: "Inquiries", href: "/admin/corporate/inquiries" },
-      { label: "PIC", href: "/admin/corporate/pic" },
-      { label: "Konten halaman", href: "/admin/corporate/content" },
-    ],
-  },
-  {
-    // Modul tambahan di luar 14 modul Lampiran I; nomor 16 hanya penanda unik.
-    no: 16,
-    label: "Media Library",
-    href: "/admin/media",
-    group: "konten",
-    hint: "Gudang gambar yang dipakai modul lain lewat tombol “Pilih dari media”.",
-    roles: CONTENT_ROLES,
-    ready: true,
-  },
-  {
-    no: 11,
-    label: "Menu Navigasi",
-    href: "/admin/menu",
-    group: "struktur",
-    hint: "Tautan di header, mega-menu, menu mobile, dan footer.",
-    roles: CONTENT_ROLES,
-    ready: true,
-  },
-  {
-    // Modul tambahan di luar 14 modul Lampiran I; nomor 15 hanya penanda unik.
-    no: 15,
-    label: "Halaman & URL",
-    href: "/admin/pages",
-    group: "struktur",
-    hint: "Slug, judul, SEO, dan status terbit tiap halaman publik, plus redirect 301.",
-    roles: CONTENT_ROLES,
-    ready: true,
-    children: [{ label: "Redirect 301", href: "/admin/redirects" }],
-  },
-  {
-    // Modul tambahan di luar 14 modul Lampiran I; nomor 18 hanya penanda unik.
-    no: 18,
-    label: "Teks Halaman",
-    href: "/admin/page-copy",
-    group: "struktur",
-    hint: "Judul section, label tombol, dan teks pendek yang tersebar di seluruh halaman.",
-    roles: CONTENT_ROLES,
-    ready: true,
-  },
-  {
-    // Modul tambahan di luar 14 modul Lampiran I; nomor 17 hanya penanda unik.
-    no: 17,
-    label: "Cabang",
-    href: "/admin/branches",
-    group: "struktur",
-    hint: "Daftar cabang di halaman Contact dan pilihan cabang pada form.",
-    roles: CONTENT_ROLES,
-    ready: true,
-  },
-  {
-    no: 13,
-    label: "SEO",
-    href: "/admin/seo",
-    group: "struktur",
-    hint: "Meta title, description, dan OG image per halaman.",
-    roles: CONTENT_ROLES,
-    ready: true,
-  },
-  {
-    // Modul tambahan di luar 14 modul Lampiran I; nomor 20 hanya penanda unik.
-    no: 20,
-    label: "Pengunjung & Halaman",
-    href: "/admin/analytics",
-    group: "analitik",
-    hint: "Jumlah pengunjung unik, tampilan halaman, dan halaman publik yang paling banyak diakses.",
-    roles: CONTENT_ROLES,
-    ready: true,
-  },
-  {
-    no: 12,
-    label: "Kontak & Umum",
-    href: "/admin/settings/contact",
-    group: "sistem",
-    hint: "Nomor WhatsApp, email, tautan booking, ikon sosial, GA4, dan favicon — dipakai seluruh situs.",
-    roles: ADMIN_ONLY_ROLES,
-    ready: true,
-    children: [{ label: "Template WhatsApp", href: "/admin/settings/whatsapp" }],
-  },
-  {
-    no: 14,
-    label: "Pengguna Admin",
-    href: "/admin/users",
-    group: "sistem",
-    hint: "Akun dan role yang bisa masuk dashboard ini. Tidak tampil di situs publik.",
-    roles: ADMIN_ONLY_ROLES,
-    ready: true,
-  },
-  {
-    // Modul tambahan di luar 14 modul Lampiran I; nomor 19 mengikuti
-    // penanda "Modul 19" di prisma/schema.prisma (BackupRun).
-    no: 19,
-    label: "Backup & Status",
-    href: "/admin/status",
-    group: "sistem",
-    hint: "Salinan database dan status sistem. Tidak tampil di situs publik.",
-    roles: ADMIN_ONLY_ROLES,
-    ready: true,
-  },
+  ...CATALOG_MODULES,
+  ...CONTENT_MODULES,
+  ...SYSTEM_MODULES,
 ];
 
 /** Modul per kelompok sidebar untuk role tertentu; kelompok kosong dibuang. */

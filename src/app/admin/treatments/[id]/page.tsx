@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
 
 import { requireRole } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-import { TreatmentForm, type TreatmentFormData } from "../treatment-form";
+import { TreatmentForm } from "../treatment-form";
+import { loadTreatmentFormData } from "../treatment-page-data";
 
 export const instant = false;
 
@@ -45,68 +45,7 @@ export default async function EditTreatmentPage({
     );
   }
 
-  let data: TreatmentFormData;
-
-  if (isNew) {
-    data = {
-      id: null,
-      name: "",
-      slug: "",
-      categoryId: defaultCategory!.id,
-      tagline: "",
-      description: "",
-      note: "",
-      addonSection: "",
-      imageUrl: "",
-      whatsappMessage: "",
-      seoTitle: "",
-      seoDescription: "",
-      sortOrder: 0,
-      isNew: false,
-      isBestSeller: false,
-      isPublished: true,
-      options: [],
-      contentImages: [],
-    };
-  } else {
-    const [treatment, contentImages] = await Promise.all([
-      prisma.treatment.findUnique({
-        where: { id },
-        include: { options: { orderBy: { sortOrder: "asc" } } },
-      }),
-      prisma.contentImage.findMany({
-        where: { entityType: "treatment", entityId: id },
-        orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }, { id: "asc" }],
-        select: { imageUrl: true, altText: true },
-      }),
-    ]);
-    if (!treatment) notFound();
-
-    data = {
-      id: treatment.id,
-      name: treatment.name,
-      slug: treatment.slug,
-      categoryId: treatment.categoryId,
-      tagline: treatment.tagline ?? "",
-      description: treatment.description ?? "",
-      note: treatment.note ?? "",
-      addonSection: treatment.addonSection ?? "",
-      imageUrl: treatment.imageUrl ?? "",
-      whatsappMessage: treatment.whatsappMessage ?? "",
-      seoTitle: treatment.seoTitle ?? "",
-      seoDescription: treatment.seoDescription ?? "",
-      sortOrder: treatment.sortOrder,
-      isNew: treatment.isNew,
-      isBestSeller: treatment.isBestSeller,
-      isPublished: treatment.isPublished,
-      options: treatment.options.map((option) => ({
-        label: option.label,
-        durationMin: String(option.durationMin),
-        priceIdr: String(option.priceIdr),
-      })),
-      contentImages,
-    };
-  }
+  const data = await loadTreatmentFormData(id, defaultCategory?.id ?? null);
 
   return <TreatmentForm treatment={data} categories={categories} />;
 }

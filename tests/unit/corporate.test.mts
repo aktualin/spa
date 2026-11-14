@@ -7,7 +7,6 @@ import {
   corporateSolutions,
 } from "../../src/data/content.ts";
 import {
-  STATIC_COLLAB_PHOTOS,
   STATIC_HERO_TITLE,
   STATIC_IN_SPA_HTML,
   STATIC_PIC,
@@ -50,6 +49,12 @@ function row(overrides: Partial<CorporateContentRow> = {}): CorporateContentRow 
     benefits: [],
     solutions: null,
     inSpaItems: [],
+    heroImageUrl: null,
+    heroImageAlt: null,
+    aboutImageUrl: null,
+    aboutImageAlt: null,
+    inSpaImageUrl: null,
+    inSpaImageAlt: null,
     ...overrides,
   };
 }
@@ -97,6 +102,28 @@ describe("isi bawaan = desain asli /corporate", () => {
     const c = resolveCorporateContent(row({ inSpaHtml: "<p> </p>", stepsHtml: "<p>Catatan</p>" }));
     assert.equal(c.inSpaHtml, null);
     assert.equal(c.stepsHtml, "<p>Catatan</p>");
+  });
+
+  it("kolom gambar: kosong tetap null, terisi diteruskan apa adanya", () => {
+    const empty = resolveCorporateContent(row());
+    assert.equal(empty.heroImageUrl, null);
+    assert.equal(empty.aboutImageUrl, null);
+    assert.equal(empty.inSpaImageUrl, null);
+
+    const c = resolveCorporateContent(
+      row({
+        heroImageUrl: "https://cdn.example.com/img/hero.jpg",
+        heroImageAlt: " Hero ",
+        aboutImageUrl: "  ",
+        inSpaImageUrl: "https://cdn.example.com/img/spa.jpg",
+        inSpaImageAlt: null,
+      }),
+    );
+    assert.equal(c.heroImageUrl, "https://cdn.example.com/img/hero.jpg");
+    assert.equal(c.heroImageAlt, "Hero");
+    assert.equal(c.aboutImageUrl, null);
+    assert.equal(c.inSpaImageUrl, "https://cdn.example.com/img/spa.jpg");
+    assert.equal(c.inSpaImageAlt, null);
   });
 });
 

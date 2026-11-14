@@ -153,12 +153,24 @@ describe("BUILD-18 normalizeWaNumber", () => {
 });
 
 describe("BUILD-18 konteks & teks bawaan", () => {
-  it("tujuh konteks sistem tersedia", () => {
+  it("sembilan konteks sistem tersedia", () => {
     assert.deepEqual(
       WHATSAPP_CONTEXTS.map((c) => c.key),
-      ["default", "treatment", "package", "promo", "gift", "membership", "retail"],
+      [
+        "default",
+        "treatment",
+        "package",
+        "promo",
+        "gift",
+        "membership",
+        "retail",
+        "location",
+        "event",
+      ],
     );
     assert.ok(isSystemTemplateKey("promo"));
+    assert.ok(isSystemTemplateKey("location"));
+    assert.ok(isSystemTemplateKey("event"));
     assert.ok(!isSystemTemplateKey("lainnya"));
   });
 
@@ -167,10 +179,85 @@ describe("BUILD-18 konteks & teks bawaan", () => {
     assert.equal(builtInMessage("membership"), "Halo kak, saya mau join member");
     assert.equal(builtInMessage("gift"), "Halo kak, saya mau beli KAMA Gift Card");
     assert.equal(builtInMessage("retail"), "Halo kak, saya mau pesan produk {{product}}");
+    assert.equal(
+      builtInMessage("location"),
+      "Halo kak, apakah yang di {{address}} sudah buka dan bisa reservasi sekarang ?",
+    );
+    assert.equal(builtInMessage("event"), "Halo kak, saya mau ikut event {{event}}");
   });
 
   it("placeholder retail menerima alias lama", () => {
     assert.ok(allowedPlaceholders("retail").includes("harga"));
+  });
+
+  it("konteks location & event punya placeholder utamanya", () => {
+    assert.deepEqual(allowedPlaceholders("location"), ["address"]);
+    assert.deepEqual(allowedPlaceholders("event"), ["event"]);
+  });
+});
+
+describe("konteks location & event", () => {
+  it("validateTemplate location: menerima alamat, memperingatkan tanpa alamat", () => {
+    assert.deepEqual(
+      validateTemplate("location", "Halo kak, apakah yang di {{address}} sudah buka ?"),
+      { errors: [], warnings: [] },
+    );
+    const tanpaAlamat = validateTemplate("location", "Halo kak, mau reservasi");
+    assert.equal(tanpaAlamat.errors.length, 0);
+    assert.equal(tanpaAlamat.warnings.length, 1);
+    assert.equal(validateTemplate("location", "Halo {{event}}").errors.length, 1);
+  });
+
+  it("validateTemplate event: menerima judul event, menolak placeholder asing", () => {
+    assert.deepEqual(
+      validateTemplate("event", "Halo kak, saya mau ikut event {{event}}"),
+      { errors: [], warnings: [] },
+    );
+    const tanpaJudul = validateTemplate("event", "Halo kak, saya mau ikut");
+    assert.equal(tanpaJudul.errors.length, 0);
+    assert.equal(tanpaJudul.warnings.length, 1);
+    assert.equal(validateTemplate("event", "Halo {{address}}").errors.length, 1);
+  });
+
+  it("resolveWhatsAppMessage location: khusus → template → bawaan", () => {
+    const values = { address: "Jl. Barito I No.21, Kramat Pela, Jakarta Selatan" };
+    assert.equal(
+      resolveWhatsAppMessage({
+        context: "location",
+        custom: "Cabang {{address}} buka ?",
+        template: "X",
+        values,
+      }),
+      "Cabang Jl. Barito I No.21, Kramat Pela, Jakarta Selatan buka?",
+    );
+    assert.equal(
+      resolveWhatsAppMessage({
+        context: "location",
+        template: "Reservasi cabang {{address}} dong",
+        values,
+      }),
+      "Reservasi cabang Jl. Barito I No.21, Kramat Pela, Jakarta Selatan dong",
+    );
+    assert.equal(
+      resolveWhatsAppMessage({ context: "location", template: null, values }),
+      // fillTemplate merapikan spasi sebelum tanda baca (" ?" → "?").
+      "Halo kak, apakah yang di Jl. Barito I No.21, Kramat Pela, Jakarta Selatan sudah buka dan bisa reservasi sekarang?",
+    );
+  });
+
+  it("resolveWhatsAppMessage event: alamat kosong dibersihkan, bawaan bila kandidat kosong", () => {
+    assert.equal(
+      resolveWhatsAppMessage({
+        context: "event",
+        template: "Daftar {{event}} {{tempat}} ya",
+        values: { event: "Wellness Weekend", tempat: null },
+      }),
+      "Daftar Wellness Weekend ya",
+    );
+    assert.equal(
+      resolveWhatsAppMessage({ context: "event", template: "{{x}}" }),
+      "Halo kak, saya mau ikut event",
+    );
   });
 });
 

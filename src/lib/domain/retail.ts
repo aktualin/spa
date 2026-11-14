@@ -1,13 +1,13 @@
 /**
- * Aturan modul KAMA Retail: batas isian admin, urutan tampil katalog,
- * pemindahan urutan (tombol ↑/↓), dan pesan WhatsApp pemesanan produk.
+ * Aturan modul KAMA Retail: batas isian admin, urutan tampil katalog, dan
+ * pemindahan urutan (tombol ↑/↓).
  *
  * Tidak ada keranjang/pembayaran online — setiap produk dipesan lewat
- * WhatsApp. Modul murni (tanpa I/O) supaya bisa diuji langsung dengan
- * `node --test`.
+ * WhatsApp; pesan pemesanannya dirakit di `src/lib/content/retail.ts`
+ * memakai registry template (`resolveWhatsAppMessage`, konteks "retail").
+ * Modul murni (tanpa I/O) supaya bisa diuji langsung dengan `node --test`.
  */
-import { formatIdr } from "../format.ts";
-import { renderTemplate } from "./whatsapp-template.ts";
+import { nextSortOrderValue } from "./sort-order.ts";
 
 /** Batas panjang isian form produk retail. */
 export const RETAIL_LIMITS = {
@@ -89,74 +89,5 @@ export function canMoveRetail(
 
 /** `sortOrder` untuk produk baru: di akhir daftar. */
 export function nextRetailSortOrder(maxSortOrder: number | null | undefined): number {
-  return typeof maxSortOrder === "number" && Number.isFinite(maxSortOrder)
-    ? maxSortOrder + 1
-    : 0;
-}
-
-/* ---------- pesan WhatsApp ---------- */
-
-/** Template bawaan bila admin belum mengatur template "retail". */
-export const DEFAULT_RETAIL_TEMPLATE = "Halo kak, saya mau pesan produk {{product}}";
-
-const NAME_KEYS = ["product", "produk", "nama", "name"] as const;
-const PRICE_KEYS = ["harga", "price"] as const;
-
-function hasPlaceholder(template: string, keys: readonly string[]): boolean {
-  return keys.some((key) => new RegExp(`\\{\\{\\s*${key}\\s*\\}\\}`).test(template));
-}
-
-export type RetailMessageInput = {
-  name: string;
-  priceIdr: number | null;
-  whatsappMessage: string | null;
-};
-
-/**
- * Pesan WhatsApp untuk tombol "Pesan via WhatsApp" sebuah produk.
- *
- * 1. Pesan khusus produk (`whatsappMessage`) dipakai apa adanya.
- * 2. Kalau kosong, dipakai template "retail" dari modul Kontak & Umum
- *    (`template`) — asalkan template itu memuat placeholder nama produk.
- * 3. Kalau tidak ada, dipakai `DEFAULT_RETAIL_TEMPLATE`.
- *
- * Placeholder yang didukung: `{{product}}`/`{{produk}}`/`{{nama}}`/`{{name}}`
- * dan `{{harga}}`/`{{price}}`. Bila produk berharga tetapi template tidak
- * memuat placeholder harga, harga ditambahkan di akhir dalam kurung.
- */
-export function retailOrderMessage(
-  product: RetailMessageInput,
-  template?: string | null,
-): string {
-  const price = product.priceIdr === null ? null : formatIdr(product.priceIdr);
-  const values: Record<string, string | null> = {
-    product: product.name,
-    produk: product.name,
-    nama: product.name,
-    name: product.name,
-    harga: price,
-    price,
-  };
-
-  const custom = product.whatsappMessage?.trim();
-  if (custom) return dropEmptyPrice(renderTemplate(custom, values));
-
-  const configured = template?.trim();
-  const base =
-    configured && hasPlaceholder(configured, NAME_KEYS)
-      ? configured
-      : DEFAULT_RETAIL_TEMPLATE;
-
-  let message = renderTemplate(base, values);
-  if (price && !hasPlaceholder(base, PRICE_KEYS)) message = `${message} (${price})`;
-  return dropEmptyPrice(message);
-}
-
-/** Placeholder harga pada produk tanpa harga tidak boleh tampil mentah. */
-function dropEmptyPrice(message: string): string {
-  if (!/\{\{\s*(?:harga|price)\s*\}\}/.test(message)) return message;
-  return message
-    .replace(/\{\{\s*(?:harga|price)\s*\}\}/g, "")
-    .replace(/[ \t]{2,}/g, " ")
-    .trim();
+  return nextSortOrderValue(maxSortOrder);
 }

@@ -3,69 +3,23 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 
-import { buildPreviewUrl, MAX_PAGE_SLUG_LENGTH, validatePageSlug } from "@/lib/domain/page-url";
-import { slugify } from "@/lib/domain/slug";
+import { buildPreviewUrl, validatePageSlug } from "@/lib/domain/page-url";
 
-import { deletePageAction, savePageAction, type ActionState } from "../actions/pages";
+import { savePageAction } from "../actions/pages";
 import { RichTextField } from "../rich-text-field";
+import { ErrorMessage, SaveButton } from "../settings/_components/form-ui";
 import {
-  ConfirmSubmit,
-  ErrorMessage,
-  Field,
-  SaveButton,
-  inputClass,
-} from "../settings/_components/form-ui";
-import { SEO_DESCRIPTION_MAX, SEO_TITLE_MAX } from "./limits";
+  initialState,
+  type PageFormData,
+  type PageStatusValue,
+  type PageTemplateValue,
+} from "./page-form.constants";
+import { PageSeoFields } from "./page-form-seo";
+import { TitleSlugFields } from "./page-form-slug";
+import { PageDeleteForm, PageFormHeader } from "./pages-form-parts";
+import { TemplateStatusFields } from "./page-form-template";
 
-export type PageTemplateValue = "STANDARD" | "LEGAL";
-export type PageStatusValue = "DRAFT" | "PUBLISHED";
-
-export type PageFormData = {
-  id: string | null;
-  title: string;
-  slug: string;
-  template: PageTemplateValue;
-  bodyHtml: string;
-  seoTitle: string;
-  seoDescription: string;
-  status: PageStatusValue;
-  /** true bila halaman pernah terbit — perubahan slug akan membuat redirect 301. */
-  wasPublished: boolean;
-};
-
-const TEMPLATES: { value: PageTemplateValue; label: string; description: string }[] = [
-  {
-    value: "STANDARD",
-    label: "Standar",
-    description: "Judul dan isi teks berformat. Cocok untuk halaman informasi umum.",
-  },
-  {
-    value: "LEGAL",
-    label: "Dokumen legal",
-    description:
-      "Tata letak dokumen panjang seperti Kebijakan Privasi atau Syarat & Ketentuan.",
-  },
-];
-
-const STATUSES: { value: PageStatusValue; label: string }[] = [
-  { value: "DRAFT", label: "Draf — belum tampil di website" },
-  { value: "PUBLISHED", label: "Terbit — tampil di website" },
-];
-
-const initialState: ActionState = { error: null };
-
-function autoSlug(title: string): string {
-  return slugify(title).slice(0, MAX_PAGE_SLUG_LENGTH).replace(/-+$/, "");
-}
-
-function Counter({ value, max }: { value: string; max: number }) {
-  const over = value.length > max;
-  return (
-    <span className={over ? "font-medium text-red-700" : undefined}>
-      {value.length}/{max}
-    </span>
-  );
-}
+export type { PageTemplateValue, PageStatusValue, PageFormData } from "./page-form.constants";
 
 export function PageForm({
   page,
@@ -92,127 +46,35 @@ export function PageForm({
   const previewUrl = buildPreviewUrl(siteUrl, slug);
   const slugChanged =
     page.wasPublished && !isNew && slug !== page.slug && slugError === null;
-  const templateInfo = TEMPLATES.find((t) => t.value === template);
 
   return (
     <div className="mx-auto max-w-2xl">
-      <Link href="/admin/pages" className="text-sm text-neutral-600 hover:underline">
-        ← Kembali ke daftar halaman
-      </Link>
-
-      <h1 className="mt-3 text-xl font-semibold text-neutral-900">
-        {isNew ? "Tambah halaman" : `Ubah halaman ${page.title}`}
-      </h1>
+      <PageFormHeader isNew={isNew} title={page.title} />
 
       <form action={formAction} className="mt-6 space-y-5">
         {page.id ? <input type="hidden" name="id" value={page.id} /> : null}
 
-        <Field label="Judul halaman" htmlFor="title">
-          <input
-            id="title"
-            name="title"
-            value={title}
-            onChange={(event) => {
-              setTitle(event.target.value);
-              if (!slugEdited) setSlug(autoSlug(event.target.value));
-            }}
-            required
-            className={inputClass}
-          />
-        </Field>
+        <TitleSlugFields
+          page={page}
+          isNew={isNew}
+          title={title}
+          setTitle={setTitle}
+          slug={slug}
+          setSlug={setSlug}
+          slugEdited={slugEdited}
+          setSlugEdited={setSlugEdited}
+          slugError={slugError}
+          previewUrl={previewUrl}
+          slugChanged={slugChanged}
+        />
 
-        <Field
-          label="Slug (alamat URL)"
-          htmlFor="slug"
-          hint={
-            isNew && !slugEdited
-              ? "Terisi otomatis dari judul. Huruf kecil, angka, dan tanda hubung."
-              : "Huruf kecil, angka, dan tanda hubung. Tanpa spasi atau garis miring."
-          }
-        >
-          <input
-            id="slug"
-            name="slug"
-            value={slug}
-            onChange={(event) => {
-              setSlug(event.target.value);
-              setSlugEdited(true);
-            }}
-            required
-            autoComplete="off"
-            spellCheck={false}
-            aria-invalid={slugError ? true : undefined}
-            aria-describedby="slug-preview"
-            className={`${inputClass} font-mono`}
-          />
-          <p id="slug-preview" aria-live="polite" className="text-xs">
-            {slugError ? (
-              <span className="text-red-700">{slugError}</span>
-            ) : previewUrl ? (
-              <>
-                <span className="text-neutral-500">Alamat halaman: </span>
-                <span className="break-all font-mono text-neutral-900">{previewUrl}</span>
-              </>
-            ) : (
-              <span className="text-neutral-500">Isi judul atau slug untuk melihat alamat.</span>
-            )}
-          </p>
-        </Field>
-
-        {slugChanged ? (
-          <p
-            role="status"
-            className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800"
-          >
-            URL lama /{page.slug} akan dialihkan permanen (301) ke /{slug} setelah
-            disimpan.
-          </p>
-        ) : null}
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Template" htmlFor="template" hint={templateInfo?.description}>
-            <select
-              id="template"
-              name="template"
-              value={template}
-              onChange={(event) => setTemplate(event.target.value as PageTemplateValue)}
-              className={inputClass}
-            >
-              {TEMPLATES.map((t) => (
-                <option key={t.value} value={t.value}>
-                  {t.label}
-                </option>
-              ))}
-            </select>
-          </Field>
-
-          <Field
-            label="Status"
-            htmlFor="status"
-            hint="Halaman draf tidak bisa dibuka pengunjung."
-          >
-            <select
-              id="status"
-              name="status"
-              value={status}
-              onChange={(event) => setStatus(event.target.value as PageStatusValue)}
-              className={inputClass}
-            >
-              {STATUSES.map((s) => (
-                <option key={s.value} value={s.value}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
-          </Field>
-        </div>
-
-        {menuUsage > 0 && status === "DRAFT" ? (
-          <p className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-            Halaman ini dipakai {menuUsage} item menu navigasi. Selama berstatus Draf, item menu
-            tersebut tidak tampil di situs.
-          </p>
-        ) : null}
+        <TemplateStatusFields
+          template={template}
+          setTemplate={setTemplate}
+          status={status}
+          setStatus={setStatus}
+          menuUsage={menuUsage}
+        />
 
         <RichTextField
           name="bodyHtml"
@@ -221,46 +83,12 @@ export function PageForm({
           folder="pages"
         />
 
-        <fieldset className="space-y-4 rounded-md border border-neutral-200 p-4">
-          <legend className="px-1 text-sm font-medium text-neutral-700">SEO</legend>
-          <Field
-            label="Meta title"
-            htmlFor="seoTitle"
-            hint={
-              <>
-                Kosongkan untuk memakai judul halaman.{" "}
-                <Counter value={seoTitle} max={SEO_TITLE_MAX} />
-              </>
-            }
-          >
-            <input
-              id="seoTitle"
-              name="seoTitle"
-              value={seoTitle}
-              onChange={(event) => setSeoTitle(event.target.value)}
-              className={inputClass}
-            />
-          </Field>
-          <Field
-            label="Meta description"
-            htmlFor="seoDescription"
-            hint={
-              <>
-                Ringkasan untuk hasil pencarian Google.{" "}
-                <Counter value={seoDescription} max={SEO_DESCRIPTION_MAX} />
-              </>
-            }
-          >
-            <textarea
-              id="seoDescription"
-              name="seoDescription"
-              value={seoDescription}
-              onChange={(event) => setSeoDescription(event.target.value)}
-              rows={3}
-              className={inputClass}
-            />
-          </Field>
-        </fieldset>
+        <PageSeoFields
+          seoTitle={seoTitle}
+          setSeoTitle={setSeoTitle}
+          seoDescription={seoDescription}
+          setSeoDescription={setSeoDescription}
+        />
 
         <ErrorMessage error={state.error} />
 
@@ -273,18 +101,7 @@ export function PageForm({
       </form>
 
       {page.id ? (
-        <form action={deletePageAction} className="mt-8 border-t border-neutral-200 pt-4">
-          <input type="hidden" name="id" value={page.id} />
-          <ConfirmSubmit
-            message={`Hapus halaman "${page.title}"? Alamat /${page.slug} akan menampilkan "halaman tidak ditemukan".${
-              menuUsage > 0
-                ? ` Halaman ini dipakai ${menuUsage} item menu navigasi; item tersebut akan disembunyikan dari situs dan ditandai "Tujuan hilang".`
-                : ""
-            } Tindakan ini tidak bisa dibatalkan.`}
-          >
-            Hapus halaman ini
-          </ConfirmSubmit>
-        </form>
+        <PageDeleteForm pageId={page.id} title={page.title} slug={page.slug} menuUsage={menuUsage} />
       ) : null}
     </div>
   );

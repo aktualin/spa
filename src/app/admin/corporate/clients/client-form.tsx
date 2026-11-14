@@ -8,16 +8,12 @@ import {
   saveClientAction,
   type ActionState,
 } from "../../actions/corporate-items";
-import { ImageField } from "../../image-field";
 import {
-  Checkbox,
   ConfirmDeleteButton,
   ErrorAlert,
-  Field,
   SaveButton,
-  inputClass,
 } from "../../promos/_kit/form-ui";
-import { PhotoListField } from "./photo-list-field";
+import { ClientFields } from "./client-form-fields";
 
 export type ClientFormData = {
   id: string | null;
@@ -56,50 +52,7 @@ export function CorporateClientForm({
       <form action={formAction} className="mt-6 space-y-5">
         {client.id ? <input type="hidden" name="id" value={client.id} /> : null}
 
-        <Field label="Nama klien / perusahaan" htmlFor="name" hint="Juga dipakai sebagai teks alternatif logo.">
-          <input
-            id="name"
-            name="name"
-            defaultValue={client.name}
-            required
-            maxLength={120}
-            className={inputClass}
-          />
-        </Field>
-
-        <ImageField
-          name="logoUrl"
-          label="Logo (opsional — tanpa logo, nama klien yang tampil)"
-          folder="corporate"
-          defaultValue={client.logoUrl}
-        />
-
-        <Field
-          label="Website (opsional)"
-          htmlFor="websiteUrl"
-          hint='Contoh: perusahaan.co.id — "https://" ditambahkan otomatis. Logo menjadi tautan ke website ini.'
-        >
-          <input
-            id="websiteUrl"
-            name="websiteUrl"
-            defaultValue={client.websiteUrl}
-            maxLength={300}
-            inputMode="url"
-            className={inputClass}
-          />
-        </Field>
-
-        <PhotoListField
-          name="photoUrls"
-          label="Foto dokumentasi kegiatan"
-          folder="corporate"
-          defaultValue={client.photoUrls}
-          max={maxPhotos}
-        />
-
-        <Checkbox name="isPublished" defaultChecked={client.isPublished}>
-          Tampilkan di website
-        </Checkbox>
+        <ClientFields client={client} maxPhotos={maxPhotos} />
 
         <ErrorAlert message={state.error} />
 

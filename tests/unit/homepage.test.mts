@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
-  HIGHLIGHT_DEFAULT_CTA,
   highlightStatus,
   highlightToCard,
   isDefaultVisibleSection,
@@ -104,7 +103,7 @@ describe("selectHighlightCards", () => {
 });
 
 describe("highlightToCard", () => {
-  it("isian kosong memakai nilai bawaan kartu lama", () => {
+  it("isian kosong → ctaLabel kosong (pemanggil memakai fallback CB)", () => {
     const card = highlightToCard(
       row({ id: "a", title: "  Karuna  ", eyebrow: "Package", href: "/menu#packages", imageUrl: "https://cdn.example.com/img/kama/06-bride.jpg" }),
     );
@@ -115,7 +114,7 @@ describe("highlightToCard", () => {
       imageAlt: "",
       tag: "Package",
       title: "Karuna",
-      ctaLabel: HIGHLIGHT_DEFAULT_CTA,
+      ctaLabel: "",
     });
   });
 

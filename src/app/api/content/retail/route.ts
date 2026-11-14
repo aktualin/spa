@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 
 import { getRetailProducts } from "@/lib/content/retail";
 
-const CACHE = { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } as const;
+import { CONTENT_CACHE } from "../cache";
 
 export async function GET() {
   const products = await getRetailProducts();
-  return NextResponse.json({ products }, { headers: CACHE });
+  return NextResponse.json({ products }, { headers: CONTENT_CACHE });
 }

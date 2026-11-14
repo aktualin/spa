@@ -6,44 +6,18 @@
  */
 
 import type { NavLink, NavMegaGroup, NavPrimaryItem } from "../../data/content.ts";
-import type { MenuLinkType, MenuLocation } from "./menu.ts";
+import {
+  FOOTER_LOCATIONS,
+  HEADER_LOCATIONS,
+  type MenuSeedItem,
+  NO_HIGHLIGHT,
+  highlightSeed,
+  leaf,
+  linkTypeForHref,
+} from "./menu-seed.types.ts";
 
-export type MenuSeedItem = {
-  key: string;
-  parentKey: string | null;
-  label: string;
-  linkType: MenuLinkType;
-  url: string | null;
-  sortOrder: number;
-  openInNew: boolean;
-  locations: MenuLocation[];
-  panelKey: string | null;
-  panelLinkLabel: string | null;
-};
-
-export function linkTypeForHref(href: string): MenuLinkType {
-  if (/^(https?:|mailto:|tel:)/i.test(href)) return "EXTERNAL_URL";
-  if (href.includes("#")) return "ANCHOR";
-  return "INTERNAL_URL";
-}
-
-const HEADER_LOCATIONS: MenuLocation[] = ["HEADER", "MOBILE"];
-const FOOTER_LOCATIONS: MenuLocation[] = ["FOOTER"];
-
-function leaf(key: string, parentKey: string, link: NavLink, sortOrder: number): MenuSeedItem {
-  return {
-    key,
-    parentKey,
-    label: link.label,
-    linkType: linkTypeForHref(link.href),
-    url: link.href,
-    sortOrder,
-    openInNew: link.external === true,
-    locations: HEADER_LOCATIONS,
-    panelKey: null,
-    panelLinkLabel: null,
-  };
-}
+export type { MenuHighlightSeed, MenuSeedItem } from "./menu-seed.types.ts";
+export { linkTypeForHref } from "./menu-seed.types.ts";
 
 export function buildStaticMenuSeed(
   nav: { primary: NavPrimaryItem[]; megaGroups: Record<string, NavMegaGroup> },
@@ -65,6 +39,7 @@ export function buildStaticMenuSeed(
       locations: HEADER_LOCATIONS,
       panelKey: item.mega ?? null,
       panelLinkLabel: group?.footerLink?.label ?? null,
+      ...highlightSeed(group),
     });
     if (!group) return;
 
@@ -81,6 +56,7 @@ export function buildStaticMenuSeed(
         locations: HEADER_LOCATIONS,
         panelKey: null,
         panelLinkLabel: null,
+        ...NO_HIGHLIGHT,
       });
       column.links.forEach((link, linkIndex) => {
         items.push(leaf(`${colKey}-${linkIndex}`, colKey, link, linkIndex));
@@ -102,6 +78,7 @@ export function buildStaticMenuSeed(
       locations: FOOTER_LOCATIONS,
       panelKey: null,
       panelLinkLabel: null,
+      ...NO_HIGHLIGHT,
     });
     links.forEach((link, linkIndex) => {
       items.push({ ...leaf(`${key}-${linkIndex}`, key, link, linkIndex), locations: FOOTER_LOCATIONS });

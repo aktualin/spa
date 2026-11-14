@@ -17,6 +17,10 @@ const baseURL = `http://localhost:${PORT}`;
 
 export default defineConfig({
   testDir: "./tests",
+  // Hanya spec e2e; tests/unit/*.test.mts dijalankan oleh `npm run test:unit`
+  // (node --test). Tanpa filter ini Playwright ikut memuatnya dan gagal karena
+  // loader CJS/ESM berbeda.
+  testMatch: /\.spec\.ts$/,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,

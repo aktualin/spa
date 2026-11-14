@@ -1,24 +1,23 @@
 import { Fragment } from "react";
 import type { Branch } from "@/lib/content/branches";
-import { LocationPin, Clock, WhatsApp, ExternalLink } from "@/components/icons";
-import {
-  locationMessage,
-  RESERVE_MESSAGE,
-  waLink,
-} from "@/lib/whatsapp";
+import { LocationPin, Clock, WhatsApp } from "@/components/icons";
+import { LocationInfoActions } from "./location-info-actions";
 
 /**
  * Kartu info cabang. Data cabang berasal dari modul Cabang; nomor WhatsApp
  * dan jam operasional kartu sudah diisi nilai Kontak & Umum oleh reader bila
  * kolom cabangnya dikosongkan. `freshaUrl` berasal dari Kontak & Umum dan
- * hanya ditampilkan untuk cabang utama.
+ * hanya ditampilkan untuk cabang utama. `waHref` dibangun di server lewat
+ * `branchWhatsAppHref` (template "location"); null → tombol WA disembunyikan.
  */
 export function LocationInfo({
   loc,
+  waHref,
   freshaUrl,
   labels,
 }: {
   loc: Branch;
+  waHref: string | null;
   freshaUrl?: string;
   labels: {
     addressMissing: string;
@@ -28,11 +27,6 @@ export function LocationInfo({
     fresha: string;
   };
 }) {
-  const waHref = waLink(
-    loc.address ? locationMessage(loc.address) : RESERVE_MESSAGE,
-    // Nomor cabang kosong → link jatuh ke pengaturan situs di atas.
-    loc.whatsappNumber || undefined,
-  );
   const hourLines = loc.openingHours;
   return (
     <div className="flex flex-col gap-3">
@@ -64,46 +58,25 @@ export function LocationInfo({
       ) : null}
       <div className="flex items-center gap-2 text-body text-cocoa/70">
         <WhatsApp className="h-4 w-4 shrink-0" />
-        <a
-          href={waHref}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {loc.phone || labels.whatsappFallback}
-        </a>
-      </div>
-      <div className="mt-auto flex flex-wrap gap-2 pt-3">
-        <a
-          className="btn btn-primary"
-          href={waHref}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <WhatsApp className="h-4 w-4" aria-hidden="true" />
-          {labels.whatsappCta}
-        </a>
-        {loc.mapsUrl ? (
+        {waHref ? (
           <a
-            className="btn btn-outline border-cocoa/40 text-cocoa"
-            href={loc.mapsUrl}
+            href={waHref}
+            data-wa-context="location"
             target="_blank"
             rel="noopener noreferrer"
           >
-            {labels.directions}
+            {loc.phone || labels.whatsappFallback}
           </a>
-        ) : null}
-        {freshaUrl ? (
-          <a
-            className="btn btn-outline border-cocoa/40 text-cocoa"
-            href={freshaUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {labels.fresha}
-            <ExternalLink className="h-4 w-4" aria-hidden="true" />
-          </a>
-        ) : null}
+        ) : (
+          <span>{loc.phone || labels.whatsappFallback}</span>
+        )}
       </div>
+      <LocationInfoActions
+        waHref={waHref}
+        mapsUrl={loc.mapsUrl}
+        freshaUrl={freshaUrl}
+        labels={labels}
+      />
     </div>
   );
 }

@@ -1,13 +1,12 @@
 import { WHATSAPP_CONTEXTS, normalizeWaNumber } from "@/lib/domain/whatsapp-template";
-import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
 
 import { requirePageAccess } from "../../access";
 import {
   getSettingsWhatsAppNumber,
   listWhatsAppTemplateRows,
-  seedWhatsAppTemplatesAction,
 } from "../../actions/whatsapp-templates";
 import { StatusBanner } from "../_components/form-ui";
+import { NumberNotice, SeedMissingForm, SeededNote } from "./whatsapp-page-parts";
 import { WhatsAppTemplateList } from "./whatsapp-template-list";
 
 export const instant = false;
@@ -25,8 +24,8 @@ export default async function AdminWhatsAppSettingsPage({
     searchParams,
   ]);
 
-  const settingsNumber = normalizeWaNumber(rawNumber);
-  const number = settingsNumber ?? WHATSAPP_NUMBER;
+  // Tanpa nomor bawaan: belum diatur → empty state, tombol publik disembunyikan.
+  const number = normalizeWaNumber(rawNumber) ?? "";
   const byKey = new Map(rows.map((row) => [row.key, row]));
   const missing = WHATSAPP_CONTEXTS.filter((context) => !byKey.has(context.key));
   const others = rows.filter(
@@ -46,12 +45,7 @@ export default async function AdminWhatsAppSettingsPage({
         tetap diutamakan.
       </p>
 
-      <p className="mt-3 rounded-md bg-neutral-50 px-3 py-2 text-sm text-neutral-700">
-        Nomor tujuan: <strong>+{number}</strong>{" "}
-        {settingsNumber
-          ? "(dari Kontak & Umum)."
-          : "(nomor bawaan — nomor di Kontak & Umum kosong atau tidak valid)."}
-      </p>
+      <NumberNotice number={number} />
 
       <StatusBanner
         saved={params.saved}
@@ -59,34 +53,9 @@ export default async function AdminWhatsAppSettingsPage({
         savedText="Template disimpan. Tombol WhatsApp di website langsung memakai pesan baru."
         deletedText="Template dihapus."
       />
-      {params.seeded !== undefined ? (
-        <p
-          role="status"
-          className="mt-4 rounded-md bg-green-50 px-3 py-2 text-sm text-green-800"
-        >
-          {Number(params.seeded) > 0
-            ? `${params.seeded} template bawaan ditambahkan.`
-            : "Semua template bawaan sudah ada."}
-        </p>
-      ) : null}
+      <SeededNote seeded={params.seeded} />
 
-      {missing.length > 0 ? (
-        <form
-          action={seedWhatsAppTemplatesAction}
-          className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
-        >
-          <p>
-            Belum tersimpan: {missing.map((context) => context.label).join(", ")}.
-            Selama belum disimpan, website memakai teks bawaan.
-          </p>
-          <button
-            type="submit"
-            className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
-          >
-            Tambahkan template bawaan
-          </button>
-        </form>
-      ) : null}
+      <SeedMissingForm missing={missing} />
 
       <div className="mt-6">
         <WhatsAppTemplateList

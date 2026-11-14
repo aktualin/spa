@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 
-import { inputClass, secondaryButtonClass } from "../../promos/_kit/form-ui";
+import { secondaryButtonClass } from "../../promos/_kit/form-ui";
+import { StringListRow } from "./string-list-row";
 
 /**
  * Editor daftar teks satu baris (benefit, fitur program, item In-Spa).
@@ -51,47 +52,20 @@ export function StringListField({
       {hint ? <p className="text-xs text-neutral-500">{hint}</p> : null}
 
       {rows.map((row, index) => (
-        <div key={row.key} className="flex flex-wrap gap-2">
-          <input
-            aria-label={`${itemLabel} baris ${index + 1}`}
-            name={name}
-            value={row.value}
-            maxLength={200}
-            onChange={(event) =>
-              setRows((current) =>
-                current.map((r) => (r.key === row.key ? { ...r, value: event.target.value } : r)),
-              )
-            }
-            placeholder={placeholder}
-            className={`${inputClass} min-w-48 flex-1`}
-          />
-          <button
-            type="button"
-            onClick={() => move(index, -1)}
-            disabled={index === 0}
-            aria-label={`Naikkan ${itemLabel} baris ${index + 1}`}
-            className={secondaryButtonClass}
-          >
-            ↑
-          </button>
-          <button
-            type="button"
-            onClick={() => move(index, 1)}
-            disabled={index === rows.length - 1}
-            aria-label={`Turunkan ${itemLabel} baris ${index + 1}`}
-            className={secondaryButtonClass}
-          >
-            ↓
-          </button>
-          <button
-            type="button"
-            onClick={() => setRows((current) => current.filter((r) => r.key !== row.key))}
-            aria-label={`Hapus ${itemLabel} baris ${index + 1}`}
-            className={`${secondaryButtonClass} text-red-700`}
-          >
-            Hapus
-          </button>
-        </div>
+        <StringListRow
+          key={row.key}
+          row={row}
+          index={index}
+          count={rows.length}
+          name={name}
+          itemLabel={itemLabel}
+          placeholder={placeholder}
+          onChange={(key, value) =>
+            setRows((current) => current.map((r) => (r.key === key ? { ...r, value } : r)))
+          }
+          move={move}
+          remove={(key) => setRows((current) => current.filter((r) => r.key !== key))}
+        />
       ))}
 
       <button

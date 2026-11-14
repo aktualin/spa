@@ -1,73 +1,8 @@
-import type { Metadata } from "next";
 import "./globals.css";
 import { Analytics } from "@/components/analytics/analytics";
 import { WhatsAppButton } from "@/components/whatsapp-button";
-import { getSeoSettings } from "@/lib/content/seo";
-import {
-  DEFAULT_DESCRIPTION,
-  DEFAULT_OG_DESCRIPTION,
-  DEFAULT_TITLE,
-  OG_LOCALE,
-  SITE_NAME,
-  TITLE_TEMPLATE,
-  faviconIcons,
-  indexingDisabled,
-} from "@/lib/domain/seo";
-import { getSiteUrl } from "@/lib/site-url";
 
-/**
- * Metadata root. Favicon, gambar OG bawaan, dan verifikasi Google Search
- * Console dibaca dari `/admin/seo/settings` lewat fungsi `"use cache"`, jadi
- * perubahan tampil tanpa redeploy dan situs tetap bisa di-prerender.
- *
- * Canonical SENGAJA tidak diset di sini: nilai root diwarisi semua halaman
- * yang tidak mengisinya sendiri, dan canonical "/" di halaman lain menyuruh
- * Google mengabaikan halaman tersebut. Canonical diisi per halaman oleh
- * `withPageSeo`.
- */
-export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSeoSettings();
-  const ogImages = settings.defaultOgImageUrl
-    ? [{ url: settings.defaultOgImageUrl }]
-    : undefined;
-
-  return {
-    // Tanpa ini, URL Open Graph dan canonical dirender relatif dan ditolak
-    // sebagian crawler.
-    metadataBase: new URL(getSiteUrl()),
-    applicationName: SITE_NAME,
-    title: {
-      default: DEFAULT_TITLE,
-      template: TITLE_TEMPLATE,
-    },
-    description: DEFAULT_DESCRIPTION,
-    keywords: [
-      "KAMA Spa",
-      "massage Jakarta",
-      "spa South Jakarta",
-      "day spa",
-      "corporate wellness",
-      "Sukma Laya",
-      "Urip Padma",
-    ],
-    openGraph: {
-      title: DEFAULT_TITLE,
-      description: DEFAULT_OG_DESCRIPTION,
-      type: "website",
-      locale: OG_LOCALE,
-      siteName: SITE_NAME,
-      ...(ogImages ? { images: ogImages } : {}),
-    },
-    twitter: { card: ogImages ? "summary_large_image" : "summary" },
-    icons: faviconIcons(settings.faviconUrl),
-    ...(settings.gscVerification
-      ? { verification: { google: settings.gscVerification } }
-      : {}),
-    ...(indexingDisabled(process.env)
-      ? { robots: { index: false, follow: false } }
-      : {}),
-  };
-}
+export { generateRootMetadata as generateMetadata } from "./layout-metadata";
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
@@ -110,7 +45,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="flex min-h-full flex-col bg-cream-soft font-sans text-cocoa">
-        
+
         {/* Marks the document as script-enabled, so the scroll-reveal
             animations may hide their blocks. Without JS the content stays
             visible — the site must never depend on JavaScript to be read. */}
@@ -120,7 +55,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
         {children}
-        
+
         <WhatsAppButton />
         <Analytics />
       </body>

@@ -8,13 +8,16 @@ import { expect, test } from "@playwright/test";
 
 test("hero menampilkan slide video + foto dan kontrol titik", async ({ page }) => {
   await page.goto("/");
-  await page.waitForLoadState("networkidle");
 
   const controls = page.getByRole("group", { name: "Pilih visual hero" });
   await expect(controls).toBeVisible();
 
   const dots = controls.getByRole("button");
   await expect(dots).toHaveCount(4);
+  // Klik titik pertama dulu: fokus di dalam hero menjeda autoplay, jadi state
+  // awal deterministik. Menunggu networkidle saja bisa kalah cepat dengan
+  // rotasi 6 detik saat media S3 lambat dimuat.
+  await dots.nth(0).click();
   await expect(dots.nth(0)).toHaveAttribute("aria-current", "true");
 
   const video = page.locator("header video").first();

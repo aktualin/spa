@@ -484,6 +484,78 @@ const EXTRA_CONTENT_BLOCKS: { key: string; value: string }[] = [
 ];
 
 
+// Grup registry baru: links (href CTA), microcopy (alt & aria), forms
+// (newsletter & reservasi). Nilai = teks yang selama ini hardcoded di
+// komponen publik, supaya tampilan tidak berubah. Placeholder {n}/{m}/
+// {name}/{title} diganti saat render.
+const LINKS_MICROCOPY_FORMS_BLOCKS: { key: string; value: string }[] = [
+  { key: "home.hero.menu_href", value: "/menu" },
+  { key: "menu.booking_cta_href", value: "/contact" },
+  { key: "menu.detail_book_href", value: "/contact" },
+  { key: "contact.cta_href", value: "/menu" },
+  { key: "membership.menu_href", value: "/menu" },
+  { key: "membership.contact_href", value: "/contact" },
+  { key: "promos.membership_href", value: "/promos/membership" },
+  { key: "promos.membership_menu_href", value: "/menu" },
+  { key: "gift_card.cta_href", value: "/treatments" },
+  { key: "events.collab_href", value: "/events/collaborations" },
+  { key: "our_story.journal_href", value: "/our-story/journal" },
+  { key: "corporate.privacy_href", value: "/privacy-policy" },
+  { key: "global.nav_aria", value: "Global" },
+  { key: "global.nav_open", value: "Buka menu" },
+  { key: "global.nav_close", value: "Tutup menu" },
+  { key: "global.fab_aria", value: "Chat via WhatsApp" },
+  { key: "global.socials_post_aria", value: "Instagram post {n}" },
+  { key: "home.hero.slider_aria", value: "Pilih visual hero" },
+  { key: "home.hero.dot_aria", value: "Tampilkan visual {n} dari {m}" },
+  { key: "home.whats_new.cta_fallback", value: "Learn More" },
+  { key: "home.reviews.aria_prev", value: "Ulasan sebelumnya" },
+  { key: "home.reviews.aria_next", value: "Ulasan berikutnya" },
+  { key: "home.reviews.aria_list", value: "Ulasan pelanggan" },
+  { key: "home.reviews.dot_aria", value: "Ke ulasan {name}" },
+  { key: "menu.scan_alt", value: "KAMA Spa menu book — page {n}" },
+  { key: "menu.scan_aria", value: "Open menu book page {n}" },
+  { key: "catalog.seo_category_description", value: "{name} di KAMA Spa — durasi dan harga lengkap." },
+  { key: "catalog.seo_treatment_description", value: "{name} di KAMA Spa — durasi dan harga lengkap." },
+  { key: "catalog.seo_package_description", value: "{name} di KAMA Spa — isi paket, durasi, dan harga." },
+  { key: "contact.maps_title", value: "KAMA Spa — Google Maps" },
+  { key: "journal.seo_description", value: "{title} — Journal KAMA Spa." },
+  { key: "gallery.alt_fallback", value: "Foto galeri KAMA Spa" },
+  { key: "gallery.grid_aria", value: "Buka foto {n} dari {m}" },
+  { key: "gallery.lightbox_prev", value: "Foto sebelumnya" },
+  { key: "gallery.lightbox_next", value: "Foto berikutnya" },
+  { key: "gallery.lightbox_close", value: "Tutup pratinjau" },
+  { key: "gallery.lightbox_counter", value: "{n} / {m}" },
+  { key: "carousel.aria_prev", value: "Gambar sebelumnya" },
+  { key: "carousel.aria_next", value: "Gambar berikutnya" },
+  { key: "carousel.aria_counter", value: "Gambar {n} dari {m}" },
+  { key: "corporate.collab_alt_suffix", value: "KAMA corporate wellness collaboration" },
+  { key: "forms.newsletter.title", value: "Newsletter" },
+  { key: "forms.newsletter.description", value: "Dapatkan kabar ritual & promo terbaru dari KAMA Spa." },
+  { key: "forms.newsletter.email_label", value: "Alamat email" },
+  { key: "forms.newsletter.name_label", value: "Nama (opsional)" },
+  { key: "forms.newsletter.branch_label", value: "Cabang favorit" },
+  { key: "forms.newsletter.submit_label", value: "Daftar" },
+  { key: "forms.newsletter.success", value: "Terima kasih! Anda terdaftar newsletter KAMA Spa." },
+  { key: "forms.newsletter.error", value: "Oops! Terjadi kesalahan. Coba lagi." },
+  { key: "forms.reservation.title", value: "Reservasi" },
+  {
+    key: "forms.reservation.description",
+    value: "Sampaikan treatment yang Anda inginkan — tim KAMA akan menghubungi Anda untuk konfirmasi jadwal.",
+  },
+  { key: "forms.reservation.name_label", value: "Nama" },
+  { key: "forms.reservation.phone_label", value: "Nomor telepon" },
+  { key: "forms.reservation.email_label", value: "Alamat email" },
+  { key: "forms.reservation.branch_label", value: "Pilih cabang" },
+  { key: "forms.reservation.message_label", value: "Treatment yang diminati" },
+  { key: "forms.reservation.submit_label", value: "Kirim Reservasi" },
+  {
+    key: "forms.reservation.success",
+    value: "Terima kasih! Permintaan reservasi Anda sudah diterima. Kami akan menghubungi Anda segera.",
+  },
+  { key: "forms.reservation.error", value: "Oops! Terjadi kesalahan. Coba lagi." },
+];
+
 function groupFor(key: string): string {
   return key.split(".")[0] ?? "global";
 }
@@ -525,7 +597,7 @@ export async function seedContent(prisma: PrismaClient): Promise<void> {
   }
   console.log(`✔ ${HOMEPAGE_SECTIONS.length} section homepage berisi konten`);
 
-  for (const block of [...CONTENT_BLOCKS, ...EXTRA_CONTENT_BLOCKS]) {
+  for (const block of [...CONTENT_BLOCKS, ...EXTRA_CONTENT_BLOCKS, ...LINKS_MICROCOPY_FORMS_BLOCKS]) {
     const existing = await prisma.contentBlock.findUnique({ where: { key: block.key } });
     if (!existing) {
       await prisma.contentBlock.create({
@@ -539,7 +611,7 @@ export async function seedContent(prisma: PrismaClient): Promise<void> {
     }
   }
   console.log(
-    `✔ ${CONTENT_BLOCKS.length + EXTRA_CONTENT_BLOCKS.length} teks halaman`,
+    `✔ ${CONTENT_BLOCKS.length + EXTRA_CONTENT_BLOCKS.length + LINKS_MICROCOPY_FORMS_BLOCKS.length} teks halaman`,
   );
 
   const program = staticMembershipProgram();

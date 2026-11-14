@@ -21,6 +21,15 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function GalleryPage() {
   const [albums, pageCopy] = await Promise.all([getGalleryAlbums(), getPageCopy()]);
   const withPhotos = albums.filter((album) => album.photos.length > 0);
+  // Microcopy galeri dari CB; placeholder {n}/{m} diganti di komponen client.
+  const galleryLabels = {
+    altFallback: copy(pageCopy, "gallery.alt_fallback") || "Foto galeri KAMA Spa",
+    gridAria: copy(pageCopy, "gallery.grid_aria") || "Buka foto {n} dari {m}",
+    lightboxPrev: copy(pageCopy, "gallery.lightbox_prev") || "Foto sebelumnya",
+    lightboxNext: copy(pageCopy, "gallery.lightbox_next") || "Foto berikutnya",
+    lightboxClose: copy(pageCopy, "gallery.lightbox_close") || "Tutup pratinjau",
+    lightboxCounter: copy(pageCopy, "gallery.lightbox_counter") || "{n} / {m}",
+  };
 
   return (
     <>
@@ -63,6 +72,7 @@ export default async function GalleryPage() {
                       // Alt kosong → caption → nama album.
                       altText: photoAltText(photo, album.name),
                     }))}
+                    labels={galleryLabels}
                   />
                 </div>
               </div>

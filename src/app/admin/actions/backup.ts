@@ -7,22 +7,18 @@ import { requireRole } from "@/lib/auth";
 import { dispatchBackupWorkflow } from "@/lib/backup/github";
 import { githubDispatchLimiter } from "@/lib/backup/limits";
 import { buildHandoverNote, parseHandoverInput } from "@/lib/domain/backup";
+import { ADMIN_ONLY_ROLES } from "@/lib/domain/roles";
 import { prisma } from "@/lib/prisma";
+
+import { formStr } from "./form-utils";
 
 /** Modul 19 (Backup & Status) — seluruh aksi khusus ADMIN. */
 
 export type BackupActionState = { error: string | null; message?: string };
 
-const ADMIN_ONLY = ["ADMIN"] as const;
-
-function field(formData: FormData, name: string): string {
-  const value = formData.get(name);
-  return typeof value === "string" ? value : "";
-}
-
 /** 30 catatan backup terbaru + catatan sukses terakhir per jenis. */
 export async function getBackupOverview() {
-  await requireRole(ADMIN_ONLY);
+  await requireRole(ADMIN_ONLY_ROLES);
 
   const include = { triggeredBy: { select: { name: true, email: true } } } as const;
   const [runs, lastAuto, lastAutoAttempt, lastManual, lastHandover] = await Promise.all([
@@ -47,14 +43,14 @@ export async function recordHandoverBackupAction(
   _prev: BackupActionState,
   formData: FormData,
 ): Promise<BackupActionState> {
-  const session = await requireRole(ADMIN_ONLY);
+  const session = await requireRole(ADMIN_ONLY_ROLES);
 
   const parsed = parseHandoverInput({
-    location: field(formData, "location"),
-    sha256: field(formData, "sha256"),
-    sizeBytes: field(formData, "sizeBytes"),
+    location: formStr(formData, "location"),
+    sha256: formStr(formData, "sha256"),
+    sizeBytes: formStr(formData, "sizeBytes"),
     restoreTested: formData.get("restoreTested") === "on",
-    note: field(formData, "note"),
+    note: formStr(formData, "note"),
   });
   if (!parsed.ok) return { error: parsed.error };
 
@@ -79,7 +75,7 @@ export async function triggerGithubBackupAction(
   _prev: BackupActionState,
   _formData: FormData,
 ): Promise<BackupActionState> {
-  const session = await requireRole(ADMIN_ONLY);
+  const session = await requireRole(ADMIN_ONLY_ROLES);
 
   const limit = githubDispatchLimiter.check(session.userId);
   if (!limit.allowed) {

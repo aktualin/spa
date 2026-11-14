@@ -1,4 +1,5 @@
 import { WhatsAppBrand } from "./icons";
+import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { whatsAppHref } from "@/lib/content/whatsapp";
 
 /**
@@ -7,12 +8,14 @@ import { whatsAppHref } from "@/lib/content/whatsapp";
  * It uses the official WhatsApp glyph and a soft pulse so it reads as the
  * primary contact action without shouting.
  *
- * Nomor dan pesan (template "default") dibaca dari modul Kontak & Umum.
+ * Nomor dan pesan (template "default") dibaca dari modul Kontak & Umum;
+ * label aksesibel dari CB global.fab_aria.
  */
 export async function WhatsAppButton() {
-  const href = await whatsAppHref("default");
+  const [href, pageCopy] = await Promise.all([whatsAppHref("default"), getPageCopy()]);
   // Nomor belum diatur admin → tombol mengambang tidak dirender.
   if (!href) return null;
+  const ariaLabel = copy(pageCopy, "global.fab_aria") || "Chat via WhatsApp";
   return (
     <a
       href={href}
@@ -20,7 +23,7 @@ export async function WhatsAppButton() {
       target="_blank"
       rel="noopener noreferrer"
       className="kama-whatsapp-fab group fixed bottom-4 right-4 z-30 flex h-12 w-12 items-center justify-center rounded-full bg-[#25d366] text-white shadow-lg shadow-black/20 transition-transform duration-300 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25d366] sm:bottom-6 sm:right-6 sm:h-14 sm:w-14"
-      aria-label="Chat via WhatsApp"
+      aria-label={ariaLabel}
     >
       <WhatsAppBrand className="relative z-[1] h-7 w-7 transition-transform duration-300 group-hover:rotate-6 sm:h-8 sm:w-8" />
     </a>

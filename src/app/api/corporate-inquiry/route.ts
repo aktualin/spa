@@ -1,18 +1,13 @@
-import { createHash } from "node:crypto";
-
-import { NextResponse, after } from "next/server";
+import { after } from "next/server";
 
 import { verifyCaptcha } from "@/lib/captcha";
 import { MAX_INQUIRY_BODY, checkFillTime } from "@/lib/domain/corporate";
-import {
-  extractClientIp,
-  isHoneypotFilled,
-  validateInquiry,
-} from "@/lib/domain/inquiry";
+import { isHoneypotFilled, validateInquiry } from "@/lib/domain/inquiry";
 import { corporateInquiryLimiter } from "@/lib/domain/rate-limit";
-import { isSameOrigin } from "@/lib/domain/same-origin";
-import { stripTags } from "@/lib/domain/sanitize";
 import { notifyCorporateInquiry } from "@/lib/email";
+
+import { errorCode, guardFormRequest, json, parseFormBody } from "../form-helpers";
+import { toInquiryRecord } from "./inquiry-record";
 
 /**
  * Endpoint submit formulir inquiry Corporate Wellness (`/corporate#inquiry`).
@@ -36,53 +31,13 @@ import { notifyCorporateInquiry } from "@/lib/email";
 // Tanpa `runtime`/`dynamic`: `cacheComponents` menolak route segment config,
 // dan handler POST memang selalu dijalankan per-request.
 
-function json(body: Record<string, unknown>, status = 200, headers?: HeadersInit) {
-  return NextResponse.json(body, {
-    status,
-    headers: { "cache-control": "no-store", ...(headers ?? {}) },
-  });
-}
-
-/** Kunci rate limit: hash IP (IP mentah tidak disimpan di memori sekalipun). */
-function rateLimitKey(ip: string): string {
-  return createHash("sha256").update(`corporate-inquiry:${ip}`).digest("hex").slice(0, 32);
-}
-
-/** Kode galat ringkas untuk log — tanpa pesan/argumen yang bisa memuat PII. */
-function errorCode(error: unknown): string {
-  if (error && typeof error === "object" && "code" in error) {
-    return String((error as { code?: unknown }).code);
-  }
-  return error instanceof Error ? error.name : "unknown";
-}
-
 export async function POST(request: Request) {
-  if (!isSameOrigin(request.headers)) {
-    return json({ error: "Permintaan tidak diizinkan." }, 403);
-  }
+  const guarded = guardFormRequest(request, corporateInquiryLimiter, "corporate-inquiry");
+  if (guarded) return guarded;
 
-  const limit = corporateInquiryLimiter.check(rateLimitKey(extractClientIp(request.headers)));
-  if (!limit.allowed) {
-    const retryAfterSeconds = Math.max(1, Math.ceil(limit.retryAfterMs / 1000));
-    return json(
-      { error: "Terlalu banyak permintaan. Silakan coba lagi dalam beberapa menit." },
-      429,
-      { "retry-after": String(retryAfterSeconds) },
-    );
-  }
-
-  let body: Record<string, unknown>;
-  try {
-    const raw = await request.text();
-    if (raw.length > MAX_INQUIRY_BODY) {
-      return json({ error: "Isian terlalu panjang." }, 413);
-    }
-    const parsed: unknown = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("bukan objek");
-    body = parsed as Record<string, unknown>;
-  } catch {
-    return json({ error: "Body permintaan tidak valid." }, 400);
-  }
+  const parsed = await parseFormBody(request, MAX_INQUIRY_BODY);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.body;
 
   // Honeypot: balas sukses supaya bot mengira terkirim, tapi jangan simpan.
   if (isHoneypotFilled(body.website)) {
@@ -92,10 +47,7 @@ export async function POST(request: Request) {
   const fill = checkFillTime(body.elapsedMs);
   if (fill === "missing") return json({ ok: true });
   if (fill === "too-fast") {
-    return json(
-      { error: "Formulir terkirim terlalu cepat. Mohon periksa isian Anda lalu kirim ulang." },
-      400,
-    );
+    return json({ error: "Formulir terkirim terlalu cepat. Mohon periksa isian Anda lalu kirim ulang." }, 400);
   }
 
   const validation = validateInquiry({
@@ -121,13 +73,7 @@ export async function POST(request: Request) {
     return json({ error: captcha.error }, captcha.status);
   }
 
-  const inquiry = {
-    name: stripTags(validation.data.name).trim(),
-    company: validation.data.company ? stripTags(validation.data.company).trim() || null : null,
-    email: stripTags(validation.data.email).trim(),
-    phone: validation.data.phone ? stripTags(validation.data.phone).trim() || null : null,
-    message: stripTags(validation.data.message).trim(),
-  };
+  const inquiry = toInquiryRecord(validation.data);
   if (!inquiry.name || !inquiry.message) {
     return json({ error: "Mohon lengkapi nama dan pesan." }, 400);
   }

@@ -9,13 +9,21 @@
 
 import { useState } from "react";
 
-import { GalleryLightbox, type LightboxPhoto } from "./gallery-lightbox";
+import { fillCopy } from "@/components/copy-text";
+
+import {
+  GalleryLightbox,
+  type GalleryLabels,
+  type LightboxPhoto,
+} from "./gallery-lightbox";
 
 type GalleryGridProps = {
   photos: LightboxPhoto[];
+  /** Teks alt/aria dari CB grup "gallery" (dibaca di halaman server). */
+  labels: GalleryLabels;
 };
 
-export function GalleryGrid({ photos }: GalleryGridProps) {
+export function GalleryGrid({ photos, labels }: GalleryGridProps) {
   // `GalleryLightbox` menutup dirinya sendiri lewat state internalnya, jadi
   // setiap klik harus memasangnya ulang. `openNonce` naik tiap klik dan masuk
   // ke `key`, sehingga foto yang sama bisa dibuka berkali-kali.
@@ -36,13 +44,13 @@ export function GalleryGrid({ photos }: GalleryGridProps) {
                 nonce: (current?.nonce ?? 0) + 1,
               }))
             }
-            aria-label={`Buka foto ${index + 1} dari ${photos.length}`}
+            aria-label={fillCopy(labels.gridAria, { n: index + 1, m: photos.length })}
             className="image-container aspect-[4/3] overflow-hidden transition-opacity hover:opacity-90"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={photo.imageUrl}
-              alt={photo.altText || photo.caption || "Foto galeri KAMA Spa"}
+              alt={photo.altText || photo.caption || labels.altFallback}
               loading="lazy"
               className="image-cover"
             />
@@ -55,6 +63,7 @@ export function GalleryGrid({ photos }: GalleryGridProps) {
           key={open.nonce}
           photos={photos}
           initialIndex={open.index}
+          labels={labels}
         />
       ) : null}
     </>

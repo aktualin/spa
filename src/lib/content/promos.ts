@@ -10,51 +10,17 @@ import { cacheLife, cacheTag } from "next/cache";
 import { isPromoActive } from "@/lib/domain/visibility";
 import { safeQueryWithMeta } from "@/lib/safe-query";
 
+import { type PublicPromo, queryPromoRows, toPublicPromo } from "./promos.types";
 import { CONTENT_TAGS } from "./tags";
 
-export type PublicPromo = {
-  id: string;
-  slug: string;
-  title: string;
-  description: string | null;
-  bannerUrl: string | null;
-  terms: string | null;
-  startDate: Date | null;
-  endDate: Date | null;
-  seoTitle: string | null;
-  seoDescription: string | null;
-  whatsappMessage: string | null;
-};
-
-type PromoRow = {
-  id: string;
-  slug: string;
-  title: string;
-  description: string | null;
-  bannerUrl: string | null;
-  terms: string | null;
-  startDate: Date | null;
-  endDate: Date | null;
-  isPublished: boolean;
-  seoTitle: string | null;
-  seoDescription: string | null;
-  whatsappMessage: string | null;
-};
-
-async function queryPromoRows(): Promise<PromoRow[]> {
-  const { prisma } = await import("@/lib/prisma");
-  return prisma.promo.findMany({
-    where: { isPublished: true },
-    orderBy: [{ sortOrder: "asc" }, { startDate: "asc" }],
-  });
-}
+export type { PublicPromo } from "./promos.types";
 
 /** Semua promo yang sedang aktif (berlaku pada waktu sekarang). */
 export async function getActivePromos(): Promise<PublicPromo[]> {
   "use cache";
   cacheTag(CONTENT_TAGS.promos);
 
-  const { data, usedFallback } = await safeQueryWithMeta<PublicPromo[]>(
+  const { data } = await safeQueryWithMeta<PublicPromo[]>(
     async () => {
       const now = new Date();
       const rows = await queryPromoRows();
@@ -69,25 +35,12 @@ export async function getActivePromos(): Promise<PublicPromo[]> {
             now,
           ),
         )
-        .map((row) => ({
-          id: row.id,
-          slug: row.slug,
-          title: row.title,
-          description: row.description,
-          bannerUrl: row.bannerUrl,
-          terms: row.terms,
-          startDate: row.startDate,
-          endDate: row.endDate,
-          seoTitle: row.seoTitle,
-          seoDescription: row.seoDescription,
-          whatsappMessage: row.whatsappMessage,
-        }));
+        .map(toPublicPromo);
     },
     [],
   );
 
-  if (usedFallback) cacheLife("minutes");
-  else cacheLife("minutes");
+  cacheLife("minutes");
   return data;
 }
 
@@ -99,7 +52,7 @@ export async function getActivePromo(slug: string): Promise<PublicPromo | null> 
   "use cache";
   cacheTag(CONTENT_TAGS.promos);
 
-  const { data, usedFallback } = await safeQueryWithMeta<PublicPromo | null>(
+  const { data } = await safeQueryWithMeta<PublicPromo | null>(
     async () => {
       const now = new Date();
       const rows = await queryPromoRows();
@@ -117,24 +70,11 @@ export async function getActivePromo(slug: string): Promise<PublicPromo | null> 
       ) {
         return null;
       }
-      return {
-        id: row.id,
-        slug: row.slug,
-        title: row.title,
-        description: row.description,
-        bannerUrl: row.bannerUrl,
-        terms: row.terms,
-        startDate: row.startDate,
-        endDate: row.endDate,
-        seoTitle: row.seoTitle,
-        seoDescription: row.seoDescription,
-        whatsappMessage: row.whatsappMessage,
-      };
+      return toPublicPromo(row);
     },
     null,
   );
 
-  if (usedFallback) cacheLife("minutes");
-  else cacheLife("minutes");
+  cacheLife("minutes");
   return data;
 }

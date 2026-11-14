@@ -10,77 +10,25 @@ import type {
   Package as StaticPackage,
   Treatment as StaticTreatment,
 } from "../../data/content.ts";
+import type { CatalogSeed, SeedPackage, SeedTreatment } from "./catalog-seed.types.ts";
+import { SEED_CATEGORIES } from "./catalog-seed.types.ts";
+import { ADDON_DURATIONS, ADDON_SECTION_BY_CATEGORY } from "./catalog-seed.addons.ts";
 import { parseDurationLabel, parsePriceLabel } from "./pricing.ts";
 import { slugify } from "./slug.ts";
 
-export type CategoryKindValue = "TREATMENT" | "ADDON";
-export type AddonSectionValue = "BODY" | "FACE" | "HEAD_SCALP" | "BATH";
-
-export type SeedCategory = {
-  slug: string;
-  name: string;
-  kind: CategoryKindValue;
-  sortOrder: number;
-};
-
-export type SeedOption = { label: string; durationMin: number; priceIdr: number };
-
-export type SeedTreatment = {
-  slug: string;
-  name: string;
-  categorySlug: string;
-  tagline: string | null;
-  description: string | null;
-  note: string | null;
-  imageUrl: string | null;
-  addonSection: AddonSectionValue | null;
-  sortOrder: number;
-  options: SeedOption[];
-};
-
-export type SeedPackage = {
-  slug: string;
-  name: string;
-  subtitle: string | null;
-  quote: string | null;
-  description: string | null;
-  imageUrl: string | null;
-  durationLabel: string | null;
-  durationMin: number | null;
-  priceIdr: number;
-  sortOrder: number;
-  items: { name: string; minutes: number | null }[];
-};
-
-export type CatalogSeed = {
-  categories: SeedCategory[];
-  treatments: SeedTreatment[];
-  packages: SeedPackage[];
-};
-
-export const SEED_CATEGORIES: SeedCategory[] = [
-  { slug: "reflexology", name: "Reflexology", kind: "TREATMENT", sortOrder: 0 },
-  { slug: "body-massage", name: "Body Massage", kind: "TREATMENT", sortOrder: 1 },
-  { slug: "add-ons", name: "Add-ons", kind: "ADDON", sortOrder: 2 },
-];
+export type {
+  CategoryKindValue,
+  AddonSectionValue,
+  SeedCategory,
+  SeedOption,
+  SeedTreatment,
+  SeedPackage,
+  CatalogSeed,
+} from "./catalog-seed.types.ts";
+export { SEED_CATEGORIES } from "./catalog-seed.types.ts";
+export { ADDON_SECTION_BY_CATEGORY } from "./catalog-seed.addons.ts";
 
 const REFLEXOLOGY_SLUGS = new Set(["chair-reflexology", "chair-spa", "chair-body-recovery"]);
-
-/** Durasi add-on; konten statis lama tidak mencantumkannya. */
-const ADDON_DURATIONS: Record<string, number> = {
-  "Face Ritual": 30,
-  "Head & Scalp Treatment": 15,
-  "Bath Ritual": 15,
-  "Body Scrub": 15,
-  "Body Mask": 15,
-};
-
-export const ADDON_SECTION_BY_CATEGORY: Record<AdditionalService["category"], AddonSectionValue> = {
-  Body: "BODY",
-  Face: "FACE",
-  "Head & Scalp": "HEAD_SCALP",
-  Bath: "BATH",
-};
 
 export function buildStaticCatalogSeed(source: {
   treatments: StaticTreatment[];

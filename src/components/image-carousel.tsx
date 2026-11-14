@@ -2,26 +2,17 @@
 
 import { useRef, useState } from "react";
 
-export type CarouselImage = { imageUrl: string; altText: string | null };
+import { CarouselArrow, CarouselDots } from "./image-carousel-parts";
+import { CarouselSingleImage } from "./image-carousel-single";
+import type { CarouselLabels, ImageCarouselProps } from "./image-carousel-types";
 
-function Chevron({ direction }: { direction: "left" | "right" }) {
-  return (
-    <svg
-      viewBox="0 0 16 16"
-      fill="none"
-      aria-hidden="true"
-      className={`size-4 ${direction === "left" ? "" : "rotate-180"}`}
-    >
-      <path
-        d="M10 3 5 8l5 5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
+export type { CarouselImage, CarouselLabels } from "./image-carousel-types";
+
+const DEFAULT_LABELS: CarouselLabels = {
+  prev: "Gambar sebelumnya",
+  next: "Gambar berikutnya",
+  counter: "Gambar {n} dari {m}",
+};
 
 /**
  * Renderer gambar konten: tepat satu gambar → <img> biasa (markup identik
@@ -35,16 +26,8 @@ export function ImageCarousel({
   className = "",
   imageClassName = "",
   eager = false,
-}: {
-  images: CarouselImage[];
-  /** Alt fallback untuk gambar yang tidak punya altText sendiri. */
-  alt: string;
-  /** Kelas pembungkus carousel (tidak dipakai untuk mode satu gambar). */
-  className?: string;
-  /** Kelas tiap <img>, mis. "image-cover" agar menyatu dengan CSS halaman. */
-  imageClassName?: string;
-  eager?: boolean;
-}) {
+  labels = DEFAULT_LABELS,
+}: ImageCarouselProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
 
@@ -52,14 +35,11 @@ export function ImageCarousel({
 
   if (images.length === 1) {
     return (
-      // Sumbernya URL eksternal arbitrer dari Supabase Storage, jadi dipakai
-      // <img> biasa alih-alih next/image.
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={images[0].imageUrl}
-        alt={images[0].altText ?? alt}
-        className={imageClassName || undefined}
-        loading={eager ? "eager" : "lazy"}
+      <CarouselSingleImage
+        image={images[0]}
+        alt={alt}
+        imageClassName={imageClassName}
+        eager={eager}
       />
     );
   }
@@ -74,9 +54,6 @@ export function ImageCarousel({
       behavior: reduced ? "auto" : "smooth",
     });
   }
-
-  const arrowClass =
-    "absolute top-1/2 -translate-y-1/2 grid size-8 place-items-center rounded-full bg-white/85 text-neutral-800 opacity-0 shadow-sm transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 max-md:opacity-100 hover:bg-white disabled:pointer-events-none disabled:opacity-0";
 
   return (
     <div className={`group relative h-full w-full overflow-hidden ${className}`}>
@@ -101,39 +78,19 @@ export function ImageCarousel({
         ))}
       </div>
 
-      <button
-        type="button"
-        aria-label="Gambar sebelumnya"
+      <CarouselArrow
+        direction="left"
+        label={labels.prev}
         disabled={index === 0}
         onClick={() => scrollTo(index - 1)}
-        className={`${arrowClass} left-3`}
-      >
-        <Chevron direction="left" />
-      </button>
-      <button
-        type="button"
-        aria-label="Gambar berikutnya"
+      />
+      <CarouselArrow
+        direction="right"
+        label={labels.next}
         disabled={index === images.length - 1}
         onClick={() => scrollTo(index + 1)}
-        className={`${arrowClass} right-3`}
-      >
-        <Chevron direction="right" />
-      </button>
-
-      <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
-        {images.map((image, i) => (
-          <button
-            key={`${image.imageUrl}-dot-${i}`}
-            type="button"
-            aria-label={`Gambar ${i + 1} dari ${images.length}`}
-            aria-current={i === index}
-            onClick={() => scrollTo(i)}
-            className={`size-2 rounded-full transition-colors ${
-              i === index ? "bg-white" : "bg-white/50 hover:bg-white/80"
-            }`}
-          />
-        ))}
-      </div>
+      />
+      <CarouselDots images={images} index={index} counterLabel={labels.counter} onSelect={scrollTo} />
     </div>
   );
 }

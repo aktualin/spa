@@ -49,9 +49,23 @@ test("the main wrapper does not reserve the header height a second time", async 
 });
 
 test("the hero content is not pushed far below the header", async ({ page }) => {
+  // Ukur tata letak statis, bukan animasi: tanpa ini pengukuran bisa jatuh di
+  // tengah transisi reveal (translateY 26px → 0) dan gap terbaca birkaç px
+  // lebih besar dari keadaan settled.
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  // Tujuh route berurutan dalam satu test: beri anggaran 3x lipat.
+  test.slow();
+  // Geometri butuh DOM + CSS + JS ter-hidrasi, BUKAN media S3. Abort image/media
+  // supaya event load cepat dan deterministik; menunggu load (bukan
+  // domcontentloaded) memastikan skrip client selesai sebelum mengukur.
+  await page.route("**/*", (route) => {
+    const type = route.request().resourceType();
+    if (type === "image" || type === "media") return route.abort();
+    return route.continue();
+  });
   for (const route of HERO_ROUTES) {
-    await page.goto(route);
-    await page.waitForLoadState("networkidle");
+    await page.goto(route, { waitUntil: "load" });
+    await page.evaluate(() => document.fonts.ready.then(() => undefined));
 
     const { headerHeight, contentTop } = await page.evaluate(() => {
       const hero = document.querySelector(".page-hero");

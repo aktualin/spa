@@ -17,7 +17,7 @@ export default async function AdminCorporateContentPage({
 }) {
   await requireRole(CONTENT_ROLES);
 
-  const [{ saved, content }, params] = await Promise.all([
+  const [{ saved, content, images }, params] = await Promise.all([
     getCorporateContentForm(),
     searchParams,
   ]);
@@ -48,6 +48,7 @@ export default async function AdminCorporateContentPage({
           inOfficeHtml: content.inOfficeHtml ?? "",
           stepsHtml: content.stepsHtml ?? "",
         }}
+        images={images}
         limits={{
           maxBenefits: CORPORATE_LIMITS.maxBenefits,
           maxSolutions: CORPORATE_LIMITS.maxSolutions,

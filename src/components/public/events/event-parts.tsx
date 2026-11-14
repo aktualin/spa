@@ -1,10 +1,9 @@
-import Link from "next/link";
-import { ArrowRight } from "@/components/icons";
-import { Reveal } from "@/components/reveal";
 import type { PublicEvent } from "@/lib/content/events";
 import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { formatEventDateRange } from "@/lib/domain/events";
-import { toPlainText } from "@/lib/domain/rich-text";
+import { DetailCard } from "@/components/public/detail-card";
+
+export { EventGallery } from "./event-gallery";
 
 /**
  * Format tanggal event — Bahasa Indonesia, selalu dalam WIB (server Vercel
@@ -51,42 +50,20 @@ export async function EventPartner({
 }
 
 export async function EventCard({ event }: { event: PublicEvent }) {
-  const pageCopy = await getPageCopy();
   return (
-    <Link
+    <DetailCard
       href={`/events/${event.slug}`}
-      className="group flex h-full flex-col bg-cream"
+      coverUrl={event.coverUrl}
+      coverAspect="aspect-[16/10]"
+      eyebrow={formatEventDate(event.startDate, event.endDate)}
+      title={event.title}
+      description={event.description}
     >
-      {event.coverUrl ? (
-        <div className="aspect-[16/10] overflow-hidden bg-cream-card">
-          <img
-            src={event.coverUrl}
-            alt={event.title}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        </div>
+      {event.location ? (
+        <p className="text-body text-cocoa/70">{event.location}</p>
       ) : null}
-      <div className="flex flex-1 flex-col gap-3 p-6">
-        <span className="eyebrow text-cocoa/60">
-          {formatEventDate(event.startDate, event.endDate)}
-        </span>
-        <h3 className="font-display text-title-sm md:text-[1.375rem] md:leading-[1.3]">
-          {event.title}
-        </h3>
-        {event.location ? (
-          <p className="text-body text-cocoa/70">{event.location}</p>
-        ) : null}
-        <EventPartner event={event} />
-        {event.description ? (
-          <p className="line-clamp-3 text-body text-cocoa/70">{toPlainText(event.description)}</p>
-        ) : null}
-        <span className="mt-auto inline-flex items-center gap-2 pt-2 text-[0.9375rem] underline underline-offset-4 transition-opacity group-hover:opacity-70">
-          {copy(pageCopy, "global.view_detail_label")}
-          <ArrowRight className="h-4 w-4" />
-        </span>
-      </div>
-    </Link>
+      <EventPartner event={event} />
+    </DetailCard>
   );
 }
 
@@ -99,39 +76,5 @@ export async function EventGrid({ events }: { events: PublicEvent[] }) {
         </li>
       ))}
     </ul>
-  );
-}
-
-export async function EventGallery({ event }: { event: PublicEvent }) {
-  if (event.photos.length === 0) return null;
-  const pageCopy = await getPageCopy();
-  return (
-    <Reveal as="section" className="bg-cream-soft">
-      <div className="container-kama py-14 md:py-16 lg:py-20">
-        <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-          {copy(pageCopy, "events.detail.gallery_title")}
-        </h2>
-        <ul className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 lg:gap-4">
-          {event.photos.map((photo) => (
-            <li
-              key={photo.id}
-              className="flex flex-col gap-2 bg-cream p-3"
-            >
-              <div className="aspect-square overflow-hidden bg-cream-card">
-                <img
-                  src={photo.imageUrl}
-                  alt={photo.caption ?? event.title}
-                  loading="lazy"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              {photo.caption ? (
-                <span className="caption-s text-cocoa/70">{photo.caption}</span>
-              ) : null}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </Reveal>
   );
 }

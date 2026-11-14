@@ -2,60 +2,19 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
-
-import {
-  MAX_PASSWORD_LENGTH,
-  MIN_PASSWORD_LENGTH,
-} from "@/lib/domain/password-policy";
 
 import {
   deleteUserAction,
   resetPasswordAction,
   updateUserAction,
-  type ActionState,
 } from "../actions/users";
-import { TemporaryPasswordNotice } from "./user-form";
+import { ErrorAlert, SaveButton } from "../promos/_kit/form-ui";
+import { DeleteAccountSection } from "./edit-user-delete";
+import { initialState, type EditUserData } from "./edit-user-parts";
+import { ResetPasswordSection } from "./edit-user-password";
+import { ProfileFields } from "./edit-user-profile";
 
-const initialState: ActionState = { error: null };
-
-const inputClass =
-  "w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900";
-
-export type EditUserData = {
-  id: string;
-  email: string;
-  name: string;
-  role: "ADMIN" | "EDITOR";
-  isActive: boolean;
-  isSelf: boolean;
-};
-
-function SaveButton({ label }: { label: string }) {
-  const { pending } = useFormStatus();
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700 disabled:opacity-60"
-    >
-      {pending ? "Menyimpan…" : label}
-    </button>
-  );
-}
-
-function DeleteButton() {
-  const { pending } = useFormStatus();
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="rounded-md bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 disabled:opacity-60"
-    >
-      {pending ? "Menghapus…" : "Hapus akun permanen"}
-    </button>
-  );
-}
+export type { EditUserData } from "./edit-user-parts";
 
 export function EditUserForm({ user }: { user: EditUserData }) {
   const [state, formAction] = useActionState(updateUserAction, initialState);
@@ -82,64 +41,9 @@ export function EditUserForm({ user }: { user: EditUserData }) {
       <form action={formAction} className="mt-6 space-y-5">
         <input type="hidden" name="id" value={user.id} />
 
-        <Field label="Nama lengkap" htmlFor="name">
-          <input
-            id="name"
-            name="name"
-            defaultValue={user.name}
-            required
-            maxLength={100}
-            className={inputClass}
-          />
-        </Field>
+        <ProfileFields user={user} />
 
-        <Field label="Role" htmlFor="role">
-          {/* Select nonaktif tidak ikut terkirim; role akun sendiri dikirim
-              lewat input tersembunyi dan tetap dijaga di server. */}
-          {user.isSelf ? <input type="hidden" name="role" value={user.role} /> : null}
-          <select
-            id="role"
-            name={user.isSelf ? undefined : "role"}
-            defaultValue={user.role}
-            disabled={user.isSelf}
-            className={inputClass}
-          >
-            <option value="EDITOR">EDITOR — mengelola modul konten</option>
-            <option value="ADMIN">ADMIN — akses penuh, termasuk pengaturan sistem</option>
-          </select>
-          {user.isSelf ? (
-            <p className="text-xs text-neutral-500">
-              Anda tidak boleh mengubah role akun Anda sendiri.
-            </p>
-          ) : null}
-        </Field>
-
-        <label className="flex items-start gap-2 text-sm text-neutral-700">
-          <input
-            type="checkbox"
-            name="isActive"
-            defaultChecked={user.isActive}
-            disabled={user.isSelf}
-            className="mt-0.5 size-4 rounded border-neutral-300"
-          />
-          <span>
-            Akun aktif (boleh login)
-            {user.isSelf ? (
-              <em className="block text-xs text-neutral-500">
-                Anda tidak boleh menonaktifkan akun Anda sendiri.
-              </em>
-            ) : null}
-          </span>
-        </label>
-
-        {state.error ? (
-          <p
-            role="alert"
-            className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700"
-          >
-            {state.error}
-          </p>
-        ) : null}
+        <ErrorAlert message={state.error} />
 
         <div className="flex items-center gap-3 border-t border-neutral-200 pt-4">
           <SaveButton label="Simpan perubahan" />
@@ -149,124 +53,13 @@ export function EditUserForm({ user }: { user: EditUserData }) {
         </div>
       </form>
 
-      {user.isSelf ? (
-        <p className="mt-10 border-t border-neutral-200 pt-6 text-sm text-neutral-600">
-          Untuk mengganti kata sandi akun Anda sendiri, gunakan menu{" "}
-          <Link href="/admin/account/password" className="underline">
-            Ganti kata sandi
-          </Link>
-          .
-        </p>
-      ) : passwordState.ok && passwordState.temporaryPassword ? (
-        <section className="mt-10 border-t border-neutral-200 pt-6">
-          <h2 className="text-sm font-semibold text-neutral-800">
-            Kata sandi direset
-          </h2>
-          <TemporaryPasswordNotice
-            email={passwordState.email ?? user.email}
-            password={passwordState.temporaryPassword}
-          />
-        </section>
-      ) : (
-        <form action={passwordAction} className="mt-10 space-y-5 border-t border-neutral-200 pt-6">
-          <input type="hidden" name="id" value={user.id} />
-          <h2 className="text-sm font-semibold text-neutral-800">Reset kata sandi</h2>
+      <ResetPasswordSection
+        user={user}
+        passwordState={passwordState}
+        passwordAction={passwordAction}
+      />
 
-          <Field
-            label="Kata sandi baru (opsional)"
-            htmlFor="newPassword"
-            hint={`Kosongkan agar sistem membuatkan kata sandi acak yang ditampilkan sekali. Bila diisi: minimal ${MIN_PASSWORD_LENGTH} karakter. Akun ini akan keluar dari semua perangkat dan wajib mengganti kata sandi saat login berikutnya.`}
-          >
-            <input
-              id="newPassword"
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              minLength={MIN_PASSWORD_LENGTH}
-              maxLength={MAX_PASSWORD_LENGTH}
-              className={inputClass}
-            />
-          </Field>
-
-          {passwordState.error ? (
-            <p
-              role="alert"
-              className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700"
-            >
-              {passwordState.error}
-            </p>
-          ) : null}
-
-          <SaveButton label="Reset kata sandi" />
-        </form>
-      )}
-
-      {user.isSelf ? null : (
-        <form action={deleteAction} className="mt-10 space-y-4 border-t border-red-200 pt-6">
-          <input type="hidden" name="id" value={user.id} />
-          <h2 className="text-sm font-semibold text-red-800">Hapus akun</h2>
-          {user.isActive ? (
-            <p className="text-sm text-neutral-600">
-              Akun aktif tidak bisa dihapus. Hapus centang <em>Akun aktif</em>{" "}
-              di atas lalu simpan; setelah itu akun bisa dihapus permanen.
-            </p>
-          ) : (
-            <>
-              <p className="text-sm text-neutral-600">
-                Penghapusan permanen dan tidak bisa dibatalkan. Media yang
-                pernah diunggah akun ini tetap ada.
-              </p>
-              <Field
-                label={`Ketik ulang email "${user.email}" untuk konfirmasi`}
-                htmlFor="confirmEmail"
-              >
-                <input
-                  id="confirmEmail"
-                  name="confirmEmail"
-                  type="email"
-                  autoComplete="off"
-                  required
-                  className={inputClass}
-                />
-              </Field>
-              {deleteState.error ? (
-                <p
-                  role="alert"
-                  className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700"
-                >
-                  {deleteState.error}
-                </p>
-              ) : null}
-              <DeleteButton />
-            </>
-          )}
-        </form>
-      )}
-    </div>
-  );
-}
-
-function Field({
-  label,
-  htmlFor,
-  hint,
-  children,
-}: {
-  label: string;
-  htmlFor: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-1.5">
-      <label
-        htmlFor={htmlFor}
-        className="block text-sm font-medium text-neutral-700"
-      >
-        {label}
-      </label>
-      {children}
-      {hint ? <p className="text-xs text-neutral-500">{hint}</p> : null}
+      <DeleteAccountSection user={user} deleteState={deleteState} deleteAction={deleteAction} />
     </div>
   );
 }

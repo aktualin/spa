@@ -3,38 +3,21 @@
 import Link from "next/link";
 import { useActionState } from "react";
 
-import { savePromoAction, deletePromoAction, type ActionState } from "../actions/promos";
+import { savePromoAction, deletePromoAction } from "../actions/promos";
 import { plainTextToHtml } from "@/lib/domain/rich-text";
 
 import { ImageField } from "../image-field";
 import { RichTextField } from "../rich-text-field";
 import {
-  Checkbox,
   ConfirmDeleteButton,
   ErrorAlert,
-  Field,
   SaveButton,
   SeoFields,
-  inputClass,
 } from "./_kit/form-ui";
+import { PromoIdentityFields, PromoPeriodFields } from "./promo-form-fields";
+import { initialState, type PromoFormData } from "./promo-form.types";
 
-export type PromoFormData = {
-  id: string | null;
-  slug: string;
-  title: string;
-  description: string;
-  bannerUrl: string;
-  terms: string;
-  startDate: string;
-  endDate: string;
-  isPublished: boolean;
-  sortOrder: number;
-  seoTitle: string;
-  seoDescription: string;
-  whatsappMessage: string;
-};
-
-const initialState: ActionState = { error: null };
+export type { PromoFormData } from "./promo-form.types";
 
 export function PromoForm({ promo }: { promo: PromoFormData }) {
   const [state, formAction] = useActionState(savePromoAction, initialState);
@@ -52,30 +35,7 @@ export function PromoForm({ promo }: { promo: PromoFormData }) {
       <form action={formAction} className="mt-6 space-y-5">
         {promo.id ? <input type="hidden" name="id" value={promo.id} /> : null}
 
-        <Field label="Judul promo" htmlFor="title">
-          <input
-            id="title"
-            name="title"
-            defaultValue={promo.title}
-            required
-            className={inputClass}
-          />
-        </Field>
-
-        <Field
-          label="Slug"
-          htmlFor="slug"
-          hint="Dipakai di URL. Huruf kecil, angka, dan tanda hubung."
-        >
-          <input
-            id="slug"
-            name="slug"
-            defaultValue={promo.slug}
-            required
-            pattern="[a-z0-9]+(-[a-z0-9]+)*"
-            className={inputClass}
-          />
-        </Field>
+        <PromoIdentityFields promo={promo} />
 
         <RichTextField
           name="description"
@@ -99,63 +59,7 @@ export function PromoForm({ promo }: { promo: PromoFormData }) {
           defaultValue={plainTextToHtml(promo.terms)}
         />
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field
-            label="Mulai berlaku"
-            htmlFor="startDate"
-            hint="Kosongkan bila langsung aktif."
-          >
-            <input
-              id="startDate"
-              name="startDate"
-              type="date"
-              defaultValue={promo.startDate}
-              className={inputClass}
-            />
-          </Field>
-
-          <Field
-            label="Berakhir"
-            htmlFor="endDate"
-            hint="Harus lebih besar dari tanggal mulai."
-          >
-            <input
-              id="endDate"
-              name="endDate"
-              type="date"
-              defaultValue={promo.endDate}
-              className={inputClass}
-            />
-          </Field>
-        </div>
-
-        <Field label="Urutan tampil" htmlFor="sortOrder">
-          <input
-            id="sortOrder"
-            name="sortOrder"
-            type="number"
-            min={0}
-            defaultValue={promo.sortOrder}
-            className={`${inputClass} w-28`}
-          />
-        </Field>
-
-        <Field
-          label="Pesan WhatsApp khusus"
-          htmlFor="whatsappMessage"
-          hint="Kosongkan untuk memakai template default."
-        >
-          <input
-            id="whatsappMessage"
-            name="whatsappMessage"
-            defaultValue={promo.whatsappMessage}
-            className={inputClass}
-          />
-        </Field>
-
-        <Checkbox name="isPublished" defaultChecked={promo.isPublished}>
-          Tampilkan di website
-        </Checkbox>
+        <PromoPeriodFields promo={promo} />
 
         <SeoFields
           title={promo.seoTitle}

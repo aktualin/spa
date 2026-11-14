@@ -9,7 +9,7 @@ import { formatDuration } from "@/lib/domain/pricing";
 import { formatIdr } from "@/lib/format";
 
 import { CatalogBadges } from "./catalog-badges";
-import { WaButton } from "./wa-button";
+import { CatalogWaCta } from "./catalog-cta";
 import { toPlainText } from "@/lib/domain/rich-text";
 
 type PackageCardProps = {
@@ -67,20 +67,16 @@ export async function PackageCard({ pkg, withCta = false }: PackageCardProps) {
         </div>
 
         {withCta ? (
-          <>
-            <div className="spacer-small" />
-            <WaButton
-              context="package"
-              custom={pkg.whatsappMessage}
-              values={{
-                package: pkg.name,
-                price: formatIdr(pkg.priceIdr),
-                duration: pkg.durationMin ? formatDuration(pkg.durationMin) : null,
-              }}
-              label={copy(pageCopy, "global.book_via_whatsapp")}
-              className="button is-secondary is-icon w-inline-block"
-            />
-          </>
+          <CatalogWaCta
+            context="package"
+            custom={pkg.whatsappMessage}
+            values={{
+              package: pkg.name,
+              price: formatIdr(pkg.priceIdr),
+              duration: pkg.durationMin ? formatDuration(pkg.durationMin) : null,
+            }}
+            label={copy(pageCopy, "global.book_via_whatsapp")}
+          />
         ) : null}
       </div>
     </div>

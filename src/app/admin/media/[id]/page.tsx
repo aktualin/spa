@@ -2,14 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { requireRole } from "@/lib/auth";
-import { formatBytes } from "@/lib/domain/media";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 
-import { deleteMediaAction, getMediaDetail } from "../../actions/media";
-import { ConfirmDeleteButton, secondaryButtonClass } from "../../promos/_kit/form-ui";
+import { getMediaDetail } from "../../actions/media";
 import { StatusBanners } from "../../promos/_kit/list-ui";
-import { formatWibDateTime } from "../../promos/_kit/schema";
-import { CopyUrlButton, MediaMetaForm, ReplaceFileForm } from "../media-forms";
+import { AssetPreview, DeleteAssetSection, UsageList } from "../media-detail-parts";
+import { MediaMetaForm, ReplaceFileForm } from "../media-forms";
 
 export const instant = false;
 
@@ -27,7 +25,6 @@ export default async function AdminMediaDetailPage({
   if (!detail) notFound();
 
   const { asset, usages } = detail;
-  const inUse = usages.length > 0;
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -52,44 +49,7 @@ export default async function AdminMediaDetailPage({
       ) : null}
 
       <div className="mt-6 grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        <div className="space-y-3">
-          <div className="flex items-center justify-center overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50">
-            {/* URL berasal dari storage eksternal, jadi <img> biasa. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={asset.url} alt={asset.altText ?? ""} className="max-h-[28rem] w-full object-contain" />
-          </div>
-
-          <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 text-sm">
-            <dt className="text-neutral-500">Ukuran</dt>
-            <dd className="text-neutral-900">{formatBytes(asset.sizeBytes)}</dd>
-            <dt className="text-neutral-500">Tipe</dt>
-            <dd className="text-neutral-900">{asset.mimeType}</dd>
-            {asset.width && asset.height ? (
-              <>
-                <dt className="text-neutral-500">Dimensi</dt>
-                <dd className="text-neutral-900">
-                  {asset.width} × {asset.height} px
-                </dd>
-              </>
-            ) : null}
-            <dt className="text-neutral-500">Folder</dt>
-            <dd className="text-neutral-900">{asset.folder}</dd>
-            <dt className="text-neutral-500">Diunggah</dt>
-            <dd className="text-neutral-900">
-              {formatWibDateTime(asset.createdAt)}
-              {asset.uploadedBy ? ` oleh ${asset.uploadedBy.name}` : ""}
-            </dd>
-            <dt className="text-neutral-500">URL</dt>
-            <dd className="break-all text-neutral-900">{asset.url}</dd>
-          </dl>
-
-          <div className="flex flex-wrap gap-2">
-            <CopyUrlButton url={asset.url} />
-            <a href={asset.url} target="_blank" rel="noreferrer" className={secondaryButtonClass}>
-              Buka berkas
-            </a>
-          </div>
-        </div>
+        <AssetPreview asset={asset} />
 
         <div className="space-y-8">
           <section className="space-y-3">
@@ -106,47 +66,14 @@ export default async function AdminMediaDetailPage({
             <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
               Dipakai di ({usages.length})
             </h2>
-            {inUse ? (
-              <ul className="divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-white text-sm">
-                {usages.map((usage, index) => (
-                  <li key={`${usage.label}-${usage.href}-${index}`} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
-                    <div className="min-w-0">
-                      <p className="text-xs text-neutral-500">{usage.label}</p>
-                      <p className="truncate text-neutral-900">{usage.name || "(tanpa nama)"}</p>
-                    </div>
-                    {usage.href ? (
-                      <Link href={usage.href} className="shrink-0 text-neutral-700 underline">
-                        Buka
-                      </Link>
-                    ) : null}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-neutral-500">Belum dipakai di konten mana pun.</p>
-            )}
+            <UsageList usages={usages} />
           </section>
 
           <section className="space-y-3">
             <ReplaceFileForm id={asset.id} folder={asset.folder} usageCount={usages.length} />
           </section>
 
-          <section className="space-y-2 border-t border-neutral-200 pt-4">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">Hapus berkas</h2>
-            {inUse ? (
-              <p className="text-sm text-neutral-600">
-                Berkas masih dipakai di {usages.length} tempat, jadi belum bisa dihapus. Ganti atau
-                kosongkan gambar di konten tersebut terlebih dahulu.
-              </p>
-            ) : (
-              <form action={deleteMediaAction}>
-                <input type="hidden" name="id" value={asset.id} />
-                <ConfirmDeleteButton message="Hapus berkas ini secara permanen dari penyimpanan?">
-                  Hapus berkas
-                </ConfirmDeleteButton>
-              </form>
-            )}
-          </section>
+          <DeleteAssetSection assetId={asset.id} usageCount={usages.length} />
         </div>
       </div>
     </div>

@@ -57,3 +57,31 @@ export async function whatsAppHref(
   ]);
   return number ? buildWhatsAppLink(message, number) : null;
 }
+
+/**
+ * Link WhatsApp kartu cabang: nomor cabang menang, lalu nomor situs;
+ * pesan dari template konteks "location" dengan placeholder {{address}}.
+ */
+export async function branchWhatsAppHref(branch: {
+  address?: string | null;
+  whatsappNumber?: string | null;
+}): Promise<string | null> {
+  const [siteNumber, message] = await Promise.all([
+    getWaNumber(),
+    getWhatsAppMessage("location", { values: { address: branch.address ?? "" } }),
+  ]);
+  const number = normalizeWaNumber(branch.whatsappNumber) ?? siteNumber;
+  return number ? buildWhatsAppLink(message, number) : null;
+}
+
+/** Link "Talk to …" corporate: nomor PIC menang, lalu nomor situs. */
+export async function corporateWhatsAppHref(
+  picPhone?: string | null,
+): Promise<string | null> {
+  const [siteNumber, message] = await Promise.all([
+    getWaNumber(),
+    getWhatsAppMessage("default"),
+  ]);
+  const number = normalizeWaNumber(picPhone) ?? siteNumber;
+  return number ? buildWhatsAppLink(message, number) : null;
+}

@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import { ArrowLeft } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
 import {
   PublicEmptyState,
@@ -12,6 +10,7 @@ import { PackageCard } from "@/components/public/package-card";
 import { getPackages } from "@/lib/content/catalog";
 import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
+import { BackLink } from "../../_components/detail-parts";
 
 export async function generateMetadata(): Promise<Metadata> {
   return withPageSeo("/treatments/packages", {});
@@ -29,13 +28,9 @@ export default async function PackagesPage() {
           title={copy(pageCopy, "catalog.packages.title")}
           description={copy(pageCopy, "catalog.packages.description")}
         >
-          <Link
-            href="/treatments"
-            className="inline-flex items-center gap-2 text-[0.9375rem] underline underline-offset-4 transition-opacity hover:opacity-70"
-          >
-            <ArrowLeft className="h-4 w-4" />
+          <BackLink href="/treatments">
             {copy(pageCopy, "catalog.packages.back")}
-          </Link>
+          </BackLink>
         </PublicPageHeader>
 
         <Reveal as="section" className="bg-cream">

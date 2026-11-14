@@ -1,8 +1,8 @@
 import Link from "next/link";
 
-import { Badge, PageHeader, StatusBanners, Thumb, primaryLinkClass } from "../promos/_kit/list-ui";
-import { SmallSubmit } from "../promos/_kit/form-ui";
-import { listAlbums, moveAlbumAction } from "../actions/gallery";
+import { PageHeader, StatusBanners, primaryLinkClass } from "../promos/_kit/list-ui";
+import { listAlbums } from "../actions/gallery";
+import { AlbumRow } from "./gallery-album-list";
 
 export const instant = false;
 
@@ -39,66 +39,7 @@ export default async function AdminGalleryPage({
         ) : (
           <ul className="divide-y divide-neutral-200 overflow-hidden rounded-lg border border-neutral-200 bg-white">
             {albums.map((album, index) => (
-              <li
-                key={album.id}
-                className="flex flex-wrap items-center justify-between gap-3 px-4 py-3"
-              >
-                <div className="flex min-w-0 items-center gap-3">
-                  <Thumb src={album.coverUrl} alt={album.name} />
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-medium text-neutral-900">
-                        {album.name}
-                      </span>
-                      {album.isPublished ? (
-                        <Badge tone="green">Tayang</Badge>
-                      ) : (
-                        <Badge tone="muted">Draf</Badge>
-                      )}
-                    </div>
-                    <p className="mt-0.5 truncate text-xs text-neutral-500">
-                      /{album.slug} · {album._count.photos} foto
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex shrink-0 items-center gap-3 text-sm">
-                  <div className="flex items-center gap-1">
-                    <form action={moveAlbumAction}>
-                      <input type="hidden" name="id" value={album.id} />
-                      <input type="hidden" name="direction" value="up" />
-                      <SmallSubmit
-                        title={`Naikkan urutan album ${album.name}`}
-                        disabled={index === 0}
-                      >
-                        ↑
-                      </SmallSubmit>
-                    </form>
-                    <form action={moveAlbumAction}>
-                      <input type="hidden" name="id" value={album.id} />
-                      <input type="hidden" name="direction" value="down" />
-                      <SmallSubmit
-                        title={`Turunkan urutan album ${album.name}`}
-                        disabled={index === albums.length - 1}
-                      >
-                        ↓
-                      </SmallSubmit>
-                    </form>
-                  </div>
-                  <Link
-                    href={`/admin/gallery/${album.id}`}
-                    className="text-neutral-800 underline"
-                  >
-                    Kelola foto
-                  </Link>
-                  <Link
-                    href={`/admin/gallery/albums/${album.id}`}
-                    className="text-neutral-600 underline"
-                  >
-                    Ubah album
-                  </Link>
-                </div>
-              </li>
+              <AlbumRow key={album.id} album={album} index={index} count={albums.length} />
             ))}
           </ul>
         )}

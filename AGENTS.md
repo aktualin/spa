@@ -58,7 +58,7 @@ node scripts/screenshot.mjs http://localhost:3000 /tmp/kama mobile   # one viewp
 - `src/components/home/reviews-carousel.tsx` — the swipeable reviews carousel.
 - `src/components/home/hero.tsx` — server wrapper for the homepage hero/banners; `src/components/home/hero-slider.tsx` is the client hero media slider.
 - `src/lib/domain/hero-slide.ts` — pure media URL validation + `HeroSlide` fallback/resolve rules (unit tested).
-- `src/components/forms/*` — reservation + newsletter forms. They are **not wired to anything**: submit is `preventDefault()` + local `sent` state. Don't assume a backend/API route exists.
+- `src/components/forms/*` — reservation + newsletter forms, wired to `POST /api/reservation` / `/api/newsletter` with admin inboxes (see `## Architecture decisions`). They take `{ branches, copy }` props; copy comes from `getFormsCopy()`.
 - `public/fonts`, `public/img`, `public/video` — locally hosted fonts (Faesa Breages for display, POI Carbonic for body/labels), imagery, and the hero video. `@font-face` rules live in `src/app/kama.css`; the old family names (`Romie trial`, `Ft regola neue trial`) are kept only as aliases because `hiatus.css` hardcodes them on legacy classes.
 - `references/` — source PDFs (menu, colour reference). PDFs are gitignored.
 - `.opencode/` — project tooling for opencode: `skills/` (nextjs-frontend, tailwind-kama-styling, kama-content-data, visual-verification), `agent/ui-reviewer`, `command/` (`/verify`, `/new-page`, `/new-treatment`, `/ui-review`), `plugins/kama-guardrails.js` (blocks edits to `hiatus.css`/`kama.css.bak`, protects the `@layer` order, enforces `<Navigation>`/`<main>`/`<Footer>` on route pages). See `.opencode/README.md`.
@@ -90,42 +90,48 @@ Conventions:
 - `opencode.json` is gitignored but holds a hardcoded provider API key — never commit it or paste it into files.
 - The menu page anchors are `#massage`, `#body`, `#face`, `#head`, `#bath`, `#packages`, `#gallery` — in that order, matching the mega menu. `additionalServices` (`AdditionalService[]`) carries the `category` + `anchor` that decide where each add-on is rendered.
 - The fixed header clearance comes from **one** token, `--kama-header-h`: the header, the drawer, the page spacer (`Navigation`) and the anchor offset (`:where([id]) { scroll-margin-top: calc(var(--kama-header-h) + 1rem) }`) all read it. Never add a hardcoded header-sized padding: `.main-wrapper` has `padding-top: 0 !important` precisely because the Navigation spacer already reserves that space (a second offset is the classic "content starts too low" bug here).
+- Files are split to **≤100 lines** (≤110 only when a split would be truly awkward): implementation lives in sibling modules (`foo.helpers.ts`, `foo.save.ts`, `foo-parts.tsx`, …) and the original path stays a **barrel** re-exporting the same public symbols, so imports never break. Server-action barrels must **not** carry `"use server"` — the directive belongs on each implementation module; a `"use server"` file may only export async functions defined in it, so re-exports there fail the build. Relative imports in chains reachable from `node --test` need explicit `.ts` extensions (`allowImportingTsExtensions` is on).
 - Git: branch `main`, remote `origin` = `git@github.com:adamhavva/spa.git`, deploy target is Vercel.
 
 ## Architecture decisions
 
 These are the decisions behind the 10-update batch (see `## Update backlog`). Keep them in sync with the code — if a rule below no longer matches the implementation, update this section instead of leaving it stale.
 
-### WhatsApp is the single contact channel
+### WhatsApp is the single contact channel — fully DB-driven
 
-`src/lib/whatsapp.ts` is the **only** place that builds a WhatsApp URL. Never hardcode a `wa.me` link in a page.
+Numbers and messages live in the database (`SiteSettings` + `WhatsAppTemplate`), edited in Kontak & Umum. There are **no hardcoded number/message constants** anymore.
 
-```ts
-WHATSAPP_NUMBER        // "6281316052040" — the KAMA Spa line
-CORPORATE_NUMBER       // "6281314856565" — "Talk to Roy" line on /corporate
-waLink(message)        // https://wa.me/<number>?text=<encoded>
-locationWhatsApp(loc)  // per-branch message
-```
+- `src/lib/whatsapp.ts` is the **only** place that builds a `wa.me` URL: `waLink(message, number)`, `toWaNumber(raw)`, `corporateWhatsApp(pic, site, message)`. Never hardcode a `wa.me` link in a page.
+- Pages use the async readers in `src/lib/content/whatsapp.ts` instead:
+  - `whatsAppHref(context, { custom, values })` — resolves the context template (a per-item `custom` message wins) + the configured number.
+  - `branchWhatsAppHref({ address, whatsappNumber })` — per-branch link, `location` context.
+  - `corporateWhatsAppHref(picPhone)` — the "Talk to Roy" line on `/corporate`.
+  - All return `null` when no number is configured → **hide the button**, never render a fake number.
+- Context registry: `WHATSAPP_CONTEXTS` (`src/lib/domain/whatsapp-template.contexts.ts`) — 9 contexts: `default`, `treatment`, `package`, `promo`, `gift`, `membership`, `retail`, `location`, `event`. Placeholders are double-brace (`{{address}}`, `{{event}}`, …). The admin template page iterates the registry, so new contexts appear automatically.
+- Every phone number rendered on the site is a WhatsApp link, **not** a `tel:` link.
+- Membership CTAs ("Join KAMA Now", "Join Now") use the `membership` template; they no longer link to `/contact`.
 
-Message templates (exact wording is intentional — the guest sees it in WhatsApp):
+### Admin-editable brand, SEO & microcopy
 
-| Context | Message |
-| --- | --- |
-| A specific location (`loc.address`) | `Halo kak, apakah yang di {address} sudah buka dan bisa reservasi sekarang ?` |
-| Generic booking (floating button, nav CTA, corporate) | `Halo kak, saya mau reservasi` |
-| Membership join | `Halo kak, saya mau join member` |
+- Brand: `SiteSettings.logoMarkLightUrl/logoMarkDarkUrl/logoLockupUrl`, `brandWordmarkTop/Bottom`, `brandLogoAlt` — consumed by the logo, footer lockup, hero slider and admin login, with the local `public/img/kama` assets as fallbacks.
+- Global SEO defaults: `SiteSettings.seoSiteName/seoDefaultTitle/seoDefaultDescription/seoOgDescription/seoOgLocale/seoTitleTemplate/seoKeywords[]`, edited in the SEO module; `layout.tsx generateMetadata` falls back to the constants in `src/lib/domain/seo.ts`.
+- Footer hrefs: `SiteSettings.footerMembershipLearnHref/footerPrivacyHref/footerTermsHref`.
+- Mega-menu highlights: `MenuItem.highlightBadge/highlightEyebrow` (root items only).
+- Corporate photos: `CorporateContent.heroImageUrl/Alt`, `aboutImageUrl/Alt`, `inSpaImageUrl/Alt`.
+- Microcopy, aria labels and CTA hrefs: `ContentBlock` registry `src/lib/domain/page-copy.ts` (groups include `links`, `microcopy`, `forms`). Server parents read `getPageCopy()`/`copy(blocks, key)`; client components receive strings via props. Placeholders are single-brace (`{n}`, `{m}`, `{name}`, `{title}`) and are replaced at render.
 
-Rules:
+### Newsletter & reservation forms
 
-- Every phone number rendered on the site is a WhatsApp link, **not** a `tel:` link (`site.phoneHref` was replaced by `waLink(...)`).
-- A location link always uses the location template — the address is interpolated from `locations[].address` so the branches can never drift apart.
-- Membership CTAs ("Join KAMA Now", "Join Now") use the member template; they no longer link to `/contact`.
+- `NewsletterForm` (footer) and `ReservationForm` (`/contact`) take `{ branches, copy }` props (copy from `getFormsCopy()`, `src/lib/content/forms.ts`) and POST to `/api/newsletter` / `/api/reservation` → `NewsletterSignup` / `ReservationRequest` tables.
+- Both routes follow the corporate-inquiry defense pattern: same-origin check, per-IP hashed rate limit, body size cap, honeypot + elapsed-time bot detection (fake success), zod validation (`src/lib/domain/forms.ts`). No Turnstile, no email.
+- Admin inboxes: `/admin/newsletter` and `/admin/reservations` (reservations: status NEW/HANDLED, notes, delete).
 
 ### Maps
 
-- `locations[].mapEmbed` (Google Maps `embed?pb=...`) is the map source; it already pins the branch, so **no Maps API key** is used and nothing needs billing.
-- `locations[].mapDirections` is the "Dapatkan Rute" link.
-- The map popup in `src/components/contact/location-cards.tsx` and the `/locations` page both render the same `mapEmbed` iframe — keep them in sync.
+- `/contact` (`src/app/contact/contact-locations.tsx`) renders three things: a Leaflet/OpenStreetMap overview map of all branches (`src/components/contact/location-map.tsx`, centre = average branch coordinate), one `LocationInfo` card per branch, and an optional Google Maps iframe from `SiteSettings.mapsEmbedUrl`.
+- Branches come from the database (`src/lib/content/branches`, type `Branch`), not `src/data`. Neither the OSM overview map nor the `embed?pb=...` iframe needs a **Maps API key**, so nothing needs billing.
+- Per-branch "Dapatkan Rute" and WhatsApp links are built in `LocationInfo` from the branch row + `branchWhatsAppHref`; the flagship branch (`FLAGSHIP_LOCATION_SLUG`) also gets a Fresha booking link (`SiteSettings.freshaUrl`).
+- There is **no `/locations` route and no `location-cards.tsx`** anymore. Older references to `locations[].mapEmbed`/`mapDirections` point at legacy seed data (`src/data/content/locations.ts`), not at the rendered embed.
 
 ### External links
 

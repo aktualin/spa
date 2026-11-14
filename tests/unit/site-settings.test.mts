@@ -3,7 +3,6 @@ import { describe, it } from "node:test";
 
 import { locations, site } from "../../src/data/content.ts";
 import {
-  applySiteSettingsToLocations,
   directionsUrl,
   footerSocials,
   formatPhoneDisplay,
@@ -47,6 +46,22 @@ const CURRENT_ROW: SiteSettingsRow = {
   footerMembershipJoinLabel: null,
   partnershipIntro: null,
   partnershipEmail: null,
+  logoMarkLightUrl: null,
+  logoMarkDarkUrl: null,
+  logoLockupUrl: null,
+  brandWordmarkTop: null,
+  brandWordmarkBottom: null,
+  brandLogoAlt: null,
+  seoSiteName: null,
+  seoDefaultTitle: null,
+  seoDefaultDescription: null,
+  seoOgDescription: null,
+  seoOgLocale: null,
+  seoTitleTemplate: null,
+  seoKeywords: [],
+  footerMembershipLearnHref: null,
+  footerPrivacyHref: null,
+  footerTermsHref: null,
 };
 
 const EMBED =
@@ -77,6 +92,22 @@ function input(overrides: Partial<SiteSettingsInput> = {}): SiteSettingsInput {
     footerMembershipJoinLabel: "",
     partnershipIntro: "",
     partnershipEmail: "",
+    logoMarkLightUrl: "",
+    logoMarkDarkUrl: "",
+    logoLockupUrl: "",
+    brandWordmarkTop: "",
+    brandWordmarkBottom: "",
+    brandLogoAlt: "",
+    seoSiteName: "",
+    seoDefaultTitle: "",
+    seoDefaultDescription: "",
+    seoOgDescription: "",
+    seoOgLocale: "",
+    seoTitleTemplate: "",
+    seoKeywords: [],
+    footerMembershipLearnHref: "",
+    footerPrivacyHref: "",
+    footerTermsHref: "",
     ...overrides,
   };
 }
@@ -206,6 +237,109 @@ describe("siteSettingsInputSchema", () => {
     fail({ bookNowHref: "javascript:alert(1)" });
     fail({ menuScanUrls: ["bukan-url"] });
     fail({ menuPdfUrl: "javascript:alert(1)" });
+    fail({ logoMarkLightUrl: "javascript:alert(1)" });
+    fail({ logoLockupUrl: "/img/logo.png" });
+    fail({ brandWordmarkTop: "x".repeat(21) });
+    fail({ seoDefaultTitle: "x".repeat(121) });
+    fail({ seoKeywords: Array.from({ length: 21 }, (_, i) => `kata-${i}`) });
+    fail({ seoKeywords: ["x".repeat(41)] });
+    fail({ footerPrivacyHref: "javascript:alert(1)" });
+    fail({ footerTermsHref: "//evil.com" });
+    fail({ footerMembershipLearnHref: "http://example.com/membership" });
+  });
+});
+
+describe("brand, SEO & tautan footer", () => {
+  it("isian brand & SEO dirapikan; kosong menjadi null saat ditulis", () => {
+    const parsed = siteSettingsInputSchema.parse(
+      input({
+        logoMarkLightUrl: " https://cdn.example.com/img/mark-light.svg ",
+        logoMarkDarkUrl: "https://cdn.example.com/img/mark-dark.svg",
+        logoLockupUrl: "https://cdn.example.com/img/lockup.svg",
+        brandWordmarkTop: " KAMA ",
+        brandWordmarkBottom: " Spa ",
+        brandLogoAlt: " Logo KAMA Spa ",
+        seoSiteName: "KAMA Spa",
+        seoDefaultTitle: " KAMA Spa — South Jakarta ",
+        seoDefaultDescription: " Wellness sanctuary. ",
+        seoOgDescription: "Relax. Refresh.",
+        seoOgLocale: "id_ID",
+        seoTitleTemplate: "%s | KAMA Spa",
+        seoKeywords: [" spa ", "", "jakarta", " "],
+        footerMembershipLearnHref: "/membership",
+        footerPrivacyHref: "/privacy-policy",
+        footerTermsHref: "https://kamaspa.id/terms",
+      }),
+    );
+    assert.equal(parsed.logoMarkLightUrl, "https://cdn.example.com/img/mark-light.svg");
+    assert.equal(parsed.brandWordmarkTop, "KAMA");
+    assert.equal(parsed.brandWordmarkBottom, "Spa");
+    assert.equal(parsed.seoDefaultTitle, "KAMA Spa — South Jakarta");
+    assert.deepEqual(parsed.seoKeywords, ["spa", "jakarta"]);
+    assert.equal(parsed.footerMembershipLearnHref, "/membership");
+
+    const write = toSiteSettingsWrite(parsed);
+    assert.equal(write.logoMarkDarkUrl, "https://cdn.example.com/img/mark-dark.svg");
+    assert.equal(write.seoOgLocale, "id_ID");
+    assert.equal(write.footerPrivacyHref, "/privacy-policy");
+    assert.deepEqual(write.seoKeywords, ["spa", "jakarta"]);
+
+    const kosong = toSiteSettingsWrite(siteSettingsInputSchema.parse(input()));
+    assert.equal(kosong.logoLockupUrl, null);
+    assert.equal(kosong.brandLogoAlt, null);
+    assert.equal(kosong.seoSiteName, null);
+    assert.equal(kosong.footerTermsHref, null);
+    assert.deepEqual(kosong.seoKeywords, []);
+  });
+
+  it("merge: gambar & tautan aman diteruskan, yang tidak aman dikosongkan", () => {
+    const merged = mergeSiteSettings({
+      ...CURRENT_ROW,
+      logoMarkLightUrl: "https://cdn.example.com/img/mark.svg",
+      logoMarkDarkUrl: "javascript:alert(1)",
+      logoLockupUrl: "/img/lockup.png",
+      brandWordmarkTop: " KAMA ",
+      brandLogoAlt: "Logo",
+      seoSiteName: "KAMA Spa",
+      seoKeywords: [" spa ", "", "jakarta"],
+      footerMembershipLearnHref: "/membership",
+      footerPrivacyHref: "javascript:alert(1)",
+      footerTermsHref: "#terms",
+    });
+    assert.equal(merged.logoMarkLightUrl, "https://cdn.example.com/img/mark.svg");
+    assert.equal(merged.logoMarkDarkUrl, "");
+    assert.equal(merged.logoLockupUrl, "");
+    assert.equal(merged.brandWordmarkTop, "KAMA");
+    assert.equal(merged.brandLogoAlt, "Logo");
+    assert.equal(merged.seoSiteName, "KAMA Spa");
+    assert.deepEqual(merged.seoKeywords, ["spa", "jakarta"]);
+    assert.equal(merged.footerMembershipLearnHref, "/membership");
+    assert.equal(merged.footerPrivacyHref, "");
+    assert.equal(merged.footerTermsHref, "#terms");
+  });
+
+  it("merge: kolom brand/SEO kosong tetap kosong (empty state)", () => {
+    const merged = mergeSiteSettings(CURRENT_ROW);
+    assert.equal(merged.logoMarkLightUrl, "");
+    assert.equal(merged.brandWordmarkTop, "");
+    assert.equal(merged.seoDefaultTitle, "");
+    assert.deepEqual(merged.seoKeywords, []);
+    assert.equal(merged.footerPrivacyHref, "");
+    assert.equal(merged.footerMembershipLearnHref, "");
+    assert.equal(merged.footerTermsHref, "");
+  });
+
+  it("form defaults meneruskan kolom baru apa adanya", () => {
+    const defaults = siteSettingsFormDefaults({
+      ...CURRENT_ROW,
+      brandWordmarkTop: "KAMA",
+      seoSiteName: "KAMA Spa",
+      footerPrivacyHref: "/privacy-policy",
+    });
+    assert.equal(defaults.values.brandWordmarkTop, "KAMA");
+    assert.equal(defaults.values.seoSiteName, "KAMA Spa");
+    assert.equal(defaults.values.footerPrivacyHref, "/privacy-policy");
+    assert.equal(defaults.values.logoLockupUrl, "");
   });
 });
 
@@ -242,29 +376,6 @@ describe("mergeSiteSettings & tampilan publik", () => {
     assert.equal(merged.tiktokUrl, "");
     assert.equal(merged.instagramUrl, "");
     assert.equal(merged.instagramUsername, "");
-  });
-  it("alamat kosong tidak mengosongkan kartu cabang", () => {
-    const applied = applySiteSettingsToLocations(locations, emptySiteSettings());
-    assert.equal(applied[0].address, locations[0].address);
-  });
-  it("lokasi kontak identik dengan data statis untuk baris saat ini", () => {
-    const applied = applySiteSettingsToLocations(locations, mergeSiteSettings(CURRENT_ROW));
-    assert.deepEqual(applied, locations);
-  });
-  it("perubahan admin diterapkan ke lokasi", () => {
-    const applied = applySiteSettingsToLocations(locations, {
-      ...mergeSiteSettings(CURRENT_ROW),
-      address: "Jl. Baru 1, Jakarta",
-      openingHours: ["Mon – Fri 10 AM – 8 PM", "Sat 9 AM – 9 PM"],
-      whatsappNumber: "6281200001111",
-      mapsEmbedUrl: EMBED,
-    });
-    assert.equal(applied[0].address, "Jl. Baru 1, Jakarta");
-    assert.equal(applied[0].mapDirections, directionsUrl("Jl. Baru 1, Jakarta"));
-    assert.equal(applied[0].mapEmbed, EMBED);
-    assert.equal(applied[0].hours, "Mon – Fri 10 AM – 8 PM\nSat 9 AM – 9 PM");
-    assert.equal(applied[1].phone, "+62 812-0000-1111");
-    assert.equal(applied[1].address, locations[1].address);
   });
   it("tautan rute statis sama dengan hasil directionsUrl", () => {
     assert.equal(directionsUrl(locations[0].address), locations[0].mapDirections);

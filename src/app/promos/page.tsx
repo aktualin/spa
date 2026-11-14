@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import { ArrowRight } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
 import {
   PublicEmptyState,
@@ -13,6 +11,7 @@ import { PromoGrid } from "@/components/public/promos/promo-parts";
 import { getActivePromos } from "@/lib/content/promos";
 import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
+import { CtaBanner } from "../_components/cta-banner";
 
 export async function generateMetadata(): Promise<Metadata> {
   return withPageSeo("/promos", {});
@@ -51,27 +50,12 @@ export default async function PromosPage() {
           </div>
         </Reveal>
 
-        <Reveal as="section" className="bg-cream-soft">
-          <div className="container-kama py-14 md:py-16 lg:py-20">
-            <div className="flex flex-col items-start gap-5 bg-cream-card px-6 py-10 md:flex-row md:items-center md:justify-between md:px-12 md:py-14">
-              <div className="flex flex-col gap-2">
-                <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-                  {copy(pageCopy, "promos.membership_title")}
-                </h2>
-                <p className="max-w-[52ch] text-body text-cocoa/70">
-                  {copy(pageCopy, "promos.membership_description")}
-                </p>
-              </div>
-              <Link
-                href="/promos/membership"
-                className="btn btn-outline shrink-0 border-cocoa/40"
-              >
-                {copy(pageCopy, "promos.membership_cta")}
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-          </div>
-        </Reveal>
+        <CtaBanner
+          title={copy(pageCopy, "promos.membership_title")}
+          description={copy(pageCopy, "promos.membership_description")}
+          href={copy(pageCopy, "promos.membership_href") || "/promos/membership"}
+          label={copy(pageCopy, "promos.membership_cta")}
+        />
       </main>
       <Footer />
     </>

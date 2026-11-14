@@ -26,10 +26,20 @@ import {
   journalPosts,
 } from "../src/data/content.ts";
 import { membership, privacyPolicy, termsConditions } from "../src/data/pages.ts";
+import { asset } from "../src/lib/asset-url.ts";
 import { buildStaticCatalogSeed } from "../src/lib/domain/catalog-seed.ts";
 import { escapeHtml } from "../src/lib/domain/corporate.ts";
 import { buildStaticMenuSeed } from "../src/lib/domain/menu-seed.ts";
+import {
+  DEFAULT_DESCRIPTION,
+  DEFAULT_OG_DESCRIPTION,
+  DEFAULT_TITLE,
+  OG_LOCALE,
+  SITE_NAME,
+  TITLE_TEMPLATE,
+} from "../src/lib/domain/seo.ts";
 import { slugify } from "../src/lib/domain/slug.ts";
+import { WHATSAPP_CONTEXTS } from "../src/lib/domain/whatsapp-template.ts";
 import { staticGiftCard } from "../src/lib/domain/gift-card.ts";
 import {
   staticCorporateContent,
@@ -310,6 +320,12 @@ async function seedCorporate() {
       picName: content.pic.name,
       picEmail: content.pic.email,
       picPhone: content.pic.phone,
+      heroImageUrl: asset("img/kama/corporate/01-corporate-sign.jpg"),
+      heroImageAlt: "KAMA Spa — Corporate Wellness Solutions",
+      aboutImageUrl: asset("img/kama/corporate/02-massage.jpg"),
+      aboutImageAlt: "Sesi corporate wellness KAMA Spa",
+      inSpaImageUrl: asset("img/kama/corporate/05-lounge.jpg"),
+      inSpaImageAlt: "Lounge KAMA Spa dengan tim menikmati refreshments",
     },
     // Tidak menimpa: suntingan admin menang.
     update: {},
@@ -377,6 +393,30 @@ async function seedSiteSettings() {
     phone: site.phone,
     instagramUrl: site.instagram,
     tiktokUrl: site.tiktok,
+    logoMarkLightUrl: asset("img/kama/mark-kama-light.png"),
+    logoMarkDarkUrl: asset("img/kama/mark-kama-dark.png"),
+    logoLockupUrl: asset("img/kama/logo-kama-light.png"),
+    brandWordmarkTop: "KAMA",
+    brandWordmarkBottom: "SPA",
+    brandLogoAlt: "KAMA Spa",
+    seoSiteName: SITE_NAME,
+    seoDefaultTitle: DEFAULT_TITLE,
+    seoDefaultDescription: DEFAULT_DESCRIPTION,
+    seoOgDescription: DEFAULT_OG_DESCRIPTION,
+    seoOgLocale: OG_LOCALE,
+    seoTitleTemplate: TITLE_TEMPLATE,
+    seoKeywords: [
+      "KAMA Spa",
+      "massage Jakarta",
+      "spa South Jakarta",
+      "day spa",
+      "corporate wellness",
+      "Sukma Laya",
+      "Urip Padma",
+    ],
+    footerMembershipLearnHref: "/membership",
+    footerPrivacyHref: "/privacy-policy",
+    footerTermsHref: "/terms-conditions",
   };
   const existing = await prisma.siteSettings.findUnique({
     where: { id: "singleton" },
@@ -394,6 +434,22 @@ async function seedSiteSettings() {
     if (!existing.phone?.trim()) update.phone = defaults.phone;
     if (!existing.instagramUrl?.trim()) update.instagramUrl = defaults.instagramUrl;
     if (!existing.tiktokUrl?.trim()) update.tiktokUrl = defaults.tiktokUrl;
+    if (!existing.logoMarkLightUrl?.trim()) update.logoMarkLightUrl = defaults.logoMarkLightUrl;
+    if (!existing.logoMarkDarkUrl?.trim()) update.logoMarkDarkUrl = defaults.logoMarkDarkUrl;
+    if (!existing.logoLockupUrl?.trim()) update.logoLockupUrl = defaults.logoLockupUrl;
+    if (!existing.brandWordmarkTop?.trim()) update.brandWordmarkTop = defaults.brandWordmarkTop;
+    if (!existing.brandWordmarkBottom?.trim()) update.brandWordmarkBottom = defaults.brandWordmarkBottom;
+    if (!existing.brandLogoAlt?.trim()) update.brandLogoAlt = defaults.brandLogoAlt;
+    if (!existing.seoSiteName?.trim()) update.seoSiteName = defaults.seoSiteName;
+    if (!existing.seoDefaultTitle?.trim()) update.seoDefaultTitle = defaults.seoDefaultTitle;
+    if (!existing.seoDefaultDescription?.trim()) update.seoDefaultDescription = defaults.seoDefaultDescription;
+    if (!existing.seoOgDescription?.trim()) update.seoOgDescription = defaults.seoOgDescription;
+    if (!existing.seoOgLocale?.trim()) update.seoOgLocale = defaults.seoOgLocale;
+    if (!existing.seoTitleTemplate?.trim()) update.seoTitleTemplate = defaults.seoTitleTemplate;
+    if (existing.seoKeywords.length === 0) update.seoKeywords = defaults.seoKeywords;
+    if (!existing.footerMembershipLearnHref?.trim()) update.footerMembershipLearnHref = defaults.footerMembershipLearnHref;
+    if (!existing.footerPrivacyHref?.trim()) update.footerPrivacyHref = defaults.footerPrivacyHref;
+    if (!existing.footerTermsHref?.trim()) update.footerTermsHref = defaults.footerTermsHref;
     if (Object.keys(update).length > 0) {
       await prisma.siteSettings.update({ where: { id: "singleton" }, data: update });
     }
@@ -432,38 +488,18 @@ async function seedPageSeo(prisma: PrismaClient): Promise<void> {
 
 }
 
-const WHATSAPP_TEMPLATES = [
-  {
-    key: "default",
-    label: "Reservasi umum",
-    message: "Halo kak, saya mau reservasi",
-  },
-  {
-    key: "membership",
-    label: "Daftar membership",
-    message: "Halo kak, saya mau join member",
-  },
-  {
-    key: "treatment",
-    label: "Reservasi treatment tertentu",
-    message: "Halo kak, saya mau reservasi {{treatment}}",
-  },
-  {
-    key: "retail",
-    label: "Pemesanan produk retail",
-    message: "Halo kak, saya mau pesan produk {{product}}",
-  },
-];
-
+// Semua konteks (default, treatment, package, promo, gift, membership,
+// retail, location, event) diisi dari teks bawaan registry. Label & pesan
+// tidak ditimpa saat seed diulang — suntingan admin menang.
 async function seedWhatsAppTemplates() {
-  for (const template of WHATSAPP_TEMPLATES) {
+  for (const context of WHATSAPP_CONTEXTS) {
     await prisma.whatsAppTemplate.upsert({
-      where: { key: template.key },
-      create: template,
-      update: { label: template.label, message: template.message },
+      where: { key: context.key },
+      create: { key: context.key, label: context.label, message: context.builtIn },
+      update: {},
     });
   }
-  console.log(`✔ ${WHATSAPP_TEMPLATES.length} template WhatsApp`);
+  console.log(`✔ ${WHATSAPP_CONTEXTS.length} template WhatsApp`);
 }
 
 // Urutan mengikuti komposisi nyata src/app/page.tsx.
@@ -535,6 +571,11 @@ async function seedMenu() {
           locations: item.locations,
           panelKey: item.panelKey,
           panelLinkLabel: item.panelLinkLabel,
+          highlightImageUrl: item.highlightImageUrl,
+          highlightLabel: item.highlightLabel,
+          highlightHref: item.highlightHref,
+          highlightBadge: item.highlightBadge,
+          highlightEyebrow: item.highlightEyebrow,
           parentId: item.parentKey ? idByKey.get(item.parentKey) : null,
         },
         select: { id: true },

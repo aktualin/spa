@@ -1,23 +1,14 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { DeferredNavigation } from "@/components/public/deferred-navigation";
 import { Footer } from "@/components/footer";
-import { ArrowLeft, Check } from "@/components/icons";
-import { Reveal } from "@/components/reveal";
-import { PackageCard } from "@/components/public/package-card";
-import { WaLink } from "@/components/public/wa-button";
-import { ImageCarousel } from "@/components/image-carousel";
-import { getCatalogSlugs, getPackage, getPackages } from "@/lib/content/catalog";
-import { getCatalogImagesBySlug } from "@/lib/content/content-images";
+import { fillCopy } from "@/components/copy-text";
+import { getCatalogSlugs, getPackage } from "@/lib/content/catalog";
 import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
-import { formatDuration } from "@/lib/domain/pricing";
-import { formatIdr } from "@/lib/format";
-import { whatsAppHref } from "@/lib/content/whatsapp";
-import { RichText } from "@/components/rich-text";
 import { toPlainText } from "@/lib/domain/rich-text";
+import { DetailTitleFallback } from "../../../_components/detail-parts";
+import { PackageDetailContent } from "./package-detail-content";
 
 type PackagePageProps = {
   params: Promise<{ slug: string }>;
@@ -32,10 +23,9 @@ export async function generateMetadata({
   params,
 }: PackagePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const pkg = await getPackage(slug);
+  const [pkg, pageCopy] = await Promise.all([getPackage(slug), getPageCopy()]);
 
   if (!pkg) {
-    const pageCopy = await getPageCopy();
     return { title: copy(pageCopy, "catalog.package.not_found_title") || undefined };
   }
 
@@ -44,7 +34,11 @@ export async function generateMetadata({
     description:
       pkg.seoDescription ??
       (toPlainText(pkg.description, 160) || null) ??
-      `${pkg.name} di KAMA Spa — isi paket, durasi, dan harga.`,
+      fillCopy(
+        copy(pageCopy, "catalog.seo_package_description") ||
+          "{name} di KAMA Spa — isi paket, durasi, dan harga.",
+        { name: pkg.name },
+      ),
   });
 }
 
@@ -55,148 +49,13 @@ export default async function PackagePage({ params }: PackagePageProps) {
     <>
       <DeferredNavigation />
       <Suspense
-        fallback={<PackageFallback title={copy(pageCopy, "catalog.package.loading_title")} />}
+        fallback={
+          <DetailTitleFallback title={copy(pageCopy, "catalog.package.loading_title")} />
+        }
       >
-        <PackageContent params={params} />
+        <PackageDetailContent params={params} />
       </Suspense>
       <Footer />
     </>
-  );
-}
-
-function PackageFallback({ title }: { title: string }) {
-  return (
-    <main className="flex-1">
-      <Reveal as="section" className="bg-cream-soft">
-        <div className="container-kama py-14 md:py-20 lg:py-24">
-          <h1 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-            {title}
-          </h1>
-        </div>
-      </Reveal>
-    </main>
-  );
-}
-
-async function PackageContent({ params }: PackagePageProps) {
-  const { slug } = await params;
-  const [pkg, pageCopy, galleryImages] = await Promise.all([
-    getPackage(slug),
-    getPageCopy(),
-    getCatalogImagesBySlug(slug),
-  ]);
-
-  if (!pkg) notFound();
-
-  // Gambar utama selalu jadi slide pertama; galeri admin menyusul. Satu
-  // gambar dirender <img> biasa, lebih dari satu jadi carousel.
-  const gallery = [
-    ...(pkg.imageUrl ? [{ imageUrl: pkg.imageUrl, altText: null }] : []),
-    ...galleryImages,
-  ];
-
-  const others = (await getPackages()).filter((p) => p.slug !== slug).slice(0, 3);
-  const waHref = await whatsAppHref("package", {
-    custom: pkg.whatsappMessage,
-    values: {
-      package: pkg.name,
-      price: formatIdr(pkg.priceIdr),
-      duration: pkg.durationMin ? formatDuration(pkg.durationMin) : null,
-    },
-  });
-
-  return (
-    <main className="flex-1">
-        <Reveal as="section" className="bg-cream-soft">
-          <div className="container-kama py-14 md:py-20 lg:py-24">
-            <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
-              <div className="flex flex-col gap-4">
-                <Link
-                  href="/treatments/packages"
-                  className="inline-flex items-center gap-2 text-[0.9375rem] underline underline-offset-4 transition-opacity hover:opacity-70"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                  {copy(pageCopy, "catalog.package.back")}
-                </Link>
-                <span className="eyebrow text-cocoa/60">{copy(pageCopy, "catalog.package.eyebrow")}</span>
-                <h1 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-                  {pkg.name}
-                </h1>
-                <RichText value={pkg.description} className="max-w-[52ch] text-lead text-cocoa/70" />
-                <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
-                  {pkg.durationMin ? (
-                    <span className="text-caption text-cocoa/60">
-                      {formatDuration(pkg.durationMin)}
-                    </span>
-                  ) : null}
-                  <span className="font-display text-title-sm">
-                    {formatIdr(pkg.priceIdr)}
-                  </span>
-                </div>
-                <div>
-                  <WaLink href={waHref} context="package">
-                    {copy(pageCopy, "catalog.package.cta_whatsapp")}
-                  </WaLink>
-                </div>
-              </div>
-
-              {gallery.length > 0 ? (
-                <div className="image-container aspect-[4/3] w-full overflow-hidden">
-                  <ImageCarousel
-                    images={gallery}
-                    alt={pkg.name}
-                    imageClassName="image-cover"
-                  />
-                </div>
-              ) : null}
-            </div>
-          </div>
-        </Reveal>
-
-        {pkg.items.length > 0 ? (
-          <Reveal as="section" className="bg-cream">
-            <div className="container-kama py-14 md:py-16 lg:py-20">
-              <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-                {copy(pageCopy, "catalog.package.includes_title")}
-              </h2>
-              <ul className="mt-8 flex max-w-[48rem] flex-col">
-                {pkg.items.map((item) => (
-                  <li
-                    key={item.label}
-                    className="flex items-center gap-3 border-b border-cocoa/15 py-4"
-                  >
-                    <Check className="h-4 w-4 shrink-0" />
-                    {item.treatmentSlug ? (
-                      <Link
-                        href={`/menu/${item.treatmentSlug}`}
-                        className="text-body underline underline-offset-4 transition-opacity hover:opacity-70"
-                      >
-                        {item.label}
-                      </Link>
-                    ) : (
-                      <span className="text-body">{item.label}</span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </Reveal>
-        ) : null}
-
-        {others.length > 0 ? (
-          <Reveal as="section" className="bg-cream-soft">
-            <div className="container-kama py-14 md:py-16 lg:py-20">
-              <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
-                {copy(pageCopy, "catalog.package.others_title")}
-              </h2>
-              <div className="w-layout-grid whats-new_list mt-8">
-                {others.map((other) => (
-                  <PackageCard key={other.slug} pkg={other} />
-                ))}
-              </div>
-            </div>
-          </Reveal>
-        ) : null}
-    </main>
   );
 }

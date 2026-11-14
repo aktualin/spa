@@ -1,33 +1,17 @@
 "use server";
 
 import { updateTag } from "next/cache";
-import { z } from "zod";
 
 import { requireRole } from "@/lib/auth";
 import {
   CONTENT_IMAGE_TAG,
-  MAX_CONTENT_IMAGES,
   type ContentImageEntityType,
   type ContentImageRow,
 } from "@/lib/domain/content-image";
 import { prisma } from "@/lib/prisma";
 import { deleteImageByUrl } from "@/lib/storage";
 
-const CONTENT_ROLES = ["ADMIN", "EDITOR"] as const;
-
-const rowsSchema = z
-  .array(
-    z.object({
-      // Hanya URL yang disimpan; file-nya ada di Supabase Storage.
-      imageUrl: z.string().trim().url("URL gambar tidak valid."),
-      altText: z
-        .string()
-        .trim()
-        .max(160, "Teks alt maksimal 160 karakter.")
-        .nullish(),
-    }),
-  )
-  .max(MAX_CONTENT_IMAGES, `Maksimal ${MAX_CONTENT_IMAGES} gambar per konten.`);
+import { CONTENT_ROLES, rowsSchema } from "./content-images.helpers";
 
 /**
  * Tulis ulang daftar gambar sebuah entitas: delete + create dalam satu

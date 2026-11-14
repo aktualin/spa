@@ -56,25 +56,54 @@ describe("U12 toWaNumber", () => {
 });
 
 describe("U12 waLink & corporateWhatsApp", () => {
-  it("meng-encode pesan ke dalam URL wa.me", () => {
-    const link = waLink("Halo kak, saya mau reservasi");
+  const MESSAGE = "Halo kak, saya mau reservasi";
+
+  it("meng-encode pesan ke dalam URL wa.me dengan nomor yang diberikan", () => {
+    const link = waLink(MESSAGE, "6281316052040");
     assert.ok(link.startsWith("https://wa.me/6281316052040?text="));
     assert.ok(link.includes("Halo%20kak"));
   });
 
-  it("memakai nomor corporate sebagai default", () => {
-    assert.ok(corporateWhatsApp().startsWith("https://wa.me/6281314856565"));
+  it("nomor boleh ditulis dengan tanda baca; dirapikan ke digit saja", () => {
+    assert.ok(
+      waLink(MESSAGE, "+62 813-1605-2040").startsWith("https://wa.me/6281316052040?text="),
+    );
   });
 
   it("memakai nomor PIC bila admin mengisinya", () => {
     assert.ok(
-      corporateWhatsApp("0812-3456-7890").startsWith(
+      corporateWhatsApp("0812-3456-7890", "6281314856565", MESSAGE)?.startsWith(
         "https://wa.me/6281234567890",
       ),
     );
   });
 
-  it("jatuh ke nomor corporate bila nomor PIC tidak masuk akal", () => {
-    assert.ok(corporateWhatsApp("123").startsWith("https://wa.me/6281314856565"));
+  it("jatuh ke nomor situs bila nomor PIC tidak masuk akal", () => {
+    assert.ok(
+      corporateWhatsApp("123", "6281314856565", MESSAGE)?.startsWith(
+        "https://wa.me/6281314856565",
+      ),
+    );
+  });
+
+  it("jatuh ke nomor situs bila PIC kosong", () => {
+    for (const pic of [null, undefined, "", "   "]) {
+      assert.ok(
+        corporateWhatsApp(pic, "0813-1485-6565", MESSAGE)?.startsWith(
+          "https://wa.me/6281314856565",
+        ),
+      );
+    }
+  });
+
+  it("null bila kedua nomor kosong — tombol disembunyikan, bukan link rusak", () => {
+    assert.equal(corporateWhatsApp(null, null, MESSAGE), null);
+    assert.equal(corporateWhatsApp(undefined, "", MESSAGE), null);
+    assert.equal(corporateWhatsApp("123", "abc", MESSAGE), null);
+  });
+
+  it("pesan tetap ter-encode pada link corporate", () => {
+    const link = corporateWhatsApp("0812-3456-7890", null, MESSAGE);
+    assert.ok(link?.includes("text=Halo%20kak"));
   });
 });

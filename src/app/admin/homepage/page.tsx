@@ -1,33 +1,13 @@
-import Link from "next/link";
-
 import { requireRole } from "@/lib/auth";
-import {
-  BOOKING_BANNER_DEFAULTS,
-  HERO_DEFAULTS,
-  type BannerDefaults,
-  type BannerKey,
-} from "@/lib/domain/homepage-banner";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 
 import { listHomepageSections } from "../actions/homepage";
 import { StatusBanner } from "../settings/_components/form-ui";
+import { BANNER_DEFAULTS } from "./homepage-banner-defaults";
+import { HomepageQuickLinks } from "./homepage-quick-links";
 import { HomepageSectionList } from "./homepage-section-list";
 
 export const instant = false;
-
-/** Teks/gambar bawaan banner — ditampilkan sebagai placeholder di form. */
-const BANNER_DEFAULTS: Record<BannerKey, BannerDefaults> = {
-  hero: HERO_DEFAULTS,
-  "membership-banner": {
-    title: "KAMA Membership.",
-    subtitle: "",
-    imageUrl: "",
-    imageAlt: "",
-    ctaLabel: "Join KAMA Now",
-    ctaHref: "/membership",
-  },
-  "booking-banner": BOOKING_BANNER_DEFAULTS,
-};
 
 export default async function AdminHomepagePage({
   searchParams,
@@ -50,44 +30,7 @@ export default async function AdminHomepagePage({
         Nyalakan/matikan tiap section, atur urutannya, dan edit teksnya. Urutan
         di sini sama dengan urutan render di homepage.
       </p>
-      <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-        <Link
-          href="/admin/homepage/hero"
-          className="font-medium text-neutral-900 underline underline-offset-2"
-        >
-          Kelola slide Hero →
-        </Link>
-        <Link
-          href="/admin/homepage/highlights"
-          className="font-medium text-neutral-900 underline underline-offset-2"
-        >
-          Kelola highlight “What’s New” →
-        </Link>
-        <Link
-          href="/admin/homepage/stats"
-          className="font-medium text-neutral-900 underline underline-offset-2"
-        >
-          Statistik Brand Intro →
-        </Link>
-        <Link
-          href="/admin/homepage/reviews"
-          className="font-medium text-neutral-900 underline underline-offset-2"
-        >
-          Ulasan →
-        </Link>
-        <Link
-          href="/admin/homepage/instagram"
-          className="font-medium text-neutral-900 underline underline-offset-2"
-        >
-          Feed Instagram →
-        </Link>
-        <Link
-          href="/admin/our-story"
-          className="font-medium text-neutral-900 underline underline-offset-2"
-        >
-          Edit Our Story →
-        </Link>
-      </p>
+      <HomepageQuickLinks />
 
       <StatusBanner saved={params.saved} deleted={params.deleted} deletedText="Section konten dihapus." />
       {params.error === "custom-name" ? (

@@ -1,10 +1,10 @@
 import Link from "next/link";
 
 import { requireRole } from "@/lib/auth";
-import { formatIdr } from "@/lib/format";
 
 import { listPackages } from "../../actions/packages";
 import { CatalogTabs } from "../catalog-tabs";
+import { PackageRow } from "./packages-list";
 
 export const instant = false;
 
@@ -62,42 +62,7 @@ export default async function AdminPackagesPage({
       ) : (
         <ul className="mt-6 divide-y divide-neutral-200 overflow-hidden rounded-lg border border-neutral-200 bg-white">
           {packages.map((pkg) => (
-            <li
-              key={pkg.id}
-              className="flex flex-wrap items-center justify-between gap-3 px-4 py-3"
-            >
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Link
-                    href={`/admin/treatments/packages/${pkg.id}`}
-                    className="font-medium text-neutral-900 hover:underline"
-                  >
-                    {pkg.name}
-                  </Link>
-                  {!pkg.isPublished ? (
-                    <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-neutral-600">
-                      Draf
-                    </span>
-                  ) : null}
-                </div>
-                <p className="mt-0.5 truncate text-xs text-neutral-500">
-                  /{pkg.slug} ·{" "}
-                  {pkg.items.length > 0
-                    ? pkg.items
-                        .map(
-                          (item) =>
-                            item.treatment?.name ?? item.label ?? "—",
-                        )
-                        .join(", ")
-                    : "belum ada isi"}
-                </p>
-              </div>
-
-              <p className="text-sm text-neutral-600">
-                {pkg.durationMin ? `${pkg.durationMin} m · ` : ""}
-                {formatIdr(pkg.priceIdr)}
-              </p>
-            </li>
+            <PackageRow key={pkg.id} pkg={pkg} />
           ))}
         </ul>
       )}

@@ -8,17 +8,12 @@ import {
   saveProgramAction,
   type ActionState,
 } from "../../actions/corporate-items";
-import { ImageField } from "../../image-field";
 import {
-  Checkbox,
   ConfirmDeleteButton,
   ErrorAlert,
-  Field,
   SaveButton,
-  inputClass,
 } from "../../promos/_kit/form-ui";
-import { StringListField } from "../_components/string-list-field";
-import { RichTextField } from "../../rich-text-field";
+import { ProgramFields } from "./program-form-fields";
 
 export type ProgramFormData = {
   id: string | null;
@@ -53,45 +48,7 @@ export function CorporateProgramForm({
       <form action={formAction} className="mt-6 space-y-5">
         {program.id ? <input type="hidden" name="id" value={program.id} /> : null}
 
-        <Field label="Nama program" htmlFor="name" hint="Contoh: Essential, Signature, Executive.">
-          <input
-            id="name"
-            name="name"
-            defaultValue={program.name}
-            required
-            maxLength={80}
-            className={inputClass}
-          />
-        </Field>
-
-        <RichTextField
-          name="description"
-          label="Deskripsi"
-          defaultValue={program.description}
-          folder="corporate"
-          compact
-        />
-
-        <StringListField
-          name="features"
-          legend="Fitur"
-          hint="Satu fitur per baris, tampil sebagai daftar centang. Baris kosong diabaikan."
-          itemLabel="fitur"
-          placeholder="Contoh: Chair massage"
-          defaultValue={program.features}
-          max={maxFeatures}
-        />
-
-        <ImageField
-          name="imageUrl"
-          label="Foto program (opsional, tampil di atas kartu)"
-          folder="corporate"
-          defaultValue={program.imageUrl}
-        />
-
-        <Checkbox name="isPublished" defaultChecked={program.isPublished}>
-          Tampilkan di website
-        </Checkbox>
+        <ProgramFields program={program} maxFeatures={maxFeatures} />
 
         <ErrorAlert message={state.error} />
 

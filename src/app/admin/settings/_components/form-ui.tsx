@@ -1,82 +1,21 @@
 "use client";
 
-import { useFormStatus } from "react-dom";
-
 /**
  * Potongan UI form admin yang dipakai bersama modul Retail, Corporate,
  * Homepage, Our Story, Menu, Kontak & Umum, dan SEO. Gayanya mengikuti
  * `treatments/treatment-form.tsx`.
+ *
+ * SaveButton/Field/Checkbox identik dengan kit promos — dipakai ulang dari
+ * sana supaya tidak ada dua salinan.
  */
 
+import { ErrorAlert } from "../../promos/_kit/form-ui";
+
 export { inputClass } from "./styles";
-
-export function SaveButton({ label = "Simpan" }: { label?: string }) {
-  const { pending } = useFormStatus();
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700 disabled:opacity-60"
-    >
-      {pending ? "Menyimpan…" : label}
-    </button>
-  );
-}
-
-export function Field({
-  label,
-  htmlFor,
-  hint,
-  children,
-}: {
-  label: string;
-  htmlFor: string;
-  hint?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-1.5">
-      <label
-        htmlFor={htmlFor}
-        className="block text-sm font-medium text-neutral-700"
-      >
-        {label}
-      </label>
-      {children}
-      {hint ? <p className="text-xs text-neutral-500">{hint}</p> : null}
-    </div>
-  );
-}
-
-export function Checkbox({
-  name,
-  defaultChecked,
-  children,
-}: {
-  name: string;
-  defaultChecked: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className="flex items-center gap-2 text-sm text-neutral-700">
-      <input
-        type="checkbox"
-        name={name}
-        defaultChecked={defaultChecked}
-        className="size-4 rounded border-neutral-300"
-      />
-      <span>{children}</span>
-    </label>
-  );
-}
+export { SaveButton, Field, Checkbox } from "../../promos/_kit/form-ui";
 
 export function ErrorMessage({ error }: { error: string | null }) {
-  if (!error) return null;
-  return (
-    <p role="alert" className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
-      {error}
-    </p>
-  );
+  return <ErrorAlert message={error} />;
 }
 
 /** Banner `?saved=1` / `?deleted=1` di halaman list. */

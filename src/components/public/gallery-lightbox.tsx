@@ -6,9 +6,10 @@
  */
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-
-import { Close, ArrowLeft, ArrowRight } from "@/components/icons";
+import { fillCopy } from "@/components/copy-text";
+import { Close } from "@/components/icons";
+import { useLightboxIndex } from "./gallery-lightbox-hooks";
+import { LightboxArrow } from "./gallery-lightbox-parts";
 
 export type LightboxPhoto = {
   imageUrl: string;
@@ -16,44 +17,25 @@ export type LightboxPhoto = {
   altText: string | null;
 };
 
+/** Teks aksesibel galeri dari CB (grup "gallery"); {n}/{m} diganti saat render. */
+export type GalleryLabels = {
+  altFallback: string;
+  gridAria: string;
+  lightboxPrev: string;
+  lightboxNext: string;
+  lightboxClose: string;
+  lightboxCounter: string;
+};
+
 type GalleryLightboxProps = {
   photos: LightboxPhoto[];
   /** Indeks foto yang dibuka pertama kali; null = lightbox tertutup. */
   initialIndex?: number | null;
+  labels: GalleryLabels;
 };
 
-export function GalleryLightbox({ photos, initialIndex = null }: GalleryLightboxProps) {
-  const [index, setIndex] = useState<number | null>(initialIndex);
-
-  const close = useCallback(() => setIndex(null), []);
-  const previous = useCallback(
-    () => setIndex((i) => (i === null ? i : (i - 1 + photos.length) % photos.length)),
-    [photos.length],
-  );
-  const next = useCallback(
-    () => setIndex((i) => (i === null ? i : (i + 1) % photos.length)),
-    [photos.length],
-  );
-
-  useEffect(() => {
-    if (index === null) return;
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        close();
-      } else if (event.key === "ArrowLeft") {
-        event.preventDefault();
-        previous();
-      } else if (event.key === "ArrowRight") {
-        event.preventDefault();
-        next();
-      }
-    };
-
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [index, close, previous, next]);
+export function GalleryLightbox({ photos, initialIndex = null, labels }: GalleryLightboxProps) {
+  const { index, close, previous, next } = useLightboxIndex(photos.length, initialIndex);
 
   if (index === null) return null;
 
@@ -71,23 +53,13 @@ export function GalleryLightbox({ photos, initialIndex = null }: GalleryLightbox
       <button
         type="button"
         onClick={close}
-        aria-label="Tutup pratinjau"
+        aria-label={labels.lightboxClose}
         className="absolute right-4 top-4 rounded-full p-2 text-cream-soft transition hover:bg-white/10"
       >
         <Close className="h-6 w-6" />
       </button>
 
-      <button
-        type="button"
-        onClick={(event) => {
-          event.stopPropagation();
-          previous();
-        }}
-        aria-label="Foto sebelumnya"
-        className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full p-2 text-cream-soft transition hover:bg-white/10 sm:left-6"
-      >
-        <ArrowLeft className="h-6 w-6" />
-      </button>
+      <LightboxArrow direction="prev" label={labels.lightboxPrev} onClick={previous} />
 
       <figure
         className="flex max-h-full w-full max-w-4xl flex-col items-center gap-3"
@@ -96,7 +68,7 @@ export function GalleryLightbox({ photos, initialIndex = null }: GalleryLightbox
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={photo.imageUrl}
-          alt={photo.altText || photo.caption || "Foto galeri KAMA Spa"}
+          alt={photo.altText || photo.caption || labels.altFallback}
           className="max-h-[70vh] w-auto max-w-full object-contain"
         />
         {photo.caption ? (
@@ -106,20 +78,10 @@ export function GalleryLightbox({ photos, initialIndex = null }: GalleryLightbox
         ) : null}
       </figure>
 
-      <button
-        type="button"
-        onClick={(event) => {
-          event.stopPropagation();
-          next();
-        }}
-        aria-label="Foto berikutnya"
-        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-2 text-cream-soft transition hover:bg-white/10 sm:right-6"
-      >
-        <ArrowRight className="h-6 w-6" />
-      </button>
+      <LightboxArrow direction="next" label={labels.lightboxNext} onClick={next} />
 
       <span className="mt-4 text-caption text-cream-soft/80">
-        {index + 1} / {photos.length}
+        {fillCopy(labels.lightboxCounter, { n: index + 1, m: photos.length })}
       </span>
     </div>
   );

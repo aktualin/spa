@@ -8,7 +8,7 @@ import {
   getWhatsNewCards,
 } from "@/lib/content/homepage";
 
-const CACHE = { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } as const;
+import { CONTENT_CACHE } from "../cache";
 
 export async function GET() {
   const [sections, stats, reviews, highlights, instagram] = await Promise.all([
@@ -18,5 +18,5 @@ export async function GET() {
     getWhatsNewCards(),
     getInstagramPosts(),
   ]);
-  return NextResponse.json({ sections, stats, reviews, highlights, instagram }, { headers: CACHE });
+  return NextResponse.json({ sections, stats, reviews, highlights, instagram }, { headers: CONTENT_CACHE });
 }

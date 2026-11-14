@@ -20,7 +20,9 @@ import {
 import {
   menuTreeToFooter,
   menuTreeToNav,
+  panelPresetsFromRows,
   presetsFromMegaGroups,
+  type PanelPresetRow,
 } from "../../src/lib/domain/menu-nav.ts";
 import { buildStaticMenuSeed, linkTypeForHref } from "../../src/lib/domain/menu-seed.ts";
 
@@ -304,6 +306,74 @@ describe("kesetaraan visual: menu statis → database → header/footer", () => 
     assert.equal(linkTypeForHref("/contact"), "INTERNAL_URL");
     assert.equal(linkTypeForHref("https://drive.google.com/x"), "EXTERNAL_URL");
     assert.equal(linkTypeForHref("mailto:a@b.id"), "EXTERNAL_URL");
+  });
+
+  it("kartu highlight pertama grup mega dibawa ke baris akar seed", () => {
+    nav.primary.forEach((item, index) => {
+      const root = seed.find((s) => s.key === `header-${index}`);
+      assert.ok(root, `akar header-${index}`);
+      const highlight = item.mega ? nav.megaGroups[item.mega].highlights[0] : undefined;
+      assert.equal(root.highlightImageUrl, highlight?.image ?? null);
+      assert.equal(root.highlightLabel, highlight?.label ?? null);
+      assert.equal(root.highlightHref, highlight?.href ?? null);
+      assert.equal(root.highlightBadge, highlight?.badge ?? null);
+      assert.equal(root.highlightEyebrow, highlight?.eyebrow ?? null);
+    });
+  });
+
+  it("kolom, tautan, dan item footer tidak membawa highlight", () => {
+    const headerRoots = new Set(nav.primary.map((_, index) => `header-${index}`));
+    for (const item of seed) {
+      if (headerRoots.has(item.key)) continue;
+      assert.equal(item.highlightImageUrl, null, item.key);
+      assert.equal(item.highlightLabel, null, item.key);
+      assert.equal(item.highlightHref, null, item.key);
+      assert.equal(item.highlightBadge, null, item.key);
+      assert.equal(item.highlightEyebrow, null, item.key);
+    }
+  });
+
+  it("preset dari baris seed (jalur DB) membangun kembali kartu highlight pertama", () => {
+    const presetRows: PanelPresetRow[] = seed.map((item) => ({
+      id: item.key,
+      parentId: item.parentKey,
+      panelKey: item.panelKey,
+      panelWidth: null,
+      highlightImageUrl: item.highlightImageUrl,
+      highlightLabel: item.highlightLabel,
+      highlightHref: item.highlightHref,
+      highlightBadge: item.highlightBadge,
+      highlightEyebrow: item.highlightEyebrow,
+    }));
+    const result = menuTreeToNav(
+      buildMenuTree(rows, "HEADER"),
+      panelPresetsFromRows(presetRows),
+    );
+    assert.deepStrictEqual(result.primary, nav.primary);
+    // Seed hanya membawa highlights[0]; lebar panel diturunkan dari jumlah kolom.
+    for (const [key, group] of Object.entries(nav.megaGroups)) {
+      assert.deepStrictEqual(result.megaGroups[key], {
+        ...group,
+        highlights: group.highlights.slice(0, 1),
+      });
+    }
+  });
+
+  it("highlight yang belum lengkap tidak menghasilkan kartu", () => {
+    const presets = panelPresetsFromRows([
+      {
+        id: "x",
+        parentId: null,
+        panelKey: "p",
+        panelWidth: null,
+        highlightImageUrl: "https://cdn.example.com/img/a.jpg",
+        highlightLabel: null,
+        highlightHref: "/menu",
+        highlightBadge: null,
+        highlightEyebrow: null,
+      },
+    ]);
+    assert.deepEqual(presets, {});
   });
 });
 

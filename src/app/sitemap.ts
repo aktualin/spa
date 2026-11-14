@@ -8,6 +8,7 @@ import { getActivePromos } from "@/lib/content/promos";
 import { getSitemapTimestamps } from "@/lib/content/seo";
 import { PUBLIC_STATIC_ROUTES } from "@/lib/domain/seo";
 import { getSiteUrl } from "@/lib/site-url";
+import { dynamicSitemapEntries } from "./sitemap-entries";
 
 /**
  * `/sitemap.xml`, di-generate dari database.
@@ -37,68 +38,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route.priority,
   }));
 
-  for (const slug of catalog.categories) {
-    entries.push({
-      url: url(`/treatments/${slug}`),
-      lastModified: stamps.categories[slug],
-      changeFrequency: "monthly",
-      priority: 0.7,
-    });
-  }
-
-  for (const { categorySlug, treatmentSlug } of catalog.treatments) {
-    entries.push({
-      url: url(`/treatments/${categorySlug}/${treatmentSlug}`),
-      lastModified: stamps.treatments[treatmentSlug],
-      changeFrequency: "monthly",
-      priority: 0.6,
-    });
-  }
-
-  for (const slug of catalog.packages) {
-    entries.push({
-      url: url(`/treatments/packages/${slug}`),
-      lastModified: stamps.packages[slug],
-      changeFrequency: "monthly",
-      priority: 0.6,
-    });
-  }
-
-  for (const post of posts) {
-    entries.push({
-      url: url(`/our-story/journal/${post.slug}`),
-      lastModified: post.updatedAt ?? post.publishedAt ?? undefined,
-      changeFrequency: "yearly",
-      priority: 0.5,
-    });
-  }
-
-  for (const slug of eventSlugs) {
-    entries.push({
-      url: url(`/events/${slug}`),
-      lastModified: stamps.events[slug],
-      changeFrequency: "weekly",
-      priority: 0.5,
-    });
-  }
-
-  for (const promo of promos) {
-    entries.push({
-      url: url(`/promos/${promo.slug}`),
-      lastModified: stamps.promos[promo.slug],
-      changeFrequency: "weekly",
-      priority: 0.6,
-    });
-  }
-
-  for (const page of pages) {
-    entries.push({
-      url: url(`/${page.slug}`),
-      lastModified: page.updatedAt,
-      changeFrequency: "monthly",
-      priority: 0.5,
-    });
-  }
-
-  return entries;
+  return [
+    ...entries,
+    ...dynamicSitemapEntries(url, { catalog, posts, eventSlugs, promos, pages, stamps }),
+  ];
 }

@@ -3,11 +3,15 @@
 import Link from "next/link";
 import { useActionState } from "react";
 
-import { saveCorporateContentAction, type ActionState } from "../../actions/corporate";
+import {
+  saveCorporateContentAction,
+  type ActionState,
+  type CorporateImageValues,
+} from "../../actions/corporate";
 import { ErrorAlert, Field, SaveButton, inputClass } from "../../promos/_kit/form-ui";
 import { RichTextField } from "../../rich-text-field";
-import { StringListField } from "../_components/string-list-field";
-import { SolutionsField } from "./solutions-field";
+import { ContentBodyFields } from "./content-form-fields";
+import { ContentImageFields } from "./content-image-fields";
 
 export type ContentFormData = {
   heroTitle: string;
@@ -30,9 +34,11 @@ const initialState: ActionState = { error: null };
 
 export function CorporateContentForm({
   content,
+  images,
   limits,
 }: {
   content: ContentFormData;
+  images: CorporateImageValues;
   limits: ContentFormLimits;
 }) {
   const [state, formAction] = useActionState(saveCorporateContentAction, initialState);
@@ -63,48 +69,9 @@ export function CorporateContentForm({
         compact
       />
 
-      <StringListField
-        name="benefits"
-        legend="Benefit (daftar centang di bagian #benefits)"
-        hint="Satu benefit per baris. Daftar kosong = memakai benefit bawaan."
-        itemLabel="benefit"
-        placeholder="Contoh: Reduced stress and burnout"
-        defaultValue={content.benefits}
-        max={limits.maxBenefits}
-      />
+      <ContentImageFields values={images} />
 
-      <SolutionsField defaultValue={content.solutions} max={limits.maxSolutions} />
-
-      <RichTextField
-        name="inSpaHtml"
-        label="Deskripsi In-Spa Corporate Experience"
-        defaultValue={content.inSpaHtml}
-        folder="corporate"
-      />
-
-      <StringListField
-        name="inSpaItems"
-        legend='Daftar "Ideal For" (In-Spa)'
-        hint="Satu item per baris. Daftar kosong = memakai daftar bawaan."
-        itemLabel="item"
-        placeholder="Contoh: Team Wellness Days"
-        defaultValue={content.inSpaItems}
-        max={limits.maxInSpaItems}
-      />
-
-      <RichTextField
-        name="inOfficeHtml"
-        label="Catatan tambahan In-Office (opsional, tampil di bawah kartu program)"
-        defaultValue={content.inOfficeHtml}
-        folder="corporate"
-      />
-
-      <RichTextField
-        name="stepsHtml"
-        label="Catatan tambahan langkah kolaborasi (opsional, tampil di bawah langkah)"
-        defaultValue={content.stepsHtml}
-        folder="corporate"
-      />
+      <ContentBodyFields content={content} limits={limits} />
 
       <ErrorAlert message={state.error} />
 

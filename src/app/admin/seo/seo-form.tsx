@@ -3,13 +3,8 @@
 import Link from "next/link";
 import { useActionState, useState } from "react";
 
-import {
-  deletePageSeoAction,
-  savePageSeoAction,
-  type ActionState,
-} from "../actions/seo";
+import { deletePageSeoAction, savePageSeoAction } from "../actions/seo";
 import { ImageField } from "../image-field";
-import { assessSeoText, formatPageTitle } from "@/lib/domain/seo";
 import {
   ConfirmSubmit,
   ErrorMessage,
@@ -17,27 +12,15 @@ import {
   SaveButton,
   inputClass,
 } from "../settings/_components/form-ui";
+import { SeoTextFields } from "./seo-form-preview";
+import { initialState, type PageSeoFormData } from "./seo-form.types";
 
-export type PageSeoFormData = {
-  id: string | null;
-  path: string;
-  title: string;
-  description: string;
-  ogImageUrl: string;
-};
-
-const initialState: ActionState = { error: null };
+export type { PageSeoFormData } from "./seo-form.types";
 
 export function PageSeoForm({ entry }: { entry: PageSeoFormData }) {
   const [state, formAction] = useActionState(savePageSeoAction, initialState);
   const [title, setTitle] = useState(entry.title);
   const [description, setDescription] = useState(entry.description);
-
-  const renderedTitle = title.trim() ? formatPageTitle(title) : "";
-  const titleCheck = assessSeoText(renderedTitle, "title");
-  const descriptionCheck = assessSeoText(description, "description");
-  const toneOf = (status: string) =>
-    status === "long" ? "text-xs text-amber-700" : "text-xs text-neutral-500";
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -67,54 +50,12 @@ export function PageSeoForm({ entry }: { entry: PageSeoFormData }) {
           />
         </Field>
 
-        <Field
-          label="Meta title"
-          htmlFor="title"
-          hint="Akhiran “ • KAMA Spa” ditambahkan otomatis (kecuali judul sudah memuat “KAMA Spa”). Idealnya total ≤ 60 karakter."
-        >
-          <input
-            id="title"
-            name="title"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            className={inputClass}
-          />
-        </Field>
-        <p className={toneOf(titleCheck.status)}>
-          {titleCheck.status === "empty"
-            ? "Kosong — halaman memakai judul bawaannya."
-            : `Tampil sebagai “${renderedTitle}”. ${titleCheck.message}`}
-        </p>
-
-        <Field
-          label="Meta description"
-          htmlFor="description"
-          hint="Ringkasan di hasil pencarian. Idealnya 70–160 karakter."
-        >
-          <textarea
-            id="description"
-            name="description"
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            rows={4}
-            className={inputClass}
-          />
-        </Field>
-        <p className={toneOf(descriptionCheck.status)}>{descriptionCheck.message}</p>
-
-        {renderedTitle || description.trim() ? (
-          <div className="rounded-md border border-neutral-200 bg-white px-4 py-3">
-            <p className="text-[11px] uppercase tracking-wide text-neutral-400">
-              Pratinjau hasil pencarian
-            </p>
-            <p className="mt-1 truncate text-base text-blue-800">
-              {renderedTitle || "(judul bawaan halaman)"}
-            </p>
-            <p className="line-clamp-2 text-sm text-neutral-600">
-              {description.trim() || "(description bawaan halaman)"}
-            </p>
-          </div>
-        ) : null}
+        <SeoTextFields
+          title={title}
+          setTitle={setTitle}
+          description={description}
+          setDescription={setDescription}
+        />
 
         <ImageField
           name="ogImageUrl"

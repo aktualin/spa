@@ -115,3 +115,37 @@ ke pengunjung.
 - [ ] **Backup end-to-end** belum diuji setelah deploy.
 - [ ] **BUILD-25 serah terima** — dokumen di `docs/` (perhatikan `.gitignore` mengabaikan `docs/*md`); `scripts/build-user-guide.mjs` belum di-commit.
 - [ ] Uji manual CRUD seluruh modul di UI, GA4, Maps embed, feed Instagram, form inquiry + email.
+
+---
+
+## ✅ Refactor split ≤100 baris + verifikasi (14 Nov 2026)
+
+Workflow `.claude/workflows/kama-admin-dynamic-refactor.js` fase Split & Verify diselesaikan:
+
+1. **Split tuntas** — semua file `src/` ≤110 baris (target ≤100). `src/proxy.ts` 304→54 baris dipecah ke `proxy.{helpers,redirect,not-found,not-found-content,admin}.ts`; tiga file admin >110 dipecah (`analytics-data.ts`, `homepage-section-source-note.tsx`, `media-replace-hook.ts`).
+2. **Fix build kritis** — 27 barrel `src/app/admin/actions/*.ts` membawa `"use server"` padahal isinya re-export; Next menolak (289 error build). Directive dipindah ke modul implementasi; barrel jadi modul biasa. Aturan ini dicatat di AGENTS.md.
+3. **Fix infra test** — Playwright ikut memuat `tests/unit/*.test.mts` (loader CJS salah) → `testMatch: /\.spec\.ts$/` di `playwright.config.ts`. Import barrel yangreachable dari `node --test` diberi ekstensi `.ts` (`modules.ts`, `homepage-sections.ts`).
+4. **Fix flake e2e (media S3 menahan event load)** — test hero: klik dot dulu (fokus menjeda autoplay); test layout: `reducedMotion` + abort image/media + tunggu `load` + `fonts.ready` + `test.slow()`; nav `beforeEach`: abort image/media. Semua flake sebelumnya berakar pada unduhan media S3 yang menahan `load`/`networkidle` saat worker paralel, bukan pada kode situs.
+5. **AGENTS.md** — bagian Architecture decisions diperbarui: WhatsApp fully DB-driven (`waLink(message, number)`, reader `src/lib/content/whatsapp.ts`, 9 konteks), brand/SEO/footer-href/foto corporate/badge mega-menu admin-editable, form newsletter+reservasi live dengan inbox admin, microcopy via ContentBlock grup links/microcopy/forms, konvensi split ≤100 baris. Managed block tidak disentuh.
+
+Verifikasi: `npx tsc --noEmit` ✅, `npm run build` ✅, `npm run test:unit` 593/593 ✅, `npm run test:e2e` **120 passed / 0 failed** (16 skip kondisional: drawer per-viewport & test butuh DATABASE_URL) termasuk proyek `admin-flows` ✅. Audit integritas split (97 barrel vs HEAD): bersih, tanpa simbol publik yang hilang tanpa pengganti. Verifikasi visual production (server sendiri :3312, 3 viewport + 6 route): **tanpa defect tingkat kode** — tanpa overflow horizontal, aturan anti-jomplang lolos (kartu treatment/package/membership/kontak/corporate equal-height + CTA rata bawah), clearance header benar, hero media ada, mobile bersih, tanpa masalah bucket S3. "Blank section" pada capture = artifact timing scroll-reveal (safety-net 10s), bukan konten tersembunyi; anomali gambar/empty-state = data uji e2e yang mutating DB bersama.
+Sync doc tambahan: bagian "Maps" AGENTS.md ternyata stale bawaan lama (bukan regresi refactor) — `/contact` kini merender Leaflet/OSM overview (`location-map.tsx`) + kartu `LocationInfo` + iframe opsional `SiteSettings.mapsEmbedUrl`; route `/locations` & `location-cards.tsx` sudah tidak ada; cabang dari DB. Doc sudah dicocokkan ke kode.
+Catatan lingkungan: port :3000 mesin ini dipakai proyek lain; dev KAMA di :3001, e2e production di :3311.
+
+### Backlog DRY lintas-scope (audit 14 Nov 2026)
+
+Duplikasi yang tersisa karena 4 split agent hanya boleh menyentuh scope masing-masing. **Subset aman sudah dikerjakan 14 Nov 2026** (type-check + unit 593/593 green; e2e konfirmasi menyusul):
+
+- [x] `firstIssue` (pembaca error zod): 7 salinan lokal/inline → `src/app/admin/promos/_kit/schema.ts:22`.
+- [x] `CONTENT_ROLES`/`ADMIN_ONLY` lokal (treatments.helpers, content-images.helpers, backup) → `src/lib/domain/roles.ts` (helpers kini re-export agar surface publik tetap).
+- [x] Pembaca formData `field` (backup, settings.helpers, seo.settings) → delegasi `form-utils.ts:10 formStr`; `readStatus` (reservations) → `form-utils.ts:27 readInquiryStatus`.
+- [x] Trio revalidasi redirect (6 salinan: journal/treatments/categories/packages/pages.helpers + events.save) → `redirects.helpers.ts:9 revalidateRedirects`.
+
+Sisa (butuh keputusan desain / cakupan lebih besar, belum dikerjakan):
+
+- [ ] `ActionState` `{ error: string|null; ok?: boolean }`: 23 deklarasi identik di `actions/*.helpers.ts` → satu type bersama (perhatikan varian: categories & journal-categories tanpa `ok`, media.types menambah `message`, users.helpers beda).
+- [ ] Regex slug / `slugSchema` / union `imageUrl` / `optionalText`: beberapa salinan → `src/lib/domain/slug.ts` + `_kit/schema.ts` (putuskan dulu aturan imageUrl: bebas vs https-only).
+- [ ] Swap adjacent index-based: 6 salinan setState client + `reorderIds` → satu helper bersama; `reorderSiblings` bisa dibangun di atas `reorderUpdates`.
+- [ ] Wrapper confirm-delete (`_kit/form-buttons` vs `settings/_components/form-ui`) → satukan hati-hati (beda hanya label pending).
+- [ ] Pagination inbox (PAGE_SIZE 25 + parse page) di reservations/newsletter/corporate.inquiries → helper bersama.
+- [ ] `revalidateHighlights` vs `revalidateHeroSlides` identik modulo path → satu helper berparameter.

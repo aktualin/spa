@@ -12,7 +12,7 @@ import { formatDuration } from "@/lib/domain/pricing";
 import { formatIdr } from "@/lib/format";
 
 import { CatalogBadges } from "./catalog-badges";
-import { WaButton } from "./wa-button";
+import { CatalogWaCta } from "./catalog-cta";
 import { toPlainText } from "@/lib/domain/rich-text";
 
 type TreatmentCardProps = {
@@ -79,16 +79,12 @@ export async function TreatmentCard({ treatment, withCta = false }: TreatmentCar
         ) : null}
 
         {withCta ? (
-          <>
-            <div className="spacer-small" />
-            <WaButton
-              context="treatment"
-              custom={treatment.whatsappMessage}
-              values={{ treatment: treatment.name, category: treatment.categoryName }}
-              label={copy(pageCopy, "global.book_via_whatsapp")}
-              className="button is-secondary is-icon w-inline-block"
-            />
-          </>
+          <CatalogWaCta
+            context="treatment"
+            custom={treatment.whatsappMessage}
+            values={{ treatment: treatment.name, category: treatment.categoryName }}
+            label={copy(pageCopy, "global.book_via_whatsapp")}
+          />
         ) : null}
       </div>
     </div>

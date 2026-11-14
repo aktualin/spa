@@ -1,13 +1,10 @@
-import { notFound } from "next/navigation";
-
 import { requireRole } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 
-import { toWibDateInput } from "../../promos/_kit/schema";
 import { StatusBanners } from "../../promos/_kit/list-ui";
-import { EventForm, type EventFormData } from "../event-form";
+import { EventForm } from "../event-form";
 import { EventPhotoManager } from "../event-photo-manager";
+import { loadEventFormData, newEventData } from "../event-page-data";
 
 export const instant = false;
 
@@ -23,27 +20,9 @@ export default async function EventEditPage({
   const [{ id }, query] = await Promise.all([params, searchParams]);
 
   if (id === "new") {
-    const data: EventFormData = {
-      id: null,
-      slug: "",
-      title: "",
-      description: "",
-      coverUrl: "",
-      location: "",
-      startDate: "",
-      endDate: "",
-      isCollaboration: false,
-      partnerName: "",
-      partnerLogoUrl: "",
-      partnerUrl: "",
-      isPublished: true,
-      sortOrder: 0,
-      seoTitle: "",
-      seoDescription: "",
-    };
     return (
       <div className="mx-auto max-w-2xl space-y-4">
-        <EventForm event={data} />
+        <EventForm event={newEventData()} />
         <p className="text-xs text-neutral-500">
           Foto galeri event bisa ditambahkan setelah event pertama kali disimpan.
         </p>
@@ -51,30 +30,7 @@ export default async function EventEditPage({
     );
   }
 
-  const event = await prisma.eventItem.findUnique({
-    where: { id },
-    include: { photos: { orderBy: [{ sortOrder: "asc" }, { id: "asc" }] } },
-  });
-  if (!event) notFound();
-
-  const data: EventFormData = {
-    id: event.id,
-    slug: event.slug,
-    title: event.title,
-    description: event.description ?? "",
-    coverUrl: event.coverUrl ?? "",
-    location: event.location ?? "",
-    startDate: toWibDateInput(event.startDate),
-    endDate: toWibDateInput(event.endDate),
-    isCollaboration: event.isCollaboration,
-    partnerName: event.partnerName ?? "",
-    partnerLogoUrl: event.partnerLogoUrl ?? "",
-    partnerUrl: event.partnerUrl ?? "",
-    isPublished: event.isPublished,
-    sortOrder: event.sortOrder,
-    seoTitle: event.seoTitle ?? "",
-    seoDescription: event.seoDescription ?? "",
-  };
+  const { event, data } = await loadEventFormData(id);
 
   return (
     <div className="mx-auto max-w-2xl space-y-10">
