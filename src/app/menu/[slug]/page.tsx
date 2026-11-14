@@ -3,15 +3,23 @@ import { Suspense } from "react";
 import { DeferredNavigation } from "@/components/public/deferred-navigation";
 import { Footer } from "@/components/footer";
 import { getCatalogSlugs, getMenuEntry } from "@/lib/content/catalog";
+import { packages as staticPackages, treatments as staticTreatments } from "@/data/content";
 import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { withPageSeo } from "@/lib/content/seo";
 import { toPlainText } from "@/lib/domain/rich-text";
 import { MenuDetailContent } from "./menu-detail-content";
 
-// Slug untuk prerender saat build diambil dari database, bukan daftar statis.
+// Slug untuk prerender saat build diambil dari database. Bila DB tidak
+// terjangkau saat build (fallback kosong), pakai slug statis — Cache
+// Components menolak generateStaticParams yang mengembalikan nol hasil.
 export async function generateStaticParams() {
   const { treatments, packages } = await getCatalogSlugs();
-  return [...treatments.map((t) => t.treatmentSlug), ...packages].map((slug) => ({ slug }));
+  const slugs = [...treatments.map((t) => t.treatmentSlug), ...packages];
+  const source =
+    slugs.length > 0
+      ? slugs
+      : [...staticTreatments.map((t) => t.slug), ...staticPackages.map((p) => p.slug)];
+  return source.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
