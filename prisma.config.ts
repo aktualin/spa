@@ -1,8 +1,8 @@
 import { config as loadEnv } from "dotenv";
 import { defineConfig } from "prisma/config";
 
-// Next.js menyimpan rahasia di .env.local; muat juga untuk Prisma CLI.
-loadEnv({ path: ".env.local" });
+// Next.js menyimpan rahasia di .env; muat juga untuk Prisma CLI.
+loadEnv({ path: ".env" });
 
 /**
  * Migrate/CLI memakai koneksi langsung (port 5432), bukan transaction pooler;

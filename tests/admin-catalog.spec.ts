@@ -14,7 +14,7 @@ import { hashPassword } from "../src/lib/password.ts";
  * karena mengubah katalog yang dibaca test lain. Data uji dihapus di akhir.
  */
 
-loadEnv({ path: ".env.local", quiet: true });
+loadEnv({ path: ".env", quiet: true });
 
 const connectionString = process.env.DATABASE_URL;
 let prisma: PrismaClient | null = null;

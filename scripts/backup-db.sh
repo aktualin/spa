@@ -4,7 +4,7 @@
 #
 # Pakai DIRECT_URL (port 5432, session pooler atau koneksi langsung), bukan
 # transaction pooler 6543: pg_dump butuh koneksi sesi.
-# Nilai dibaca dari environment, atau dari .env.local bila ada.
+# Nilai dibaca dari environment, atau dari .env bila ada.
 #
 # Jalankan:  ./scripts/backup-db.sh [folder-tujuan]
 # Default folder tujuan: ./backups
@@ -31,20 +31,20 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT_DIR="${1:-$ROOT_DIR/backups}"
-ENV_FILE="$ROOT_DIR/.env.local"
+ENV_FILE="$ROOT_DIR/.env"
 PG_DUMP_BIN="${PG_DUMP:-pg_dump}"
 
 # Hasil hanya bisa dibaca pemilik akun.
 umask 077
 
-# Baca DIRECT_URL dari .env.local tanpa mengekspor seluruh isinya ke shell.
+# Baca DIRECT_URL dari .env tanpa mengekspor seluruh isinya ke shell.
 if [[ -z "${DIRECT_URL:-}" && -f "$ENV_FILE" ]]; then
   # \042 = kutip ganda, \047 = kutip tunggal — nilainya bisa dibungkus salah satu.
   DIRECT_URL="$(grep -E '^DIRECT_URL=' "$ENV_FILE" | head -n1 | cut -d= -f2- | tr -d '\042\047')"
 fi
 
 if [[ -z "${DIRECT_URL:-}" ]]; then
-  echo "DIRECT_URL belum diset (cek .env.local atau environment)." >&2
+  echo "DIRECT_URL belum diset (cek .env atau environment)." >&2
   exit 1
 fi
 

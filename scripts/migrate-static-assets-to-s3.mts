@@ -16,7 +16,6 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { extname, join, relative, sep } from "node:path";
 import { config as loadEnv } from "dotenv";
 
-loadEnv({ path: ".env.local", quiet: true });
 loadEnv({ path: ".env", quiet: true });
 
 const endpoint = process.env.SUPABASE_S3_ENDPOINT_URL;
@@ -38,7 +37,7 @@ const missing = [
   .map(([name]) => name);
 
 if (missing.length > 0) {
-  console.error(`Env belum lengkap di .env.local: ${missing.join(", ")}`);
+  console.error(`Env belum lengkap di .env: ${missing.join(", ")}`);
   process.exit(1);
 }
 

@@ -6,7 +6,7 @@ Perbarui status setiap kali satu butir selesai dan sudah di-commit.
 Legenda: ✅ selesai & di-commit · 🔄 sedang dikerjakan · ⏳ belum · ⚠️ butuh keputusan/aksi user
 
 Aturan kerja yang berlaku (dari user):
-- Setiap update yang lolos verifikasi langsung di-commit (jangan stage `opencode.json`, `.env.local`, `index.html`).
+- Setiap update yang lolos verifikasi langsung di-commit (jangan stage `opencode.json`, `.env`, `index.html`).
 - Verifikasi saat development: `tsc --noEmit` + unit test (`node --test tests/unit/*.test.mts`). E2E Playwright dihentikan sementara — kecuali BUILD-24 yang memang meminta testing.
 - Tanpa dependensi npm baru; UI/komentar bahasa Indonesia; frontend existing tidak boleh berubah visual.
 - `docs/` di-ignore git — panduan di `docs/user-guide/*.md` hanya ada di lokal.

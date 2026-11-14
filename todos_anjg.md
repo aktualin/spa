@@ -12,7 +12,7 @@ Legenda: ⏳ belum · 🔄 sedang jalan · ⚠️ butuh aksi/keputusan user
 - **Arsitektur data: halaman tetap Server Component yang membaca DB langsung lewat reader `src/lib/content/*`.** BUKAN fetch HTTP ke `/api/content/*`. Alasan: fetch ke API sendiri menambah hop, mematahkan revalidasi `use cache`/`updateTag`, butuh URL absolut per environment, dan menambah titik gagal. Endpoint `/api/content/*` tetap ada khusus untuk sistem luar.
 - **Format harga membership tetap pendek** ("Rp 1,5jt"), bukan `formatIdr` ("Rp 1.500.000") — itu gaya desain situs.
 - **`defaultSectionLayout()` di `homepage.ts` dipertahankan** sebagai struktur layout (section mana + urutan, tanpa teks/gambar). Tanpa itu homepage & footer hilang total saat tabel kosong.
-- Setiap update yang lolos verifikasi langsung di-commit. Jangan stage `opencode.json`, `.env.local`, `index.html`.
+- Setiap update yang lolos verifikasi langsung di-commit. Jangan stage `opencode.json`, `.env`, `index.html`.
 - Verifikasi wajib tiap perubahan: `npx tsc --noEmit` + `node --test tests/unit/*.test.mts` + `npm run build`.
 
 ---

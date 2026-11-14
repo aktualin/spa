@@ -12,7 +12,6 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 import { config as loadEnv } from "dotenv";
 
-loadEnv({ path: ".env.local", quiet: true });
 loadEnv({ path: ".env", quiet: true });
 
 const connectionString = process.env.DATABASE_URL;
@@ -20,7 +19,7 @@ const publicBase = process.env.NEXT_PUBLIC_SUPABASE_PUBLIC_URL?.replace(/\/$/, "
 const bucket = process.env.SUPABASE_S3_BUCKET;
 
 if (!connectionString) {
-  console.error("DATABASE_URL belum diset di .env.local");
+  console.error("DATABASE_URL belum diset di .env");
   process.exit(1);
 }
 if (!publicBase || !bucket) {

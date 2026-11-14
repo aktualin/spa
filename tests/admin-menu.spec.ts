@@ -14,7 +14,7 @@ import { hashPassword } from "../src/lib/password.ts";
  * dan item menu uji dibuat sementara lalu dihapus lagi.
  */
 
-loadEnv({ path: ".env.local", quiet: true });
+loadEnv({ path: ".env", quiet: true });
 
 const connectionString = process.env.DATABASE_URL;
 let prisma: PrismaClient | null = null;

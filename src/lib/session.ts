@@ -28,7 +28,7 @@ function getSecret(): Uint8Array {
   const secret = process.env.ADMIN_SESSION_SECRET;
   if (!secret || secret.length < 32) {
     throw new Error(
-      "ADMIN_SESSION_SECRET belum diset di .env.local (minimal 32 karakter)",
+      "ADMIN_SESSION_SECRET belum diset di .env (minimal 32 karakter)",
     );
   }
   return new TextEncoder().encode(secret);

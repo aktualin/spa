@@ -48,11 +48,11 @@ import {
 } from "../src/lib/domain/corporate.ts";
 import { seedContent } from "./seed-content.mts";
 
-loadEnv({ path: ".env.local", quiet: true });
+loadEnv({ path: ".env", quiet: true });
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
-  console.error("DATABASE_URL belum diset di .env.local");
+  console.error("DATABASE_URL belum diset di .env");
   process.exit(1);
 }
 

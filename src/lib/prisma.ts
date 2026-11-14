@@ -9,7 +9,7 @@ import { DB_SCHEMA } from "@/lib/db-schema";
 const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
-  throw new Error("DATABASE_URL belum diset di .env.local");
+  throw new Error("DATABASE_URL belum diset di .env");
 }
 
 const globalForPrisma = globalThis as unknown as {

@@ -13,7 +13,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 import { config as loadEnv } from "dotenv";
 
-loadEnv({ path: ".env.local", quiet: true });
+loadEnv({ path: ".env", quiet: true });
 
 const scryptAsync = promisify(scrypt);
 
@@ -47,7 +47,7 @@ if (password.length < 12) {
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
-  console.error("DATABASE_URL belum diset di .env.local");
+  console.error("DATABASE_URL belum diset di .env");
   process.exit(1);
 }
 

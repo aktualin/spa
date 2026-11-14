@@ -3,7 +3,7 @@ import { DeleteObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client
 
 function requireEnv(name: string): string {
   const value = process.env[name];
-  if (!value) throw new Error(`${name} belum diset di .env.local`);
+  if (!value) throw new Error(`${name} belum diset di .env`);
   return value;
 }
 

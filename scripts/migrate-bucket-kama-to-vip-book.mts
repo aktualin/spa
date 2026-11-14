@@ -12,14 +12,13 @@
 import { CopyObjectCommand, HeadObjectCommand, ListObjectsV2Command, S3Client } from "@aws-sdk/client-s3";
 import { config as loadEnv } from "dotenv";
 
-loadEnv({ path: ".env.local", quiet: true });
 loadEnv({ path: ".env", quiet: true });
 
 const SOURCE_BUCKET = "kama";
 const bucket = process.env.SUPABASE_S3_BUCKET;
 
 if (!bucket) {
-  console.error("SUPABASE_S3_BUCKET belum diset di .env.local");
+  console.error("SUPABASE_S3_BUCKET belum diset di .env");
   process.exit(1);
 }
 if (bucket === SOURCE_BUCKET) {

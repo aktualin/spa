@@ -11,7 +11,7 @@ import { config as loadEnv } from "dotenv";
  * (lihat playwright.config.ts), jadi test menunggu sebentar sebelum memeriksa.
  */
 
-loadEnv({ path: ".env.local", quiet: true });
+loadEnv({ path: ".env", quiet: true });
 
 const connectionString = process.env.DATABASE_URL;
 let prisma: PrismaClient | null = null;

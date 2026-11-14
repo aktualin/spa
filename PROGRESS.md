@@ -56,7 +56,7 @@ Legenda: ✅ selesai & terverifikasi · 🔧 sebagian · ⬜ belum dimulai · �
 - [x] Pesan error seragam (tidak membocorkan email terdaftar) + proteksi open redirect `?next=`
 - [x] `/admin/login`, `/admin` (dashboard), layout sidebar 14 modul role-aware
 - [x] `src/app/admin/modules.ts` — definisi 14 modul, sumber tunggal sidebar
-- [x] `scripts/create-admin.mjs` + `ADMIN_SESSION_SECRET` di `.env.local`
+- [x] `scripts/create-admin.mjs` + `ADMIN_SESSION_SECRET` di `.env`
 - [x] Akun `admin@kamaspa.id` (ADMIN) dibuat — ⚠️ **kata sandi sementara, wajib diganti**
 - [x] Diverifikasi Playwright: `/admin` → redirect login → masuk → dashboard 14 modul
 
