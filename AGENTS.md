@@ -58,7 +58,7 @@ node scripts/screenshot.mjs http://localhost:3000 /tmp/kama mobile   # one viewp
 - `src/components/home/reviews-marquee.tsx` — the reviews marquee (auto-scrolling, pauses on hover/focus/touch).
 - `src/components/home/hero.tsx` — server wrapper for the homepage hero/banners; `src/components/home/hero-slider.tsx` is the client hero media slider.
 - `src/lib/domain/hero-slide.ts` — pure media URL validation + `HeroSlide` fallback/resolve rules (unit tested).
-- `src/components/forms/*` — reservation + newsletter forms, wired to `POST /api/reservation` / `/api/newsletter` with admin inboxes (see `## Architecture decisions`). They take `{ branches, copy }` props; copy comes from `getFormsCopy()`.
+- `src/components/forms/*` — reservation form, wired to `POST /api/reservation` with an admin inbox (see `## Architecture decisions`). It takes `{ branches, copy }` props; copy comes from `getFormsCopy()`. (The newsletter form only lives on the `feat/newsletter` branch.)
 - `public/fonts`, `public/img`, `public/video` — locally hosted fonts (Faesa Breages for display, POI Carbonic for body/labels), imagery, and the hero video. `@font-face` rules live in `src/app/kama.css`; the old family names (`Romie trial`, `Ft regola neue trial`) are kept only as aliases because `hiatus.css` hardcodes them on legacy classes.
 - `references/` — source PDFs (menu, colour reference). PDFs are gitignored.
 - `.opencode/` — project tooling for opencode: `skills/` (nextjs-frontend, tailwind-kama-styling, kama-content-data, visual-verification), `agent/ui-reviewer`, `command/` (`/verify`, `/new-page`, `/new-treatment`, `/ui-review`), `plugins/kama-guardrails.js` (blocks edits to `hiatus.css`/`kama.css.bak`, protects the `@layer` order, enforces `<Navigation>`/`<main>`/`<Footer>` on route pages). See `.opencode/README.md`.
@@ -120,11 +120,11 @@ Numbers and messages live in the database (`SiteSettings` + `WhatsAppTemplate`),
 - Corporate photos: `CorporateContent.heroImageUrl/Alt`, `aboutImageUrl/Alt`, `inSpaImageUrl/Alt`.
 - Microcopy, aria labels and CTA hrefs: `ContentBlock` registry `src/lib/domain/page-copy.ts` (groups include `links`, `microcopy`, `forms`). Server parents read `getPageCopy()`/`copy(blocks, key)`; client components receive strings via props. Placeholders are single-brace (`{n}`, `{m}`, `{name}`, `{title}`) and are replaced at render.
 
-### Newsletter & reservation forms
+### Reservation form (newsletter lives only on `feat/newsletter`)
 
-- `NewsletterForm` (footer) and `ReservationForm` (`/contact`) take `{ branches, copy }` props (copy from `getFormsCopy()`, `src/lib/content/forms.ts`) and POST to `/api/newsletter` / `/api/reservation` → `NewsletterSignup` / `ReservationRequest` tables.
-- Both routes follow the corporate-inquiry defense pattern: same-origin check, per-IP hashed rate limit, body size cap, honeypot + elapsed-time bot detection (fake success), zod validation (`src/lib/domain/forms.ts`). No Turnstile, no email.
-- Admin inboxes: `/admin/newsletter` and `/admin/reservations` (reservations: status NEW/HANDLED, notes, delete).
+- `ReservationForm` (`/contact`) takes `{ branches, copy }` props (copy from `getFormsCopy()`, `src/lib/content/forms.ts`) and POSTs to `/api/reservation` → `ReservationRequest` table. There is no newsletter form, `/api/newsletter` route, or `/admin/newsletter` inbox on `main`; the `NewsletterSignup` Prisma model stays in the schema so the shared table/data is not dropped.
+- The route follows the corporate-inquiry defense pattern: same-origin check, per-IP hashed rate limit, body size cap, honeypot + elapsed-time bot detection (fake success), zod validation (`src/lib/domain/forms.ts`). No Turnstile, no email.
+- Admin inbox: `/admin/reservations` (status NEW/HANDLED, notes, delete).
 
 ### Maps
 
