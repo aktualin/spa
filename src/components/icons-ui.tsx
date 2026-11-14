@@ -79,6 +79,54 @@ export function ExternalLink({ className }: IconProps) {
   );
 }
 
+export function Eye({ className }: IconProps) {
+  return (
+    <IconFrame viewBox="0 0 24 24" className={className}>
+      <path
+        d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5" />
+    </IconFrame>
+  );
+}
+
+export function EyeOff({ className }: IconProps) {
+  return (
+    <IconFrame viewBox="0 0 24 24" className={className}>
+      <path
+        d="M3 3L21 21"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M10.6 6.1C11.1 6 11.5 6 12 6c6 0 9.5 6 9.5 6a17 17 0 0 1-3.9 4.7"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M6.4 8A16.8 16.8 0 0 0 2.5 12S6 18 12 18c1.5 0 2.9-.4 4.1-1"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.9 9.9a3 3 0 0 0 4.2 4.2"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </IconFrame>
+  );
+}
+
 export function Check({ className }: IconProps) {
   return (
     <IconFrame viewBox="0 0 16 16" className={className}>

@@ -84,6 +84,8 @@ export const getSession = cache(async (): Promise<SessionPayload | null> => {
     role: user.role,
     sessionVersion: user.sessionVersion,
     mustChangePassword: user.mustChangePassword,
+    // Dipertahankan agar ganti kata sandi tidak memendekkan sesi "Ingat saya".
+    remember: claims.remember,
   };
 });
 

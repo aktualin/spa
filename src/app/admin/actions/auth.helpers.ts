@@ -24,6 +24,9 @@ export const loginSchema = z.object({
     .min(1, "Kata sandi wajib diisi.")
     .max(MAX_PASSWORD_LENGTH, "Email atau kata sandi salah."),
   next: z.string().optional(),
+  // Checkbox mengirim "on" saat dicentang dan tidak ada sama sekali saat tidak;
+  // coerce mengubah "on" → true dan undefined tetap undefined.
+  remember: z.coerce.boolean().optional(),
 });
 
 export type LoginState = { error: string | null };

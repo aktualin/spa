@@ -2,6 +2,8 @@ import { jwtVerify, SignJWT } from "jose";
 
 export const SESSION_COOKIE = "kama_admin_session";
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 8; // 8 jam kerja
+/** Checkbox "Ingat saya" di halaman login: sesi diperpanjang jadi 30 hari. */
+export const REMEMBER_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
 /**
  * Saklar darurat untuk mematikan login admin saat pengembangan lokal: `true`
@@ -22,6 +24,8 @@ export type SessionPayload = {
   /** Harus sama dengan `AdminUser.sessionVersion`; beda = sesi sudah dicabut. */
   sessionVersion: number;
   mustChangePassword: boolean;
+  /** True bila login memakai "Ingat saya" (umur sesi 30 hari, bukan 8 jam). */
+  remember?: boolean;
 };
 
 function getSecret(): Uint8Array {
@@ -37,16 +41,21 @@ function getSecret(): Uint8Array {
 export async function createSessionToken(
   payload: SessionPayload,
 ): Promise<string> {
+  const maxAge = payload.remember
+    ? REMEMBER_MAX_AGE_SECONDS
+    : SESSION_MAX_AGE_SECONDS;
+
   return new SignJWT({
     email: payload.email,
     role: payload.role,
     sv: payload.sessionVersion,
     mcp: payload.mustChangePassword,
+    ...(payload.remember ? { rm: true } : {}),
   })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(payload.userId)
     .setIssuedAt()
-    .setExpirationTime(`${SESSION_MAX_AGE_SECONDS}s`)
+    .setExpirationTime(`${maxAge}s`)
     .sign(getSecret());
 }
 
@@ -69,16 +78,20 @@ export async function verifySessionToken(
       role,
       sessionVersion: payload.sv,
       mustChangePassword: payload.mcp === true,
+      remember: payload.rm === true,
     };
   } catch {
     return null;
   }
 }
 
-export const sessionCookieOptions = {
-  httpOnly: true,
-  sameSite: "lax" as const,
-  secure: process.env.NODE_ENV === "production",
-  path: "/",
-  maxAge: SESSION_MAX_AGE_SECONDS,
-};
+/** Opsi cookie sesi; `remember` = umur 30 hari ("Ingat saya"), selain itu 8 jam. */
+export function sessionCookieOptions(remember = false) {
+  return {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: remember ? REMEMBER_MAX_AGE_SECONDS : SESSION_MAX_AGE_SECONDS,
+  };
+}

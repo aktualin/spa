@@ -33,6 +33,7 @@ export async function loginAction(
     // Input tersembunyi `next` hanya ada bila login datang dari redirect;
     // formData.get() mengembalikan null, bukan undefined, saat field tidak ada.
     next: formData.get("next") ?? undefined,
+    remember: formData.get("remember") ?? undefined,
   });
 
   if (!parsed.success) {
@@ -40,6 +41,7 @@ export async function loginAction(
   }
 
   const { email, password, next } = parsed.data;
+  const remember = parsed.data.remember === true;
   const user = await prisma.adminUser.findUnique({ where: { email } });
 
   // Pesan yang sama untuk user tidak ada / password salah, supaya tidak
@@ -78,9 +80,10 @@ export async function loginAction(
     role: user.role,
     sessionVersion: user.sessionVersion,
     mustChangePassword: user.mustChangePassword,
+    remember,
   });
 
-  (await cookies()).set(SESSION_COOKIE, token, sessionCookieOptions);
+  (await cookies()).set(SESSION_COOKIE, token, sessionCookieOptions(remember));
 
   redirect(user.mustChangePassword ? CHANGE_PASSWORD_PATH : safeAdminNext(next));
 }

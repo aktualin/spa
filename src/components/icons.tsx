@@ -4,7 +4,16 @@
  * di-re-export dari sini supaya jalur impor lama tetap berlaku.
  */
 export { ArrowRight, ArrowRightThin, ArrowLeft, ArrowRightLong } from "./icons-arrows";
-export { Search, Close, CloseCircle, ChevronDown, ExternalLink, Check } from "./icons-ui";
+export {
+  Search,
+  Close,
+  CloseCircle,
+  ChevronDown,
+  ExternalLink,
+  Check,
+  Eye,
+  EyeOff,
+} from "./icons-ui";
 export { Instagram, Facebook, TikTok, Email } from "./icons-social";
 export { WhatsApp, WhatsAppBrand } from "./icons-whatsapp";
 export { LocationPin, Clock } from "./icons-place";

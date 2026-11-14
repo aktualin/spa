@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 
 import { loginAction, type LoginState } from "../actions/auth";
+import { PasswordField } from "./password-field";
 
 const initialState: LoginState = { error: null };
 
@@ -52,16 +53,22 @@ export function LoginForm({ next }: { next?: string }) {
         <label htmlFor="password" className={labelClass}>
           Password
         </label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          placeholder="••••••••"
-          required
-          className={fieldClass}
-        />
+        <PasswordField className={fieldClass} />
       </div>
+
+      <label
+        htmlFor="remember"
+        className="flex cursor-pointer select-none items-center gap-2 text-xs text-ink/70"
+      >
+        <input
+          id="remember"
+          name="remember"
+          type="checkbox"
+          value="on"
+          className="h-4 w-4 rounded border-tan accent-espresso"
+        />
+        Ingat saya
+      </label>
 
       {state.error ? (
         <p

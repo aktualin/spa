@@ -82,8 +82,13 @@ export async function changeOwnPasswordAction(
     role: updated.role,
     sessionVersion: updated.sessionVersion,
     mustChangePassword: false,
+    remember: session.remember,
   });
-  (await cookies()).set(SESSION_COOKIE, token, sessionCookieOptions);
+  (await cookies()).set(
+    SESSION_COOKIE,
+    token,
+    sessionCookieOptions(session.remember),
+  );
   wrongCurrentPasswordLimiter.reset(session.userId);
 
   redirect("/admin?password=changed");
