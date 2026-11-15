@@ -5,7 +5,7 @@ import { whatsAppHref } from "@/lib/content/whatsapp";
 
 import { NavigationClient } from "./navigation-client";
 
-/** Header situs; isi menunya dikelola dari modul Menu Navigasi. */
+/** Header situs; isi menunya dibaca dari tabel MenuItem (diisi seed awal). */
 export async function Navigation() {
   const [{ header, mobile }, whatsappHref, settings, pageCopy] = await Promise.all([
     getNavigationData(),

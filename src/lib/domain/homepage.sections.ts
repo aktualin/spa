@@ -32,7 +32,7 @@ export function isFixedPositionSection(key: string): boolean {
 
 /**
  * Section yang hanya punya tombol tampil/sembunyi (tanpa isian teks/gambar).
- * Footer berisi data global situs (Pengaturan & Menu Navigasi).
+ * Footer berisi data global situs (Pengaturan & tabel MenuItem).
  */
 export function isToggleOnlySection(key: string): boolean {
   return key === "footer";

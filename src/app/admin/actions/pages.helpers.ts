@@ -39,8 +39,6 @@ export function revalidatePages(paths: string[], redirectsChanged: boolean) {
   updateTag(CONTENT_TAGS.pages);
   if (redirectsChanged) revalidateRedirects();
   revalidatePath("/admin/pages");
-  // Item menu bertipe Halaman mengikuti slug & status halaman ini.
-  revalidatePath("/admin/menu");
   revalidatePath("/sitemap.xml");
   for (const path of new Set(paths)) revalidatePath(path);
 }

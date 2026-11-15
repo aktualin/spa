@@ -64,7 +64,6 @@ describe("BUILD-17 — matriks role → modul", () => {
       "/admin/our-story",
       "/admin/pages/new",
       "/admin/redirects",
-      "/admin/menu",
       "/admin/seo/1",
     ]) {
       assert.equal(canAccessPath("EDITOR", path), true, path);

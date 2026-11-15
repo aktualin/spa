@@ -57,7 +57,6 @@ export async function contentSpotCounts(): Promise<Record<string, number>> {
     branch,
     galleryPhoto,
     retailProduct,
-    menuItem,
     staticPage,
   ] = await Promise.all([
     prisma.homepageHighlight.count(),
@@ -68,7 +67,6 @@ export async function contentSpotCounts(): Promise<Record<string, number>> {
     prisma.branch.count(),
     prisma.galleryPhoto.count(),
     prisma.retailProduct.count(),
-    prisma.menuItem.count(),
     prisma.staticPage.count(),
   ]);
 
@@ -81,7 +79,6 @@ export async function contentSpotCounts(): Promise<Record<string, number>> {
     branch,
     galleryPhoto,
     retailProduct,
-    menuItem,
     staticPage,
   };
 }

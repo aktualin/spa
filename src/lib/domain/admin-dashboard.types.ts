@@ -35,7 +35,6 @@ export const CONTENT_SPOTS: readonly ContentSpot[] = [
   { key: "branch", label: "Daftar cabang di halaman Contact", href: "/admin/branches" },
   { key: "galleryPhoto", label: "Foto galeri", href: "/admin/gallery" },
   { key: "retailProduct", label: "Produk KAMA Retail", href: "/admin/retail" },
-  { key: "menuItem", label: "Menu navigasi header & footer", href: "/admin/menu" },
   { key: "staticPage", label: "Halaman di modul Halaman & URL", href: "/admin/pages" },
 ];
 

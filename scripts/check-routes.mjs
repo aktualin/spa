@@ -83,7 +83,6 @@ const REQUIRED_ROUTES = [
   "admin/corporate/inquiries",
   "admin/homepage",
   "admin/our-story",
-  "admin/menu",
   "admin/settings/contact",
   "admin/settings/whatsapp",
   "admin/seo",

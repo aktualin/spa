@@ -5,15 +5,6 @@ import type { AdminModule } from "./modules.types.ts";
 /** Modul kelompok "Halaman & Navigasi", "Analitik", dan "Pengaturan Sistem". */
 export const SYSTEM_MODULES: readonly AdminModule[] = [
   {
-    no: 11,
-    label: "Menu Navigasi",
-    href: "/admin/menu",
-    group: "struktur",
-    hint: "Tautan di header, mega-menu, menu mobile, dan footer.",
-    roles: CONTENT_ROLES,
-    ready: true,
-  },
-  {
     // Modul tambahan di luar 14 modul Lampiran I; nomor 15 hanya penanda unik.
     no: 15,
     label: "Halaman & URL",

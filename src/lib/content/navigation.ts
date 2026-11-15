@@ -1,7 +1,8 @@
 /**
- * Menu navigasi publik (modul Menu Navigasi) untuk header, menu mobile, dan
- * footer. Tabel kosong atau database tidak terbaca → menu kosong; navigasi
- * sepenuhnya mengikuti apa yang disusun admin.
+ * Menu navigasi publik untuk header, menu mobile, dan footer. Sumbernya tabel
+ * MenuItem (diisi seed awal; modul admin pengelola menu sudah dihapus, jadi
+ * struktur menu dibekukan). Tabel kosong atau database tidak terbaca → menu
+ * kosong; navigasi sepenuhnya mengikuti isi tabel.
  */
 import { cacheLife, cacheTag } from "next/cache";
 
