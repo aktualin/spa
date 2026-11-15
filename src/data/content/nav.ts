@@ -13,7 +13,9 @@ export const nav: {
   primary: [
     { label: "Menu", href: "/menu", mega: "services" },
     { label: "Corporate Wellness", href: "/corporate", mega: "corporate" },
+    { label: "Gallery", href: "/gallery" },
     { label: "Contact", href: "/contact" },
+    { label: "Reservation", href: "/reservation" },
     {
       label: "Service Menu",
       href: "https://drive.google.com/file/d/1UfW-JFOno47KCLi-PwID4XdrCDHkwIfc/view?usp=sharing",

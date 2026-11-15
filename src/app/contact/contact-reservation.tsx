@@ -1,18 +1,21 @@
 import { ReservationForm } from "@/components/forms/reservation-form";
 import { Reveal } from "@/components/reveal";
 import type { Branch } from "@/lib/content/branches";
-import type { ReservationCopy } from "@/lib/domain/forms";
+import type { ReservationCopy, ReservationServiceGroup } from "@/lib/domain/forms";
 
 /**
  * Reservasi — form sungguhan ke /api/reservation; judul & deskripsi dari CB
- * grup "forms", pilihan cabang dari modul Cabang.
+ * grup "forms", pilihan cabang dari modul Cabang, pilihan treatment dari
+ * katalog (sama dengan halaman /reservation).
  */
 export function ContactReservation({
   reservation,
   branches,
+  services,
 }: {
   reservation: ReservationCopy;
   branches: Branch[];
+  services: ReservationServiceGroup[];
 }) {
   if (!reservation.title && !reservation.description) return null;
 
@@ -31,7 +34,7 @@ export function ContactReservation({
               ) : null}
             </div>
             <div className="min-w-0">
-              <ReservationForm branches={branches} copy={reservation} />
+              <ReservationForm branches={branches} services={services} copy={reservation} />
             </div>
           </div>
         </div>

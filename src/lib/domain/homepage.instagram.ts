@@ -1,5 +1,4 @@
-/** Feed Instagram section Socials — lihat `homepage.ts`. */
-import { isSafeCtaHref, isSafeImageUrl } from "./homepage-banner.ts";
+/** Feed Instagram section Socials (embed postingan) — lihat `homepage.ts`. */
 import {
   type OrderedRow,
   type SimpleValidation,
@@ -8,81 +7,84 @@ import {
 import { clean } from "./text.ts";
 
 /** Batas isian feed Instagram (karakter / jumlah). */
-export const INSTAGRAM_LIMITS = { imageAlt: 200, href: 500, max: 12 } as const;
+export const INSTAGRAM_LIMITS = { postUrl: 300, max: 12 } as const;
+
+/** Jenis postingan yang didukung: foto (/p/), reel (/reel/), IGTV (/tv/). */
+const POST_PATH = /^\/(p|reel|reels|tv)\/([A-Za-z0-9_-]+)\/?(?:[?#]|$)/;
 
 export type InstagramItem = {
   key: string;
-  imageUrl: string;
-  imageAlt: string;
-  /** null → tautan profil Instagram. */
-  href: string | null;
-};
-
-export type InstagramRowLike = OrderedRow & {
-  id: string;
-  imageUrl: string;
-  imageAlt?: string | null;
-  href?: string | null;
+  /** URL kanonis postingan: `https://www.instagram.com/p/{code}/`. */
+  postUrl: string;
+  /** URL untuk iframe embed: `postUrl` + `embed`. */
+  embedUrl: string;
 };
 
 /**
- * `null` = tabel kosong → pertahankan grid foto bawaan. Foto dengan alamat
- * gambar tidak aman dibuang; tautan tidak aman jatuh ke tautan profil.
+ * Normalisasi URL postingan Instagram ke bentuk kanonis. Menerima http/https,
+ * `www.`, alias `/reels/`, dan query/fragment di belakang kode; `null` bila
+ * bukan tautan postingan Instagram.
+ */
+export function normalizeInstagramPostUrl(input: string): string | null {
+  const value = clean(input);
+  if (!value || value.length > INSTAGRAM_LIMITS.postUrl) return null;
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    return null;
+  }
+  if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+  if (url.hostname !== "instagram.com" && url.hostname !== "www.instagram.com") return null;
+  const match = POST_PATH.exec(url.pathname);
+  if (!match) return null;
+  const kind = match[1] === "reels" ? "reel" : match[1];
+  return `https://www.instagram.com/${kind}/${match[2]}/`;
+}
+
+export type InstagramRowLike = OrderedRow & {
+  id: string;
+  postUrl: string;
+};
+
+/**
+ * `null` = tabel kosong → section menampilkan pesan feed kosong. Baris dengan
+ * URL tidak valid dibuang; postingan kembar hanya dihitung sekali.
  */
 export function selectInstagramPosts(rows: InstagramRowLike[]): InstagramItem[] | null {
   if (rows.length === 0) return null;
-  return publishedInOrder(rows)
-    .filter((row) => isSafeImageUrl(clean(row.imageUrl)))
-    .slice(0, INSTAGRAM_LIMITS.max)
-    .map((row) => {
-      const href = clean(row.href);
-      return {
-        key: row.id,
-        imageUrl: clean(row.imageUrl),
-        imageAlt: clean(row.imageAlt),
-        href: href && isSafeCtaHref(href) ? href : null,
-      };
-    });
+  const seen = new Set<string>();
+  const items: InstagramItem[] = [];
+  for (const row of publishedInOrder(rows)) {
+    const postUrl = normalizeInstagramPostUrl(row.postUrl);
+    if (!postUrl || seen.has(postUrl)) continue;
+    seen.add(postUrl);
+    items.push({ key: row.id, postUrl, embedUrl: `${postUrl}embed` });
+    if (items.length >= INSTAGRAM_LIMITS.max) break;
+  }
+  return items;
 }
 
 export type InstagramRawInput = {
-  imageUrl?: string | null;
-  imageAlt?: string | null;
-  href?: string | null;
+  postUrl?: string | null;
   isPublished?: boolean;
 };
 export type InstagramData = {
-  imageUrl: string;
-  imageAlt: string | null;
-  href: string | null;
+  postUrl: string;
   isPublished: boolean;
 };
 
 export function validateInstagramInput(raw: InstagramRawInput): SimpleValidation<InstagramData> {
-  const imageUrl = clean(raw.imageUrl);
-  const imageAlt = clean(raw.imageAlt);
-  const href = clean(raw.href);
-  if (!imageUrl) return { ok: false, error: "Foto wajib diunggah atau dipilih." };
-  if (!isSafeImageUrl(imageUrl)) return { ok: false, error: "Alamat gambar tidak valid." };
-  if (imageAlt.length > INSTAGRAM_LIMITS.imageAlt) {
-    return { ok: false, error: `Teks alt maksimal ${INSTAGRAM_LIMITS.imageAlt} karakter.` };
+  if (!clean(raw.postUrl)) {
+    return { ok: false, error: "URL postingan Instagram wajib diisi." };
   }
-  if (href.length > INSTAGRAM_LIMITS.href) {
-    return { ok: false, error: `Tautan maksimal ${INSTAGRAM_LIMITS.href} karakter.` };
-  }
-  if (href && !isSafeCtaHref(href)) {
+  const postUrl = normalizeInstagramPostUrl(raw.postUrl ?? "");
+  if (!postUrl) {
     return {
       ok: false,
-      error: "Tautan harus berupa path internal (mis. /menu) atau alamat https://….",
+      error:
+        "Bukan tautan postingan Instagram. Contoh yang valid: https://www.instagram.com/p/Cxxxx/",
     };
   }
-  return {
-    ok: true,
-    data: {
-      imageUrl,
-      imageAlt: imageAlt || null,
-      href: href || null,
-      isPublished: raw.isPublished ?? false,
-    },
-  };
+  return { ok: true, data: { postUrl, isPublished: raw.isPublished ?? false } };
 }

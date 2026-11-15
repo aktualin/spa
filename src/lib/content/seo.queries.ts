@@ -86,8 +86,9 @@ export async function getSeoSettings(): Promise<SeoSettings> {
 }
 
 /**
- * Menggabungkan metadata default halaman dengan override `PageSeo` dan
- * pengaturan global, lalu melengkapi canonical, Open Graph, dan twitter card.
+ * Menggabungkan metadata default halaman dengan bawaan registry per route
+ * (`PAGE_SEO_DEFAULTS`), override `PageSeo`, dan pengaturan global, lalu
+ * melengkapi keywords, canonical, Open Graph, dan twitter card.
  * Lihat `mergePageSeo` di `@/lib/domain/seo`.
  */
 export async function withPageSeo(
@@ -95,5 +96,8 @@ export async function withPageSeo(
   defaults: Metadata,
 ): Promise<Metadata> {
   const [seo, settings] = await Promise.all([getPageSeo(path), getSeoSettings()]);
-  return mergePageSeo(path, defaults, seo, settings);
+  return mergePageSeo(path, defaults, seo, {
+    defaultOgImageUrl: settings.defaultOgImageUrl,
+    keywords: settings.seoKeywords,
+  });
 }

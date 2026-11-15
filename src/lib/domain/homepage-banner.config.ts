@@ -42,7 +42,7 @@ export const BANNER_FIELDS: Record<BannerKey, BannerFieldConfig> = {
     subtitle: true,
     titleLabel: "Judul utama (H1)",
     subtitleLabel: "Eyebrow (teks kecil di atas judul)",
-    ctaHint: "Tautan pada kartu putih di pojok hero (bawaan: “Book Now” → /contact).",
+    ctaHint: "Tautan pada kartu putih di pojok hero (bawaan: “Book Now” → /reservation).",
   },
   "membership-banner": {
     image: true,

@@ -78,7 +78,7 @@ export const CONTENT_MODULES: readonly AdminModule[] = [
     label: "Reservasi",
     href: "/admin/reservations",
     group: "konten",
-    hint: "Permintaan reservasi dari form halaman kontak beserta status tindak lanjutnya.",
+    hint: "Permintaan reservasi dari form publik (/contact & /reservation) beserta status tindak lanjutnya.",
     roles: CONTENT_ROLES,
     ready: true,
   },

@@ -5,7 +5,8 @@ import { stripTags } from "@/lib/domain/sanitize";
 import { errorCode, guardFormRequest, isBotBody, json, parseFormBody } from "../form-helpers";
 
 /**
- * Endpoint submit formulir reservasi halaman kontak (`/api/reservation`).
+ * Endpoint submit formulir reservasi publik (`/api/reservation`, dipakai
+ * halaman `/contact` dan `/reservation`).
  * Pertahanan mengikuti pola inquiry corporate: origin, rate limit per IP
  * (hash, tanpa menyimpan IP), batas body, honeypot + lama pengisian
  * (`isBotSubmission` → sukses palsu), validasi zod, lalu simpan (status NEW).
@@ -35,6 +36,12 @@ export async function POST(request: Request) {
     phone: stripTags(validation.data.phone).trim(),
     email: validation.data.email ? stripTags(validation.data.email).trim() || null : null,
     branchSlug: validation.data.branchSlug?.trim() || null,
+    treatment: validation.data.treatment
+      ? stripTags(validation.data.treatment).trim() || null
+      : null,
+    preferredDate: validation.data.preferredDate || null,
+    preferredTime: validation.data.preferredTime || null,
+    guests: validation.data.guests ?? null,
     message: validation.data.message ? stripTags(validation.data.message).trim() || null : null,
     status: "NEW" as const,
   };

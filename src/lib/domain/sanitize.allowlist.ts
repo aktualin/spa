@@ -1,4 +1,7 @@
 /** Daftar putih tag/atribut sanitizer HTML — lihat `sanitize.ts`. */
+import { LAYOUT_CLASSES } from "./rich-text-layout.ts";
+
+export { LAYOUT_CLASSES };
 
 /** Tag yang boleh dipertahankan. */
 export const ALLOWED_TAGS = new Set([
@@ -40,10 +43,14 @@ export const ALLOWED_TAGS = new Set([
   "div",
 ]);
 
-/** Atribut yang boleh dipertahankan per tag. */
+/**
+ * Atribut yang boleh dipertahankan per tag. `class` hanya untuk img/figure
+ * dan nilainya disaring lagi ke LAYOUT_CLASSES (posisi gambar dari editor).
+ */
 export const ALLOWED_ATTRIBUTES: Record<string, readonly string[]> = {
   a: ["href", "title", "target", "rel"],
-  img: ["src", "alt", "title", "width", "height", "loading"],
+  img: ["src", "alt", "title", "width", "height", "loading", "class"],
+  figure: ["class"],
   td: ["colspan", "rowspan"],
   th: ["colspan", "rowspan", "scope"],
 };

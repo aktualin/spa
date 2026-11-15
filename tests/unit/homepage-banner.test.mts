@@ -208,12 +208,12 @@ describe("resolveBanner", () => {
   });
 
   it("CTA tidak lengkap atau tidak aman → tombol bawaan", () => {
-    assert.equal(resolveBanner({ ...legacyHero, ctaLabel: "Pesan" }, HERO_DEFAULTS).ctaHref, "/contact");
+    assert.equal(resolveBanner({ ...legacyHero, ctaLabel: "Pesan" }, HERO_DEFAULTS).ctaHref, "/reservation");
     const unsafe = resolveBanner(
       { ...legacyHero, ctaLabel: "Pesan", ctaHref: "javascript:alert(1)" },
       HERO_DEFAULTS,
     );
     assert.equal(unsafe.ctaLabel, "Book Now");
-    assert.equal(unsafe.ctaHref, "/contact");
+    assert.equal(unsafe.ctaHref, "/reservation");
   });
 });

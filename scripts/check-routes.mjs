@@ -70,6 +70,7 @@ const REQUIRED_ROUTES = [
   "promos",
   "promos/membership",
   "gift-card",
+  "reservation",
   "corporate-wellness",
   "admin",
   "admin/login",

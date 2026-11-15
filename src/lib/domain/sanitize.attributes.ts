@@ -2,6 +2,7 @@
 import {
   ALLOWED_ATTRIBUTES,
   ATTRIBUTE_PATTERN,
+  LAYOUT_CLASSES,
   SAFE_SCHEMES,
   SCHEME_PATTERN,
   URL_ATTRIBUTES,
@@ -41,6 +42,14 @@ export function sanitizeAttributes(tag: string, raw: string): string {
     if (!allowed.includes(name)) continue;
     if (name.startsWith("on")) continue;
     if (URL_ATTRIBUTES.has(name) && !isSafeUrl(value)) continue;
+
+    // Class hanya lolos untuk layout editor (posisi gambar); token di luar
+    // daftar putih dibuang, dan class tanpa token valid tidak ditulis.
+    if (name === "class") {
+      const tokens = value.split(/\s+/).filter((token) => LAYOUT_CLASSES.has(token));
+      if (tokens.length > 0) kept.push(`class="${tokens.join(" ")}"`);
+      continue;
+    }
 
     kept.push(`${name}="${value.replace(/"/g, "&quot;")}"`);
   }

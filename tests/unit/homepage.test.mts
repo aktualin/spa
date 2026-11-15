@@ -200,6 +200,7 @@ describe("reorderIds", () => {
 
 import {
   INSTAGRAM_LIMITS,
+  normalizeInstagramPostUrl,
   selectInstagramPosts,
   selectReviews,
   selectStats,
@@ -235,20 +236,24 @@ describe("statistik, ulasan, feed Instagram", () => {
     assert.deepEqual(out, [{ key: "a", quote: "q", name: "N", location: "", role: "" }]);
   });
 
-  it("Instagram: gambar tak aman dibuang, tautan tak aman jadi profil, maks 12", () => {
+  it("Instagram: URL tak valid dibuang, kembar dihitung sekali, maks 12", () => {
     const rows = Array.from({ length: 14 }, (_, i) => ({
       id: String(i),
-      imageUrl: "https://cdn.example.com/img/a.jpg",
+      postUrl: `https://www.instagram.com/p/C${String(i).padStart(4, "0")}/`,
       isPublished: true,
       sortOrder: i,
     }));
     assert.equal(selectInstagramPosts(rows)?.length, INSTAGRAM_LIMITS.max);
     const out = selectInstagramPosts([
-      { id: "x", imageUrl: "javascript:alert(1)", isPublished: true, sortOrder: 0 },
-      { id: "y", imageUrl: "https://cdn.example.com/img/a.jpg", href: "javascript:alert(1)", isPublished: true, sortOrder: 1 },
+      { id: "x", postUrl: "javascript:alert(1)", isPublished: true, sortOrder: 0 },
+      { id: "y", postUrl: "https://instagram.com/p/Ab1-_/?x=1", isPublished: true, sortOrder: 1 },
+      { id: "z", postUrl: "https://www.instagram.com/p/Ab1-_", isPublished: true, sortOrder: 2 },
+      { id: "w", postUrl: "https://www.instagram.com/reels/Rr9/", isPublished: true, sortOrder: 3 },
     ]);
-    assert.equal(out?.length, 1);
-    assert.equal(out?.[0].href, null);
+    assert.deepEqual(out?.map((i) => i.key), ["y", "w"]);
+    assert.equal(out?.[0].postUrl, "https://www.instagram.com/p/Ab1-_/");
+    assert.equal(out?.[0].embedUrl, "https://www.instagram.com/p/Ab1-_/embed");
+    assert.equal(out?.[1].postUrl, "https://www.instagram.com/reel/Rr9/");
   });
 
   it("validasi statistik", () => {
@@ -267,9 +272,14 @@ describe("statistik, ulasan, feed Instagram", () => {
   });
 
   it("validasi Instagram", () => {
-    assert.equal(validateInstagramInput({ imageUrl: "" }).ok, false);
-    assert.equal(validateInstagramInput({ imageUrl: "javascript:x" }).ok, false);
-    assert.equal(validateInstagramInput({ imageUrl: "https://cdn.example.com/img/a.jpg", href: "javascript:x" }).ok, false);
-    assert.equal(validateInstagramInput({ imageUrl: "https://cdn.example.com/img/a.jpg", href: "https://instagram.com/p/1" }).ok, true);
+    assert.equal(validateInstagramInput({ postUrl: "" }).ok, false);
+    assert.equal(validateInstagramInput({ postUrl: "javascript:x" }).ok, false);
+    assert.equal(validateInstagramInput({ postUrl: "https://example.com/p/Ab1/" }).ok, false);
+    assert.equal(validateInstagramInput({ postUrl: "https://www.instagram.com/kama__spa/" }).ok, false);
+    assert.equal(normalizeInstagramPostUrl("http://instagram.com/p/Ab1/?igshid=x"), "https://www.instagram.com/p/Ab1/");
+    assert.equal(normalizeInstagramPostUrl("https://www.instagram.com/tv/Ab1"), "https://www.instagram.com/tv/Ab1/");
+    assert.equal(normalizeInstagramPostUrl("https://instagram.com.evil.io/p/Ab1/"), null);
+    const ok = validateInstagramInput({ postUrl: "https://instagram.com/p/Ab1/", isPublished: true });
+    assert.ok(ok.ok && ok.data.postUrl === "https://www.instagram.com/p/Ab1/" && ok.data.isPublished);
   });
 });

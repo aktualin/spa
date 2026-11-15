@@ -4,6 +4,7 @@ import {
   DEFAULT_DESCRIPTION,
   DEFAULT_OG_DESCRIPTION,
   DEFAULT_TITLE,
+  FALLBACK_KEYWORDS,
   OG_LOCALE,
   SITE_NAME,
   TITLE_TEMPLATE,
@@ -11,17 +12,6 @@ import {
   indexingDisabled,
 } from "@/lib/domain/seo";
 import { getSiteUrl } from "@/lib/site-url";
-
-/** Keywords cadangan bila admin belum mengisi daftar keywords di Kontak & Umum. */
-const FALLBACK_KEYWORDS = [
-  "KAMA Spa",
-  "massage Jakarta",
-  "spa South Jakarta",
-  "day spa",
-  "corporate wellness",
-  "Sukma Laya",
-  "Urip Padma",
-];
 
 /**
  * Metadata root — otomatis, tanpa modul admin SEO. Favicon, gambar OG bawaan,

@@ -8,15 +8,12 @@ import {
   deleteInstagramPostAction,
   saveInstagramPostAction,
 } from "../../actions/homepage-content";
-import { ImageField } from "../../image-field";
 import { Checkbox, Field, inputClass } from "../../promos/_kit/form-ui";
 import { Shell, initialState } from "./content-form-shell";
 
 export type InstagramFormData = {
   id: string | null;
-  imageUrl: string;
-  imageAlt: string;
-  href: string;
+  postUrl: string;
   isPublished: boolean;
 };
 
@@ -25,51 +22,30 @@ export function InstagramForm({ post }: { post: InstagramFormData }) {
   return (
     <Shell
       listPath="/admin/homepage/instagram"
-      backLabel="Kembali ke daftar foto"
-      heading={post.id ? "Ubah foto Instagram" : "Tambah foto Instagram"}
-      intro="Tampil sebagai kotak foto persegi di section feed Instagram."
+      backLabel="Kembali ke daftar postingan"
+      heading={post.id ? "Ubah postingan Instagram" : "Tambah postingan Instagram"}
+      intro="Postingan di-embed langsung dari Instagram di section feed homepage. Tidak ada foto yang diunggah."
       id={post.id}
       formAction={formAction}
       error={state.error}
       deleteAction={deleteInstagramPostAction}
-      deleteMessage="Hapus foto ini dari feed? Gambar yang tercatat di Media Library tetap tersimpan."
-      deleteLabel="Hapus foto ini"
+      deleteMessage="Hapus postingan ini dari feed?"
+      deleteLabel="Hapus postingan ini"
     >
-      <fieldset className="space-y-4 rounded-md border border-neutral-200 p-4">
-        <legend className="px-1 text-sm font-medium text-neutral-700">Foto</legend>
-        <ImageField
-          name="imageUrl"
-          label="Foto feed"
-          folder="instagram"
-          defaultValue={post.imageUrl}
-        />
-        <p className="text-xs text-neutral-500">
-          Dipotong persegi 1:1. Disarankan minimal 800×800 px, JPG/WebP di bawah 1 MB.
-        </p>
-        <Field
-          label="Teks alt (opsional)"
-          htmlFor="imageAlt"
-          hint="Deskripsi singkat foto untuk pembaca layar. Kosong = foto dianggap hiasan."
-        >
-          <input
-            id="imageAlt"
-            name="imageAlt"
-            defaultValue={post.imageAlt}
-            maxLength={INSTAGRAM_LIMITS.imageAlt}
-            className={inputClass}
-          />
-        </Field>
-      </fieldset>
       <Field
-        label="Tautan postingan (opsional)"
-        htmlFor="href"
-        hint="https://… ke postingan Instagram. Kosong = tautan profil Instagram (dari Kontak & Umum)."
+        label="URL postingan Instagram"
+        htmlFor="postUrl"
+        hint="Tempel tautan postingan (Instagram → … → Salin tautan), mis. https://www.instagram.com/p/Cxxxx/ — foto, reel, dan IGTV didukung."
       >
         <input
-          id="href"
-          name="href"
-          defaultValue={post.href}
-          maxLength={INSTAGRAM_LIMITS.href}
+          id="postUrl"
+          name="postUrl"
+          type="url"
+          inputMode="url"
+          required
+          placeholder="https://www.instagram.com/p/…"
+          defaultValue={post.postUrl}
+          maxLength={INSTAGRAM_LIMITS.postUrl}
           className={inputClass}
         />
       </Field>

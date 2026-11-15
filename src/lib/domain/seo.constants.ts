@@ -10,6 +10,17 @@ export const DEFAULT_OG_DESCRIPTION =
   "Combining traditional healing techniques and modern wellness approaches, KAMA Spa offers thoughtfully curated treatments designed to restore balance, relaxation, and mindful presence.";
 export const OG_LOCALE = "id_ID";
 
+/** Keywords cadangan bila admin belum mengisi daftar keywords di Kontak & Umum. */
+export const FALLBACK_KEYWORDS: string[] = [
+  "KAMA Spa",
+  "massage Jakarta",
+  "spa South Jakarta",
+  "day spa",
+  "corporate wellness",
+  "Sukma Laya",
+  "Urip Padma",
+];
+
 /** Panjang ideal yang dipakai Google sebelum teks dipotong. */
 export const SEO_LIMITS = {
   titleMin: 30,

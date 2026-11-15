@@ -6,6 +6,7 @@ import { Reveal } from "@/components/reveal";
 import { getBranches } from "@/lib/content/branches";
 import { getFormsCopy } from "@/lib/content/forms";
 import { copy, getPageCopy } from "@/lib/content/page-copy";
+import { getReservationServices } from "@/lib/content/reservation";
 import { withPageSeo } from "@/lib/content/seo";
 import { getSiteSettings } from "@/lib/content/site";
 import { branchWhatsAppHref } from "@/lib/content/whatsapp";
@@ -19,11 +20,12 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ContactPage() {
   // Cabang dikelola di modul Cabang; alamat, jam, nomor, peta, dan koordinat
   // per cabang. Nomor/jam yang dikosongkan per cabang mengikuti Kontak & Umum.
-  const [branches, settings, pageCopy, formsCopy] = await Promise.all([
+  const [branches, settings, pageCopy, formsCopy, services] = await Promise.all([
     getBranches(),
     getSiteSettings(),
     getPageCopy(),
     getFormsCopy(),
+    getReservationServices(),
   ]);
   // Link WA per cabang (template "location" + alamat); null bila belum ada
   // nomor di cabang maupun di pengaturan situs → tombol kartu disembunyikan.
@@ -61,7 +63,11 @@ export default async function ContactPage() {
           settings={settings}
           pageCopy={pageCopy}
         />
-        <ContactReservation reservation={formsCopy.reservation} branches={branches} />
+        <ContactReservation
+          reservation={formsCopy.reservation}
+          branches={branches}
+          services={services}
+        />
 
         <Reveal as="section" className="section_get-in-touch is-top-off">
           <div className="get-in-touch_container">

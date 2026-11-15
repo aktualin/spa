@@ -12,10 +12,18 @@ export {
   DEFAULT_TITLE,
   DEFAULT_DESCRIPTION,
   DEFAULT_OG_DESCRIPTION,
+  FALLBACK_KEYWORDS,
   OG_LOCALE,
   SEO_LIMITS,
 } from "./seo.constants.ts";
 export { pageTitle, formatPageTitle, titleText } from "./seo.title.ts";
+export {
+  type PageSeoDefaults,
+  PAGE_SEO_DEFAULTS,
+  MAX_PAGE_KEYWORDS,
+  routeSeoDefaults,
+  resolveRouteKeywords,
+} from "./seo.pages.ts";
 export {
   type SeoTextStatus,
   type SeoTextAssessment,

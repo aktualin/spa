@@ -21,7 +21,13 @@ import { CorporateSteps } from "./corporate-steps";
  * belum punya override sendiri.
  */
 export async function generateMetadata(): Promise<Metadata> {
-  return withPageSeo("/corporate", await withPageSeo("/corporate-wellness", {}));
+  // Panggilan inner mewarisi override PageSeo lama (title/description/OG image)
+  // untuk path `/corporate-wellness`. Canonical & og:url hasil inner DIBUANG:
+  // path itu redirect 308 ke sini, dan canonical yang menunjuk URL redirect
+  // diabaikan Google — outer menyetel ulang keduanya ke `/corporate`.
+  const { alternates: _legacyAlternates, openGraph: _legacyOg, ...legacy } =
+    await withPageSeo("/corporate-wellness", {});
+  return withPageSeo("/corporate", legacy);
 }
 
 export default async function CorporatePage() {

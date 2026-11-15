@@ -58,7 +58,8 @@ node scripts/screenshot.mjs http://localhost:3000 /tmp/kama mobile   # one viewp
 - `src/components/home/reviews-marquee.tsx` — the reviews marquee (auto-scrolling, pauses on hover/focus/touch).
 - `src/components/home/hero.tsx` — server wrapper for the homepage hero/banners; `src/components/home/hero-slider.tsx` is the client hero media slider.
 - `src/lib/domain/hero-slide.ts` — pure media URL validation + `HeroSlide` fallback/resolve rules (unit tested).
-- `src/components/forms/*` — reservation form, wired to `POST /api/reservation` with an admin inbox (see `## Architecture decisions`). It takes `{ branches, copy }` props; copy comes from `getFormsCopy()`. (The newsletter form only lives on the `feat/newsletter` branch.)
+- `src/components/forms/*` — reservation form, wired to `POST /api/reservation` with an admin inbox (see `## Architecture decisions`). It takes `{ branches, services, copy }` props (services = pilihan treatment/package dari `getReservationServices()`, copy dari `getFormsCopy()`) and is used by both `/contact` and `/reservation`. (The newsletter form only lives on the `feat/newsletter` branch.)
+- `src/app/reservation/page.tsx` — public reservation page: tujuan CTA "Book Now" kartu putih hero, tombol Book Now header, dan item menu "Reservation".
 - `public/fonts`, `public/img`, `public/video` — locally hosted fonts (Faesa Breages for display, POI Carbonic for body/labels), imagery, and the hero video. `@font-face` rules live in `src/app/kama.css`; the old family names (`Romie trial`, `Ft regola neue trial`) are kept only as aliases because `hiatus.css` hardcodes them on legacy classes.
 - `references/` — source PDFs (menu, colour reference). PDFs are gitignored.
 - `.opencode/` — project tooling for opencode: `skills/` (nextjs-frontend, tailwind-kama-styling, kama-content-data, visual-verification), `agent/ui-reviewer`, `command/` (`/verify`, `/new-page`, `/new-treatment`, `/ui-review`), `plugins/kama-guardrails.js` (blocks edits to `hiatus.css`/`kama.css.bak`, protects the `@layer` order, enforces `<Navigation>`/`<main>`/`<Footer>` on route pages). See `.opencode/README.md`.
@@ -114,28 +115,32 @@ Numbers and messages live in the database (`SiteSettings` + `WhatsAppTemplate`),
 ### Admin-editable brand, SEO & microcopy
 
 - Brand: `SiteSettings.logoMarkLightUrl/logoMarkDarkUrl/logoLockupUrl`, `brandWordmarkTop/Bottom`, `brandLogoAlt` — consumed by the logo, footer lockup, hero slider and admin login, with the local `public/img/kama` assets as fallbacks.
-- Global SEO defaults: `SiteSettings.seoSiteName/seoDefaultTitle/seoDefaultDescription/seoOgDescription/seoOgLocale/seoTitleTemplate/seoKeywords[]`, edited in the SEO module; `layout.tsx generateMetadata` falls back to the constants in `src/lib/domain/seo.ts`.
+- SEO is **fully automatic — there is no SEO admin module** (the whole "Halaman & Navigasi" group — Halaman & URL, Teks Halaman, Cabang, SEO — was removed from the dashboard). Next Metadata API does the work: `src/app/layout-metadata.ts generateRootMetadata` reads `SiteSettings.seoSiteName/seoDefaultTitle/seoDefaultDescription/seoOgDescription/seoOgLocale/seoTitleTemplate/seoKeywords[]` and falls back to the constants in `src/lib/domain/seo.ts`; per-page metadata comes from `withPageSeo` (`src/lib/content/seo.queries.ts`, `PageSeo` rows are DB-managed). Per-route code defaults (title/description/keywords) live in `PAGE_SEO_DEFAULTS` (`src/lib/domain/seo.pages*.ts`, one entry per `PUBLIC_STATIC_ROUTES` path): `mergePageSeo` fills any gap when a page passes empty defaults, and dynamic routes inherit via longest-prefix match (`/treatments/massage/x` → `/treatments`). Keywords per page = explicit `keywords` in the page's defaults, else route keywords + global keywords (`SiteSettings.seoKeywords` or `FALLBACK_KEYWORDS`) deduped case-insensitively, capped at `MAX_PAGE_KEYWORDS` (12). Precedence everywhere: `PageSeo` DB override → page explicit defaults → route registry → root defaults. `/robots.txt` is `src/app/robots.ts` (blocks `/admin` + `/api`, noindex on staging via `SEO_NOINDEX=1`/Vercel preview) and `/sitemap.xml` is `src/app/sitemap.ts` (generated from the DB). `gscVerification`, `faviconUrl` and `defaultOgImageUrl` have **no editor UI** — existing DB values keep working, empty values fall back.
 - Footer hrefs: `SiteSettings.footerMembershipLearnHref/footerPrivacyHref/footerTermsHref`.
 - Mega-menu highlights: `MenuItem.highlightBadge/highlightEyebrow` (root items only).
 - Corporate photos: `CorporateContent.heroImageUrl/Alt`, `aboutImageUrl/Alt`, `inSpaImageUrl/Alt`.
-- Microcopy, aria labels and CTA hrefs: `ContentBlock` registry `src/lib/domain/page-copy.ts` (groups include `links`, `microcopy`, `forms`). Server parents read `getPageCopy()`/`copy(blocks, key)`; client components receive strings via props. Placeholders are single-brace (`{n}`, `{m}`, `{name}`, `{title}`) and are replaced at render.
+- Microcopy, aria labels and CTA hrefs: `ContentBlock` registry `src/lib/domain/page-copy.ts` (groups include `links`, `microcopy`, `forms`). Server parents read `getPageCopy()`/`copy(blocks, key)`; client components receive strings via props. Placeholders are single-brace (`{n}`, `{m}`, `{name}`, `{title}`) and are replaced at render. Values are seed/migration-managed — the `/admin/page-copy` editor no longer exists.
 
 ### Reservation form (newsletter lives only on `feat/newsletter`)
 
-- `ReservationForm` (`/contact`) takes `{ branches, copy }` props (copy from `getFormsCopy()`, `src/lib/content/forms.ts`) and POSTs to `/api/reservation` → `ReservationRequest` table. There is no newsletter form, `/api/newsletter` route, or `/admin/newsletter` inbox on `main`; the `NewsletterSignup` Prisma model stays in the schema so the shared table/data is not dropped.
-- The route follows the corporate-inquiry defense pattern: same-origin check, per-IP hashed rate limit, body size cap, honeypot + elapsed-time bot detection (fake success), zod validation (`src/lib/domain/forms.ts`). No Turnstile, no email.
+- `ReservationForm` (used by `/contact` **and** `/reservation`) takes `{ branches, services, copy }` props (copy from `getFormsCopy()`, `src/lib/content/forms.ts`; services from `getReservationServices()`, `src/lib/content/reservation.ts`) and POSTs to `/api/reservation` → `ReservationRequest` table. There is no newsletter form, `/api/newsletter` route, or `/admin/newsletter` inbox on `main`; the `NewsletterSignup` Prisma model stays in the schema so the shared table/data is not dropped.
+- Fields: nama, telepon, email, cabang, jenis treatment (select optgroup per kategori + grup "Packages"), tanggal, jam, jumlah orang, catatan. Jadwal & layanan disimpan di `ReservationRequest.preferredDate` ("YYYY-MM-DD"), `preferredTime` ("HH:MM"), `treatment` (nama tampil, bukan slug — inbox tetap terbaca walau treatment diganti) dan `guests` (6 = "6+"); detail admin merendernya lewat `src/app/admin/reservations/reservation-detail-list.tsx`.
+- The route follows the corporate-inquiry defense pattern: same-origin check, per-IP hashed rate limit, body size cap, honeypot + elapsed-time bot detection (fake success), zod validation (`src/lib/domain/forms.ts`). No Turnstile, no email. The elapsed timer is set in `useEffect` (not render) so Cache Components prerender does not freeze `Date.now()`.
 - Admin inbox: `/admin/reservations` (status NEW/HANDLED, notes, delete).
+- Public page `/reservation` is the destination of the hero white-card "Book Now" CTA, the header Book Now button and the "Reservation" menu item. Migrations: `20261116150000_public_reservation` (columns, menu item, CTA/Book Now retarget, label form baru) and `20261116160000_reservation_form_copy` (guarantees the `forms.reservation.*` ContentBlocks — deploys never run `seed-content.mts`, so copy that only lives in the seed would render empty).
 
 ### Maps
 
 - `/contact` (`src/app/contact/contact-locations.tsx`) renders three things: a Leaflet/OpenStreetMap overview map of all branches (`src/components/contact/location-map.tsx`, centre = average branch coordinate), one `LocationInfo` card per branch, and an optional Google Maps iframe from `SiteSettings.mapsEmbedUrl`.
-- Branches come from the database (`src/lib/content/branches`, type `Branch`), not `src/data`. Neither the OSM overview map nor the `embed?pb=...` iframe needs a **Maps API key**, so nothing needs billing.
+- Branches come from the database (`src/lib/content/branches`, type `Branch`), not `src/data`; rows are DB-managed (the `/admin/branches` editor was removed). Neither the OSM overview map nor the `embed?pb=...` iframe needs a **Maps API key**, so nothing needs billing.
 - Per-branch "Dapatkan Rute" and WhatsApp links are built in `LocationInfo` from the branch row + `branchWhatsAppHref`; the flagship branch (`FLAGSHIP_LOCATION_SLUG`) also gets a Fresha booking link (`SiteSettings.freshaUrl`).
 - There is **no `/locations` route and no `location-cards.tsx`** anymore. Older references to `locations[].mapEmbed`/`mapDirections` point at legacy seed data (`src/data/content/locations.ts`), not at the rendered embed.
 
 ### External links
 
 - `nav.primary` entries may carry `external: true`. External items render as `<a target="_blank" rel="noopener noreferrer">` in **both** the desktop nav and the mobile drawer (never `next/link`).
+- "Gallery" (`/gallery`) is a plain header link between Corporate Wellness and Contact, and also sits in the footer About group. Because the admin menu module was removed (the menu structure is frozen/DB-driven), the item was added both to the static seed data (`src/data/content/nav.ts`, `footer.ts`) and to existing databases via migration `20261116090000_menu_gallery_link`.
+- "Reservation" (`/reservation`) is a plain header/drawer link between Contact and Service Menu, added the same way: static seed (`src/data/content/nav.ts`) + migration `20261116150000_public_reservation` for existing databases.
 - "Service Menu" is a Google Drive PDF (service/menu price list) and lives at the **end** of `nav.primary` — the dropdown groups must stay first (`tests/nav.spec.ts` asserts that exact order).
 - Social + partnership live in `site.social`: Instagram `kama__spa`, TikTok `@kama__spa`, partnership email `marketing@kamaspa.id`. Facebook was dropped (no brand account).
 - Icons for socials live in `src/components/icons.tsx` and must match the platform (Instagram / TikTok / envelope for email) — no generic globe/link glyphs.
@@ -157,6 +162,19 @@ Numbers and messages live in the database (`SiteSettings` + `WhatsAppTemplate`),
 - Autoplay is 6 s. It pauses on hover/focus inside the hero, when the tab is hidden, and under `prefers-reduced-motion` (which also disables the crossfade and video). There is intentionally no visible pause button; one slide renders no controls/autoplay.
 - Admin CRUD lives at `/admin/homepage/hero` (`src/app/admin/actions/hero-slides.ts`). Saves must `updateTag(CONTENT_TAGS.homepage)` and revalidate `/`, `/admin/homepage`, `/admin/homepage/hero`; removed images are cleaned with `deleteImageByUrl`.
 - `Reveal` does not forward event handlers, so the client slider wraps it in a pointer/focus-capture container. Keep the `data-hero-slide`/`data-active` hooks used by `tests/hero.spec.ts`.
+
+### Instagram feed = embed postingan (bukan unggahan foto)
+
+- `/admin/homepage/instagram` manages **post URLs only**: `InstagramPost.postUrl` stores the canonical `https://www.instagram.com/{p|reel|tv}/{code}/` (migration `20261116090000_instagram_embed` dropped `imageUrl`/`imageAlt`/`href`). The form is a single URL field — no upload, no Media Library entry (`media.columns.ts` has no instagramPost row anymore), and the "Salin 12 foto bawaan" import action is gone.
+- `normalizeInstagramPostUrl` (`src/lib/domain/homepage.instagram.ts`) accepts http/https, `www.`, `/reels/`, and trailing query/fragment; `selectInstagramPosts` drops invalid rows, dedupes, caps at `INSTAGRAM_LIMITS.max`, and builds `embedUrl` (`postUrl` + `embed`).
+- The homepage Socials section renders `src/components/home/instagram-embeds.tsx`: official Instagram embed iframes (`…/embed`, `loading="lazy"`, fixed height) in a 1/2/3-column grid. `InstagramGrid` (square photo cells) now serves only the Gallery Teaser's live Graph-API feed / gallery photos.
+- Duplicates are rejected on save by comparing canonical URLs; a post deleted/privated on Instagram shows Instagram's own fallback inside the iframe.
+
+### Rich text & image placement (Google-Docs-style)
+
+- All admin rich text goes through `RichTextField` (visual contentEditable / raw HTML / preview). Saved HTML must pass `richTextInput`/`sanitizeHtml`; public pages render it with `<RichText>` (`src/components/rich-text.tsx`, `.kama-prose` styles in `kama.css`) — never `dangerouslySetInnerHTML` directly.
+- Image placement: the toolbar's ◧ Kiri / ◨ Kanan / Tengah / Blok buttons set `kama-img-left|right|center` classes on the selected `<img>` (`src/app/admin/rich-text-image.ts`). Those are the **only** class values the sanitizer keeps — the allowlist is `LAYOUT_CLASSES` (`src/lib/domain/rich-text-layout.ts`), allowed on `img`/`figure` only. Floats live under `.kama-prose` in `kama.css`; below `md` they fall back to full-width blocks.
+- `/gallery` renders `GalleryAlbum.description` as rich HTML via `PublicSectionHeader` → `RichText` — don't flatten it back to `toPlainText`.
 
 ### Card consistency (the anti-jomplang rule)
 

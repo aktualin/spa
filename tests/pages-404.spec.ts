@@ -13,7 +13,7 @@ test("slug tidak valid (huruf besar) juga 404", async ({ request }) => {
 });
 
 test("route yang sudah ada tidak ikut menjadi 404", async ({ request }) => {
-  for (const path of ["/", "/contact", "/treatments", "/gift-card", "/our-story"]) {
+  for (const path of ["/", "/contact", "/treatments", "/gift-card", "/our-story", "/reservation"]) {
     expect((await request.get(path)).status(), path).toBe(200);
   }
 });

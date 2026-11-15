@@ -12,9 +12,10 @@ import { firstIssue } from "../promos/_kit/schema";
 import { readInquiryStatus } from "./form-utils";
 
 /**
- * Inbox permintaan reservasi (form halaman kontak). Data pribadi (UU PDP) —
- * hanya untuk ADMIN/EDITOR yang login; tidak pernah di-cache publik.
- * Status memakai enum InquiryStatus yang sama dengan inquiry corporate.
+ * Inbox permintaan reservasi (form publik /contact & /reservation). Data
+ * pribadi (UU PDP) — hanya untuk ADMIN/EDITOR yang login; tidak pernah
+ * di-cache publik. Status memakai enum InquiryStatus yang sama dengan
+ * inquiry corporate.
  */
 
 const MODULE_PATH = "/admin/reservations";
@@ -40,7 +41,17 @@ export async function listReservationRequests(params: { status?: string; page?: 
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
-      select: { id: true, name: true, phone: true, branchSlug: true, status: true, createdAt: true },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        branchSlug: true,
+        treatment: true,
+        preferredDate: true,
+        preferredTime: true,
+        status: true,
+        createdAt: true,
+      },
     }),
     prisma.reservationRequest.count({ where }),
     prisma.reservationRequest.groupBy({ by: ["status"], _count: { _all: true } }),

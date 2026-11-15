@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
+  PAGE_SEO_DEFAULTS,
   PUBLIC_STATIC_ROUTES,
   assessSeoText,
   buildRobots,
@@ -14,6 +15,8 @@ import {
   normalizeSeoPath,
   pageTitle,
   parseGscVerification,
+  resolveRouteKeywords,
+  routeSeoDefaults,
   seoPathError,
 } from "../../src/lib/domain/seo.ts";
 import { ADMIN_MODULES } from "../../src/app/admin/modules.ts";
@@ -143,6 +146,88 @@ describe("mergePageSeo", () => {
     const meta = mergePageSeo("/x", { title: "X" }, null, { defaultOgImageUrl: null });
     assert.deepEqual(meta.twitter, { card: "summary" });
     assert.equal((meta.openGraph as Record<string, unknown>).images, undefined);
+  });
+});
+
+describe("bawaan SEO per halaman (registry)", () => {
+  it("setiap route tetap punya entri registry", () => {
+    for (const route of PUBLIC_STATIC_ROUTES) {
+      assert.ok(route.path in PAGE_SEO_DEFAULTS, `${route.path} belum punya entri`);
+    }
+  });
+
+  it("judul & deskripsi registry dalam rentang ideal", () => {
+    for (const [path, entry] of Object.entries(PAGE_SEO_DEFAULTS)) {
+      if (entry.title) {
+        assert.equal(
+          assessSeoText(formatPageTitle(entry.title), "title").status,
+          "ideal",
+          path,
+        );
+      }
+      if (entry.description) {
+        assert.equal(assessSeoText(entry.description, "description").status, "ideal", path);
+      }
+      assert.ok((entry.keywords ?? []).length > 0, `${path} tanpa keywords`);
+    }
+  });
+
+  it("route dinamis mewarisi prefix terpanjang", () => {
+    assert.equal(
+      routeSeoDefaults("/treatments/massage/sukma-laya"),
+      PAGE_SEO_DEFAULTS["/treatments"],
+    );
+    assert.equal(
+      routeSeoDefaults("/treatments/packages/x"),
+      PAGE_SEO_DEFAULTS["/treatments/packages"],
+    );
+    assert.equal(routeSeoDefaults("/menu/foo"), PAGE_SEO_DEFAULTS["/menu"]);
+    assert.equal(routeSeoDefaults("/contact/"), PAGE_SEO_DEFAULTS["/contact"]);
+    assert.equal(routeSeoDefaults("/corporate-wellness"), PAGE_SEO_DEFAULTS["/corporate"]);
+    assert.equal(routeSeoDefaults("/no-such-page"), undefined);
+  });
+
+  it("mergePageSeo mengisi dari registry saat bawaan kosong", () => {
+    const meta = mergePageSeo("/gift-card", {}, null, { defaultOgImageUrl: null });
+    const entry = PAGE_SEO_DEFAULTS["/gift-card"];
+    assert.equal(meta.title, entry.title);
+    assert.equal(meta.description, entry.description);
+    const og = meta.openGraph as Record<string, unknown>;
+    assert.equal(og.title, entry.title);
+    assert.equal(og.description, entry.description);
+    assert.ok((meta.keywords as string[]).length > 0);
+  });
+
+  it("bawaan eksplisit halaman menang atas registry", () => {
+    const meta = mergePageSeo(
+      "/gift-card",
+      { title: "Judul Sendiri", description: "Desc sendiri", keywords: ["a"] },
+      null,
+      { defaultOgImageUrl: null },
+    );
+    assert.equal(meta.title, "Judul Sendiri");
+    assert.equal(meta.description, "Desc sendiri");
+    assert.deepEqual(meta.keywords, ["a"]);
+  });
+
+  it("keywords gabungan route + global, dedupe case-insensitive, ada batasnya", () => {
+    const meta = mergePageSeo("/contact", {}, null, {
+      defaultOgImageUrl: null,
+      keywords: ["Reservasi Spa", "KAMA Spa"],
+    });
+    const keywords = meta.keywords as string[];
+    assert.ok(keywords.includes("KAMA Spa"));
+    assert.equal(new Set(keywords.map((k) => k.toLowerCase())).size, keywords.length);
+    assert.ok(keywords.length <= 12);
+    assert.deepEqual(
+      resolveRouteKeywords(["Spa Jakarta", "promo spa"], ["spa jakarta", "KAMA Spa"]),
+      ["Spa Jakarta", "promo spa", "KAMA Spa"],
+    );
+  });
+
+  it("keywords global kosong → fallback domain dipakai", () => {
+    const meta = mergePageSeo("/x", {}, null, { defaultOgImageUrl: null, keywords: [] });
+    assert.ok((meta.keywords as string[]).includes("KAMA Spa"));
   });
 });
 

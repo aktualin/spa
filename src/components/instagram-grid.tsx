@@ -10,9 +10,9 @@ export type InstagramGridItem = {
 };
 
 /**
- * Grid foto Instagram (feed live maupun postingan admin): kotak persegi
- * dengan overlay ikon saat hover. Dipakai SocialsSection & GalleryTeaser;
- * `rel` tautan mengikuti konteks masing-masing pemanggil.
+ * Grid foto Instagram (feed live maupun foto galeri): kotak persegi dengan
+ * overlay ikon saat hover. Dipakai GalleryTeaser; `rel` tautan mengikuti
+ * konteks masing-masing pemanggil.
  */
 export function InstagramGrid({
   items,

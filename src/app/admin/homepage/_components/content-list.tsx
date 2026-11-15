@@ -47,8 +47,9 @@ export function ContentList({
   deleted?: string;
   deletedLabel: string;
   emptyNote: ReactNode;
-  importLabel: string;
-  importAction: () => void | Promise<void>;
+  /** Opsional: hanya daftar dengan data bawaan (Statistik, Ulasan). */
+  importLabel?: string;
+  importAction?: () => void | Promise<void>;
   noLiveNote: ReactNode;
   footnote: ReactNode;
   toggleAction: FormAction;

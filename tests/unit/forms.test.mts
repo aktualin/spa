@@ -88,6 +88,51 @@ describe("validateReservation", () => {
     assert.equal(validateReservation(reservation({ branchSlug: "x".repeat(61) })).ok, false);
   });
 
+  it("jadwal opsional; hanya menerima format input date/time", () => {
+    const lengkap = validateReservation(
+      reservation({ preferredDate: "2026-11-20", preferredTime: "14:30" }),
+    );
+    assert.ok(lengkap.ok);
+    if (lengkap.ok) {
+      assert.equal(lengkap.data.preferredDate, "2026-11-20");
+      assert.equal(lengkap.data.preferredTime, "14:30");
+    }
+    assert.equal(validateReservation(reservation({ preferredDate: "", preferredTime: "" })).ok, true);
+    for (const preferredDate of ["20-11-2026", "2026-13-01", "2026-11-32", "besok"]) {
+      const result = validateReservation(reservation({ preferredDate }));
+      assert.equal(result.ok, false, preferredDate);
+      if (!result.ok) assert.equal(result.error, "Format tanggal tidak valid.");
+    }
+    for (const preferredTime of ["24:00", "14:60", "2 pm"]) {
+      const result = validateReservation(reservation({ preferredTime }));
+      assert.equal(result.ok, false, preferredTime);
+      if (!result.ok) assert.equal(result.error, "Format jam tidak valid.");
+    }
+  });
+
+  it("treatment opsional, maks 160 karakter", () => {
+    const ok = validateReservation(reservation({ treatment: "Sukma Laya (90 min)" }));
+    assert.ok(ok.ok);
+    if (ok.ok) assert.equal(ok.data.treatment, "Sukma Laya (90 min)");
+    assert.equal(validateReservation(reservation({ treatment: "x".repeat(160) })).ok, true);
+    const panjang = validateReservation(reservation({ treatment: "x".repeat(161) }));
+    assert.equal(panjang.ok, false);
+    if (!panjang.ok) assert.equal(panjang.error, "Nama treatment maks. 160 karakter.");
+  });
+
+  it("guests: string angka di-coerce, kosong = tidak diisi, di luar 1..20 ditolak", () => {
+    const dua = validateReservation(reservation({ guests: "2" }));
+    assert.ok(dua.ok);
+    if (dua.ok) assert.equal(dua.data.guests, 2);
+    const kosong = validateReservation(reservation({ guests: "  " }));
+    assert.ok(kosong.ok);
+    if (kosong.ok) assert.equal(kosong.data.guests, undefined);
+    for (const guests of ["0", "21", "banyak", "2.5"]) {
+      const result = validateReservation(reservation({ guests }));
+      assert.equal(result.ok, false, guests);
+    }
+  });
+
   it("honeypot terisi ditolak dengan pesan generik", () => {
     const result = validateReservation(reservation({ website: "isi-bot" }));
     assert.equal(result.ok, false);

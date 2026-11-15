@@ -17,6 +17,7 @@ export const footerLinks = {
   About: [
     { label: "Contact", href: "/contact" },
     { label: "Membership", href: "/membership" },
+    { label: "Gallery", href: "/gallery" },
   ],
   Community: [{ label: "Corporate Wellness", href: "/corporate" }],
 };

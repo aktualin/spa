@@ -34,7 +34,10 @@ export function RichTextField({
   onHtmlChange?: (html: string) => void;
 }) {
   const editor = useRichTextEditor(defaultValue, onHtmlChange);
-  const { editorRef, html, setHtml, mode, setMode, sync, run, insertHtml, insertImage, switchMode } = editor;
+  const {
+    editorRef, html, setHtml, mode, setMode, sync, run,
+    insertHtml, insertImage, setImagePlacement, switchMode,
+  } = editor;
   const { fileRef, busy, error, uploadImage } = useInlineImageUpload(folder, insertImage);
   const [pickerOpen, setPickerOpen] = useState(false);
 
@@ -59,6 +62,7 @@ export function RichTextField({
               fileRef={fileRef}
               onFile={(file) => void uploadImage(file)}
               onOpenPicker={() => setPickerOpen(true)}
+              onImagePlacement={setImagePlacement}
             />
             <VisualEditor
               editorRef={editorRef}

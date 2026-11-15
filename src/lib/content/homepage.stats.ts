@@ -48,7 +48,7 @@ export async function getHomepageReviews(): Promise<ReviewItem[]> {
   return data;
 }
 
-/** Foto feed Instagram pilihan admin; tabel kosong → daftar kosong. */
+/** Postingan Instagram pilihan admin (di-embed); tabel kosong → null. */
 export async function getInstagramPosts(): Promise<InstagramItem[] | null> {
   "use cache";
   cacheTag(CONTENT_TAGS.homepage);

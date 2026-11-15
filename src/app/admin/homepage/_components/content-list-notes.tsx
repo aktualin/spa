@@ -14,17 +14,19 @@ export function ContentListNotes({
   isEmpty: boolean;
   liveCount: number;
   emptyNote: ReactNode;
-  importLabel: string;
-  importAction: () => void | Promise<void>;
+  importLabel?: string;
+  importAction?: () => void | Promise<void>;
   noLiveNote: ReactNode;
 }) {
   if (isEmpty) {
     return (
       <div className="mt-6 space-y-3 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-800">
         {emptyNote}
-        <form action={importAction}>
-          <SmallSubmit>{importLabel}</SmallSubmit>
-        </form>
+        {importAction && importLabel ? (
+          <form action={importAction}>
+            <SmallSubmit>{importLabel}</SmallSubmit>
+          </form>
+        ) : null}
       </div>
     );
   }

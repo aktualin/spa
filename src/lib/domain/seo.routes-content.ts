@@ -1,4 +1,4 @@
-/** Route tetap: our story, journal, galeri, event, retail, gift card, kontak. */
+/** Route tetap: our story, journal, galeri, event, retail, gift card, kontak, reservasi. */
 import type { PublicStaticRoute } from "./seo.routes.ts";
 
 export const SEO_ROUTES_CONTENT: readonly PublicStaticRoute[] = [
@@ -69,5 +69,13 @@ export const SEO_ROUTES_CONTENT: readonly PublicStaticRoute[] = [
     changeFrequency: "monthly",
     group: "contact",
     contentModules: [{ label: "Kontak & Umum", href: "/admin/settings/contact" }],
+  },
+  {
+    path: "/reservation",
+    label: "Reservation",
+    priority: 0.7,
+    changeFrequency: "monthly",
+    group: "contact",
+    contentModules: [{ label: "Reservasi", href: "/admin/reservations" }],
   },
 ];

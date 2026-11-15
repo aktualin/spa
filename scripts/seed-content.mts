@@ -30,7 +30,7 @@ const HOMEPAGE_SECTIONS: SectionSeed[] = [
     subtitle: "Massage • Spa • Corporate Wellness",
     imageUrl: asset("img/kama/incense-smoke-poster.jpg"),
     ctaLabel: "Book Now",
-    ctaHref: "/contact",
+    ctaHref: "/reservation",
     legacyTitles: ["Hero"],
   },
   {
@@ -118,7 +118,7 @@ const CONTENT_BLOCKS: { key: string; value: string }[] = [
   {
     key: "global.instagram_empty",
     value:
-      "Belum ada foto Instagram. Tambahkan dari admin, modul Homepage → Feed Instagram.",
+      "Belum ada postingan Instagram. Tambahkan tautan postingan dari admin, modul Homepage → Feed Instagram.",
   },
   { key: "global.gallery_cta_label", value: "Lihat Galeri Lengkap" },
   { key: "global.book_via_whatsapp", value: "Book via WhatsApp" },
@@ -141,7 +141,7 @@ const CONTENT_BLOCKS: { key: string; value: string }[] = [
   {
     key: "home.socials.empty",
     value:
-      "Belum ada foto Instagram. Tambahkan dari admin, modul Homepage → Feed Instagram.",
+      "Belum ada postingan Instagram. Tambahkan tautan postingan dari admin, modul Homepage → Feed Instagram.",
   },
   { key: "home.promo.eyebrow", value: "Promo" },
   { key: "home.promo.event_eyebrow", value: "Upcoming Event" },
@@ -537,7 +537,11 @@ const LINKS_MICROCOPY_FORMS_BLOCKS: { key: string; value: string }[] = [
   { key: "forms.reservation.phone_label", value: "Nomor telepon" },
   { key: "forms.reservation.email_label", value: "Alamat email" },
   { key: "forms.reservation.branch_label", value: "Pilih cabang" },
-  { key: "forms.reservation.message_label", value: "Treatment yang diminati" },
+  { key: "forms.reservation.treatment_label", value: "Pilih jenis treatment" },
+  { key: "forms.reservation.date_label", value: "Tanggal" },
+  { key: "forms.reservation.time_label", value: "Jam" },
+  { key: "forms.reservation.guests_label", value: "Jumlah orang" },
+  { key: "forms.reservation.message_label", value: "Catatan tambahan (opsional)" },
   { key: "forms.reservation.submit_label", value: "Kirim Reservasi" },
   {
     key: "forms.reservation.success",
@@ -651,7 +655,7 @@ export async function seedContent(prisma: PrismaClient): Promise<void> {
       update.partnershipEmail = "marketing@kamaspa.id";
     }
     if (!settings.bookNowLabel?.trim()) update.bookNowLabel = "Book Now";
-    if (!settings.bookNowHref?.trim()) update.bookNowHref = "/contact";
+    if (!settings.bookNowHref?.trim()) update.bookNowHref = "/reservation";
     // Galeri menu book (section #gallery di /menu): 10 halaman scan + PDF di
     // bucket S3 — dulu statis di public/img, kini dikelola dari Pengaturan.
     const menuScans =

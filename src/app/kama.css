@@ -1444,10 +1444,39 @@ html[data-js="true"] .kama-reveal.is-visible {
   font-family: var(--font-display);
   font-style: italic;
 }
+/* Posisi gambar dari editor admin — hanya class di LAYOUT_CLASSES
+   (rich-text-layout.ts) yang lolos sanitizer. flow-root membuat tinggi blok
+   tetap menghitung gambar yang di-float. */
+.kama-prose { display: flow-root; }
 .kama-prose :where(img) {
   display: block;
   max-width: 100%;
   height: auto;
+}
+.kama-prose img.kama-img-left,
+.kama-prose img.kama-img-right {
+  width: min(100%, 22rem);
+}
+.kama-prose img.kama-img-left {
+  float: left;
+  margin: 0.3em 1.5em 1em 0;
+}
+.kama-prose img.kama-img-right {
+  float: right;
+  margin: 0.3em 0 1em 1.5em;
+}
+.kama-prose img.kama-img-center {
+  margin-inline: auto;
+}
+/* Layar kecil: tidak ada ruang untuk teks di samping gambar — float
+   dimatikan, gambar jadi satu blok penuh seperti posisi default. */
+@media (max-width: 47.9375rem) {
+  .kama-prose img.kama-img-left,
+  .kama-prose img.kama-img-right {
+    float: none;
+    width: 100%;
+    margin: 0 0 1em;
+  }
 }
 .kama-prose :where(figcaption) {
   margin-top: 0.5em;

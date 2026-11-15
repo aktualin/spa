@@ -72,7 +72,7 @@ export const HERO_DEFAULTS: BannerDefaults = {
   imageUrl: asset("img/kama/incense-smoke-poster.jpg"),
   imageAlt: "",
   ctaLabel: "Book Now",
-  ctaHref: "/contact",
+  ctaHref: "/reservation",
 };
 
 export const BOOKING_BANNER_DEFAULTS: BannerDefaults = {

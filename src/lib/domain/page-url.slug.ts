@@ -26,6 +26,7 @@ export const RESERVED_ROOT_SEGMENTS: readonly string[] = [
   "our-story",
   "preview",
   "promos",
+  "reservation",
   "retail",
   "treatments",
   // Berkas metadata yang dibuat Next.js

@@ -3,7 +3,6 @@ import { INSTAGRAM_LIMITS } from "@/lib/domain/homepage";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 
 import {
-  importDefaultInstagramAction,
   listInstagramPosts,
   moveInstagramPostAction,
   toggleInstagramPostAction,
@@ -11,6 +10,11 @@ import {
 import { ContentList } from "../_components/content-list";
 
 export const instant = false;
+
+/** `https://www.instagram.com/p/Cxxxx/` → `p/Cxxxx` untuk judul baris. */
+function shortLabel(postUrl: string) {
+  return postUrl.replace(/^https?:\/\/(www\.)?instagram\.com\//, "").replace(/\/$/, "");
+}
 
 export default async function AdminHomepageInstagramPage({
   searchParams,
@@ -23,35 +27,31 @@ export default async function AdminHomepageInstagramPage({
   return (
     <ContentList
       title="Feed Instagram"
-      subtitle="Foto di grid section Instagram. Username dan tautan profil diatur di Kontak & Umum. Urutan di daftar ini sama dengan urutan foto di homepage."
+      subtitle="Postingan yang di-embed di section Instagram homepage. Cukup tempel tautan postingan — tidak ada foto yang diunggah. Urutan di daftar ini sama dengan urutan di homepage."
       basePath="/admin/homepage/instagram"
-      addLabel="Tambah foto"
+      addLabel="Tambah postingan"
       addDisabledNote={
-        posts.length >= INSTAGRAM_LIMITS.max ? `Maksimal ${INSTAGRAM_LIMITS.max} foto.` : null
+        posts.length >= INSTAGRAM_LIMITS.max
+          ? `Maksimal ${INSTAGRAM_LIMITS.max} postingan.`
+          : null
       }
       rows={posts.map((p) => ({
         id: p.id,
-        title: p.imageAlt || "Foto Instagram",
-        meta: p.href ?? "tautan profil Instagram",
-        thumb: p.imageUrl,
+        title: shortLabel(p.postUrl),
+        meta: "embed Instagram",
         isPublished: p.isPublished,
       }))}
       saved={params.saved}
       deleted={params.deleted}
-      deletedLabel="Foto dihapus."
+      deletedLabel="Postingan dihapus."
       emptyNote={
-        <>
-          <p>
-            Belum ada foto. Saat ini grid Instagram menampilkan 12 foto bawaan situs. Begitu foto
-            pertama disimpan, foto bawaan <strong>diganti seluruhnya</strong> oleh daftar ini.
-          </p>
-          <p>Agar tampilan tidak berubah, salin dulu 12 foto bawaan, lalu ganti satu per satu.</p>
-        </>
+        <p>
+          Belum ada postingan. Tambahkan tautan postingan Instagram (foto, reel, atau IGTV) untuk
+          menampilkan embednya di homepage.
+        </p>
       }
-      importLabel="Salin 12 foto bawaan"
-      importAction={importDefaultInstagramAction}
-      noLiveNote="Tidak ada foto yang tayang, jadi grid Instagram kosong (judul dan tombol Follow tetap tampil). Terbitkan minimal satu foto, atau matikan section Socials di halaman Section Homepage."
-      footnote={`Maksimal ${INSTAGRAM_LIMITS.max} foto. Tanpa tautan postingan, foto menuju profil Instagram.`}
+      noLiveNote="Tidak ada postingan yang tayang, jadi feed Instagram kosong (judul dan tombol Follow tetap tampil). Terbitkan minimal satu postingan, atau matikan section Socials di halaman Section Homepage."
+      footnote={`Maksimal ${INSTAGRAM_LIMITS.max} postingan. Setiap postingan di-embed langsung dari Instagram, jadi postingan yang dihapus/diprivat oleh pemiliknya ikut hilang dari feed.`}
       toggleAction={toggleInstagramPostAction}
       moveAction={moveInstagramPostAction}
     />

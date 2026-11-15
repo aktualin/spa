@@ -1,22 +1,31 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Check } from "@/components/icons";
-import type { BranchOption, ReservationCopy } from "@/lib/domain/forms";
+import type { BranchOption, ReservationCopy, ReservationServiceGroup } from "@/lib/domain/forms";
 
-export type { BranchOption };
+import { ReservationFields } from "./reservation-fields";
 
-/** Form reservasi halaman kontak; submit sungguhan ke /api/reservation. */
+export type { BranchOption, ReservationServiceGroup };
+
+/** Form reservasi publik (/contact & /reservation); submit ke /api/reservation. */
 export function ReservationForm({
   branches,
+  services = [],
   copy,
 }: {
   branches: readonly BranchOption[];
+  services?: readonly ReservationServiceGroup[];
   copy: ReservationCopy;
 }) {
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const startedAt = useRef(Date.now());
+  // Diisi saat mount (bukan saat render) supaya prerender Cache Components
+  // tidak membekukan Date.now(); dipakai pertahanan bot elapsedMs.
+  const startedAt = useRef<number | null>(null);
+  useEffect(() => {
+    startedAt.current = Date.now();
+  }, []);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -31,9 +40,13 @@ export function ReservationForm({
           phone: String(data.get("phone") ?? ""),
           email: String(data.get("email") ?? ""),
           branchSlug: String(data.get("branchSlug") ?? ""),
+          treatment: String(data.get("treatment") ?? ""),
+          preferredDate: String(data.get("preferredDate") ?? ""),
+          preferredTime: String(data.get("preferredTime") ?? ""),
+          guests: String(data.get("guests") ?? ""),
           message: String(data.get("message") ?? ""),
           website: String(data.get("website") ?? ""),
-          elapsedMs: Date.now() - startedAt.current,
+          elapsedMs: startedAt.current === null ? 0 : Date.now() - startedAt.current,
         }),
       });
       setState(res.ok ? "sent" : "error");
@@ -54,24 +67,7 @@ export function ReservationForm({
 
   return (
     <form className="newsletter" data-track-form="reservation" onSubmit={onSubmit} aria-label={copy.title}>
-      <div className="layout-row gap-medium">
-        <input className="form_input w-input" type="text" name="name" placeholder={copy.nameLabel} aria-label={copy.nameLabel} required />
-        <input className="form_input w-input" type="tel" name="phone" placeholder={copy.phoneLabel} aria-label={copy.phoneLabel} required />
-      </div>
-      <div className="layout-row gap-medium">
-        <input className="form_input w-input" type="email" name="email" placeholder={copy.emailLabel} aria-label={copy.emailLabel} />
-        <select className="form_input is-select" name="branchSlug" aria-label={copy.branchLabel} defaultValue="" required>
-          <option value="" disabled>
-            {copy.branchLabel}
-          </option>
-          {branches.map((branch) => (
-            <option key={branch.slug} value={branch.slug}>
-              {branch.name} | {branch.area}
-            </option>
-          ))}
-        </select>
-      </div>
-      <textarea className="form_input w-input" name="message" placeholder={copy.messageLabel} aria-label={copy.messageLabel} rows={3} />
+      <ReservationFields branches={branches} services={services} copy={copy} />
       {/* Honeypot: tidak terlihat manusia, bot mengisinya → ditolak server. */}
       <input name="website" type="text" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
       <input className="button is-tertiary w-button" type="submit" value={copy.submitLabel} disabled={state === "sending"} />

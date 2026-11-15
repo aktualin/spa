@@ -3,10 +3,13 @@
 import { redirect } from "next/navigation";
 
 import { requireRole, requireSession } from "@/lib/auth";
-import { INSTAGRAM_LIMITS, validateInstagramInput } from "@/lib/domain/homepage";
+import {
+  INSTAGRAM_LIMITS,
+  normalizeInstagramPostUrl,
+  validateInstagramInput,
+} from "@/lib/domain/homepage";
 import { CONTENT_ROLES } from "@/lib/domain/roles";
 import { prisma } from "@/lib/prisma";
-import { deleteImageByUrl } from "@/lib/storage";
 
 import { checked, text } from "../promos/_kit/schema";
 import {
@@ -27,6 +30,16 @@ export async function getInstagramPost(id: string) {
   return prisma.instagramPost.findUnique({ where: { id } });
 }
 
+/** Postingan yang sama (URL kanonis) tidak boleh dobel di daftar. */
+async function hasDuplicate(postUrl: string, id: string | null) {
+  const rows = await prisma.instagramPost.findMany({
+    select: { id: true, postUrl: true },
+  });
+  return rows.some(
+    (row) => row.id !== id && normalizeInstagramPostUrl(row.postUrl) === postUrl,
+  );
+}
+
 export async function saveInstagramPostAction(
   _prev: ActionState,
   formData: FormData,
@@ -34,28 +47,27 @@ export async function saveInstagramPostAction(
   await requireRole(CONTENT_ROLES);
   const id = idOf(formData);
   const result = validateInstagramInput({
-    imageUrl: text(formData, "imageUrl"),
-    imageAlt: text(formData, "imageAlt"),
-    href: text(formData, "href"),
+    postUrl: text(formData, "postUrl"),
     isPublished: checked(formData, "isPublished"),
   });
   if (!result.ok) return { error: result.error };
   const data = result.data;
 
+  if (await hasDuplicate(data.postUrl, id)) {
+    return { error: "Postingan itu sudah ada di daftar." };
+  }
+
   if (id) {
-    const previous = await prisma.instagramPost.findUnique({
+    const existing = await prisma.instagramPost.findUnique({
       where: { id },
-      select: { imageUrl: true },
+      select: { id: true },
     });
-    if (!previous) return { error: "Foto tidak ditemukan." };
+    if (!existing) return { error: "Postingan tidak ditemukan." };
     await prisma.instagramPost.update({ where: { id }, data });
-    if (previous.imageUrl !== data.imageUrl) {
-      await deleteImageByUrl(previous.imageUrl).catch(() => {});
-    }
   } else {
     const count = await prisma.instagramPost.count();
     if (count >= INSTAGRAM_LIMITS.max) {
-      return { error: `Maksimal ${INSTAGRAM_LIMITS.max} foto.` };
+      return { error: `Maksimal ${INSTAGRAM_LIMITS.max} postingan.` };
     }
     const last = await prisma.instagramPost.findFirst({
       orderBy: { sortOrder: "desc" },
@@ -75,11 +87,10 @@ export async function deleteInstagramPostAction(formData: FormData) {
   if (!id) return;
   const existing = await prisma.instagramPost.findUnique({
     where: { id },
-    select: { imageUrl: true },
+    select: { id: true },
   });
   if (!existing) redirect(INSTAGRAM_PATH);
   await prisma.instagramPost.delete({ where: { id } });
-  await deleteImageByUrl(existing.imageUrl).catch(() => {});
   revalidateAll(INSTAGRAM_PATH);
   redirect(`${INSTAGRAM_PATH}?deleted=1`);
 }

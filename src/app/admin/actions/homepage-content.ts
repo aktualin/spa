@@ -1,6 +1,6 @@
 /**
  * Server Action statistik Brand Intro (`HomepageStat`), ulasan
- * (`HomepageReview`), dan foto feed Instagram (`InstagramPost`). Aturan isi
+ * (`HomepageReview`), dan embed feed Instagram (`InstagramPost`). Aturan isi
  * ada di `@/lib/domain/homepage`. Pola sama dengan `homepage-highlights.ts`.
  *
  * Barrel: implementasi dipecah ke modul saudara per entity.
@@ -33,5 +33,4 @@ export {
 export {
   moveInstagramPostAction,
   toggleInstagramPostAction,
-  importDefaultInstagramAction,
 } from "./homepage-content.instagram-order";

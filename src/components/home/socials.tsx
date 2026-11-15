@@ -1,8 +1,9 @@
 import { fillCopy } from "@/components/copy-text";
 import { ArrowRight } from "@/components/icons";
-import { InstagramGrid } from "@/components/instagram-grid";
 import { Reveal } from "@/components/reveal";
 import { getInstagramPosts, type HomepageSection } from "@/lib/content/homepage";
+
+import { InstagramEmbeds } from "./instagram-embeds";
 import { copy, type PageCopy } from "@/lib/content/page-copy";
 import { getSiteSettings } from "@/lib/content/site";
 
@@ -25,13 +26,11 @@ export async function SocialsSection({
     copy(copyBlocks, "global.socials_post_aria") || "Instagram post {n}";
   const cells = (posts ?? []).map((post, i) => ({
     key: post.key,
-    src: post.imageUrl,
-    alt: post.imageAlt,
-    href: post.href ?? instagramUrl,
+    embedUrl: post.embedUrl,
     label: fillCopy(postAria, { n: i + 1 }),
   }));
 
-  // Tanpa URL Instagram maupun foto dari admin, bagian ini tidak punya isi.
+  // Tanpa URL Instagram maupun postingan dari admin, bagian ini tidak punya isi.
   if (!instagramUrl && cells.length === 0) return null;
 
   return (
@@ -68,11 +67,11 @@ export async function SocialsSection({
           ) : null}
         </div>
 
-        {/* Gallery grid */}
+        {/* Embed postingan Instagram */}
         {cells.length === 0 ? (
           emptyText ? <p className="mt-8 text-body text-cocoa/60">{emptyText}</p> : null
         ) : (
-          <InstagramGrid items={cells} rel="noreferrer" />
+          <InstagramEmbeds items={cells} />
         )}
       </div>
     </Reveal>

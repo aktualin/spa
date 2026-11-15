@@ -18,15 +18,13 @@ export default async function HomepageInstagramEditPage({
 
   let data: InstagramFormData;
   if (id === "new") {
-    data = { id: null, imageUrl: "", imageAlt: "", href: "", isPublished: true };
+    data = { id: null, postUrl: "", isPublished: true };
   } else {
     const post = await getInstagramPost(id);
     if (!post) notFound();
     data = {
       id: post.id,
-      imageUrl: post.imageUrl,
-      imageAlt: post.imageAlt ?? "",
-      href: post.href ?? "",
+      postUrl: post.postUrl,
       isPublished: post.isPublished,
     };
   }

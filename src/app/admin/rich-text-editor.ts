@@ -3,7 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 
 import { formatHtmlForEditing, toSafeHtml } from "@/lib/domain/rich-text";
+import type { ImagePlacement } from "@/lib/domain/rich-text-layout";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
+
+import { placeSelectedImage } from "./rich-text-image";
 
 export type Mode = "visual" | "html" | "preview";
 
@@ -73,6 +76,11 @@ export function useRichTextEditor(
     insertHtml(`<img src="${url}" alt="${safeAlt}" loading="lazy">`);
   }
 
+  /** Posisi gambar terpilih (teks kiri/kanan, tengah, atau blok penuh). */
+  function setImagePlacement(placement: ImagePlacement) {
+    placeSelectedImage(editorRef.current, placement, sync);
+  }
+
   function switchMode(next: Mode) {
     if (mode === "visual") sync();
     // HTML mentah dirapikan saat keluar dari mode HTML agar editor visual
@@ -85,5 +93,8 @@ export function useRichTextEditor(
     setMode(next);
   }
 
-  return { editorRef, html, setHtml, mode, setMode, sync, run, insertHtml, insertImage, switchMode };
+  return {
+    editorRef, html, setHtml, mode, setMode, sync, run,
+    insertHtml, insertImage, setImagePlacement, switchMode,
+  };
 }

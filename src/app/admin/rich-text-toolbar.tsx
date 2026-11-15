@@ -3,23 +3,26 @@
 import type { RefObject } from "react";
 
 import { ALLOWED_MEDIA_TYPES } from "@/lib/domain/media";
+import type { ImagePlacement } from "@/lib/domain/rich-text-layout";
 
 const tool =
   "rounded px-2 py-1 text-xs text-neutral-700 hover:bg-neutral-200 disabled:opacity-40";
 
-/** Toolbar editor visual: format teks, tautan, gambar, dan undo/redo. */
+/** Toolbar editor visual: format teks, tautan, gambar, posisi gambar, undo/redo. */
 export function RichTextToolbar({
   run,
   busy,
   fileRef,
   onFile,
   onOpenPicker,
+  onImagePlacement,
 }: {
   run: (command: string, value?: string) => void;
   busy: boolean;
   fileRef: RefObject<HTMLInputElement | null>;
   onFile: (file: File) => void;
   onOpenPicker: () => void;
+  onImagePlacement: (placement: ImagePlacement) => void;
 }) {
   function addLink() {
     const url = window.prompt("URL tautan (https://…, mailto:…, atau /halaman)");
@@ -63,6 +66,11 @@ export function RichTextToolbar({
       <button type="button" title="Pilih gambar dari Media Library" className={tool} disabled={busy} onClick={onOpenPicker}>
         Media Library
       </button>
+      <span className="mx-1 w-px bg-neutral-200" aria-hidden="true" />
+      <button type="button" title="Gambar di kiri, teks mengalir di kanannya" className={tool} onClick={() => onImagePlacement("left")}>◧ Kiri</button>
+      <button type="button" title="Gambar di kanan, teks mengalir di kirinya" className={tool} onClick={() => onImagePlacement("right")}>◨ Kanan</button>
+      <button type="button" title="Gambar di tengah" className={tool} onClick={() => onImagePlacement("center")}>Tengah</button>
+      <button type="button" title="Gambar selebar kolom, teks di atas/bawahnya" className={tool} onClick={() => onImagePlacement("block")}>Blok</button>
       <span className="mx-1 w-px bg-neutral-200" aria-hidden="true" />
       <button type="button" title="Hapus format" className={tool} onClick={() => run("removeFormat")}>Tx</button>
       <button type="button" title="Urungkan" className={tool} onClick={() => run("undo")}>Undo</button>

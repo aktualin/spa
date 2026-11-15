@@ -62,6 +62,32 @@ describe("U11 sanitizeHtml — atribut", () => {
   });
 });
 
+describe("U11 sanitizeHtml — class layout gambar", () => {
+  it("mempertahankan class posisi gambar pada img", () => {
+    const out = sanitizeHtml('<img src="/a.jpg" class="kama-img-right">');
+    assert.equal(out, '<img src="/a.jpg" class="kama-img-right">');
+  });
+
+  it("membuang token class di luar daftar putih", () => {
+    const out = sanitizeHtml('<img src="/a.jpg" class="kama-img-left evil btn">');
+    assert.equal(out, '<img src="/a.jpg" class="kama-img-left">');
+  });
+
+  it("class tanpa token valid tidak ditulis", () => {
+    assert.equal(sanitizeHtml('<img src="/a.jpg" class="evil">'), '<img src="/a.jpg">');
+  });
+
+  it("figure boleh membawa class posisi", () => {
+    const out = sanitizeHtml('<figure class="kama-img-center"><img src="/a.jpg"></figure>');
+    assert.ok(out.includes('<figure class="kama-img-center">'));
+  });
+
+  it("class tetap dibuang pada tag selain img/figure", () => {
+    assert.equal(sanitizeHtml('<p class="kama-img-left">a</p>'), "<p>a</p>");
+    assert.equal(sanitizeHtml('<div class="kama-img-right">a</div>'), "<div>a</div>");
+  });
+});
+
 describe("U11 sanitizeHtml — skema URL", () => {
   it("menolak javascript:", () => {
     const out = sanitizeHtml('<a href="javascript:alert(1)">a</a>');

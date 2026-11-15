@@ -6,6 +6,7 @@ import { listReservationRequests } from "../actions/reservations";
 import { InquiryStatusBadge } from "../corporate/inquiries/status-badges";
 import { PageHeader, StatusBanners } from "../promos/_kit/list-ui";
 import { formatWibDateTime } from "../promos/_kit/schema";
+import { formatReservationSchedule } from "./reservation-detail-list";
 
 export const instant = false;
 
@@ -24,7 +25,7 @@ function listHref(status: string | null | undefined, page = 1): string {
   return `/admin/reservations${qs ? `?${qs}` : ""}`;
 }
 
-/** Inbox permintaan reservasi dari form halaman kontak. */
+/** Inbox permintaan reservasi dari form publik (/contact & /reservation). */
 export default async function AdminReservationsPage({
   searchParams,
 }: {
@@ -84,6 +85,10 @@ export default async function AdminReservationsPage({
                   <p className="mt-0.5 text-xs text-neutral-500">
                     {formatWibDateTime(row.createdAt)}
                     {row.branchSlug ? ` · cabang ${row.branchSlug}` : ""}
+                    {row.treatment ? ` · ${row.treatment}` : ""}
+                    {row.preferredDate || row.preferredTime
+                      ? ` · ${formatReservationSchedule(row.preferredDate, row.preferredTime)}`
+                      : ""}
                   </p>
                 </div>
                 <InquiryStatusBadge status={row.status} />
