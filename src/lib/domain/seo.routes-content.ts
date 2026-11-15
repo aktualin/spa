@@ -68,9 +68,6 @@ export const SEO_ROUTES_CONTENT: readonly PublicStaticRoute[] = [
     priority: 0.7,
     changeFrequency: "monthly",
     group: "contact",
-    contentModules: [
-      { label: "Cabang", href: "/admin/branches" },
-      { label: "Kontak & Umum", href: "/admin/settings/contact" },
-    ],
+    contentModules: [{ label: "Kontak & Umum", href: "/admin/settings/contact" }],
   },
 ];

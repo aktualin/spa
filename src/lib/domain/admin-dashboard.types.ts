@@ -31,11 +31,8 @@ export const CONTENT_SPOTS: readonly ContentSpot[] = [
   { key: "homepageReview", label: "Ulasan di homepage", href: "/admin/homepage/reviews" },
   { key: "homepageStat", label: "Statistik brand di homepage", href: "/admin/homepage/stats" },
   { key: "instagramPost", label: "Feed Instagram", href: "/admin/homepage/instagram" },
-  { key: "contentBlock", label: "Teks halaman (judul section & label tombol)", href: "/admin/page-copy" },
-  { key: "branch", label: "Daftar cabang di halaman Contact", href: "/admin/branches" },
   { key: "galleryPhoto", label: "Foto galeri", href: "/admin/gallery" },
   { key: "retailProduct", label: "Produk KAMA Retail", href: "/admin/retail" },
-  { key: "staticPage", label: "Halaman di modul Halaman & URL", href: "/admin/pages" },
 ];
 
 /** Tempat konten yang masih nol baris, mengikuti urutan `CONTENT_SPOTS`. */

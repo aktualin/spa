@@ -5,7 +5,8 @@
 
 /**
  * Kolom `SiteSettings` milik modul Kontak & Umum. Kolom SEO (`gscVerification`,
- * `faviconUrl`, `defaultOgImageUrl`) sengaja tidak ada di sini: diedit modul SEO.
+ * `faviconUrl`, `defaultOgImageUrl`) sengaja tidak ada di sini: tidak punya
+ * editor admin — metadata dihasilkan otomatis dan nilainya dibaca apa adanya.
  */
 export type SiteSettingsRow = {
   address: string | null;

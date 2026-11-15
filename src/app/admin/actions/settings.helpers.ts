@@ -56,8 +56,9 @@ export function readSiteSettingsInput(formData: FormData): SiteSettingsInput {
     footerMembershipLearnHref: field("footerMembershipLearnHref"),
     footerPrivacyHref: field("footerPrivacyHref"),
     footerTermsHref: field("footerTermsHref"),
-    // Kolom SEO teks diedit modul SEO (/admin/seo/settings), bukan form ini.
-    // Nilai kosong hanya agar schema lengkap; penulisannya dikecualikan di bawah.
+    // Kolom SEO teks tidak punya editor admin (metadata otomatis); nilainya
+    // dibiarkan apa adanya di DB. Nilai kosong hanya agar schema lengkap;
+    // penulisannya dikecualikan di bawah.
     seoSiteName: "",
     seoDefaultTitle: "",
     seoDefaultDescription: "",

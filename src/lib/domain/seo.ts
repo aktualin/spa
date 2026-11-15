@@ -1,6 +1,6 @@
 /**
- * Aturan SEO murni (tanpa I/O) — dipakai metadata publik, sitemap, robots,
- * dan dashboard `/admin/seo`. Diuji di `tests/unit/seo.test.mts`.
+ * Aturan SEO murni (tanpa I/O) — dipakai metadata publik, sitemap, dan robots.
+ * Diuji di `tests/unit/seo.test.mts`.
  * Implementasinya dipecah ke berkas `seo.*.ts` di folder ini; berkas ini
  * hanya mengekspor ulang simbol publiknya.
  */

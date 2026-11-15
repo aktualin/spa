@@ -8,10 +8,7 @@ export const SEO_ROUTES_MAIN: readonly PublicStaticRoute[] = [
     priority: 1,
     changeFrequency: "weekly",
     group: "home",
-    contentModules: [
-      { label: "Homepage & Our Story", href: "/admin/homepage" },
-      { label: "Teks Halaman", href: "/admin/page-copy" },
-    ],
+    contentModules: [{ label: "Homepage & Our Story", href: "/admin/homepage" }],
   },
   {
     path: "/treatments",

@@ -24,11 +24,11 @@ const FALLBACK_KEYWORDS = [
 ];
 
 /**
- * Metadata root. Favicon, gambar OG bawaan, verifikasi Google Search Console,
- * dan teks SEO global (nama situs, judul/deskripsi bawaan, OG, locale,
- * template judul, keywords) dibaca dari `/admin/seo/settings` + Kontak & Umum
- * lewat fungsi `"use cache"`, jadi perubahan tampil tanpa redeploy dan situs
- * tetap bisa di-prerender. Kolom yang kosong jatuh ke konstanta domain/seo.
+ * Metadata root — otomatis, tanpa modul admin SEO. Favicon, gambar OG bawaan,
+ * verifikasi Google Search Console, dan teks SEO global (nama situs,
+ * judul/deskripsi bawaan, OG, locale, template judul, keywords) dibaca dari
+ * baris `SiteSettings` lewat fungsi `"use cache"`; kolom yang kosong jatuh ke
+ * konstanta domain/seo, jadi situs selalu punya metadata lengkap.
  *
  * Canonical SENGAJA tidak diset di sini: nilai root diwarisi semua halaman
  * yang tidak mengisinya sendiri, dan canonical "/" di halaman lain menyuruh

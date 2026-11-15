@@ -24,7 +24,6 @@ export type AdminModule = {
 export const ADMIN_GROUPS: readonly AccessGroup[] = [
   { id: "katalog", label: "Katalog & Harga" },
   { id: "konten", label: "Konten Situs" },
-  { id: "struktur", label: "Halaman & Navigasi" },
   { id: "analitik", label: "Analitik" },
   { id: "sistem", label: "Pengaturan Sistem" },
 ];

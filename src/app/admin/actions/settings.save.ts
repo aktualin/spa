@@ -14,7 +14,8 @@ import { readSiteSettingsInput, type SiteSettingsFormState } from "./settings.he
 /**
  * Simpan Kontak & Umum. Hanya kolom milik modul ini yang ditulis; kolom SEO
  * (`gscVerification`, `faviconUrl`, `defaultOgImageUrl`, dan teks SEO bawaan)
- * tidak disentuh — teks SEO diedit lewat /admin/seo/settings.
+ * tidak disentuh — metadata dihasilkan otomatis dan jatuh ke konstanta
+ * `src/lib/domain/seo.constants.ts` bila kolomnya kosong.
  */
 export async function saveSiteSettingsAction(
   prevState: SiteSettingsFormState,

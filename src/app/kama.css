@@ -36,6 +36,11 @@
   --kama-gray-03: #93837a;
 }
 
+input[type="checkbox"] {
+  -webkit-appearance: checkbox;
+  appearance: auto;
+}
+
 /* ---- Hiatus design-system remap to KAMA palette ---------------------- */
 /* Loaded after hiatus.css, so these override the Webflow tokens. */
 

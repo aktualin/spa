@@ -23,18 +23,18 @@ import { ADMIN_GROUPS, type AdminModule } from "./modules.types.ts";
  * Matriks akses:
  * - ADMIN & EDITOR (CONTENT_ROLES): semua modul konten — treatment, harga,
  *   gallery, media, promo, membership, journal, events, retail, corporate,
- *   homepage, halaman & URL, menu navigasi, SEO per halaman.
+ *   homepage.
  * - ADMIN saja (ADMIN_ONLY_ROLES): modul pengaturan sistem —
  *   - Pengguna Admin: membuat akun & memberi role = bisa menaikkan hak akses.
  *   - Kontak & Umum (termasuk Template WhatsApp): nomor WhatsApp, email,
- *     tautan booking, ID Google Analytics, verifikasi Search Console, favicon.
- *     Satu salah isi merusak semua tombol booking/WhatsApp atau pelacakan di
- *     seluruh situs, dan ID GA4/GSC menyuntikkan skrip pihak ketiga.
+ *     tautan booking, ID Google Analytics. Satu salah isi merusak semua
+ *     tombol booking/WhatsApp atau pelacakan di seluruh situs, dan ID GA4
+ *     menyuntikkan skrip pihak ketiga.
  *   - Backup & Status: mengunduh salinan database (berisi data inquiry dan
  *     data pribadi) serta melihat status sistem.
- * SEO per halaman tetap untuk EDITOR karena isinya teks judul/deskripsi yang
- * ditulis bersama kontennya; pengaturan SEO global (GA4/GSC/OG bawaan) ada di
- * Kontak & Umum yang khusus ADMIN.
+ * SEO tidak punya modul admin: metadata dihasilkan otomatis (Metadata API di
+ * `src/app/layout-metadata.ts` + `withPageSeo`), `/robots.txt` dari
+ * `src/app/robots.ts`, dan `/sitemap.xml` dari `src/app/sitemap.ts`.
  *
  * Path admin yang tidak tercakup modul mana pun dianggap khusus ADMIN
  * (fail-closed) — daftarkan halaman baru di sini. Logika pencocokan path:

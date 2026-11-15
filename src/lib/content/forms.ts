@@ -1,8 +1,7 @@
 /**
- * Bacaan teks formulir reservasi dari ContentBlock
- * (grup "forms" di /admin/page-copy). Tanpa fallback statis: blok yang
- * belum diisi bernilai kosong dan form menampilkan label kosong sampai
- * admin mengisinya (seed mengisi nilai awal berbahasa Indonesia).
+ * Bacaan teks formulir reservasi dari ContentBlock (grup "forms"). Tanpa
+ * fallback statis: nilainya datang dari seed/migrasi dan dibaca apa adanya —
+ * tidak ada editor admin untuk ContentBlock.
  */
 import { cacheLife, cacheTag } from "next/cache";
 

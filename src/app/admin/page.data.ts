@@ -53,21 +53,15 @@ export async function contentSpotCounts(): Promise<Record<string, number>> {
     homepageReview,
     homepageStat,
     instagramPost,
-    contentBlock,
-    branch,
     galleryPhoto,
     retailProduct,
-    staticPage,
   ] = await Promise.all([
     prisma.homepageHighlight.count(),
     prisma.homepageReview.count(),
     prisma.homepageStat.count(),
     prisma.instagramPost.count(),
-    prisma.contentBlock.count(),
-    prisma.branch.count(),
     prisma.galleryPhoto.count(),
     prisma.retailProduct.count(),
-    prisma.staticPage.count(),
   ]);
 
   return {
@@ -75,10 +69,7 @@ export async function contentSpotCounts(): Promise<Record<string, number>> {
     homepageReview,
     homepageStat,
     instagramPost,
-    contentBlock,
-    branch,
     galleryPhoto,
     retailProduct,
-    staticPage,
   };
 }

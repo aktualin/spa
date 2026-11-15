@@ -89,7 +89,6 @@ const REQUIRED_ROUTES = [
   "admin/our-story",
   "admin/settings/contact",
   "admin/settings/whatsapp",
-  "admin/seo",
   "admin/users",
 ];
 

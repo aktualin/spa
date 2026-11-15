@@ -62,9 +62,6 @@ describe("BUILD-17 — matriks role → modul", () => {
       "/admin/corporate/programs/1",
       "/admin/homepage/highlights/1",
       "/admin/our-story",
-      "/admin/pages/new",
-      "/admin/redirects",
-      "/admin/seo/1",
     ]) {
       assert.equal(canAccessPath("EDITOR", path), true, path);
       assert.equal(canAccessPath("ADMIN", path), true, path);
@@ -110,7 +107,7 @@ describe("BUILD-17 — sidebar sesuai role", () => {
     assert.ok(!labels.includes("Kontak & Umum"));
     assert.ok(!labels.includes("Backup & Status"));
     assert.ok(labels.includes("Journal"));
-    assert.ok(labels.includes("SEO"));
+    assert.ok(!labels.includes("SEO"));
   });
 
   it("ADMIN melihat semua modul", () => {

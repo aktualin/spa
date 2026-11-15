@@ -33,14 +33,14 @@ export const DESCRIBE: Record<string, { select: Record<string, true>; name: (r: 
   retailProduct: { select: { id: true, name: true }, name: (r) => str(r.name), href: (r) => `/admin/retail/${str(r.id)}` },
   homepageSection: { select: { id: true, title: true, key: true }, name: (r) => str(r.title) || str(r.key), href: () => "/admin/homepage" },
   ourStoryContent: { select: { id: true, heroTitle: true }, name: (r) => str(r.heroTitle) || "Our Story", href: () => "/admin/our-story" },
-  pageSeo: { select: { id: true, path: true }, name: (r) => str(r.path), href: (r) => `/admin/seo/${str(r.id)}` },
+  pageSeo: { select: { id: true, path: true }, name: (r) => str(r.path), href: (r) => str(r.path) || "/" },
   corporateContent: { select: { id: true, heroTitle: true }, name: (r) => str(r.heroTitle) || "Corporate Wellness", href: () => "/admin/corporate" },
-  staticPage: { select: { id: true, title: true }, name: (r) => str(r.title), href: (r) => `/admin/pages/${str(r.id)}` },
+  staticPage: { select: { id: true, title: true, slug: true }, name: (r) => str(r.title), href: (r) => `/${str(r.slug)}` },
   corporateProgram: { select: { id: true, name: true }, name: (r) => str(r.name), href: () => "/admin/corporate" },
   corporateClient: { select: { id: true, name: true }, name: (r) => str(r.name), href: () => "/admin/corporate" },
   homepageHighlight: { select: { id: true, title: true }, name: (r) => str(r.title), href: () => "/admin/homepage" },
   instagramPost: { select: { id: true, imageAlt: true }, name: (r) => str(r.imageAlt) || "Foto feed Instagram", href: () => "/admin/homepage" },
-  siteSettings: { select: { id: true }, name: () => "Pengaturan situs", href: () => "/admin/seo" },
+  siteSettings: { select: { id: true }, name: () => "Pengaturan situs", href: () => "/admin/settings/contact" },
 };
 
 export const strList = (value: unknown) =>
