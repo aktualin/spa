@@ -83,6 +83,17 @@ export const CONTENT_MODULES: readonly AdminModule[] = [
     ready: true,
   },
   {
+    // Modul tambahan di luar 14 modul Lampiran I; nomor 23 hanya penanda unik.
+    no: 23,
+    label: "Tamu",
+    href: "/admin/guests",
+    group: "konten",
+    hint: "Pencatatan data tamu dan atribut tambahannya — internal, tidak tampil di situs publik.",
+    roles: CONTENT_ROLES,
+    ready: true,
+    children: [{ label: "Tambah tamu", href: "/admin/guests/new" }],
+  },
+  {
     // Modul tambahan di luar 14 modul Lampiran I; nomor 16 hanya penanda unik.
     no: 16,
     label: "Media Library",
