@@ -27,11 +27,22 @@ export type Mode = "visual" | "html" | "preview";
  * Sengaja tanpa dependency: `contentEditable` + `execCommand` cukup untuk
  * kebutuhan konten situs ini.
  */
-export function useRichTextEditor(defaultValue: string) {
+export function useRichTextEditor(
+  defaultValue: string,
+  onHtmlChange?: (html: string) => void,
+) {
   const editorRef = useRef<HTMLDivElement>(null);
   // Teks polos lama ditampilkan sebagai paragraf agar langsung bisa diformat.
   const [html, setHtml] = useState(() => toSafeHtml(defaultValue));
   const [mode, setMode] = useState<Mode>("visual");
+
+  // Laporkan HTML terbaru ke pemakai (mis. panel pratinjau split-view) tanpa
+  // menjadikan callback-nya dependency effect.
+  const changeRef = useRef(onHtmlChange);
+  useEffect(() => {
+    changeRef.current = onHtmlChange;
+    changeRef.current?.(html);
+  });
 
   // Isi editor visual hanya ditulis saat (kembali) masuk mode visual, supaya
   // posisi kursor tidak melompat setiap kali mengetik.

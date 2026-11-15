@@ -31,6 +31,10 @@ for (const file of PAGES) {
   // Halaman admin memakai layout dashboard sendiri, bukan Navigation/Footer publik.
   if (rel.startsWith(join("admin", ""))) continue;
 
+  // Route pratinjau (iframe split-view editor halaman) sengaja tanpa
+  // Navigation/Footer — bukan halaman publik.
+  if (rel.startsWith(join("preview", ""))) continue;
+
   // Rute dinamis memakai `<DeferredNavigation />` (Navigation di dalam
   // Suspense) supaya shell-nya tetap bisa di-prerender.
   const hasNav =

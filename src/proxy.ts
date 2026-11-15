@@ -26,6 +26,12 @@ export async function proxy(request: NextRequest, event: NextFetchEvent) {
     return guardAdminApi(request);
   }
 
+  // Pratinjau halaman admin (iframe split-view editor): guard sesi yang sama
+  // dengan /admin — bukan halaman publik, tidak dicatat analitik.
+  if (pathname === "/preview" || pathname.startsWith("/preview/")) {
+    return guardAdminPage(request);
+  }
+
   if (pathname !== "/admin" && !pathname.startsWith("/admin/")) {
     const handled =
       (await applyRedirect(request)) ??
@@ -49,6 +55,7 @@ export const config = {
   matcher: [
     "/admin/:path*",
     "/api/admin/:path*",
+    "/preview/:path*",
     // Halaman publik saja: tanpa /api, aset Next, folder img, dan berkas berekstensi.
     "/((?!api(?:/|$)|_next/|img/|favicon\\.ico$|.*\\.\\w+$).*)",
   ],

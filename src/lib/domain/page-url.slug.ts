@@ -24,6 +24,7 @@ export const RESERVED_ROOT_SEGMENTS: readonly string[] = [
   "membership",
   "menu",
   "our-story",
+  "preview",
   "promos",
   "retail",
   "treatments",

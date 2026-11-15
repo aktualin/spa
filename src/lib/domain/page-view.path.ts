@@ -14,7 +14,7 @@ const EXCLUDED_EXACT = new Set([
   "/sitemap.xml",
   "/manifest.webmanifest",
 ]);
-const EXCLUDED_PREFIXES = ["/admin", "/api", "/_next", "/img"];
+const EXCLUDED_PREFIXES = ["/admin", "/api", "/_next", "/img", "/preview"];
 
 /** Route metadata Next.js (gambar OG/ikon) bukan halaman yang dibaca orang. */
 const METADATA_IMAGE = /\/(?:opengraph-image|twitter-image|icon|apple-icon)$/;

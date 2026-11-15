@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getPage } from "../../actions/pages";
 import { getSiteUrl } from "@/lib/site-url";
 
-import { PageForm } from "../page-form";
+import { PageEditor } from "../page-editor";
 
 export const instant = false;
 
@@ -17,7 +17,7 @@ export default async function EditStaticPage({
   if (!page) notFound();
 
   return (
-    <PageForm
+    <PageEditor
       siteUrl={getSiteUrl()}
       menuUsage={page._count.menuItems}
       page={{

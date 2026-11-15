@@ -162,7 +162,7 @@ describe("favicon, robots, sitemap", () => {
     const robots = buildRobots("https://kamaspa.id", false);
     assert.equal(robots.sitemap, "https://kamaspa.id/sitemap.xml");
     const rule = (Array.isArray(robots.rules) ? robots.rules[0] : robots.rules)!;
-    assert.deepEqual(rule.disallow, ["/admin", "/admin/", "/api/"]);
+    assert.deepEqual(rule.disallow, ["/admin", "/admin/", "/api/", "/preview/"]);
     const blocked = buildRobots("https://kamaspa.id", true);
     assert.equal(blocked.sitemap, undefined);
   });

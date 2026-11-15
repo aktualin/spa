@@ -20,6 +20,7 @@ export function RichTextField({
   folder = "content",
   hint,
   compact = false,
+  onHtmlChange,
 }: {
   name: string;
   label: string;
@@ -29,8 +30,10 @@ export function RichTextField({
   hint?: string;
   /** Tinggi awal lebih pendek untuk deskripsi singkat. */
   compact?: boolean;
+  /** Dipanggil setiap HTML editor berubah (dipakai pratinjau split-view). */
+  onHtmlChange?: (html: string) => void;
 }) {
-  const editor = useRichTextEditor(defaultValue);
+  const editor = useRichTextEditor(defaultValue, onHtmlChange);
   const { editorRef, html, setHtml, mode, setMode, sync, run, insertHtml, insertImage, switchMode } = editor;
   const { fileRef, busy, error, uploadImage } = useInlineImageUpload(folder, insertImage);
   const [pickerOpen, setPickerOpen] = useState(false);

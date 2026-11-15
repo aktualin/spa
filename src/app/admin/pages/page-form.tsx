@@ -1,21 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 
-import { buildPreviewUrl, validatePageSlug } from "@/lib/domain/page-url";
+import type { PageDraft } from "@/lib/domain/page-preview";
 
 import { savePageAction } from "../actions/pages";
 import { RichTextField } from "../rich-text-field";
 import { ErrorMessage, SaveButton } from "../settings/_components/form-ui";
-import {
-  initialState,
-  type PageFormData,
-  type PageStatusValue,
-  type PageTemplateValue,
-} from "./page-form.constants";
+import { useDraftEmitter } from "./page-form-draft";
+import { initialState, type PageFormData } from "./page-form.constants";
 import { PageSeoFields } from "./page-form-seo";
 import { TitleSlugFields } from "./page-form-slug";
+import { usePageFormState } from "./page-form-state";
 import { PageDeleteForm, PageFormHeader } from "./pages-form-parts";
 import { TemplateStatusFields } from "./page-form-template";
 
@@ -25,54 +22,52 @@ export function PageForm({
   page,
   siteUrl,
   menuUsage = 0,
+  onDraftChange,
 }: {
   page: PageFormData;
   siteUrl: string;
   /** Jumlah item menu navigasi yang menunjuk halaman ini. */
   menuUsage?: number;
+  /** Dipanggil setiap isian berubah — dipakai panel pratinjau split-view. */
+  onDraftChange?: (draft: PageDraft) => void;
 }) {
   const [state, formAction] = useActionState(savePageAction, initialState);
+  const form = usePageFormState(page, siteUrl);
 
-  const isNew = page.id === null;
-  const [title, setTitle] = useState(page.title);
-  const [slug, setSlug] = useState(page.slug);
-  const [slugEdited, setSlugEdited] = useState(!isNew || page.slug !== "");
-  const [template, setTemplate] = useState<PageTemplateValue>(page.template);
-  const [status, setStatus] = useState<PageStatusValue>(page.status);
-  const [seoTitle, setSeoTitle] = useState(page.seoTitle);
-  const [seoDescription, setSeoDescription] = useState(page.seoDescription);
-
-  const slugError = slug === "" && !slugEdited ? null : validatePageSlug(slug);
-  const previewUrl = buildPreviewUrl(siteUrl, slug);
-  const slugChanged =
-    page.wasPublished && !isNew && slug !== page.slug && slugError === null;
+  useDraftEmitter(onDraftChange, {
+    title: form.title,
+    template: form.template,
+    status: form.status,
+    seoDescription: form.seoDescription,
+    bodyHtml: form.bodyHtml,
+  });
 
   return (
     <div className="mx-auto max-w-2xl">
-      <PageFormHeader isNew={isNew} title={page.title} />
+      <PageFormHeader isNew={form.isNew} title={page.title} />
 
       <form action={formAction} className="mt-6 space-y-5">
         {page.id ? <input type="hidden" name="id" value={page.id} /> : null}
 
         <TitleSlugFields
           page={page}
-          isNew={isNew}
-          title={title}
-          setTitle={setTitle}
-          slug={slug}
-          setSlug={setSlug}
-          slugEdited={slugEdited}
-          setSlugEdited={setSlugEdited}
-          slugError={slugError}
-          previewUrl={previewUrl}
-          slugChanged={slugChanged}
+          isNew={form.isNew}
+          title={form.title}
+          setTitle={form.setTitle}
+          slug={form.slug}
+          setSlug={form.setSlug}
+          slugEdited={form.slugEdited}
+          setSlugEdited={form.setSlugEdited}
+          slugError={form.slugError}
+          previewUrl={form.previewUrl}
+          slugChanged={form.slugChanged}
         />
 
         <TemplateStatusFields
-          template={template}
-          setTemplate={setTemplate}
-          status={status}
-          setStatus={setStatus}
+          template={form.template}
+          setTemplate={form.setTemplate}
+          status={form.status}
+          setStatus={form.setStatus}
           menuUsage={menuUsage}
         />
 
@@ -81,13 +76,14 @@ export function PageForm({
           label="Isi halaman"
           defaultValue={page.bodyHtml}
           folder="pages"
+          onHtmlChange={form.setBodyHtml}
         />
 
         <PageSeoFields
-          seoTitle={seoTitle}
-          setSeoTitle={setSeoTitle}
-          seoDescription={seoDescription}
-          setSeoDescription={setSeoDescription}
+          seoTitle={form.seoTitle}
+          setSeoTitle={form.setSeoTitle}
+          seoDescription={form.seoDescription}
+          setSeoDescription={form.setSeoDescription}
         />
 
         <ErrorMessage error={state.error} />

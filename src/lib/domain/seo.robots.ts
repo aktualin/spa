@@ -16,7 +16,7 @@ export function buildRobots(siteUrl: string, noindex: boolean): MetadataRoute.Ro
     return { rules: [{ userAgent: "*", disallow: "/" }] };
   }
   return {
-    rules: [{ userAgent: "*", allow: "/", disallow: ["/admin", "/admin/", "/api/"] }],
+    rules: [{ userAgent: "*", allow: "/", disallow: ["/admin", "/admin/", "/api/", "/preview/"] }],
     sitemap: `${siteUrl}/sitemap.xml`,
     host: siteUrl,
   };
