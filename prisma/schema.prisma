@@ -1049,3 +1049,40 @@ model PageView {
   @@index([path, createdAt])
   @@index([visitorId, createdAt])
 }
+
+/**
+ * ---------- Modul 23: Pencatatan Tamu ----------
+ */
+
+// Data utama tamu. Kolom memakai nama snake_case sesuai spesifikasi tabel
+// Supabase (migration `guest_management`): id UUID default gen_random_uuid(),
+// CHECK jenis_kelamin ('Laki-laki'|'Perempuan'|'Lainnya') dipasang di SQL
+// migration — Prisma tidak mengelola CHECK constraint, jadi validasi enum
+// dilakukan zod di src/lib/domain/guests.ts.
+model Guest {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nama         String?
+  umur         Int?
+  jenisKelamin String?  @map("jenis_kelamin")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  attributes GuestAttribute[]
+
+  @@index([createdAt])
+  @@map("guests")
+}
+
+// Atribut tambahan tamu berpola key-value (contoh key: 'tanggal_lahir',
+// 'warna_rambut', 'alergi'). Satu key hanya boleh muncul sekali per tamu.
+model GuestAttribute {
+  id      String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  guestId String  @map("guest_id") @db.Uuid
+  key     String
+  value   String?
+
+  guest Guest @relation(fields: [guestId], references: [id], onDelete: Cascade)
+
+  @@unique([guestId, key])
+  @@map("guest_attributes")
+}
