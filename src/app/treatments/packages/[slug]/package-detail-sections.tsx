@@ -18,7 +18,7 @@ export function PackageIncludes({
   return (
     <Reveal as="section" className="bg-cream">
       <div className="container-kama py-14 md:py-16 lg:py-20">
-        <h2 className="font-title italic text-title md:text-[2.375rem] md:leading-[1.2]">
+        <h2 className=" italic text-title md:text-[2.375rem] md:leading-[1.2]">
           {copy(pageCopy, "catalog.package.includes_title")}
         </h2>
         <ul className="mt-8 flex max-w-[48rem] flex-col">
@@ -59,7 +59,7 @@ export function OtherPackages({
   return (
     <Reveal as="section" className="bg-cream-soft">
       <div className="container-kama py-14 md:py-16 lg:py-20">
-        <h2 className="font-title italic text-title md:text-[2.375rem] md:leading-[1.2]">
+        <h2 className=" italic text-title md:text-[2.375rem] md:leading-[1.2]">
           {copy(pageCopy, "catalog.package.others_title")}
         </h2>
         <div className="w-layout-grid whats-new_list mt-8">

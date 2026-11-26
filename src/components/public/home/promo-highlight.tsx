@@ -37,7 +37,7 @@ export async function PromoHighlightSection({ copyBlocks }: { copyBlocks: PageCo
             <span className="eyebrow text-cocoa/60">
               {promo ? promoEyebrow : eventEyebrow}
             </span>
-            <h2 className="font-title italic text-title md:text-[2.375rem] md:leading-[1.2]">
+            <h2 className=" italic text-title md:text-[2.375rem] md:leading-[1.2]">
               {promo ? promo.title : event?.title}
             </h2>
             <p className="max-w-[52ch] text-body text-cocoa/70">

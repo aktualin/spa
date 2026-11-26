@@ -17,7 +17,7 @@ export function BookingBanner({ section }: BannerProps) {
       <div className="container-kama py-12 md:py-16">
         <div className="flex flex-col items-center gap-6 bg-cream-card px-6 py-10 text-center md:flex-row md:justify-between md:gap-8 md:px-12 md:py-14 md:text-left">
           {title ? (
-            <h2 className="font-title italic text-title md:text-[2.375rem] md:leading-[1.2]">
+            <h2 className=" italic text-title md:text-[2.375rem] md:leading-[1.2]">
               {title}
             </h2>
           ) : null}

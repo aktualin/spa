@@ -17,7 +17,7 @@ export function EventDetailBody({
     <Reveal as="section" className="bg-cream-soft">
       <div className="container-kama py-14 md:py-16 lg:py-20">
         <div className="flex flex-col gap-6">
-          <h2 className="font-title italic text-title md:text-[2.375rem] md:leading-[1.2]">
+          <h2 className=" italic text-title md:text-[2.375rem] md:leading-[1.2]">
             {copy(pageCopy, "events.detail.title")}
           </h2>
           {event.description ? (

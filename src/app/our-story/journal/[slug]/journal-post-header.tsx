@@ -37,7 +37,7 @@ export function JournalPostHeader({
                 <span className="text-caption text-cocoa/50">{published}</span>
               ) : null}
             </div>
-            <h1 className="font-title italic text-title md:text-[2.375rem] md:leading-[1.2]">
+            <h1 className=" italic text-title md:text-[2.375rem] md:leading-[1.2]">
               {post.title}
             </h1>
             {post.excerpt ? (

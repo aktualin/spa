@@ -66,7 +66,7 @@ export async function PromoDetailContent({ params }: PromoDetailPageProps) {
         <div className="container-kama py-14 md:py-16 lg:py-20">
           <div className="flex flex-col gap-8">
             <div className="flex flex-col gap-4">
-              <h2 className="font-title italic text-title md:text-[2.375rem] md:leading-[1.2]">
+              <h2 className=" italic text-title md:text-[2.375rem] md:leading-[1.2]">
                 {copy(pageCopy, "promos.detail.title")}
               </h2>
               {promo.description ? (

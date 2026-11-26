@@ -29,7 +29,7 @@ export function TestimonialsSection({
       <div className="container-kama py-14 md:py-16 lg:py-20">
         {eyebrow ? <span className="eyebrow text-cocoa/60">{eyebrow}</span> : null}
         {heading ? (
-          <h2 className="font-title italic text-title md:text-[2.375rem] md:leading-[1.2]">
+          <h2 className=" italic text-title md:text-[2.375rem] md:leading-[1.2]">
             {heading}
           </h2>
         ) : null}

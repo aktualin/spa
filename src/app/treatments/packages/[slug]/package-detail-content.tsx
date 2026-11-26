@@ -51,7 +51,7 @@ export async function PackageDetailContent({ params }: PackagePageProps) {
                 {copy(pageCopy, "catalog.package.back")}
               </BackLink>
               <span className="eyebrow text-cocoa/60">{copy(pageCopy, "catalog.package.eyebrow")}</span>
-              <h1 className="font-title italic text-title md:text-[2.375rem] md:leading-[1.2]">
+              <h1 className=" italic text-title md:text-[2.375rem] md:leading-[1.2]">
                 {pkg.name}
               </h1>
               <RichText value={pkg.description} className="max-w-[52ch] text-lead text-cocoa/70" />

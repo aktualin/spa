@@ -16,7 +16,7 @@ export function JournalPostOthers({
   return (
     <Reveal as="section" className="bg-cream-soft">
       <div className="container-kama py-14 md:py-16 lg:py-20">
-        <h2 className="font-title italic text-title md:text-[2.375rem] md:leading-[1.2]">
+        <h2 className=" italic text-title md:text-[2.375rem] md:leading-[1.2]">
           {copy(pageCopy, "journal.detail.others_title")}
         </h2>
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
