@@ -22,9 +22,11 @@ export function LocationMap({
     const L = (window as any).L;
     if (!L) return;
 
+    // Satu lokasi → zoom tingkat jalan; beberapa cabang → zoom kawasan.
+    const zoom = branches.length === 1 ? 15 : 13;
     const map = L.map(mapRef.current).setView(
       [center.latitude, center.longitude],
-      13,
+      zoom,
     );
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {

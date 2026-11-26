@@ -27,10 +27,13 @@ export default async function ContactPage() {
     getFormsCopy(),
     getReservationServices(),
   ]);
+  // Halaman kontak hanya menampilkan cabang pertama (urutan admin): satu
+  // alamat + peta berdampingan. Cabang lain tetap tersedia di /reservation.
+  const visibleBranches = branches.slice(0, 1);
   // Link WA per cabang (template "location" + alamat); null bila belum ada
   // nomor di cabang maupun di pengaturan situs → tombol kartu disembunyikan.
   const branchWaHrefs = await Promise.all(
-    branches.map((branch) =>
+    visibleBranches.map((branch) =>
       branchWhatsAppHref({
         address: branch.address,
         whatsappNumber: branch.whatsappNumber,
@@ -58,14 +61,14 @@ export default async function ContactPage() {
         </Reveal>
 
         <ContactLocations
-          branches={branches}
+          branches={visibleBranches}
           branchWaHrefs={branchWaHrefs}
           settings={settings}
           pageCopy={pageCopy}
         />
         <ContactReservation
           reservation={formsCopy.reservation}
-          branches={branches}
+          branches={visibleBranches}
           services={services}
         />
 

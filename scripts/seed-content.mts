@@ -160,7 +160,7 @@ export const CONTENT_BLOCKS: { key: string; value: string }[] = [
     value:
       "Reserve your treatment, or just drop us a line — we'll help you find the right ritual for what you need today.",
   },
-  { key: "contact.locations.title", value: "Our Locations" },
+  { key: "contact.locations.title", value: "Our Location" },
   {
     key: "contact.locations.empty",
     value:

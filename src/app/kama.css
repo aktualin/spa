@@ -1404,6 +1404,7 @@ html[data-js="true"] .kama-reveal.is-visible {
 .package-card,
 .location-card_component,
 .contact-card,
+.contact-info-card,
 .benefits_card,
 .whats-new_card,
 .review_card {
@@ -1413,6 +1414,7 @@ html[data-js="true"] .kama-reveal.is-visible {
 .treatment-card,
 .package-card,
 .contact-card,
+.contact-info-card,
 .benefits_card,
 .whats-new_card,
 .review_card {
