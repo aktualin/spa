@@ -85,3 +85,7 @@ export async function corporateWhatsAppHref(
   const number = normalizeWaNumber(picPhone) ?? siteNumber;
   return number ? buildWhatsAppLink(message, number) : null;
 }
+
+/* Link WhatsApp kantor (footer "Connect With Us") — implementasi di sibling;
+   nomornya sendiri, tidak pernah fallback ke nomor booking di atas. */
+export { officeWhatsAppHref } from "./whatsapp.office";

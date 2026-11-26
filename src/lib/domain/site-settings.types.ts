@@ -9,6 +9,9 @@ export type SiteSettings = {
   openingHours: string[];
   /** Digit saja, format internasional (mis. `6281316052040`). */
   whatsappNumber: string;
+  /** Digit WhatsApp kantor (mis. `6281188072287`) — hanya untuk footer
+   * "Connect With Us", terpisah dari nomor booking; kosong → baris disembunyikan. */
+  officeWhatsappNumber: string;
   email: string;
   phone: string;
   instagramUrl: string;

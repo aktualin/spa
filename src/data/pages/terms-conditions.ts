@@ -59,7 +59,7 @@ export const termsConditions: { intro: string; sections: PolicySection[] } = {
     {
       title: "Contact Us",
       paragraphs: [
-        "For questions about these terms, contact us at hello@kamaspa.id or +62 813-1605-2040, or visit KAMA Spa in Kramat Pela, South Jakarta.",
+        "For questions about these terms, contact us at marketing@kamaspa.id or +62 813-1605-2040, or visit KAMA Spa in Kramat Pela, South Jakarta.",
       ],
     },
   ],

@@ -13,6 +13,7 @@ export type SiteSettingsRow = {
   mapsEmbedUrl: string | null;
   openingHours: string[];
   whatsappNumber: string | null;
+  officeWhatsappNumber: string | null;
   email: string | null;
   phone: string | null;
   instagramUrl: string | null;

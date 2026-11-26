@@ -5,6 +5,7 @@ export type SiteSettingsInput = {
   address: string;
   openingHours: string[];
   whatsappNumber: string;
+  officeWhatsappNumber: string;
   email: string;
   phone: string;
   instagramUrl: string;

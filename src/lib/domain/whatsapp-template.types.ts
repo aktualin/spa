@@ -9,7 +9,8 @@ export type WhatsAppContextKey =
   | "membership"
   | "retail"
   | "location"
-  | "event";
+  | "event"
+  | "office";
 
 export type WhatsAppPlaceholder = {
   /** Nama placeholder tanpa kurung kurawal. */

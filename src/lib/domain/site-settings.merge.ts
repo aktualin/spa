@@ -41,6 +41,8 @@ export function mergeSiteSettings(row: SiteSettingsRow | null): SiteSettings {
     address: text(row.address),
     openingHours: normalizeOpeningHours(row.openingHours ?? []),
     whatsappNumber: normalizeWhatsAppNumber(text(row.whatsappNumber)) ?? "",
+    officeWhatsappNumber:
+      normalizeWhatsAppNumber(text(row.officeWhatsappNumber)) ?? "",
     email: text(row.email),
     phone: text(row.phone),
     instagramUrl,

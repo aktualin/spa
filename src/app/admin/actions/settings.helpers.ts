@@ -26,6 +26,7 @@ export function readSiteSettingsInput(formData: FormData): SiteSettingsInput {
     address: field("address"),
     openingHours: readOpeningHours(formData),
     whatsappNumber: field("whatsappNumber"),
+    officeWhatsappNumber: field("officeWhatsappNumber"),
     email: field("email"),
     phone: field("phone"),
     instagramUrl: field("instagramUrl"),

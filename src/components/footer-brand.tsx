@@ -1,25 +1,19 @@
 import type { SiteSettings } from "@/lib/content/site";
 import { footerSocials } from "@/lib/domain/site-settings";
 import { asset } from "@/lib/asset-url";
-import { Email, Facebook, Instagram, TikTok } from "./icons";
+import { FooterConnect, type OfficeWhatsApp } from "./footer-connect";
 
-/* One icon per social platform — never a generic link glyph. */
-const socialIcons = {
-  instagram: Instagram,
-  tiktok: TikTok,
-  facebook: Facebook,
-  email: Email,
-} as const;
-
-/** Kolom brand footer: lockup, sosial, tagline, dan email partnership. */
+/** Kolom brand footer: lockup, sosial + WA kantor, tagline, dan email partnership. */
 export function FooterBrand({
   settings,
   connectEyebrow,
   partnershipIntro,
+  officeWhatsApp,
 }: {
   settings: SiteSettings;
   connectEyebrow: string;
   partnershipIntro: string;
+  officeWhatsApp: OfficeWhatsApp | null;
 }) {
   // Ikon sosial dari Kontak & Umum; field kosong tidak ditampilkan.
   const socials = footerSocials(settings);
@@ -38,24 +32,8 @@ export function FooterBrand({
           <span className="eyebrow text-cream-soft/70">{connectEyebrow}</span>
         ) : null}
 
-        {/* Social + partnership — the icon matches the platform. */}
-        <div className="flex flex-wrap items-center gap-3">
-          {socials.map((social) => {
-            const Icon = socialIcons[social.icon];
-            return (
-              <a
-                key={social.label}
-                href={social.href}
-                target={social.icon === "email" ? undefined : "_blank"}
-                rel="noopener noreferrer"
-                aria-label={social.label}
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-cream-soft/40 transition-colors hover:bg-cream-soft hover:text-cocoa"
-              >
-                <Icon className="h-5 w-5" />
-              </a>
-            );
-          })}
-        </div>
+        {/* Sosial + WhatsApp kantor — ikon cocok per platform (footer-connect.tsx). */}
+        <FooterConnect socials={socials} officeWhatsApp={officeWhatsApp} />
 
         {settings.footerTagline ? (
           <p className="max-w-[46ch] font-display text-title-lg text-cream-soft md:text-[1.75rem] md:leading-[1.4]">

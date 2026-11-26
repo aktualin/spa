@@ -777,6 +777,9 @@ model SiteSettings {
   openingHours String[]
 
   whatsappNumber String?
+  // WhatsApp kantor — tampil di footer "Connect With Us"; TERPISAH dari
+  // whatsappNumber (nomor booking: tombol melayang, tombol reservasi).
+  officeWhatsappNumber String?
   email          String?
   phone          String?
 

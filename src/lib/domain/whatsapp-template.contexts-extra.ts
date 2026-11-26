@@ -1,4 +1,4 @@
-/** Konteks template: retail, cabang, event. */
+/** Konteks template: retail, cabang, event, kantor. */
 import type { WhatsAppContextDefinition } from "./whatsapp-template.types.ts";
 
 export const EXTRA_CONTEXTS: readonly WhatsAppContextDefinition[] = [
@@ -38,5 +38,12 @@ export const EXTRA_CONTEXTS: readonly WhatsAppContextDefinition[] = [
       { name: "event", description: "Judul event", sample: "Wellness Weekend" },
     ],
     primary: "event",
+  },
+  {
+    key: "office",
+    label: "WhatsApp kantor",
+    usedOn: "Tautan nomor WhatsApp kantor di footer “Connect With Us”.",
+    builtIn: "Hi KAMA, I'd like to speak with the office team",
+    placeholders: [],
   },
 ];

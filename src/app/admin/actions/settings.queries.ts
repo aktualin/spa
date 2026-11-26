@@ -19,6 +19,7 @@ export async function getContactSettingsRow() {
       mapsEmbedUrl: true,
       openingHours: true,
       whatsappNumber: true,
+      officeWhatsappNumber: true,
       email: true,
       phone: true,
       instagramUrl: true,

@@ -42,6 +42,27 @@ export function formatPhoneDisplay(digits: string): string {
   return `+62 ${groups.join("-")}`;
 }
 
+/**
+ * Tampilan lokal Indonesia untuk WhatsApp kantor di footer:
+ * `6281188072287` → `0811 8807 2287` (awalan 0, grup 3-4-4).
+ * Nomor non-Indonesia jatuh ke `formatPhoneDisplay`.
+ * Null-safe: kosong / tanpa digit → `""`.
+ */
+export function formatWhatsAppLocalDisplay(
+  digits: string | null | undefined,
+): string {
+  const clean = (digits ?? "").replace(/\D/g, "");
+  if (!clean) return "";
+  if (!clean.startsWith("62") || clean.length < 9) {
+    return formatPhoneDisplay(clean);
+  }
+  const local = clean.slice(2);
+  const groups = [local.slice(0, 3), local.slice(3, 7), local.slice(7)].filter(
+    Boolean,
+  );
+  return `0${groups.join(" ")}`;
+}
+
 /** Nomor telepon biasa: boleh angka, `+`, spasi, titik, tanda hubung, kurung. */
 export function isValidPhone(input: string): boolean {
   const raw = input.trim();

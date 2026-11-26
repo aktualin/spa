@@ -389,6 +389,7 @@ async function seedSiteSettings() {
     address: site.address,
     openingHours: [site.hours],
     whatsappNumber: site.phone.replace(/\D/g, ""),
+    officeWhatsappNumber: site.officeWhatsapp.replace(/\D/g, ""),
     email: site.email,
     phone: site.phone,
     instagramUrl: site.instagram,
@@ -430,6 +431,7 @@ async function seedSiteSettings() {
     if (!existing.address?.trim()) update.address = defaults.address;
     if (existing.openingHours.length === 0) update.openingHours = defaults.openingHours;
     if (!existing.whatsappNumber?.trim()) update.whatsappNumber = defaults.whatsappNumber;
+    if (!existing.officeWhatsappNumber?.trim()) update.officeWhatsappNumber = defaults.officeWhatsappNumber;
     if (!existing.email?.trim()) update.email = defaults.email;
     if (!existing.phone?.trim()) update.phone = defaults.phone;
     if (!existing.instagramUrl?.trim()) update.instagramUrl = defaults.instagramUrl;
@@ -489,8 +491,8 @@ async function seedPageSeo(prisma: PrismaClient): Promise<void> {
 }
 
 // Semua konteks (default, treatment, package, promo, gift, membership,
-// retail, location, event) diisi dari teks bawaan registry. Label & pesan
-// tidak ditimpa saat seed diulang — suntingan admin menang.
+// retail, location, event, office) diisi dari teks bawaan registry. Label &
+// pesan tidak ditimpa saat seed diulang — suntingan admin menang.
 async function seedWhatsAppTemplates() {
   for (const context of WHATSAPP_CONTEXTS) {
     await prisma.whatsAppTemplate.upsert({

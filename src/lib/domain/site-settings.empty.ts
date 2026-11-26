@@ -10,6 +10,7 @@ export function emptySiteSettings(): SiteSettings {
     address: "",
     openingHours: [],
     whatsappNumber: "",
+    officeWhatsappNumber: "",
     email: "",
     phone: "",
     instagramUrl: "",

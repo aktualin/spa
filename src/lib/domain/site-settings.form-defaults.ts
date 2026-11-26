@@ -48,6 +48,8 @@ export function siteSettingsFormDefaults(row: SiteSettingsRow | null): FormDefau
       address: pick(text(row.address), shown.address, "Alamat"),
       openingHours: hours.length > 0 ? hours : [...shown.openingHours],
       whatsappNumber: pick(text(row.whatsappNumber), shown.whatsappNumber, "Nomor WhatsApp"),
+      // Field opsional baru: tanpa pick/prefill — kosong berarti baris footer disembunyikan.
+      officeWhatsappNumber: text(row.officeWhatsappNumber),
       email: pick(text(row.email), shown.email, "Email"),
       phone: text(row.phone),
       instagramUrl: text(row.instagramUrl),

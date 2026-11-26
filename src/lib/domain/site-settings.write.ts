@@ -9,6 +9,7 @@ export function toSiteSettingsWrite(parsed: SiteSettingsParsed): SiteSettingsWri
     address: parsed.address,
     openingHours: parsed.openingHours,
     whatsappNumber: parsed.whatsappNumber,
+    officeWhatsappNumber: orNull(parsed.officeWhatsappNumber),
     email: parsed.email,
     phone: orNull(parsed.phone),
     instagramUrl: orNull(parsed.instagramUrl),

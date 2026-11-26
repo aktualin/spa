@@ -14,7 +14,7 @@ export function ContactFields({ values }: { values: SiteSettingsInput }) {
       <Field
         label="Nomor WhatsApp booking"
         htmlFor="whatsappNumber"
-        hint="Boleh ditulis 08xx atau +62xx; otomatis disimpan sebagai 628xx. Dipakai semua tombol WhatsApp di halaman kontak dan footer."
+        hint="Boleh ditulis 08xx atau +62xx; otomatis disimpan sebagai 628xx. Dipakai tombol WhatsApp booking: tombol melayang, drawer, reservasi, dan kartu cabang."
       >
         <input
           id="whatsappNumber"
@@ -23,6 +23,21 @@ export function ContactFields({ values }: { values: SiteSettingsInput }) {
           defaultValue={values.whatsappNumber}
           inputMode="tel"
           placeholder="081316052040"
+          className={inputClass}
+        />
+      </Field>
+
+      <Field
+        label="Nomor WhatsApp kantor (opsional)"
+        htmlFor="officeWhatsappNumber"
+        hint="Ditampilkan bersama nomornya (mis. 0811 8807 2287) di bagian “Connect With Us” footer. Terpisah dari nomor booking di atas — kosongkan untuk menyembunyikannya dari footer."
+      >
+        <input
+          id="officeWhatsappNumber"
+          name="officeWhatsappNumber"
+          defaultValue={values.officeWhatsappNumber}
+          inputMode="tel"
+          placeholder="081188072287"
           className={inputClass}
         />
       </Field>

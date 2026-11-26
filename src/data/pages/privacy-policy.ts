@@ -73,7 +73,7 @@ export const privacyPolicy: { intro: string; sections: PolicySection[] } = {
     {
       title: "Contact Us",
       paragraphs: [
-        "If you have questions about our privacy policy or would like to update your data, contact us at hello@kamaspa.id or +62 813-1605-2040.",
+        "If you have questions about our privacy policy or would like to update your data, contact us at marketing@kamaspa.id or +62 813-1605-2040.",
       ],
     },
   ],

@@ -6,6 +6,7 @@ import {
   directionsUrl,
   footerSocials,
   formatPhoneDisplay,
+  formatWhatsAppLocalDisplay,
   instagramUsernameFromUrl,
   isPlatformUrl,
   mergeSiteSettings,
@@ -27,7 +28,8 @@ const CURRENT_ROW: SiteSettingsRow = {
   mapsEmbedUrl: null,
   openingHours: ["Mon – Sun. 10 AM – 8 PM"],
   whatsappNumber: "6281316052040",
-  email: "hello@kamaspa.id",
+  officeWhatsappNumber: "6281188072287",
+  email: "marketing@kamaspa.id",
   phone: "+6281316052040",
   instagramUrl: "https://www.instagram.com/kama__spa",
   instagramUsername: null,
@@ -72,6 +74,7 @@ function input(overrides: Partial<SiteSettingsInput> = {}): SiteSettingsInput {
     address: "Jl. Barito I No.21",
     openingHours: ["Mon – Sun. 10 AM – 8 PM"],
     whatsappNumber: "0813-1605-2040",
+    officeWhatsappNumber: "0811-8807-2287",
     email: "Hello@KamaSpa.id",
     phone: "",
     instagramUrl: "",
@@ -139,6 +142,19 @@ describe("formatPhoneDisplay", () => {
   });
 });
 
+describe("formatWhatsAppLocalDisplay", () => {
+  it("format lokal 0… grup 3-4-4 untuk nomor Indonesia", () => {
+    assert.equal(formatWhatsAppLocalDisplay("6281188072287"), "0811 8807 2287");
+    assert.equal(formatWhatsAppLocalDisplay("6281316052040"), "0813 1605 2040");
+  });
+  it("null-safe; non-Indonesia jatuh ke formatPhoneDisplay", () => {
+    assert.equal(formatWhatsAppLocalDisplay(""), "");
+    assert.equal(formatWhatsAppLocalDisplay(null), "");
+    assert.equal(formatWhatsAppLocalDisplay(undefined), "");
+    assert.equal(formatWhatsAppLocalDisplay("6591234567"), "+6591234567");
+  });
+});
+
 describe("parseMapsEmbedInput", () => {
   it("menerima URL embed Google Maps", () => {
     assert.equal(parseMapsEmbedInput(EMBED), EMBED);
@@ -201,6 +217,7 @@ describe("siteSettingsInputSchema", () => {
       }),
     );
     assert.equal(parsed.whatsappNumber, "6281316052040");
+    assert.equal(parsed.officeWhatsappNumber, "6281188072287");
     assert.equal(parsed.email, "hello@kamaspa.id");
     assert.deepEqual(parsed.openingHours, ["Mon – Fri 10 AM – 8 PM", "Sat – Sun 9 AM – 9 PM"]);
     assert.equal(parsed.instagramUsername, "kama__spa");
@@ -219,6 +236,16 @@ describe("siteSettingsInputSchema", () => {
     assert.ok(!("faviconUrl" in write));
     assert.ok(!("defaultOgImageUrl" in write));
   });
+  it("WhatsApp kantor opsional: kosong → null saat ditulis, format dinormalkan", () => {
+    const parsed = siteSettingsInputSchema.parse(
+      input({ officeWhatsappNumber: "0811 8807 2287" }),
+    );
+    assert.equal(parsed.officeWhatsappNumber, "6281188072287");
+    assert.equal(toSiteSettingsWrite(parsed).officeWhatsappNumber, "6281188072287");
+    const blank = siteSettingsInputSchema.parse(input({ officeWhatsappNumber: "  " }));
+    assert.equal(blank.officeWhatsappNumber, "");
+    assert.equal(toSiteSettingsWrite(blank).officeWhatsappNumber, null);
+  });
   it("menolak field wajib kosong dan format salah", () => {
     const fail = (overrides: Partial<SiteSettingsInput>) =>
       assert.equal(siteSettingsInputSchema.safeParse(input(overrides)).success, false);
@@ -226,6 +253,8 @@ describe("siteSettingsInputSchema", () => {
     fail({ openingHours: ["", " "] });
     fail({ whatsappNumber: "" });
     fail({ whatsappNumber: "0812" });
+    fail({ officeWhatsappNumber: "0812" });
+    fail({ officeWhatsappNumber: "12ab" });
     fail({ email: "bukan-email" });
     fail({ instagramUrl: "http://www.instagram.com/kama" });
     fail({ tiktokUrl: "https://www.instagram.com/kama" });
@@ -352,6 +381,7 @@ describe("mergeSiteSettings & tampilan publik", () => {
     assert.equal(merged.address, site.address);
     assert.deepEqual(merged.openingHours, [site.hours]);
     assert.equal(merged.whatsappNumber, CURRENT_ROW.whatsappNumber);
+    assert.equal(merged.officeWhatsappNumber, "6281188072287");
     assert.equal(merged.instagramUrl, site.instagram);
     assert.equal(merged.instagramUsername, "kama__spa");
     assert.equal(merged.tiktokUrl, site.tiktok);
@@ -364,6 +394,7 @@ describe("mergeSiteSettings & tampilan publik", () => {
       address: " ",
       openingHours: [],
       whatsappNumber: "abc",
+      officeWhatsappNumber: "abc",
       email: null,
       tiktokUrl: null,
       instagramUrl: "",
@@ -372,6 +403,7 @@ describe("mergeSiteSettings & tampilan publik", () => {
     assert.equal(merged.address, "");
     assert.deepEqual(merged.openingHours, []);
     assert.equal(merged.whatsappNumber, "");
+    assert.equal(merged.officeWhatsappNumber, "");
     assert.equal(merged.email, "");
     assert.equal(merged.tiktokUrl, "");
     assert.equal(merged.instagramUrl, "");

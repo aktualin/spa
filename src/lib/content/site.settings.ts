@@ -28,6 +28,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
           mapsEmbedUrl: true,
           openingHours: true,
           whatsappNumber: true,
+          officeWhatsappNumber: true,
           email: true,
           phone: true,
           instagramUrl: true,

@@ -153,7 +153,7 @@ describe("BUILD-18 normalizeWaNumber", () => {
 });
 
 describe("BUILD-18 konteks & teks bawaan", () => {
-  it("sembilan konteks sistem tersedia", () => {
+  it("sepuluh konteks sistem tersedia", () => {
     assert.deepEqual(
       WHATSAPP_CONTEXTS.map((c) => c.key),
       [
@@ -166,11 +166,13 @@ describe("BUILD-18 konteks & teks bawaan", () => {
         "retail",
         "location",
         "event",
+        "office",
       ],
     );
     assert.ok(isSystemTemplateKey("promo"));
     assert.ok(isSystemTemplateKey("location"));
     assert.ok(isSystemTemplateKey("event"));
+    assert.ok(isSystemTemplateKey("office"));
     assert.ok(!isSystemTemplateKey("lainnya"));
   });
 
@@ -184,6 +186,10 @@ describe("BUILD-18 konteks & teks bawaan", () => {
       "Hi KAMA, is {{address}} open now, and can I make a reservation?",
     );
     assert.equal(builtInMessage("event"), "Hi KAMA, I'd like to join the {{event}} event");
+    assert.equal(
+      builtInMessage("office"),
+      "Hi KAMA, I'd like to speak with the office team",
+    );
   });
 
   it("placeholder retail menerima alias lama", () => {

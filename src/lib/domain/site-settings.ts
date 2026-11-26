@@ -18,6 +18,7 @@ export { emptySiteSettings } from "./site-settings.empty.ts";
 export {
   normalizeWhatsAppNumber,
   formatPhoneDisplay,
+  formatWhatsAppLocalDisplay,
   isValidPhone,
 } from "./site-settings.phone.ts";
 export {

@@ -39,6 +39,16 @@ export const contactFields = {
       "Nomor WhatsApp tidak valid. Tulis 08xx atau +62xx (8–15 digit, hanya angka).",
     )
     .transform((value) => normalizeWhatsAppNumber(value) as string),
+  officeWhatsappNumber: z
+    .string()
+    .trim()
+    .refine(
+      (value) => isBlank(value) || normalizeWhatsAppNumber(value) !== null,
+      "Nomor WhatsApp kantor tidak valid. Tulis 08xx atau +62xx (8–15 digit, hanya angka).",
+    )
+    .transform((value) =>
+      isBlank(value) ? "" : (normalizeWhatsAppNumber(value) as string),
+    ),
   email: z
     .string()
     .trim()
