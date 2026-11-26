@@ -26,6 +26,8 @@ const assetBaseUrl =
 
 const nextConfig: NextConfig = {
   env: { NEXT_PUBLIC_ASSET_BASE_URL: assetBaseUrl },
+  // Kebijakan upgrade agen: hanya advis keamanan yang memicu rekomendasi.
+  experimental: { agentUpgrade: "security" },
   cacheComponents: true,
   partialPrefetching: true,
   reactCompiler: true,
