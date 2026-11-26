@@ -35,7 +35,7 @@ export function HeroSlideMediaFields({
           <Field
             label="URL video"
             htmlFor="videoUrl"
-            hint="File langsung .mp4/.webm dari bucket S3, mis. https://…/storage/v1/object/public/vip-book/video/incense-smoke.mp4. Tautan halaman YouTube/Vimeo tidak didukung."
+            hint="File langsung .mp4/.webm dari bucket S3, mis. https://…/storage/v1/object/public/kama/video/incense-smoke.mp4. Tautan halaman YouTube/Vimeo tidak didukung."
           >
             <input
               id="videoUrl"
@@ -44,7 +44,7 @@ export function HeroSlideMediaFields({
               inputMode="url"
               defaultValue={slide.videoUrl}
               maxLength={HERO_SLIDE_LIMITS.videoUrl}
-              placeholder="https://…/vip-book/video/incense-smoke.mp4"
+              placeholder="https://…/kama/video/incense-smoke.mp4"
               autoComplete="off"
               className={inputClass}
             />
