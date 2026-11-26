@@ -995,6 +995,15 @@ video {
   grid-template-columns: auto 1fr;
 }
 
+/* Lockup navbar dari public/logo-kama-light.png. PNG-nya cream (varian latar
+   gelap), navbar cream — dipakai sebagai mask lalu diwarnai cocoa. */
+.kama-logo-lockup {
+  aspect-ratio: 513 / 148;
+  background-color: var(--color-cocoa);
+  -webkit-mask: url("/logo-kama-light.png") center / contain no-repeat;
+  mask: url("/logo-kama-light.png") center / contain no-repeat;
+}
+
 /* ---- Fixed navigation ----------------------------------------------- */
 
 .navigation_holder,
