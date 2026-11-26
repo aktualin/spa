@@ -16,8 +16,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <head>
-        {/* Font utama dipreload agar heading (Faesa) dan body (POI Carbonic)
-            tidak berkedip saat `font-display: swap` berganti. */}
+        {/* Font utama dipreload agar heading (Playfair/Faesa) dan body
+            (POI Carbonic) tidak berkedip saat `font-display: swap` berganti. */}
         <link
           rel="preload"
           href="/fonts/FaesaBreages-Regular.otf"
@@ -30,6 +30,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           href="/fonts/POICarbonicTrial-Regular.otf"
           as="font"
           type="font/otf"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/PlayfairDisplay-Italic-Latin.woff2"
+          as="font"
+          type="font/woff2"
           crossOrigin="anonymous"
         />
         <link

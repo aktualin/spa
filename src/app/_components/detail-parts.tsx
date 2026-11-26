@@ -14,7 +14,7 @@ export function DetailTitleFallback({ title }: { title: string }) {
     <main className="flex-1">
       <Reveal as="section" className="bg-cream-soft">
         <div className="container-kama py-14 md:py-20 lg:py-24">
-          <h1 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
+          <h1 className="font-title italic text-title md:text-[2.375rem] md:leading-[1.2]">
             {title}
           </h1>
         </div>

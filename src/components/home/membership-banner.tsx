@@ -68,7 +68,7 @@ export function MembershipBanner({
           ) : null}
 
           <div className="flex flex-col items-center justify-center gap-6 p-8 text-center md:p-12 lg:p-16">
-            <h2 className="font-display text-title md:text-[2rem] md:leading-[1.3]">
+            <h2 className="font-title italic text-title md:text-[2rem] md:leading-[1.3]">
               {title ? <em>{title}</em> : null}
               {title && priceHeadline ? <br /> : null}
               {priceHeadline}
