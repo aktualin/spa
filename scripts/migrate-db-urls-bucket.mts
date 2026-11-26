@@ -1,12 +1,13 @@
 /**
- * Migrasi satu jalan: menulis ulang URL publik bucket lama `kama` di SELURUH
- * kolom teks database menjadi bucket aktif (SUPABASE_S3_BUCKET, mis. vip-book).
- * Hanya nilai ber-prefix base lama yang disentuh — konten lain tidak berubah.
- * Jalankan scripts/migrate-bucket-kama-to-vip-book.mts lebih dulu supaya
- * objeknya sudah ada di bucket target.
+ * Menulis ulang URL publik bucket lama di SELURUH kolom teks database menjadi
+ * bucket aktif (SUPABASE_S3_BUCKET). Bucket lama default `kama`; arah sebaliknya
+ * (mis. vip-book → kama) lewat `--from=<bucket>`. Hanya nilai ber-prefix base
+ * lama yang disentuh — konten lain tidak berubah. Pastikan objeknya sudah ada
+ * di bucket target sebelum menjalankan.
  *
- *   node scripts/migrate-db-urls-kama-to-vip-book.mts --dry-run   # pratinjau
- *   node scripts/migrate-db-urls-kama-to-vip-book.mts             # tulis
+ *   node scripts/migrate-db-urls-bucket.mts --dry-run                # pratinjau
+ *   node scripts/migrate-db-urls-bucket.mts                          # tulis
+ *   node scripts/migrate-db-urls-bucket.mts --from=vip-book --dry-run
  *
  * Idempoten: sesudah dijalankan tidak ada lagi nilai ber-base lama, jadi
  * jalanan ulang tidak mengubah apa pun.
@@ -20,7 +21,8 @@ loadEnv({ path: ".env", quiet: true });
 const connectionString = process.env.DIRECT_URL ?? process.env.DATABASE_URL;
 const publicBase = process.env.NEXT_PUBLIC_SUPABASE_PUBLIC_URL?.replace(/\/$/, "");
 const bucket = process.env.SUPABASE_S3_BUCKET;
-const OLD_BUCKET = "kama";
+const fromFlag = process.argv.find((a) => a.startsWith("--from="));
+const OLD_BUCKET = fromFlag ? fromFlag.slice("--from=".length) : "kama";
 
 if (!connectionString) {
   console.error("DATABASE_URL belum diset di .env");
