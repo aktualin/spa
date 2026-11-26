@@ -18,7 +18,11 @@ export function MegaPanel({
   const wide = group.panel === "wide";
 
   return (
-    <div className="kama-dropdown-panel w-[38rem] max-w-[calc(100vw-2rem)]">
+    <div
+      className={`kama-dropdown-panel ${
+        wide ? "w-[38rem]" : "w-[22rem]"
+      } max-w-[calc(100vw-2rem)]`}
+    >
       <div className="flex flex-wrap gap-x-12 gap-y-6 p-6">
         {group.columns.map((col, colIndex) => (
           <div key={`${colIndex}-${col.title}`} className="min-w-[11rem]">
