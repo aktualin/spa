@@ -36,14 +36,6 @@ export function HomeSection({
   switch (key) {
     case "hero":
       return <Hero section={section} copyBlocks={pageCopy} slides={heroSlides} />;
-    case "membership-banner":
-      return (
-        <MembershipBanner
-          section={section}
-          program={membershipProgram}
-          copyBlocks={pageCopy}
-        />
-      );
     case "whats-new":
       return (
         <WhatsNewSection
