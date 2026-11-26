@@ -5,7 +5,6 @@ import { whatsAppHref } from "@/lib/content/whatsapp";
 import { FooterBottom } from "./footer-bottom";
 import { FooterBrand } from "./footer-brand";
 import { FooterLinks } from "./footer-links";
-import { FooterMembershipCta } from "./footer-membership";
 
 export async function Footer() {
   const [{ footer: footerLinks }, settings, pageCopy, joinHref] =
@@ -27,8 +26,6 @@ export async function Footer() {
 
   return (
     <footer id="footer" className="mt-auto">
-      <FooterMembershipCta settings={settings} learnHref={learnHref} joinHref={joinHref} />
-
       {/* Main footer */}
       <section className="bg-cocoa text-cream-soft">
         <div className="container-kama">

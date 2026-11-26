@@ -67,7 +67,7 @@ export function HeroSlider({ section, labels, slides }: HeroSliderProps) {
               ) : null}
             </div>
 
-            {showCard ? (
+            {/* {showCard ? (
               <HeroSlideCard
                 eyebrow={labels.cardEyebrow}
                 body={labels.cardBody}
@@ -75,7 +75,7 @@ export function HeroSlider({ section, labels, slides }: HeroSliderProps) {
                 ctaHref={ctaHref}
                 menuHref={labels.menuHref}
               />
-            ) : null}
+            ) : null} */}
           </div>
         </div>
       </Reveal>
