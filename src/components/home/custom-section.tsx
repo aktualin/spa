@@ -28,7 +28,7 @@ export function CustomSection({ section }: { section: HomepageSection }) {
         <div className={imageUrl ? "grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16" : "max-w-[70ch]"}>
           <div className="flex min-w-0 flex-col gap-4">
             {title ? (
-              <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">{title}</h2>
+              <h2 className="font-title italic text-title md:text-[2.375rem] md:leading-[1.2]">{title}</h2>
             ) : null}
             {subtitle ? <p className="text-lead text-cocoa/70">{subtitle}</p> : null}
             <RichText value={section.bodyHtml} className="max-w-[65ch] text-body text-cocoa/80" />

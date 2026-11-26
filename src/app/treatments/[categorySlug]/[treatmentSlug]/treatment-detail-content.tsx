@@ -62,7 +62,7 @@ export async function TreatmentDetailContent({ params }: TreatmentPageProps) {
                   </span>
                 ) : null}
               </div>
-              <h1 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
+              <h1 className="font-title italic text-title md:text-[2.375rem] md:leading-[1.2]">
                 {treatment.name}
               </h1>
               <RichText value={treatment.description} className="max-w-[52ch] text-lead text-cocoa/70" />

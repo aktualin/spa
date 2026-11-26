@@ -18,7 +18,7 @@ export function TreatmentPricing({
   return (
     <Reveal as="section" className="bg-cream">
       <div className="container-kama py-14 md:py-16 lg:py-20">
-        <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
+        <h2 className="font-title italic text-title md:text-[2.375rem] md:leading-[1.2]">
           {copy(pageCopy, "catalog.treatment.pricing_title")}
         </h2>
         <ul className="mt-8 flex max-w-[48rem] flex-col">
@@ -57,7 +57,7 @@ export function RelatedTreatments({
   return (
     <Reveal as="section" className="bg-cream-soft">
       <div className="container-kama py-14 md:py-16 lg:py-20">
-        <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
+        <h2 className="font-title italic text-title md:text-[2.375rem] md:leading-[1.2]">
           {copy(pageCopy, "catalog.treatment.related_prefix")} {categoryName}
         </h2>
         <div className="w-layout-grid whats-new_list mt-8">

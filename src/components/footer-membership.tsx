@@ -26,7 +26,7 @@ export function FooterMembershipCta({
       <div className="container-kama">
         <div className="flex flex-col items-start gap-6 py-10 md:flex-row md:items-center md:justify-between md:py-14">
           {settings.footerMembershipTitle ? (
-            <h2 className="max-w-[22ch] font-display text-title md:text-[2.375rem] md:leading-[1.2]">
+            <h2 className="max-w-[22ch] font-title italic text-title md:text-[2.375rem] md:leading-[1.2]">
               {settings.footerMembershipTitle}
             </h2>
           ) : null}

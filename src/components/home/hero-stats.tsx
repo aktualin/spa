@@ -28,7 +28,7 @@ export function HeroStats({
           <div className="flex flex-col items-start gap-5">
             {eyebrow ? <p className="text-lead">{eyebrow}</p> : null}
             {title || subtitle ? (
-              <h2 className="font-display text-title md:text-[2.375rem] md:leading-[1.2]">
+              <h2 className="font-title italic text-title md:text-[2.375rem] md:leading-[1.2]">
                 {title ? <strong>{title}</strong> : null}
                 {title && subtitle ? <br /> : null}
                 {subtitle ? <em className="font-normal">{subtitle}</em> : null}

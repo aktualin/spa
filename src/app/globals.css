@@ -139,6 +139,10 @@
   --font-sans: "POI Carbonic", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Faesa Breages", ui-serif, Georgia, serif;
   --font-eyebrow: "POI Carbonic", ui-sans-serif, system-ui, sans-serif;
+  /* Heading tiers: --font-title (Playfair Display Italic) = page H1 + main
+     section headings; --font-display (Faesa) = card titles, prices, prose
+     headings, brand statement, stat numbers. Body/labels stay --font-sans. */
+  --font-title: "Playfair Display", ui-serif, Georgia, serif;
 
   /* Mobile-first scale; bigger steps are applied with `md:` / `lg:`. */
   --text-display: 2.5rem;
