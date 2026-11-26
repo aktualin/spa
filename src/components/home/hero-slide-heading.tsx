@@ -37,7 +37,7 @@ export function HeroSlideHeading({
       ) : null}
 
       {title ? (
-        <h1 className="mt-6  italic text-display font-normal md:text-[2.75rem] lg:text-[4.1875rem] lg:leading-[1.1]">
+        <h1 className="mt-6 font-title italic text-display font-normal md:text-[2.75rem] lg:text-[4.1875rem] lg:leading-[1.1]">
           {title}
         </h1>
       ) : null}

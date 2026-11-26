@@ -9,7 +9,7 @@ export async function EventGallery({ event }: { event: PublicEvent }) {
   return (
     <Reveal as="section" className="bg-cream-soft">
       <div className="container-kama py-14 md:py-16 lg:py-20">
-        <h2 className=" italic text-title md:text-[2.375rem] md:leading-[1.2]">
+        <h2 className="font-title italic text-title md:text-[2.375rem] md:leading-[1.2]">
           {copy(pageCopy, "events.detail.gallery_title")}
         </h2>
         <ul className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 lg:gap-4">

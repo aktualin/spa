@@ -23,7 +23,7 @@ export function PublicPageHeader({
   const text = (
     <div className="flex max-w-[60ch] flex-col gap-4">
       <span className="eyebrow text-cocoa/60">{eyebrow}</span>
-      <h1 className=" italic text-title md:text-[2.375rem] md:leading-[1.2]">
+      <h1 className="font-title italic text-title md:text-[2.375rem] md:leading-[1.2]">
         {title}
       </h1>
       {description ? (

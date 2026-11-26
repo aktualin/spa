@@ -34,7 +34,7 @@ export function PublicSectionHeader({
           </div>
         ) : null}
         {eyebrow ? <span className="eyebrow text-cocoa/60">{eyebrow}</span> : null}
-        <h2 className=" italic text-title md:text-[2.375rem] md:leading-[1.2]">
+        <h2 className="font-title italic text-title md:text-[2.375rem] md:leading-[1.2]">
           {title}
         </h2>
         {description ? (
