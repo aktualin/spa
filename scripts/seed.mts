@@ -529,7 +529,6 @@ const HOMEPAGE_SECTIONS: {
     keepText: true,
   },
   { key: "brand-intro", title: "Brand Intro" },
-  { key: "socials", title: "Gallery Teaser & Instagram" },
   { key: "booking-banner", title: "Booking Banner" },
 ];
 

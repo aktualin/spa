@@ -19,7 +19,6 @@ export function visibleHomeSections(
     "membership-banner",
     "whats-new",
     "brand-intro",
-    "socials",
     "booking-banner",
     "signature-treatments",
     "promo-highlight",

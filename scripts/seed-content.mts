@@ -65,12 +65,6 @@ export const HOMEPAGE_SECTIONS: SectionSeed[] = [
     legacyTitles: ["Brand Intro"],
   },
   {
-    key: "socials",
-    title: "Gallery Teaser & Instagram",
-    ctaLabel: "Follow Us",
-    legacyTitles: ["Gallery Teaser & Instagram", "Socials"],
-  },
-  {
     key: "booking-banner",
     title: "Have any questions? Drop us a line.",
     ctaLabel: "Get In Touch",

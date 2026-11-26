@@ -1,7 +1,6 @@
 import { BookingBanner, Hero, HeroStats, MembershipBanner } from "@/components/home/hero";
 import { CustomSection } from "@/components/home/custom-section";
 import { WhatsNewSection } from "@/components/home/sections";
-import { SocialsSection } from "@/components/home/socials";
 import { SignatureTreatmentsSection } from "@/components/public/home/signature-treatments";
 import { PromoHighlightSection } from "@/components/public/home/promo-highlight";
 import { GalleryTeaserSection } from "@/components/public/home/gallery-teaser";
@@ -46,8 +45,6 @@ export function HomeSection({
       );
     case "brand-intro":
       return <HeroStats stats={stats} section={section} copyBlocks={pageCopy} />;
-    case "socials":
-      return <SocialsSection section={section} copyBlocks={pageCopy} />;
     case "signature-treatments":
       return <SignatureTreatmentsSection section={section} copyBlocks={pageCopy} />;
     case "promo-highlight":

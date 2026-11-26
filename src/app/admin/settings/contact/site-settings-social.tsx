@@ -29,7 +29,7 @@ export function SocialFields({ values }: { values: SiteSettingsInput }) {
       <Field
         label="Username Instagram"
         htmlFor="instagramUsername"
-        hint="Tanpa @ — tampil sebagai @username di bagian Instagram beranda."
+        hint="Tanpa @ — opsional. Tautan sosial di footer memakai field URL Instagram di atas."
       >
         <div className="flex items-stretch">
           <span className="flex items-center rounded-l-md border border-r-0 border-neutral-300 bg-neutral-50 px-3 text-sm text-neutral-500">

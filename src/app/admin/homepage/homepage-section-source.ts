@@ -15,10 +15,6 @@ export const SECTION_SOURCE: Record<
     text: "Kotak angka “KAMA at a glance” diatur di Statistik Brand Intro. Cerita lengkap brand diatur di halaman Our Story.",
     link: { href: "/admin/homepage/stats", label: "Kelola statistik" },
   },
-  socials: {
-    text: "Foto grid Instagram diatur di Feed Instagram (foto, teks alt, tautan, urutan). Username dan tautan profil diatur di Kontak & Umum.",
-    link: { href: "/admin/homepage/instagram", label: "Kelola feed Instagram" },
-  },
   "signature-treatments": {
     text: "Menampilkan hingga 6 treatment yang ditandai best seller di modul Treatments. Section tidak tampil bila belum ada.",
     link: { href: "/admin/treatments", label: "Buka Treatments" },
