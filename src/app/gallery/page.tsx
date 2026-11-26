@@ -22,11 +22,11 @@ export default async function GalleryPage() {
   const withPhotos = albums.filter((album) => album.photos.length > 0);
   // Microcopy galeri dari CB; placeholder {n}/{m} diganti di komponen client.
   const galleryLabels = {
-    altFallback: copy(pageCopy, "gallery.alt_fallback") || "Foto galeri KAMA Spa",
-    gridAria: copy(pageCopy, "gallery.grid_aria") || "Buka foto {n} dari {m}",
-    lightboxPrev: copy(pageCopy, "gallery.lightbox_prev") || "Foto sebelumnya",
-    lightboxNext: copy(pageCopy, "gallery.lightbox_next") || "Foto berikutnya",
-    lightboxClose: copy(pageCopy, "gallery.lightbox_close") || "Tutup pratinjau",
+    altFallback: copy(pageCopy, "gallery.alt_fallback") || "KAMA Spa gallery photo",
+    gridAria: copy(pageCopy, "gallery.grid_aria") || "Open photo {n} of {m}",
+    lightboxPrev: copy(pageCopy, "gallery.lightbox_prev") || "Previous photo",
+    lightboxNext: copy(pageCopy, "gallery.lightbox_next") || "Next photo",
+    lightboxClose: copy(pageCopy, "gallery.lightbox_close") || "Close preview",
     lightboxCounter: copy(pageCopy, "gallery.lightbox_counter") || "{n} / {m}",
   };
 

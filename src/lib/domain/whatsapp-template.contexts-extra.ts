@@ -6,7 +6,7 @@ export const EXTRA_CONTEXTS: readonly WhatsAppContextDefinition[] = [
     key: "retail",
     label: "Pemesanan produk retail",
     usedOn: "Tombol “Pesan via WhatsApp” di halaman Retail.",
-    builtIn: "Halo kak, saya mau pesan produk {{product}}",
+    builtIn: "Hi KAMA, I'd like to order {{product}}",
     placeholders: [
       { name: "product", description: "Nama produk", sample: "KAMA Body Oil" },
       {
@@ -23,7 +23,7 @@ export const EXTRA_CONTEXTS: readonly WhatsAppContextDefinition[] = [
     label: "Reservasi per cabang",
     usedOn: "Tombol WhatsApp pada kartu cabang di halaman Kontak.",
     builtIn:
-      "Halo kak, apakah yang di {{address}} sudah buka dan bisa reservasi sekarang ?",
+      "Hi KAMA, is {{address}} open now, and can I make a reservation?",
     placeholders: [
       { name: "address", description: "Alamat cabang", sample: "Jl. Kemang Raya No. 12" },
     ],
@@ -33,7 +33,7 @@ export const EXTRA_CONTEXTS: readonly WhatsAppContextDefinition[] = [
     key: "event",
     label: "Daftar event",
     usedOn: "Tombol “Register via WhatsApp” di halaman detail event.",
-    builtIn: "Halo kak, saya mau ikut event {{event}}",
+    builtIn: "Hi KAMA, I'd like to join the {{event}} event",
     placeholders: [
       { name: "event", description: "Judul event", sample: "Wellness Weekend" },
     ],

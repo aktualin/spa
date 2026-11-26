@@ -57,11 +57,11 @@ describe("validateReservation", () => {
   it("nama wajib, maks 120 karakter", () => {
     const kosong = validateReservation(reservation({ name: "   " }));
     assert.equal(kosong.ok, false);
-    if (!kosong.ok) assert.equal(kosong.error, "Nama wajib diisi.");
+    if (!kosong.ok) assert.equal(kosong.error, "Name is required.");
     assert.equal(validateReservation(reservation({ name: "x".repeat(120) })).ok, true);
     const panjang = validateReservation(reservation({ name: "x".repeat(121) }));
     assert.equal(panjang.ok, false);
-    if (!panjang.ok) assert.equal(panjang.error, "Nama maks. 120 karakter.");
+    if (!panjang.ok) assert.equal(panjang.error, "Name must be 120 characters or fewer.");
     assert.equal(validateReservation({ phone: "081316052040", website: "", elapsedMs: 5000 }).ok, false);
   });
 
@@ -69,7 +69,7 @@ describe("validateReservation", () => {
     for (const phone of ["", "123", "0813abc", "+62 813 1605 2040 1234 567"]) {
       const result = validateReservation(reservation({ phone }));
       assert.equal(result.ok, false, phone);
-      if (!result.ok) assert.equal(result.error, "Nomor telepon tidak valid (8–15 digit).");
+      if (!result.ok) assert.equal(result.error, "Phone number is invalid (8–15 digits).");
     }
     assert.equal(validateReservation(reservation({ phone: "+62 813 1605 2040" })).ok, true);
   });
@@ -77,14 +77,14 @@ describe("validateReservation", () => {
   it("email salah format ditolak", () => {
     const result = validateReservation(reservation({ email: "bukan-email" }));
     assert.equal(result.ok, false);
-    if (!result.ok) assert.equal(result.error, "Format email tidak valid.");
+    if (!result.ok) assert.equal(result.error, "Invalid email format.");
   });
 
   it("pesan maks 1000 karakter; cabang maks 60", () => {
     assert.equal(validateReservation(reservation({ message: "x".repeat(1000) })).ok, true);
     const pesan = validateReservation(reservation({ message: "x".repeat(1001) }));
     assert.equal(pesan.ok, false);
-    if (!pesan.ok) assert.equal(pesan.error, "Pesan maks. 1000 karakter.");
+    if (!pesan.ok) assert.equal(pesan.error, "Message must be 1000 characters or fewer.");
     assert.equal(validateReservation(reservation({ branchSlug: "x".repeat(61) })).ok, false);
   });
 
@@ -101,12 +101,12 @@ describe("validateReservation", () => {
     for (const preferredDate of ["20-11-2026", "2026-13-01", "2026-11-32", "besok"]) {
       const result = validateReservation(reservation({ preferredDate }));
       assert.equal(result.ok, false, preferredDate);
-      if (!result.ok) assert.equal(result.error, "Format tanggal tidak valid.");
+      if (!result.ok) assert.equal(result.error, "Invalid date format.");
     }
     for (const preferredTime of ["24:00", "14:60", "2 pm"]) {
       const result = validateReservation(reservation({ preferredTime }));
       assert.equal(result.ok, false, preferredTime);
-      if (!result.ok) assert.equal(result.error, "Format jam tidak valid.");
+      if (!result.ok) assert.equal(result.error, "Invalid time format.");
     }
   });
 
@@ -117,7 +117,7 @@ describe("validateReservation", () => {
     assert.equal(validateReservation(reservation({ treatment: "x".repeat(160) })).ok, true);
     const panjang = validateReservation(reservation({ treatment: "x".repeat(161) }));
     assert.equal(panjang.ok, false);
-    if (!panjang.ok) assert.equal(panjang.error, "Nama treatment maks. 160 karakter.");
+    if (!panjang.ok) assert.equal(panjang.error, "Treatment name must be 160 characters or fewer.");
   });
 
   it("guests: string angka di-coerce, kosong = tidak diisi, di luar 1..20 ditolak", () => {
@@ -136,7 +136,7 @@ describe("validateReservation", () => {
   it("honeypot terisi ditolak dengan pesan generik", () => {
     const result = validateReservation(reservation({ website: "isi-bot" }));
     assert.equal(result.ok, false);
-    if (!result.ok) assert.equal(result.error, "Terjadi kesalahan. Coba lagi.");
+    if (!result.ok) assert.equal(result.error, "Something went wrong. Please try again.");
   });
 
   it("elapsedMs wajib angka bulat 0..86_400_000", () => {

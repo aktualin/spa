@@ -174,16 +174,16 @@ describe("BUILD-18 konteks & teks bawaan", () => {
     assert.ok(!isSystemTemplateKey("lainnya"));
   });
 
-  it("teks bawaan sama dengan pesan hardcode sebelumnya", () => {
-    assert.equal(builtInMessage("default"), "Halo kak, saya mau reservasi");
-    assert.equal(builtInMessage("membership"), "Halo kak, saya mau join member");
-    assert.equal(builtInMessage("gift"), "Halo kak, saya mau beli KAMA Gift Card");
-    assert.equal(builtInMessage("retail"), "Halo kak, saya mau pesan produk {{product}}");
+  it("teks bawaan English sesuai registry konteks", () => {
+    assert.equal(builtInMessage("default"), "Hi KAMA, I'd like to make a reservation");
+    assert.equal(builtInMessage("membership"), "Hi KAMA, I'd like to join the membership");
+    assert.equal(builtInMessage("gift"), "Hi KAMA, I'd like to buy a KAMA Gift Card");
+    assert.equal(builtInMessage("retail"), "Hi KAMA, I'd like to order {{product}}");
     assert.equal(
       builtInMessage("location"),
-      "Halo kak, apakah yang di {{address}} sudah buka dan bisa reservasi sekarang ?",
+      "Hi KAMA, is {{address}} open now, and can I make a reservation?",
     );
-    assert.equal(builtInMessage("event"), "Halo kak, saya mau ikut event {{event}}");
+    assert.equal(builtInMessage("event"), "Hi KAMA, I'd like to join the {{event}} event");
   });
 
   it("placeholder retail menerima alias lama", () => {
@@ -240,8 +240,7 @@ describe("konteks location & event", () => {
     );
     assert.equal(
       resolveWhatsAppMessage({ context: "location", template: null, values }),
-      // fillTemplate merapikan spasi sebelum tanda baca (" ?" → "?").
-      "Halo kak, apakah yang di Jl. Barito I No.21, Kramat Pela, Jakarta Selatan sudah buka dan bisa reservasi sekarang?",
+      "Hi KAMA, is Jl. Barito I No.21, Kramat Pela, Jakarta Selatan open now, and can I make a reservation?",
     );
   });
 
@@ -256,7 +255,7 @@ describe("konteks location & event", () => {
     );
     assert.equal(
       resolveWhatsAppMessage({ context: "event", template: "{{x}}" }),
-      "Halo kak, saya mau ikut event",
+      "Hi KAMA, I'd like to join the event",
     );
   });
 });
@@ -309,14 +308,14 @@ describe("BUILD-18 resolveWhatsAppMessage", () => {
   it("lalu teks bawaan konteks", () => {
     assert.equal(
       resolveWhatsAppMessage({ context: "promo", template: null, values }),
-      "Halo kak, saya mau tanya promo Promo Akhir Pekan",
+      "Hi KAMA, I'd like to ask about the Promo Akhir Pekan promo",
     );
   });
 
   it("kandidat yang kosong setelah diisi dilewati", () => {
     assert.equal(
       resolveWhatsAppMessage({ context: "default", template: "{{x}}" }),
-      "Halo kak, saya mau reservasi",
+      "Hi KAMA, I'd like to make a reservation",
     );
   });
 });

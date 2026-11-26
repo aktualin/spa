@@ -9,9 +9,9 @@ import type { CarouselLabels, ImageCarouselProps } from "./image-carousel-types"
 export type { CarouselImage, CarouselLabels } from "./image-carousel-types";
 
 const DEFAULT_LABELS: CarouselLabels = {
-  prev: "Gambar sebelumnya",
-  next: "Gambar berikutnya",
-  counter: "Gambar {n} dari {m}",
+  prev: "Previous image",
+  next: "Next image",
+  counter: "Image {n} of {m}",
 };
 
 /**

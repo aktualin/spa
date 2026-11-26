@@ -8,14 +8,14 @@ import type { PageSeoDefaults } from "./seo.pages.ts";
  * alias ini keywords route tidak pernah ikut ke hasil akhir.
  */
 const CORPORATE: PageSeoDefaults = {
-  title: "Corporate Wellness Jakarta",
+  title: "Corporate Wellness Programs in Jakarta",
   description:
-    "Program corporate wellness KAMA Spa untuk perusahaan: on-site massage, paket employee wellness, dan kolaborasi brand. Hubungi tim marketing untuk proposal.",
+    "KAMA Spa corporate wellness for companies: on-site massage, employee wellness packages, and brand collaborations. Contact our marketing team for a proposal.",
   keywords: [
     "corporate wellness",
     "office massage Jakarta",
     "employee wellness",
-    "wellness perusahaan",
+    "company wellness programs",
   ],
 };
 
@@ -24,53 +24,53 @@ export const PAGE_SEO_DATA_MAIN: Readonly<Record<string, PageSeoDefaults>> = {
   // entri ini hanya memasok keywords khusus beranda.
   "/": {
     keywords: [
-      "spa Jakarta Selatan",
+      "spa South Jakarta",
       "wellness sanctuary",
       "massage Jakarta",
       "day spa Jakarta",
     ],
   },
   "/treatments": {
-    title: "Treatments Spa & Massage Jakarta",
+    title: "Spa Treatments & Massage in Jakarta",
     description:
-      "Jelajahi koleksi treatments KAMA Spa: massage tradisional, body treatment, facial, hingga head & bath ritual. Cek durasi, manfaat, dan harga tiap treatment.",
+      "Explore the KAMA Spa treatment collection: traditional massage, body treatments, facials, and head & bath rituals. See duration, benefits, and price for each.",
     keywords: [
-      "treatments spa",
+      "spa treatments",
       "massage Jakarta",
       "body treatment",
       "facial Jakarta",
-      "harga spa Jakarta",
+      "spa prices Jakarta",
     ],
   },
   "/treatments/packages": {
-    title: "Paket Spa & Massage Hemat",
+    title: "Curated Spa Packages in South Jakarta",
     description:
-      "Paket spa curated KAMA Spa untuk relaksasi menyeluruh — kombinasi massage, body treatment, dan ritual dengan harga paket yang lebih hemat dibanding satuan.",
-    keywords: ["paket spa", "paket massage", "spa package Jakarta", "harga paket spa"],
+      "KAMA Spa curated packages for complete relaxation — massage, body treatments, and rituals combined at a package price that saves more than booking separately.",
+    keywords: ["spa packages", "massage packages", "spa package Jakarta", "spa package prices"],
   },
   "/menu": {
-    title: "Menu & Harga Spa Lengkap",
+    title: "Full Spa Menu & Prices in South Jakarta",
     description:
-      "Daftar menu lengkap KAMA Spa beserta durasi dan harganya — dari massage, body scrub, facial, head therapy, sampai bath ritual dan additional services.",
-    keywords: ["menu spa", "harga spa Jakarta", "daftar perawatan spa", "price list spa"],
+      "The complete KAMA Spa menu with durations and prices — from massage, body scrubs, and facials to head therapy, bath rituals, and additional services.",
+    keywords: ["spa menu", "spa prices Jakarta", "spa treatment list", "spa price list"],
   },
   "/promos": {
-    title: "Promo Spa & Massage Terbaru",
+    title: "Latest Spa & Massage Promos in Jakarta",
     description:
-      "Kumpulan promo terbaru KAMA Spa: potongan treatment, paket hemat, dan penawaran spesial member. Booking lewat WhatsApp, kuota promo terbatas tiap bulan.",
-    keywords: ["promo spa", "promo massage Jakarta", "diskon spa", "penawaran spa"],
+      "The latest KAMA Spa promotions: treatment discounts, value packages, and special member offers. Book via WhatsApp — promo slots are limited each month.",
+    keywords: ["spa promos", "massage promos Jakarta", "spa discounts", "spa offers"],
   },
   "/membership": {
-    title: "Membership Spa di Jakarta",
+    title: "Spa Membership Plans in South Jakarta",
     description:
-      "Jadi member KAMA Spa dan nikmati harga khusus, prioritas booking, dan benefit eksklusif lainnya untuk perawatan rutin. Cek tier membership dan cara bergabung.",
-    keywords: ["membership spa", "member spa Jakarta", "benefit member", "langganan spa"],
+      "Become a KAMA Spa member and enjoy member prices, priority booking, and exclusive benefits for your routine care. Explore membership tiers and how to join.",
+    keywords: ["spa membership", "spa member Jakarta", "member benefits", "spa subscription"],
   },
   "/promos/membership": {
-    title: "Promo Membership Spesial",
+    title: "Special Membership Offers in Jakarta",
     description:
-      "Promo khusus membership KAMA Spa — penawaran bergabung, upgrade tier, dan benefit eksklusif member untuk perawatan wellness rutin di Jakarta Selatan.",
-    keywords: ["promo membership", "promo member spa", "diskon membership"],
+      "Special KAMA Spa membership offers — joining deals, tier upgrades, and exclusive member benefits for routine wellness care in South Jakarta.",
+    keywords: ["membership promo", "spa member promo", "membership discount"],
   },
   "/corporate": CORPORATE,
   "/corporate-wellness": CORPORATE,

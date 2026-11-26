@@ -125,7 +125,7 @@ describe("photoAltText", () => {
   });
 
   it("alt & caption kosong → nama album", () => {
-    assert.equal(photoAltText({ altText: "", caption: null }, "Interior"), "Foto Interior — KAMA Spa");
-    assert.equal(photoAltText({ altText: null, caption: null }, " "), "Foto galeri KAMA Spa");
+    assert.equal(photoAltText({ altText: "", caption: null }, "Interior"), "Interior — KAMA Spa");
+    assert.equal(photoAltText({ altText: null, caption: null }, " "), "KAMA Spa gallery photo");
   });
 });

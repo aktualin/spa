@@ -2,8 +2,8 @@ import { asset } from "../asset-url.ts";
 
 /** Isi awal untuk seed dan form admin — bukan untuk dirender ke pengunjung. */
 export const GIFT_CARD_DEFAULTS = {
-  subtitle: "Hadiah yang isinya waktu untuk benar-benar berhenti sejenak.",
-  whatsappMessage: "Halo kak, saya mau beli KAMA Gift Card",
+  subtitle: "A gift of time to truly pause.",
+  whatsappMessage: "Hi KAMA, I'd like to buy a KAMA Gift Card",
 } as const;
 
 export type GiftCard = {
@@ -23,7 +23,7 @@ export function staticGiftCard(): GiftCard {
     termsHtml: null,
     whatsappMessage: GIFT_CARD_DEFAULTS.whatsappMessage,
     bodyHtml:
-      "<p>KAMA Gift Card adalah cara tercepat untuk hadiah yang berarti. Berlaku untuk seluruh treatment dan ritual KAMA Spa, dan dapat dipakai kapan saja bersama orang terdekat.</p><ul><li>NominalFleksibel sesuai kebutuhan</li><li>Berlaku untuk semua treatment</li><li>Pemesanan dan pembayaran lewat WhatsApp</li></ul>",
+      "<p>The KAMA Gift Card is the quickest way to give a gift that matters. Valid for every treatment and ritual at KAMA Spa, and ready to enjoy any time with someone close to you.</p><ul><li>Flexible amounts to suit any occasion</li><li>Valid for all treatments</li><li>Order and pay via WhatsApp</li></ul>",
     imageUrl: asset("img/kama/05-foot-bath.jpg"),
   };
 }

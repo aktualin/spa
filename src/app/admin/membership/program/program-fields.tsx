@@ -26,7 +26,7 @@ export function ProgramHeaderFields({ program }: { program: MembershipProgramDat
       <Field
         label="Kalimat harga"
         htmlFor="priceHeadline"
-        hint='Contoh "Just Rp 1.5jt a month." Tampil di banner membership homepage dan bagian Main Benefits. Harga per tier diatur di tier atau modul Harga.'
+        hint='Contoh "Just Rp 1,500,000 a month." Tampil di banner membership homepage dan bagian Main Benefits. Harga per tier diatur di tier atau modul Harga.'
       >
         <input id="priceHeadline" name="priceHeadline" defaultValue={program.priceHeadline} required maxLength={PROGRAM_LIMITS.priceHeadline} className={inputClass} />
       </Field>

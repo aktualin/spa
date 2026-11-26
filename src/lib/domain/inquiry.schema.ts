@@ -16,31 +16,31 @@ export const MIN_FORM_FILL_MS = 3000;
 /** Skema data yang sampai ke server. Semua field bebas dari HTML. */
 export const inquirySchema = z.object({
   name: z
-    .string({ error: "Nama wajib diisi." })
+    .string({ error: "Name is required." })
     .trim()
-    .min(2, "Nama wajib diisi.")
-    .max(INQUIRY_LIMITS.name, "Nama terlalu panjang."),
+    .min(2, "Name is required.")
+    .max(INQUIRY_LIMITS.name, "Name is too long."),
   company: z
     .string()
     .trim()
-    .max(INQUIRY_LIMITS.company, "Nama perusahaan terlalu panjang.")
+    .max(INQUIRY_LIMITS.company, "Company name is too long.")
     .optional(),
   email: z
-    .string({ error: "Email wajib diisi." })
+    .string({ error: "Email is required." })
     .trim()
-    .min(1, "Email wajib diisi.")
-    .max(INQUIRY_LIMITS.email, "Email terlalu panjang.")
-    .email("Format email tidak valid."),
+    .min(1, "Email is required.")
+    .max(INQUIRY_LIMITS.email, "Email is too long.")
+    .email("Invalid email format."),
   phone: z
     .string()
     .trim()
-    .max(INQUIRY_LIMITS.phone, "Nomor telepon terlalu panjang.")
+    .max(INQUIRY_LIMITS.phone, "Phone number is too long.")
     .optional(),
   message: z
-    .string({ error: "Pesan wajib diisi." })
+    .string({ error: "Message is required." })
     .trim()
-    .min(10, "Pesan terlalu singkat.")
-    .max(INQUIRY_LIMITS.message, "Pesan terlalu panjang (maksimal 5000 karakter)."),
+    .min(10, "Message is too short.")
+    .max(INQUIRY_LIMITS.message, "Message is too long (5000 characters max)."),
   captchaToken: z.string().trim().optional(),
   website: z.string().trim().optional(),
   startedAt: z.number().int().nonnegative().optional(),
@@ -53,14 +53,14 @@ export type InquiryValidation =
   | { ok: false; error: string };
 
 /**
- * Validasi payload inquiry. Mengembalikan pesan error berbahasa Indonesia
+ * Validasi payload inquiry. Mengembalikan pesan error berbahasa Inggris
  * yang aman untuk ditampilkan ke pengunjung.
  */
 export function validateInquiry(raw: unknown): InquiryValidation {
   const parsed = inquirySchema.safeParse(raw);
   if (!parsed.success) {
     const issue = parsed.error.issues[0];
-    return { ok: false, error: issue?.message ?? "Input tidak valid." };
+    return { ok: false, error: issue?.message ?? "Invalid submission." };
   }
 
   // Field opsional yang kosong string diperlakukan sebagai tidak diisi.

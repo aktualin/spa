@@ -22,7 +22,7 @@ test("the floating WhatsApp button carries the generic booking message", async (
 
   expect(href).toBeTruthy();
   expect(href).toContain(FILLER);
-  expect(decodeURIComponent(href!)).toContain("Halo kak, saya mau reservasi");
+  expect(decodeURIComponent(href!)).toContain("Hi KAMA, I'd like to make a reservation");
 });
 
 test("the membership call-to-action joins through WhatsApp", async ({ page }) => {
@@ -33,7 +33,7 @@ test("the membership call-to-action joins through WhatsApp", async ({ page }) =>
   const href = decodeURIComponent((await cta.getAttribute("href"))!);
 
   expect(href).toContain(FILLER);
-  expect(href).toContain("Halo kak, saya mau join member");
+  expect(href).toContain("Hi KAMA, I'd like to join the membership");
 });
 
 test("the footer partnership link opens the e-mail client", async ({ page }) => {

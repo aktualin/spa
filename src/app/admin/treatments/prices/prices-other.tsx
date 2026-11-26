@@ -15,7 +15,7 @@ export function MembershipPrices({ tiers }: { tiers: PriceData["tiers"] }) {
       <p className="mt-1 text-xs text-neutral-500">
         Harga di kartu membership mengikuti angka di bawah ini. Namun
         kalimat harga di banner membership homepage (contoh &ldquo;Just Rp
-        1.5jt a month.&rdquo;) adalah teks terpisah — ubah juga di{" "}
+        1,500,000 a month.&rdquo;) adalah teks terpisah — ubah juga di{" "}
         <Link href="/admin/membership/program" className="underline">
           Program membership
         </Link>{" "}

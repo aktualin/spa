@@ -1,11 +1,8 @@
-const idrFormatter = new Intl.NumberFormat("id-ID", {
-  style: "currency",
-  currency: "IDR",
+const idrFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
-/** 145000 → "Rp 145.000" */
+/** 145000 → "Rp 145,000" (English grouping, brand "Rp" prefix). */
 export function formatIdr(amount: number): string {
-  // Intl menempelkan simbol tanpa spasi ("Rp145.000"); beri spasi agar terbaca.
-  return idrFormatter.format(amount).replace(/^Rp\s?/, "Rp ");
+  return `Rp ${idrFormatter.format(amount)}`;
 }

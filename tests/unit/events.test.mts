@@ -182,22 +182,22 @@ describe("U6 validasi input event", () => {
 });
 
 describe("U6 formatEventDateRange", () => {
-  it("tanpa tanggal → Tanggal menyusul", () => {
-    assert.equal(formatEventDateRange(null, null), "Tanggal menyusul");
+  it("tanpa tanggal → Date to be announced", () => {
+    assert.equal(formatEventDateRange(null, null), "Date to be announced");
   });
 
   it("memakai WIB: 00.00 WIB tidak mundur sehari", () => {
-    assert.equal(formatEventDateRange(wib("2026-12-12"), null), "12 Desember 2026");
+    assert.equal(formatEventDateRange(wib("2026-12-12"), null), "12 December 2026");
   });
 
   it("satu hari tidak ditulis dua kali; rentang memakai pemisah", () => {
     assert.equal(
       formatEventDateRange(wib("2026-12-12"), wibEnd("2026-12-12")),
-      "12 Desember 2026",
+      "12 December 2026",
     );
     assert.equal(
       formatEventDateRange(wib("2026-12-12"), wibEnd("2026-12-14")),
-      "12 Desember 2026 — 14 Desember 2026",
+      "12 December 2026 — 14 December 2026",
     );
   });
 });

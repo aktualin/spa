@@ -3,57 +3,57 @@ import type { PageSeoDefaults } from "./seo.pages.ts";
 
 export const PAGE_SEO_DATA_CONTENT: Readonly<Record<string, PageSeoDefaults>> = {
   "/our-story": {
-    title: "Cerita & Filosofi di Balik KAMA",
+    title: "The Story & Philosophy Behind KAMA",
     description:
-      "Kenali perjalanan dan filosofi KAMA Spa — perpaduan teknik penyembuhan tradisional Nusantara dengan pendekatan wellness modern di jantung South Jakarta.",
-    keywords: ["tentang KAMA Spa", "filosofi spa", "wellness sanctuary", "cerita brand spa"],
+      "Discover the journey and philosophy of KAMA Spa — traditional Nusantara healing techniques blended with modern wellness in the heart of South Jakarta.",
+    keywords: ["about KAMA Spa", "spa philosophy", "wellness sanctuary", "spa brand story"],
   },
   "/our-story/journal": {
-    title: "Journal Wellness & Spa",
+    title: "Wellness & Spa Journal from Jakarta",
     description:
-      "Artikel seputar wellness, self-care, dan perawatan spa dari KAMA Spa: tips relaksasi, manfaat massage, ritual tradisional, dan panduan hidup seimbang.",
-    keywords: ["blog wellness", "artikel spa", "tips self care", "manfaat massage"],
+      "Articles on wellness, self-care, and spa treatments from KAMA Spa: relaxation tips, massage benefits, traditional rituals, and guides to balanced living.",
+    keywords: ["wellness blog", "spa articles", "self-care tips", "massage benefits"],
   },
   "/gallery": {
-    title: "Galeri Suasana Spa Jakarta",
+    title: "Spa Atmosphere Gallery in South Jakarta",
     description:
-      "Intip suasana KAMA Spa lewat galeri foto — interior treatment room, detail ritual, dan atmosfer tenang wellness sanctuary kami di Jakarta Selatan.",
-    keywords: ["galeri spa", "foto spa Jakarta", "suasana spa", "interior spa"],
+      "Step inside KAMA Spa through our photo gallery — treatment room interiors, ritual details, and the calm atmosphere of our South Jakarta wellness sanctuary.",
+    keywords: ["spa gallery", "spa photos Jakarta", "spa atmosphere", "spa interior"],
   },
   "/events": {
-    title: "Event & Workshop Wellness",
+    title: "Wellness Events & Workshops in Jakarta",
     description:
-      "Ikuti event dan workshop wellness KAMA Spa: sound healing, kelas mindfulness, dan kolaborasi komunitas. Cek jadwal terdekat dan daftar lewat WhatsApp.",
-    keywords: ["event wellness Jakarta", "workshop spa", "sound healing Jakarta", "event self care"],
+      "Join KAMA Spa wellness events and workshops: sound healing, mindfulness classes, and community collaborations. See upcoming dates and register via WhatsApp.",
+    keywords: ["wellness events Jakarta", "spa workshops", "sound healing Jakarta", "self-care events"],
   },
   "/events/collaborations": {
-    title: "Kolaborasi & Partnership",
+    title: "Brand Collaborations & Partnerships",
     description:
-      "Kolaborasi KAMA Spa dengan brand, komunitas, dan kreator wellness — dari pop-up event sampai co-created treatment. Ajukan ide kolaborasi via tim marketing.",
-    keywords: ["kolaborasi brand", "partnership spa", "co-created treatment", "kolaborasi wellness"],
+      "KAMA Spa collaborations with brands, communities, and wellness creators — from pop-up events to co-created treatments. Pitch your idea via our marketing team.",
+    keywords: ["brand collaborations", "spa partnerships", "co-created treatment", "wellness collaborations"],
   },
   "/retail": {
-    title: "Produk Retail Spa & Wellness",
+    title: "Spa & Wellness Retail Products in Jakarta",
     description:
-      "Bawa pulang ritual KAMA Spa: koleksi produk retail kami — essential oil, body care, dan aromatherapy pilihan untuk merawat diri di rumah setiap hari.",
-    keywords: ["produk spa", "essential oil Jakarta", "body care", "aromatherapy", "beli produk spa"],
+      "Bring the KAMA Spa ritual home: our retail collection of essential oils, body care, and aromatherapy picks for everyday self-care at home.",
+    keywords: ["spa products", "essential oils Jakarta", "body care", "aromatherapy", "buy spa products"],
   },
   "/gift-card": {
-    title: "Gift Card Spa Jakarta",
+    title: "Buy Spa Gift Cards in South Jakarta",
     description:
-      "Berikan hadiah relaksasi dengan gift card KAMA Spa — tersedia berbagai nominal untuk treatment apa pun, berlaku di semua cabang, dan bisa dikirim digital.",
-    keywords: ["gift card spa", "voucher spa Jakarta", "hadiah spa", "kado relaksasi"],
+      "Give the gift of relaxation with a KAMA Spa gift card — flexible amounts for any treatment, valid at every branch, and deliverable digitally.",
+    keywords: ["spa gift card", "spa voucher Jakarta", "spa gift", "relaxation gift"],
   },
   "/contact": {
-    title: "Kontak, Lokasi & Reservasi",
+    title: "Spa Contact, Locations & Reservations",
     description:
-      "Hubungi KAMA Spa untuk reservasi dan informasi cabang. Temukan alamat, jam operasional, peta lokasi, dan link WhatsApp tiap cabang di halaman ini.",
-    keywords: ["kontak spa Jakarta", "reservasi spa", "lokasi KAMA Spa", "cabang spa Jakarta Selatan"],
+      "Contact KAMA Spa for reservations and branch information. Find addresses, opening hours, location maps, and WhatsApp links for every branch on this page.",
+    keywords: ["contact spa Jakarta", "spa reservations", "KAMA Spa locations", "spa branches South Jakarta"],
   },
   "/reservation": {
-    title: "Reservasi Spa Jakarta Selatan",
+    title: "Book Spa Reservations in South Jakarta",
     description:
-      "Ajukan reservasi treatment KAMA Spa secara online — pilih cabang, tanggal, jam, dan jenis treatment. Tim kami mengonfirmasi jadwal Anda via WhatsApp.",
-    keywords: ["reservasi spa Jakarta", "booking spa online", "jadwal treatment spa", "reservasi KAMA Spa"],
+      "Request a KAMA Spa treatment reservation online — choose your branch, date, time, and treatment. Our team confirms your schedule via WhatsApp.",
+    keywords: ["spa reservation Jakarta", "book spa online", "spa treatment schedule", "KAMA Spa reservation"],
   },
 };

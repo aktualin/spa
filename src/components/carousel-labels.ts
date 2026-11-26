@@ -8,8 +8,8 @@ import { copy, type PageCopy } from "@/lib/content/page-copy";
 
 export function carouselLabels(blocks: PageCopy): CarouselLabels {
   return {
-    prev: copy(blocks, "carousel.aria_prev") || "Gambar sebelumnya",
-    next: copy(blocks, "carousel.aria_next") || "Gambar berikutnya",
-    counter: copy(blocks, "carousel.aria_counter") || "Gambar {n} dari {m}",
+    prev: copy(blocks, "carousel.aria_prev") || "Previous image",
+    next: copy(blocks, "carousel.aria_next") || "Next image",
+    counter: copy(blocks, "carousel.aria_counter") || "Image {n} of {m}",
   };
 }

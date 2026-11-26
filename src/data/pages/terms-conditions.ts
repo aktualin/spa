@@ -4,62 +4,62 @@ import type { PolicySection } from "./privacy-policy.ts";
 
 export const termsConditions: { intro: string; sections: PolicySection[] } = {
   intro:
-    "Selamat datang di platform KAMA Spa (“KAMA”). Dengan mengakses atau menggunakan situs web ini, Anda menyetujui ketentuan penggunaan berikut.",
+    "Welcome to the KAMA Spa platform (“KAMA”). By accessing or using this website, you agree to the following terms of use.",
   sections: [
     {
-      title: "Ketentuan Penggunaan",
+      title: "Terms of Use",
       paragraphs: [
-        "Anda menyatakan bahwa berusia minimal 17 tahun. Anda bertanggung jawab memastikan penggunaan layanan kami sesuai dengan hukum dan peraturan yang berlaku.",
-        "Konten, teks, gambar, dan materi di dalam situs ini dilindungi oleh hak kekayaan intelektual. Penggunaan konten yang tidak diizinkan dapat berujung pada penghentian akses Anda.",
-        "Tautan ke situs pihak ketiga disediakan semata-mata untuk kenyamanan dan bukan sebagai endorsements. KAMA tidak bertanggung jawab atas isi maupun keakuratan situs di luar.",
+        "You confirm that you are at least 17 years old. You are responsible for ensuring that your use of our services complies with applicable laws and regulations.",
+        "The content, text, images, and materials on this site are protected by intellectual property rights. Unauthorized use of the content may result in the termination of your access.",
+        "Links to third-party sites are provided for convenience only and do not constitute endorsements. KAMA is not responsible for the content or accuracy of external sites.",
       ],
     },
     {
-      title: "Reservasi dan Jadwal",
+      title: "Reservations and Scheduling",
       paragraphs: [
-        "Reservasi dapat dibuat melalui WhatsApp, telepon, atau formulir di situs ini. Jadwal yang dikonfirmasi berlaku untuk tamu yang hadir pada waktu yang telah disepakati.",
-        "Permintaan pembatalan atau perubahan jadwal perlu disampaikan sesuai kebijakan pembatalan yang berlaku.",
+        "Reservations can be made via WhatsApp, by phone, or through the form on this site. A confirmed schedule applies to guests arriving at the agreed time.",
+        "Requests to cancel or reschedule must be made in accordance with the applicable cancellation policy.",
       ],
     },
     {
-      title: "Kebijakan Pembatalan",
+      title: "Cancellation Policy",
       paragraphs: [
-        "Kami memerlukan pemberitahuan 24 jam untuk membatalkan janji, dan nomor kartu kredit diperlukan untuk menahan reservasi.",
-        "Reservasi grup berisi 3 orang atau lebih wajib dibatalkan 72 jam sebelumnya. Janji yang terlewat akan dibebankan penuh, sedangkan pembatalan dalam rentang 24 jam akan dibebankan 50% dari biaya layanan.",
-        "Kami berhak membatalkan atau menunda layanan bila terjadi keadaan kahar, dan dalam hal tersebut akan menginformasikan Anda secepatnya.",
+        "We require 24 hours' notice to cancel an appointment, and a credit card number is required to hold a reservation.",
+        "Group reservations of 3 or more guests must be cancelled at least 72 hours in advance. Missed appointments are charged in full, while cancellations within 24 hours are charged 50% of the service fee.",
+        "We reserve the right to cancel or postpone services in the event of force majeure, and will inform you as soon as possible in such cases.",
       ],
     },
     {
-      title: "Pembayaran",
+      title: "Payment",
       paragraphs: [
-        "Harga tercantum dalam Rupiah dan belum termasuk pajak pemerintah sebesar 10%. Metode pembayaran yang diterima dapat langsung saat konfirmasi reservasi.",
-        "Kartu kredit yang dipakai untuk menahan reservasi hanya digunakan untuk keperluan pembatalan atau no-show.",
+        "Prices are listed in Rupiah and exclude 10% government tax. Accepted payment methods will be confirmed when your reservation is made.",
+        "The credit card used to hold a reservation is used only for cancellation or no-show purposes.",
       ],
     },
     {
-      title: "Perlakuan yang Diharapkan",
+      title: "Expected Conduct",
       paragraphs: [
-        "Kami menjunjung tinggi privasi dan ketenangan setiap tamu. Kami meminta ponsel dimatikan selama layanan berlangsung dan anak-anak tidak mendampingi tamu lain.",
-        "Perilaku yang mengganggu, sikap yang tidak sopan, atau penolakan terhadap arahan terapis dapat menyebabkan layanan dihentikan tanpa refund.",
+        "We uphold the privacy and calm of every guest. We ask that phones be switched off during services and that children do not accompany other guests.",
+        "Disruptive behavior, discourteous conduct, or refusal to follow a therapist's instructions may result in the service being terminated without a refund.",
       ],
     },
     {
-      title: "Hazard & Keselamatan",
+      title: "Hazards & Safety",
       paragraphs: [
-        "Anda wajib menyampaikan kondisi medis, alergi, kehamilan, atau kondisi lain yang relevan sebelum layanan dimulai. Kami tidak bertanggung jawab atas kondisi yang belum kami ketahui sebelumnya.",
-        "Barang bawaan yang hilang atau rusak berada di luar tanggung jawab kami, kecuali kerusakan yang disebabkan oleh kelalaian pihak kami.",
+        "You must disclose any medical conditions, allergies, pregnancy, or other relevant conditions before your service begins. We are not liable for conditions we were not informed of in advance.",
+        "Lost or damaged personal belongings are outside our responsibility, except for damage caused by our negligence.",
       ],
     },
     {
-      title: "Perubahan atas Ketentuan Ini",
+      title: "Changes to These Terms",
       paragraphs: [
-        "Kami berhak memperbarui ketentuan ini kapan saja. Perubahan akan dipublikasikan di situs ini dan berlaku sejak tanggal pencantuman di atas.",
+        "We reserve the right to update these terms at any time. Changes will be published on this site and take effect from the date stated above.",
       ],
     },
     {
-      title: "Hubungi Kami",
+      title: "Contact Us",
       paragraphs: [
-        "Untuk pertanyaan mengenai ketentuan ini, hubungi kami di hello@kamaspa.id atau +62 813-1605-2040, atau datang ke KAMA Spa di Kramat Pela, Jakarta Selatan.",
+        "For questions about these terms, contact us at hello@kamaspa.id or +62 813-1605-2040, or visit KAMA Spa in Kramat Pela, South Jakarta.",
       ],
     },
   ],

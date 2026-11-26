@@ -29,9 +29,9 @@ export async function Hero({
     lockupUrl: settings.logoLockupUrl || asset("img/kama/logo-kama-light.png"),
     lockupAlt: settings.brandLogoAlt || "KAMA Spa",
     menuHref: safeHref(copy(copyBlocks, "home.hero.menu_href")) ?? "/menu",
-    sliderAria: copy(copyBlocks, "home.hero.slider_aria") || "Pilih visual hero",
+    sliderAria: copy(copyBlocks, "home.hero.slider_aria") || "Choose hero visual",
     dotAria:
-      copy(copyBlocks, "home.hero.dot_aria") || "Tampilkan visual {n} dari {m}",
+      copy(copyBlocks, "home.hero.dot_aria") || "Show visual {n} of {m}",
   };
 
   return <HeroSlider section={section} labels={labels} slides={media} />;

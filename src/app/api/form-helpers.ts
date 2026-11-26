@@ -44,14 +44,14 @@ export function guardFormRequest(
   scope: string,
 ): NextResponse | null {
   if (!isSameOrigin(request.headers)) {
-    return json({ error: "Permintaan tidak diizinkan." }, 403);
+    return json({ error: "Request not allowed." }, 403);
   }
 
   const limit = limiter.check(rateLimitKey(scope, extractClientIp(request.headers)));
   if (!limit.allowed) {
     const retryAfterSeconds = Math.max(1, Math.ceil(limit.retryAfterMs / 1000));
     return json(
-      { error: "Terlalu banyak permintaan. Silakan coba lagi dalam beberapa menit." },
+      { error: "Too many requests. Please try again in a few minutes." },
       429,
       { "retry-after": String(retryAfterSeconds) },
     );
@@ -67,13 +67,13 @@ export async function parseFormBody(
   try {
     const raw = await request.text();
     if (raw.length > maxBody) {
-      return { ok: false, response: json({ error: "Isian terlalu panjang." }, 413) };
+      return { ok: false, response: json({ error: "Submission is too long." }, 413) };
     }
     const parsed: unknown = JSON.parse(raw);
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("bukan objek");
     return { ok: true, body: parsed as Record<string, unknown> };
   } catch {
-    return { ok: false, response: json({ error: "Body permintaan tidak valid." }, 400) };
+    return { ok: false, response: json({ error: "Invalid request body." }, 400) };
   }
 }
 

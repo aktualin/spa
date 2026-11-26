@@ -47,7 +47,7 @@ export async function POST(request: Request) {
   const fill = checkFillTime(body.elapsedMs);
   if (fill === "missing") return json({ ok: true });
   if (fill === "too-fast") {
-    return json({ error: "Formulir terkirim terlalu cepat. Mohon periksa isian Anda lalu kirim ulang." }, 400);
+    return json({ error: "The form was submitted too quickly. Please review your details and try again." }, 400);
   }
 
   const validation = validateInquiry({
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
   }
   if (body.consent !== true) {
     return json(
-      { error: "Mohon setujui pemrosesan data untuk menindaklanjuti inquiry ini." },
+      { error: "Please consent to data processing so we can follow up on this inquiry." },
       400,
     );
   }
@@ -75,7 +75,7 @@ export async function POST(request: Request) {
 
   const inquiry = toInquiryRecord(validation.data);
   if (!inquiry.name || !inquiry.message) {
-    return json({ error: "Mohon lengkapi nama dan pesan." }, 400);
+    return json({ error: "Please provide your name and message." }, 400);
   }
 
   let id: string;
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
     id = created.id;
   } catch (error) {
     console.error("[corporate-inquiry] gagal menyimpan inquiry:", errorCode(error));
-    return json({ error: "Terjadi kesalahan pada server. Silakan coba lagi." }, 500);
+    return json({ error: "Something went wrong on our server. Please try again." }, 500);
   }
 
   // Email ke pihak pertama dikirim setelah respons — kegagalannya tidak

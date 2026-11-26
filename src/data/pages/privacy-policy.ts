@@ -8,72 +8,72 @@ export type PolicySection = {
 
 export const privacyPolicy: { intro: string; sections: PolicySection[] } = {
   intro:
-    "Selamat datang di platform KAMA Spa (“KAMA”). Dengan mengakses atau menggunakan situs web ini, Anda menyetujui penggunaan data pribadi Anda sesuai kebijakan privasi yang kami tetapkan di bawah ini.",
+    "Welcome to the KAMA Spa platform (“KAMA”). By accessing or using this website, you agree to the use of your personal data in accordance with the privacy policy set out below.",
   sections: [
     {
-      title: "Informasi yang Kami Kumpulkan",
+      title: "Information We Collect",
       paragraphs: [
-        "Kami mengumpulkan berbagai jenis informasi agar dapat memberikan layanan yang lebih baik dan relevan bagi Anda:",
+        "We collect several types of information so we can provide a better, more relevant service to you:",
       ],
       bullets: [
-        "Informasi pribadi: nama, alamat email, nomor telepon, alamat, dan informasi preferensi yang Anda berikan saat membuat reservasi, melakukan pembelian, menghubungi kami, atau mengikuti promosi.",
-        "Data penggunaan: halaman yang Anda kunjungi, fitur yang Anda gunakan, durasi kunjungan, dan perangkat yang Anda gunakan untuk mengakses layanan kami.",
-        "Informasi perangkat: jenis perangkat, sistem operasi, jenis browser, dan alamat IP.",
+        "Personal information: your name, email address, phone number, address, and preference details you provide when making a reservation, completing a purchase, contacting us, or joining a promotion.",
+        "Usage data: the pages you visit, the features you use, the length of your visit, and the device you use to access our services.",
+        "Device information: device type, operating system, browser type, and IP address.",
       ],
     },
     {
-      title: "Bagaimana Kami Menggunakan Informasi Anda",
-      paragraphs: ["Informasi Anda digunakan untuk tujuan berikut:"],
+      title: "How We Use Your Information",
+      paragraphs: ["Your information is used for the following purposes:"],
       bullets: [
-        "Menyediakan dan meningkatkan layanan kami.",
-        "Memproses reservasi dan pembelian Anda.",
-        "Mengirim komunikasi pemasaran dan promosi, dengan persetujuan Anda.",
-        "Menjawab pertanyaan dan permintaan Anda.",
-        "Mempersonalisasi pengalaman Anda bersama kami.",
-        "Mematuhi ketentuan hukum dan regulasi yang berlaku.",
+        "To provide and improve our services.",
+        "To process your reservations and purchases.",
+        "To send marketing and promotional communications, with your consent.",
+        "To respond to your questions and requests.",
+        "To personalize your experience with us.",
+        "To comply with applicable laws and regulations.",
       ],
     },
     {
-      title: "Pembagian Informasi Anda",
+      title: "Sharing Your Information",
       paragraphs: [
-        "Kami tidak pernah menjual informasi pribadi Anda kepada pihak ketiga.",
-        "Kami mungkin berbagi informasi Anda dengan penyedia layanan pihak ketiga yang membantu kami menjalankan layanan. Penyedia tersebut diwajibkan menjaga kerahasiaan informasi Anda dan hanya menggunakannya untuk tujuan yang telah kami izinkan.",
-        "Informasi juga dapat dibagikan dalam keadaan tertentu untuk mematuhi ketentuan hukum, mencegah kegiatan yang tidak sah, serta melindungi hak dan keselamatan pihak lain.",
+        "We never sell your personal information to third parties.",
+        "We may share your information with third-party service providers who help us operate our services. These providers are required to keep your information confidential and to use it only for the purposes we have authorized.",
+        "Information may also be disclosed in certain circumstances to comply with the law, prevent unlawful activity, and protect the rights and safety of others.",
       ],
     },
     {
-      title: "Pilihan Anda",
-      paragraphs: ["Anda memiliki kendali atas informasi Anda. Anda dapat:"],
+      title: "Your Choices",
+      paragraphs: ["You remain in control of your information. You can:"],
       bullets: [
-        "Mengakses dan memperbarui data pribadi Anda dengan menghubungi tim kami.",
-        "Berhenti menerima komunikasi pemasaran dan promosi dari kami kapan saja.",
-        "Meminta penghapusan data pribadi Anda.",
+        "Access and update your personal data by contacting our team.",
+        "Opt out of marketing and promotional communications from us at any time.",
+        "Request the deletion of your personal data.",
       ],
     },
     {
-      title: "Cookies dan Teknologi Pelacakan",
+      title: "Cookies and Tracking Technologies",
       paragraphs: [
-        "Kami menggunakan cookies dan teknologi pelacakan lain untuk mengumpulkan informasi tentang cara Anda menggunakan layanan. Anda dapat mengatur penggunaan cookies di tingkat peramban. Menonaktifkan cookies mungkin membatasi sebagian fitur di situs kami.",
+        "We use cookies and other tracking technologies to gather information about how you use our services. You can manage cookies at the browser level. Disabling cookies may limit some features of our site.",
       ],
     },
     {
-      title: "Kebijakan Pemasaran SMS",
+      title: "SMS Marketing Policy",
       paragraphs: [
-        "Bagian ini berlaku khusus untuk pemasaran SMS dan tidak menggantikan Kebijakan Privasi kami secara keseluruhan.",
-        "Nomor telepon Anda hanya dikumpulkan ketika Anda memberikan secara sukarela, misalnya saat melakukan transaksi, melakukan inquiry, atau mendaftar untuk pesan promosi. Anda dapat berhenti berlangganan kapan saja dengan mengirim STOP atau UNSUBSCRIBE. Setelah opted out, nomor Anda tidak akan dijual atau dialihkan ke pihak ketiga untuk keperluan pemasaran.",
-        "Berlangganan pesan SMS tidak diperlukan untuk mengakses promosi atau diskon, yang juga tersedia langsung di situs kami.",
+        "This section applies specifically to SMS marketing and does not replace our Privacy Policy as a whole.",
+        "Your phone number is collected only when you provide it voluntarily — for example, when completing a transaction, making an inquiry, or signing up for promotional messages. You can opt out at any time by sending STOP or UNSUBSCRIBE. Once you have opted out, your number will not be sold or transferred to third parties for marketing purposes.",
+        "Subscribing to SMS messages is not required to access promotions or discounts, which are also available directly on our site.",
       ],
     },
     {
-      title: "Perubahan atas Kebijakan Ini",
+      title: "Changes to This Policy",
       paragraphs: [
-        "Kami dapat memperbarui kebijakan ini secara berkala. Perubahan signifikan akan dipublikasikan di situs kami. Pembaruan terakhir: 1 Januari 2026.",
+        "We may update this policy from time to time. Significant changes will be published on our site. Last updated: 1 January 2026.",
       ],
     },
     {
-      title: "Hubungi Kami",
+      title: "Contact Us",
       paragraphs: [
-        "Jika Anda memiliki pertanyaan tentang kebijakan privasi kami atau ingin memperbarui data Anda, hubungi kami di hello@kamaspa.id atau +62 813-1605-2040.",
+        "If you have questions about our privacy policy or would like to update your data, contact us at hello@kamaspa.id or +62 813-1605-2040.",
       ],
     },
   ],

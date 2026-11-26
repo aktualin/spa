@@ -42,7 +42,7 @@ test("mobile drawer opens flush under the header", async ({
   await expect(drawer).toBeHidden();
 
   const headerBox = (await header.boundingBox())!;
-  await page.getByRole("button", { name: /buka menu/i }).click();
+  await page.getByRole("button", { name: /open menu/i }).click();
 
   await expect(drawer).toBeVisible();
 
@@ -68,7 +68,7 @@ test("mobile drawer keeps the call to action visible", async ({
 }, testInfo) => {
   test.skip(testInfo.project.name === DESKTOP, "desktop has no drawer");
 
-  await page.getByRole("button", { name: /buka menu/i }).click();
+  await page.getByRole("button", { name: /open menu/i }).click();
 
   const cta = page.locator("#mobile-navigation").getByRole("link", {
     name: "Book Now",
@@ -86,7 +86,7 @@ test("mobile drawer keeps the call to action pinned to the bottom", async ({
 }, testInfo) => {
   test.skip(testInfo.project.name === DESKTOP, "desktop has no drawer");
 
-  await page.getByRole("button", { name: /buka menu/i }).click();
+  await page.getByRole("button", { name: /open menu/i }).click();
 
   const drawer = page.locator("#mobile-navigation");
   const accordion = drawer.getByRole("button", { name: "Service Menu" });
@@ -109,7 +109,7 @@ test("the floating whatsapp button never covers the drawer", async ({
 }, testInfo) => {
   test.skip(testInfo.project.name === DESKTOP, "desktop has no drawer");
 
-  await page.getByRole("button", { name: /buka menu/i }).click();
+  await page.getByRole("button", { name: /open menu/i }).click();
 
   const drawerButton = page
     .locator("#mobile-navigation")
@@ -130,7 +130,7 @@ test("the floating whatsapp button never covers the drawer", async ({
 test("mobile accordion lists the menu links", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === DESKTOP, "desktop has no drawer");
 
-  await page.getByRole("button", { name: /buka menu/i }).click();
+  await page.getByRole("button", { name: /open menu/i }).click();
 
   const accordion = page
     .locator("#mobile-navigation")
@@ -148,7 +148,7 @@ test("mobile accordion lists the menu links", async ({ page }, testInfo) => {
 test("escape closes the mobile drawer", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === DESKTOP, "desktop has no drawer");
 
-  await page.getByRole("button", { name: /buka menu/i }).click();
+  await page.getByRole("button", { name: /open menu/i }).click();
   await expect(page.locator("#mobile-navigation")).toBeVisible();
 
   await page.keyboard.press("Escape");
@@ -319,7 +319,7 @@ test("mobile drawer marks the current page link active", async ({
 
   await page.goto("/gallery");
   await page.waitForLoadState("networkidle");
-  await page.getByRole("button", { name: /buka menu/i }).click();
+  await page.getByRole("button", { name: /open menu/i }).click();
 
   const drawer = page.locator("#mobile-navigation");
   await expect(drawer.getByRole("link", { name: "Gallery" })).toHaveAttribute(

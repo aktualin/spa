@@ -8,7 +8,7 @@ export const additionalServices: AdditionalService[] = [
     anchor: "body",
     price: "120k",
     description:
-      "A gentle exfoliation that buffs away dullness and renew skin radiance. Comes in selected of home-special-blend scrubs.",
+      "A gentle exfoliation that buffs away dullness and renews skin radiance. Available in a selection of our house-blend scrubs.",
     image: asset("img/kama/04-turmeric-scrub.jpg"),
   },
   {

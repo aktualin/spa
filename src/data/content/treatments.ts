@@ -10,7 +10,7 @@ export const treatments: Treatment[] = [
     tagline: "A full reflexology treatment focused on the feet and shoulders",
     description:
       "A full reflexology treatment focused on the feet and shoulders, stimulating nerve points connected to vital organs and effective in relaxing the lower body, improving blood circulation, and reducing tension in the shoulder area.",
-    note: "We are using dry massage techniques without oil.",
+    note: "We use dry massage techniques without oil.",
     prices: [
       { duration: "60 min", price: "145k" },
       { duration: "90 min", price: "195k" },
@@ -26,7 +26,7 @@ export const treatments: Treatment[] = [
     tagline: "A curated relaxation treatment",
     description:
       "A curated relaxation treatment beginning with an aromatic meditation ritual, followed by intentional pressure applied to stimulating points along the arms, back, and feet, and thoughtfully completed with a sensory foot ritual as a calming final touch.",
-    note: "We are using dry massage techniques without oil.",
+    note: "We use dry massage techniques without oil.",
     prices: [
       { duration: "75 min", price: "195k" },
       { duration: "90 min", price: "225k" },

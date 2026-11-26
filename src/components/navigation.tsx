@@ -28,8 +28,8 @@ export async function Navigation() {
         alt: settings.brandLogoAlt,
       }}
       navAria={copy(pageCopy, "global.nav_aria") || "Global"}
-      navOpen={copy(pageCopy, "global.nav_open") || "Buka menu"}
-      navClose={copy(pageCopy, "global.nav_close") || "Tutup menu"}
+      navOpen={copy(pageCopy, "global.nav_open") || "Open menu"}
+      navClose={copy(pageCopy, "global.nav_close") || "Close menu"}
       fabAria={copy(pageCopy, "global.fab_aria") || "Chat via WhatsApp"}
     />
   );

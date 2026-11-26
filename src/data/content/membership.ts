@@ -19,7 +19,7 @@ export type MembershipData = {
 export const membership: MembershipData = {
   eyebrow: "membership",
   title: "KAMA Membership.",
-  price: "Just Rp 1.5jt a month.",
+  price: "Just Rp 1,500,000 a month.",
   body: "Make sure your me-time is always accounted for. You get a credit for one essential service a month, lower prices, special offers, and more.",
   cta: "Join KAMA Now",
   href: "/membership",

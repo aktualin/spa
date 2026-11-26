@@ -9,7 +9,7 @@ import { expect, test } from "@playwright/test";
 test("hero menampilkan slide video + foto dan kontrol titik", async ({ page }) => {
   await page.goto("/");
 
-  const controls = page.getByRole("group", { name: "Pilih visual hero" });
+  const controls = page.getByRole("group", { name: "Choose hero visual" });
   await expect(controls).toBeVisible();
 
   const dots = controls.getByRole("button");

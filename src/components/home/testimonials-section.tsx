@@ -23,7 +23,7 @@ export function TestimonialsSection({
   if (reviews.length === 0) return null;
   const eyebrow = section?.eyebrow?.trim() || null;
   const heading = section?.title?.trim() || null;
-  const listLabel = copy(copyBlocks, "home.reviews.aria_list") || "Ulasan pelanggan";
+  const listLabel = copy(copyBlocks, "home.reviews.aria_list") || "Customer reviews";
   return (
     <Reveal as="section" className="bg-cream">
       <div className="container-kama py-14 md:py-16 lg:py-20">

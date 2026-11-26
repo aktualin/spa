@@ -6,11 +6,11 @@ import { toWaNumber, waLink, corporateWhatsApp } from "../../src/lib/whatsapp.ts
 
 describe("U12 formatIdr", () => {
   it("memberi pemisah ribuan dan spasi setelah Rp", () => {
-    assert.equal(formatIdr(145000), "Rp 145.000");
+    assert.equal(formatIdr(145000), "Rp 145,000");
   });
 
   it("memformat nilai jutaan", () => {
-    assert.equal(formatIdr(1500000), "Rp 1.500.000");
+    assert.equal(formatIdr(1500000), "Rp 1,500,000");
   });
 
   it("memformat nol", () => {
@@ -18,7 +18,7 @@ describe("U12 formatIdr", () => {
   });
 
   it("tidak menampilkan angka desimal", () => {
-    assert.ok(!formatIdr(145000.75).includes(","));
+    assert.ok(!formatIdr(145000.75).includes("."));
   });
 });
 
@@ -56,12 +56,12 @@ describe("U12 toWaNumber", () => {
 });
 
 describe("U12 waLink & corporateWhatsApp", () => {
-  const MESSAGE = "Halo kak, saya mau reservasi";
+  const MESSAGE = "Hi KAMA, I'd like to make a reservation";
 
   it("meng-encode pesan ke dalam URL wa.me dengan nomor yang diberikan", () => {
     const link = waLink(MESSAGE, "6281316052040");
     assert.ok(link.startsWith("https://wa.me/6281316052040?text="));
-    assert.ok(link.includes("Halo%20kak"));
+    assert.ok(link.includes("Hi%20KAMA"));
   });
 
   it("nomor boleh ditulis dengan tanda baca; dirapikan ke digit saja", () => {
@@ -104,6 +104,6 @@ describe("U12 waLink & corporateWhatsApp", () => {
 
   it("pesan tetap ter-encode pada link corporate", () => {
     const link = corporateWhatsApp("0812-3456-7890", null, MESSAGE);
-    assert.ok(link?.includes("text=Halo%20kak"));
+    assert.ok(link?.includes("text=Hi%20KAMA"));
   });
 });

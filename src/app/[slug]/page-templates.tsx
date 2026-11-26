@@ -4,9 +4,9 @@ import type { PublicPage } from "@/lib/content/pages";
 import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { sanitizeHtml } from "@/lib/domain/sanitize";
 
-/** Tanggal pembaruan dalam format Indonesia, mis. "8 November 2026". */
+/** Tanggal pembaruan dalam format English day-first, mis. "8 November 2026". */
 function formatUpdatedAt(date: Date): string {
-  return new Intl.DateTimeFormat("id-ID", {
+  return new Intl.DateTimeFormat("en-GB", {
     day: "numeric",
     month: "long",
     year: "numeric",

@@ -11,7 +11,7 @@ export async function GET(
   const { slug } = await params;
   const post = await getJournalPost(slug);
   if (!post) {
-    return NextResponse.json({ error: "Artikel tidak ditemukan." }, { status: 404 });
+    return NextResponse.json({ error: "Article not found." }, { status: 404 });
   }
   return NextResponse.json({ post }, { headers: CONTENT_CACHE });
 }

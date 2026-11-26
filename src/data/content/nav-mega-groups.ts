@@ -8,7 +8,7 @@ export const megaGroups: Record<string, NavMegaGroup> = {
     panel: "narrow",
     columns: [
       {
-        title: "Layanan",
+        title: "Services",
         links: [
           { label: "Body Massage", href: "/menu#massage" },
           { label: "Chair Services", href: "/menu#massage" },
@@ -22,12 +22,12 @@ export const megaGroups: Record<string, NavMegaGroup> = {
       {
         image: asset("img/kama/03-oil-bowl.jpg"),
         badge: "new",
-        eyebrow: "Just Rp 1.5jt a month",
+        eyebrow: "Just Rp 1,500,000 a month",
         label: "Join KAMA Now",
         href: "/membership",
       },
     ],
-    footerLink: { label: "Lihat semua treatment", href: "/menu" },
+    footerLink: { label: "View all treatments", href: "/menu" },
   },
   corporate: {
     id: "corporate",
@@ -60,6 +60,6 @@ export const megaGroups: Record<string, NavMegaGroup> = {
         href: "/corporate#in-spa",
       },
     ],
-    footerLink: { label: "Lihat program corporate", href: "/corporate" },
+    footerLink: { label: "View corporate programs", href: "/corporate" },
   },
 };

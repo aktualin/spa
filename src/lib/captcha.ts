@@ -38,7 +38,7 @@ export async function verifyCaptcha(token: string | undefined | null): Promise<C
       ok: false,
       status: 503,
       error:
-        "Formulir sementara tidak dapat menerima kiriman. Silakan hubungi kami lewat WhatsApp atau email.",
+        "The form is temporarily unable to accept submissions. Please contact us via WhatsApp or email.",
     };
   }
   if (policy === "skip") {
@@ -47,7 +47,7 @@ export async function verifyCaptcha(token: string | undefined | null): Promise<C
   }
 
   if (!token || !token.trim()) {
-    return { ok: false, status: 400, error: "Mohon selesaikan verifikasi captcha terlebih dahulu." };
+    return { ok: false, status: 400, error: "Please complete the captcha verification first." };
   }
 
   try {
@@ -60,7 +60,7 @@ export async function verifyCaptcha(token: string | undefined | null): Promise<C
       cache: "no-store",
     });
     if (!response.ok) {
-      return { ok: false, status: 400, error: "Verifikasi captcha gagal. Silakan coba lagi." };
+      return { ok: false, status: 400, error: "Captcha verification failed. Please try again." };
     }
     const data = (await response.json().catch(() => null)) as SiteverifyResponse | null;
     if (!data?.success) {
@@ -68,14 +68,14 @@ export async function verifyCaptcha(token: string | undefined | null): Promise<C
     }
     return { ok: true, skipped: false };
   } catch {
-    return { ok: false, status: 400, error: "Verifikasi captcha gagal. Silakan coba lagi." };
+    return { ok: false, status: 400, error: "Captcha verification failed. Please try again." };
   }
 }
 
 /** Turnstile mengirim `error-codes` sebagai array string. */
 function describeCaptchaError(codes: unknown): string {
   if (Array.isArray(codes) && codes.includes("timeout-or-duplicate")) {
-    return "Verifikasi captcha kedaluwarsa. Silakan selesaikan captcha lagi.";
+    return "Captcha verification expired. Please complete the captcha again.";
   }
   return describeTurnstileError(
     Array.isArray(codes) ? codes.map((code) => ({ code: String(code) })) : codes,

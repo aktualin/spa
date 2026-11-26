@@ -41,7 +41,7 @@ export function PriceFields({ pkg }: { pkg: PackageFormData }) {
       <Field
         label="Teks durasi"
         htmlFor="durationLabel"
-        hint='Teks yang tampil di halaman Menu, contoh: "2 hours 30 minute". Kosong = dari durasi menit.'
+        hint='Teks yang tampil di halaman Menu, contoh: "2 hours 30 minutes". Kosong = dari durasi menit.'
       >
         <input
           id="durationLabel"

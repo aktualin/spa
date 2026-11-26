@@ -323,9 +323,9 @@ async function seedCorporate() {
       heroImageUrl: asset("img/kama/corporate/01-corporate-sign.jpg"),
       heroImageAlt: "KAMA Spa — Corporate Wellness Solutions",
       aboutImageUrl: asset("img/kama/corporate/02-massage.jpg"),
-      aboutImageAlt: "Sesi corporate wellness KAMA Spa",
+      aboutImageAlt: "KAMA Spa corporate wellness session",
       inSpaImageUrl: asset("img/kama/corporate/05-lounge.jpg"),
-      inSpaImageAlt: "Lounge KAMA Spa dengan tim menikmati refreshments",
+      inSpaImageAlt: "KAMA Spa lounge with a team enjoying refreshments",
     },
     // Tidak menimpa: suntingan admin menang.
     update: {},
@@ -458,21 +458,21 @@ async function seedSiteSettings() {
 
 async function seedPageSeo(prisma: PrismaClient): Promise<void> {
   const routes = [
-    { path: "/", title: "KAMA Spa • Wellness Sanctuary di South Jakarta", description: "KAMA Spa adalah wellness sanctuary di jantung South Jakarta. Memadukan teknik penyembuhan tradisional dengan pendekatan wellness modern untuk treatments, massage, dan corporate wellness." },
-    { path: "/treatments", title: "Treatments", description: "Seluruh treatment KAMA Spa — massage, body, facial, head & scalp, dan bath ritual, lengkap dengan durasi dan harga." },
-    { path: "/treatments/packages", title: "Spa Packages", description: "Paket dan All Day Spa KAMA — rangkaian treatment yang disusun jadi satu ritual lengkap." },
-    { path: "/menu", title: "Menu Treatments", description: "KAMA Spa menu — massage, body scrub, face ritual, head & scalp treatment, bath ritual, dan paket All Day Spa." },
-    { path: "/promos", title: "Promos", description: "Promo dan penawaran khusus KAMA Spa yang sedang berjalan — termasuk membership dan paket treatment." },
-    { path: "/membership", title: "Membership", description: "KAMA Membership — paket keanggotaan dengan essential service bulanan, harga anggota untuk seluruh menu, dan benefit khusus." },
-    { path: "/promos/membership", title: "Promo Membership", description: "KAMA Membership — paket keanggotaan dengan essential service bulanan, harga anggota untuk seluruh menu, dan benefit khusus." },
-    { path: "/corporate", title: "Corporate Wellness", description: "KAMA Corporate Wellness Solutions — program wellness di kantor, pengalaman wellness tim, dan benefit kesehatan karyawan." },
-    { path: "/our-story", title: "Our Story", description: "Filosofi dan nilai KAMA Spa — perawatan tradisional yang dikerjakan tanpa terburu-buru." },
-    { path: "/our-story/journal", title: "Journal", description: "Tulisan KAMA Spa tentang perawatan tubuh, ritual, dan kebiasaan istirahat yang baik." },
-    { path: "/gallery", title: "Gallery", description: "Foto ruang, ritual, dan detail kecil di KAMA Spa — supaya Anda tahu seperti apa suasananya sebelum datang." },
-    { path: "/events", title: "Events", description: "Upcoming events dan program KAMA Spa — personally curated experiences, corporate wellness, dan kolaborasi dengan brand." },
-    { path: "/events/collaborations", title: "Kolaborasi", description: "Program wellness KAMA Spa yang pernah dijalankan bersama partner, perusahaan, dan brand — a glimpse of wellness in action." },
-    { path: "/retail", title: "KAMA Retail", description: "Produk perawatan KAMA Spa yang bisa dibawa pulang — minyak, scrub, dan perlengkapan ritual di rumah." },
-    { path: "/gift-card", title: "Gift Card", description: "KAMA Gift Card — hadiah berupa waktu istirahat, berlaku untuk seluruh treatment dan ritual KAMA Spa." },
+    { path: "/", title: "KAMA Spa • Wellness Sanctuary in South Jakarta", description: "KAMA Spa is a wellness sanctuary in South Jakarta, blending traditional healing with modern wellness across treatments, massage, and corporate wellness." },
+    { path: "/treatments", title: "Spa Treatments & Massage in Jakarta", description: "Explore the KAMA Spa treatment collection: traditional massage, body treatments, facials, and head & bath rituals. See duration, benefits, and price for each." },
+    { path: "/treatments/packages", title: "Curated Spa Packages in South Jakarta", description: "KAMA Spa curated packages for complete relaxation — massage, body treatments, and rituals combined at a package price that saves more than booking separately." },
+    { path: "/menu", title: "Full Spa Menu & Prices in South Jakarta", description: "The complete KAMA Spa menu with durations and prices — from massage, body scrubs, and facials to head therapy, bath rituals, and additional services." },
+    { path: "/promos", title: "Latest Spa & Massage Promos in Jakarta", description: "The latest KAMA Spa promotions: treatment discounts, value packages, and special member offers. Book via WhatsApp — promo slots are limited each month." },
+    { path: "/membership", title: "Spa Membership Plans in South Jakarta", description: "Become a KAMA Spa member and enjoy member prices, priority booking, and exclusive benefits for your routine care. Explore membership tiers and how to join." },
+    { path: "/promos/membership", title: "Special Membership Offers in Jakarta", description: "Special KAMA Spa membership offers — joining deals, tier upgrades, and exclusive member benefits for routine wellness care in South Jakarta." },
+    { path: "/corporate", title: "Corporate Wellness Programs in Jakarta", description: "KAMA Spa corporate wellness for companies: on-site massage, employee wellness packages, and brand collaborations. Contact our marketing team for a proposal." },
+    { path: "/our-story", title: "The Story & Philosophy Behind KAMA", description: "Discover the journey and philosophy of KAMA Spa — traditional Nusantara healing techniques blended with modern wellness in the heart of South Jakarta." },
+    { path: "/our-story/journal", title: "Wellness & Spa Journal from Jakarta", description: "Articles on wellness, self-care, and spa treatments from KAMA Spa: relaxation tips, massage benefits, traditional rituals, and guides to balanced living." },
+    { path: "/gallery", title: "Spa Atmosphere Gallery in South Jakarta", description: "Step inside KAMA Spa through our photo gallery — treatment room interiors, ritual details, and the calm atmosphere of our South Jakarta wellness sanctuary." },
+    { path: "/events", title: "Wellness Events & Workshops in Jakarta", description: "Join KAMA Spa wellness events and workshops: sound healing, mindfulness classes, and community collaborations. See upcoming dates and register via WhatsApp." },
+    { path: "/events/collaborations", title: "Brand Collaborations & Partnerships", description: "KAMA Spa collaborations with brands, communities, and wellness creators — from pop-up events to co-created treatments. Pitch your idea via our marketing team." },
+    { path: "/retail", title: "Spa & Wellness Retail Products in Jakarta", description: "Bring the KAMA Spa ritual home: our retail collection of essential oils, body care, and aromatherapy picks for everyday self-care at home." },
+    { path: "/gift-card", title: "Buy Spa Gift Cards in South Jakarta", description: "Give the gift of relaxation with a KAMA Spa gift card — flexible amounts for any treatment, valid at every branch, and deliverable digitally." },
   ];
   for (const route of routes) {
     const existing = await prisma.pageSeo.findUnique({ where: { path: route.path } });

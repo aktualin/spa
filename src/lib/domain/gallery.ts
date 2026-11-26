@@ -84,5 +84,5 @@ export function photoAltText(
   const caption = photo.caption?.trim();
   if (caption) return caption;
   const name = albumName.trim();
-  return name ? `Foto ${name} — KAMA Spa` : "Foto galeri KAMA Spa";
+  return name ? `${name} — KAMA Spa` : "KAMA Spa gallery photo";
 }

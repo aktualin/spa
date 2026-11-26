@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     status: "NEW" as const,
   };
   if (!data.name || !data.phone) {
-    return json({ error: "Mohon lengkapi nama dan nomor telepon." }, 400);
+    return json({ error: "Please provide your name and phone number." }, 400);
   }
 
   try {
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
     await prisma.reservationRequest.create({ data });
   } catch (error) {
     console.error("[reservation] gagal menyimpan permintaan:", errorCode(error));
-    return json({ error: "Terjadi kesalahan pada server. Silakan coba lagi." }, 500);
+    return json({ error: "Something went wrong on our server. Please try again." }, 500);
   }
 
   return json({ ok: true });

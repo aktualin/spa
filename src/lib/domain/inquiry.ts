@@ -65,11 +65,11 @@ export function describeTurnstileError(errors: unknown): string {
   if (Array.isArray(errors) && errors.length > 0) {
     const first = errors[0] as { code?: string } | undefined;
     if (first?.code === "invalid-input-response") {
-      return "Verifikasi captcha gagal. Silakan coba lagi.";
+      return "Verification failed. Please try again.";
     }
     if (first?.code === "timeout-or-duplicate") {
-      return "Verifikasi captcha kedaluwarsa. Silakan muat ulang halaman.";
+      return "Verification expired. Please reload the page.";
     }
   }
-  return "Verifikasi captcha gagal. Silakan coba lagi.";
+  return "Verification failed. Please try again.";
 }

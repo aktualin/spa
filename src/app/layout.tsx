@@ -7,7 +7,7 @@ export { generateRootMetadata as generateMetadata } from "./layout-metadata";
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="id"
+      lang="en"
       className="h-full antialiased"
       data-scroll-behavior="smooth"
       /* The inline script below sets `data-js` on <html> before React

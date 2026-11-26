@@ -65,11 +65,13 @@ describe("U1 parsePriceIdr", () => {
 });
 
 describe("U1 parsePriceLabel (label gaya konten statis)", () => {
-  it("mengubah sufiks k/rb/jt menjadi rupiah penuh", () => {
+  it("mengubah sufiks k/rb/jt/million menjadi rupiah penuh", () => {
     assert.equal(parsePriceLabel("145k"), 145000);
     assert.equal(parsePriceLabel("650rb"), 650000);
     assert.equal(parsePriceLabel("1.5jt"), 1500000);
     assert.equal(parsePriceLabel("1000k"), 1000000);
+    assert.equal(parsePriceLabel("1.5 million"), 1500000);
+    assert.equal(parsePriceLabel("2m"), 2000000);
   });
 
   it("menerima pemisah ribuan pada label", () => {
@@ -108,15 +110,16 @@ describe("U2 parseDurationMin", () => {
 
 describe("U2 formatDuration", () => {
   it("menit di bawah satu jam tetap dalam menit", () => {
-    assert.equal(formatDuration(30), "30 menit");
-    assert.equal(formatDuration(45), "45 menit");
+    assert.equal(formatDuration(30), "30 minutes");
+    assert.equal(formatDuration(45), "45 minutes");
+    assert.equal(formatDuration(1), "1 minute");
   });
 
   it("satu jam ke atas ditulis dalam jam", () => {
-    assert.equal(formatDuration(60), "1 jam");
-    assert.equal(formatDuration(90), "1.5 jam");
-    assert.equal(formatDuration(120), "2 jam");
-    assert.equal(formatDuration(150), "2.5 jam");
+    assert.equal(formatDuration(60), "1 hour");
+    assert.equal(formatDuration(90), "1.5 hours");
+    assert.equal(formatDuration(120), "2 hours");
+    assert.equal(formatDuration(150), "2.5 hours");
   });
 
   it("nilai tidak valid menghasilkan string kosong", () => {
@@ -158,12 +161,12 @@ describe("U1 batas & harga opsional (modul Harga)", () => {
 });
 
 describe("U1 formatMembershipPriceLabel", () => {
-  it("memakai gaya label halaman Membership", () => {
-    assert.equal(formatMembershipPriceLabel(1500000), "Rp 1,5jt");
-    assert.equal(formatMembershipPriceLabel(2000000), "Rp 2jt");
-    assert.equal(formatMembershipPriceLabel(1250000), "Rp 1,25jt");
-    assert.equal(formatMembershipPriceLabel(750000), "Rp 750rb");
-    assert.equal(formatMembershipPriceLabel(1250), "Rp 1.250");
+  it("memakai gaya label halaman Membership (format IDR penuh)", () => {
+    assert.equal(formatMembershipPriceLabel(1500000), "Rp 1,500,000");
+    assert.equal(formatMembershipPriceLabel(2000000), "Rp 2,000,000");
+    assert.equal(formatMembershipPriceLabel(1250000), "Rp 1,250,000");
+    assert.equal(formatMembershipPriceLabel(750000), "Rp 750,000");
+    assert.equal(formatMembershipPriceLabel(1250), "Rp 1,250");
   });
 
   it("bolak-balik dengan parsePriceLabel", () => {

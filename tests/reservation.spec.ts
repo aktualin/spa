@@ -20,7 +20,7 @@ test.beforeEach(async ({ page }) => {
 
 test("/reservation merender form reservasi lengkap", async ({ page }) => {
   await page.goto("/reservation");
-  await expect(page.locator("h1")).toContainText(/reservasi/i);
+  await expect(page.locator("h1")).toContainText(/reservation/i);
 
   const form = page.locator('form[data-track-form="reservation"]');
   await expect(form).toBeVisible();
@@ -47,7 +47,7 @@ test("CTA Book Now menuju /reservation", async ({ page }, testInfo) => {
     const cta = page.locator("header nav").getByRole("link", { name: "Book Now" });
     await expect(cta).toHaveAttribute("href", "/reservation");
   } else {
-    await page.getByRole("button", { name: /buka menu/i }).click();
+    await page.getByRole("button", { name: /open menu/i }).click();
     const cta = page
       .locator("#mobile-navigation")
       .getByRole("link", { name: "Book Now" });
