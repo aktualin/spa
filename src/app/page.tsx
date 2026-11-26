@@ -3,7 +3,6 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import {
   getHeroSlides,
-  getHomepageReviews,
   getHomepageSections,
   getHomepageStats,
   getWhatsNewCards,
@@ -33,8 +32,8 @@ export async function generateMetadata(): Promise<Metadata> {
  * gallery-teaser) hanya muncul bila barisnya ada di DB dan aktif.
  *
  * Semua teks/gambar/tombol berasal dari DB (`HomepageSection`, `ContentBlock`,
- * `HomepageHighlight`, `HomepageStat`, `HomepageReview`, `InstagramPost`).
- * Tidak ada teks cadangan di kode.
+ * `HomepageHighlight`, `HomepageStat`, `InstagramPost`). Tidak ada teks
+ * cadangan di kode.
  *
  * Section `footer` hanya mengatur tampil/sembunyi footer di homepage; posisinya
  * tetap di paling bawah (tidak ikut urutan). Tanpa baris DB → tampil.
@@ -45,7 +44,6 @@ export default async function Home() {
     membershipProgram,
     whatsNewCards,
     stats,
-    reviews,
     heroSlides,
     pageCopy,
   ] = await Promise.all([
@@ -53,7 +51,6 @@ export default async function Home() {
     getMembershipProgram(),
     getWhatsNewCards(),
     getHomepageStats(),
-    getHomepageReviews(),
     getHeroSlides(),
     getPageCopy(),
   ]);
@@ -64,7 +61,6 @@ export default async function Home() {
     membershipProgram,
     whatsNewCards,
     stats,
-    reviews,
     heroSlides,
     pageCopy,
     showFooter,

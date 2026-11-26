@@ -2,7 +2,6 @@ export const HOMEPAGE_SECTION_KEYS = [
   "hero",
   "membership-banner",
   "whats-new",
-  "reviews",
   "brand-intro",
   "socials",
   "booking-banner",
@@ -18,7 +17,6 @@ const KEY_LABEL: Record<string, string> = {
   hero: "Hero",
   "membership-banner": "Banner Membership",
   "whats-new": "What's New",
-  reviews: "Reviews",
   "brand-intro": "Brand Intro",
   socials: "Socials",
   "booking-banner": "Banner Booking",
@@ -62,7 +60,7 @@ export function sectionKeyLabel(key: string): string {
  * tetap diberi form isian walau kartunya diatur di modul lain.
  * `whats-new` juga memakai tombol ajakan (label + tujuan).
  */
-export const TEXT_EDITABLE_SECTION_KEYS = ["whats-new", "reviews"] as const;
+export const TEXT_EDITABLE_SECTION_KEYS = ["whats-new"] as const;
 
 export function hasEditableText(key: string): boolean {
   return (TEXT_EDITABLE_SECTION_KEYS as readonly string[]).includes(key);

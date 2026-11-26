@@ -28,7 +28,6 @@ export type ContentSpot = {
 
 export const CONTENT_SPOTS: readonly ContentSpot[] = [
   { key: "homepageHighlight", label: "What's New di homepage", href: "/admin/homepage/highlights" },
-  { key: "homepageReview", label: "Ulasan di homepage", href: "/admin/homepage/reviews" },
   { key: "homepageStat", label: "Statistik brand di homepage", href: "/admin/homepage/stats" },
   { key: "instagramPost", label: "Feed Instagram", href: "/admin/homepage/instagram" },
   { key: "galleryPhoto", label: "Foto galeri", href: "/admin/gallery" },

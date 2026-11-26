@@ -1009,20 +1009,6 @@ model HomepageStat {
   updatedAt DateTime @updatedAt
 }
 
-// Ulasan di section Reviews.
-model HomepageReview {
-  id          String  @id @default(cuid())
-  quote       String
-  name        String
-  location    String?
-  role        String?
-  isPublished Boolean @default(true)
-  sortOrder   Int     @default(0)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 // Embed postingan Instagram yang dipilih admin: satu baris = satu URL
 // postingan (https://www.instagram.com/p|reel|tv/{code}/) yang di-embed.
 model InstagramPost {

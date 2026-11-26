@@ -16,7 +16,7 @@ export type ContentListRow = {
 type FormAction = (formData: FormData) => void | Promise<void>;
 
 /**
- * Daftar admin bersama untuk Statistik, Ulasan, dan Feed Instagram: status
+ * Daftar admin bersama untuk Statistik dan Feed Instagram: status
  * terbit, tombol Terbitkan/Jadikan draf, urutan ↑/↓, dan tombol "Salin data
  * bawaan" saat tabel kosong. Server component murni.
  */
@@ -47,7 +47,7 @@ export function ContentList({
   deleted?: string;
   deletedLabel: string;
   emptyNote: ReactNode;
-  /** Opsional: hanya daftar dengan data bawaan (Statistik, Ulasan). */
+  /** Opsional: hanya daftar dengan data bawaan (Statistik). */
   importLabel?: string;
   importAction?: () => void | Promise<void>;
   noLiveNote: ReactNode;

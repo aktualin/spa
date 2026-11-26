@@ -1,6 +1,6 @@
 import { BookingBanner, Hero, HeroStats, MembershipBanner } from "@/components/home/hero";
 import { CustomSection } from "@/components/home/custom-section";
-import { TestimonialsSection, WhatsNewSection } from "@/components/home/sections";
+import { WhatsNewSection } from "@/components/home/sections";
 import { SocialsSection } from "@/components/home/socials";
 import { SignatureTreatmentsSection } from "@/components/public/home/signature-treatments";
 import { PromoHighlightSection } from "@/components/public/home/promo-highlight";
@@ -8,7 +8,7 @@ import { GalleryTeaserSection } from "@/components/public/home/gallery-teaser";
 import type { HeroSlideRow } from "@/lib/content/homepage";
 import type { MembershipProgram } from "@/lib/content/membership";
 import type { PageCopy } from "@/lib/content/page-copy";
-import type { HighlightCard, ReviewItem, StatItem } from "@/lib/domain/homepage";
+import type { HighlightCard, StatItem } from "@/lib/domain/homepage";
 import type { VisibleHomeSection } from "./home-order";
 
 /** Data bersama yang dibutuhkan renderer section homepage. */
@@ -16,7 +16,6 @@ export type HomeSectionData = {
   membershipProgram: MembershipProgram | null;
   whatsNewCards: HighlightCard[];
   stats: StatItem[];
-  reviews: ReviewItem[];
   heroSlides: HeroSlideRow[];
   pageCopy: PageCopy;
   showFooter: boolean;
@@ -31,7 +30,7 @@ export function HomeSection({
   data: HomeSectionData;
 }) {
   const { key, section } = entry;
-  const { membershipProgram, whatsNewCards, stats, reviews, heroSlides, pageCopy, showFooter } = data;
+  const { membershipProgram, whatsNewCards, stats, heroSlides, pageCopy, showFooter } = data;
 
   switch (key) {
     case "hero":
@@ -42,14 +41,6 @@ export function HomeSection({
           cards={whatsNewCards}
           section={section}
           showFooterCta={showFooter}
-          copyBlocks={pageCopy}
-        />
-      );
-    case "reviews":
-      return (
-        <TestimonialsSection
-          reviews={reviews}
-          section={section}
           copyBlocks={pageCopy}
         />
       );

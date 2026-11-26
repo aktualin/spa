@@ -8,8 +8,6 @@ import { isSafeCtaHref } from "@/lib/domain/homepage-banner";
 import type { HighlightCard } from "@/lib/domain/homepage";
 import { WhatsNewCardBody } from "./whats-new-card";
 
-export { TestimonialsSection } from "./testimonials-section";
-
 /**
  * Section "What's New". Judul, deskripsi, dan tombol diambil dari
  * `HomepageSection` (modul Homepage); bagian yang belum diisi admin tidak

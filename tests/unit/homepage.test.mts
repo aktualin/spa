@@ -29,7 +29,7 @@ function row(partial: Partial<HighlightRowLike> & { id: string }): HighlightRowL
 
 describe("section bawaan", () => {
   it("section lama & footer tampil walau belum ada baris DB", () => {
-    for (const key of ["hero", "whats-new", "reviews", "booking-banner", "footer"]) {
+    for (const key of ["hero", "whats-new", "booking-banner", "footer"]) {
       assert.equal(isDefaultVisibleSection(key), true, key);
     }
   });
@@ -202,17 +202,14 @@ import {
   INSTAGRAM_LIMITS,
   normalizeInstagramPostUrl,
   selectInstagramPosts,
-  selectReviews,
   selectStats,
   validateInstagramInput,
-  validateReviewInput,
   validateStatInput,
 } from "../../src/lib/domain/homepage.ts";
 
-describe("statistik, ulasan, feed Instagram", () => {
+describe("statistik & feed Instagram", () => {
   it("tabel kosong → null (pakai fallback statis)", () => {
     assert.equal(selectStats([]), null);
-    assert.equal(selectReviews([]), null);
     assert.equal(selectInstagramPosts([]), null);
   });
 
@@ -227,13 +224,6 @@ describe("statistik, ulasan, feed Instagram", () => {
       { id: "c", value: "3", label: "tiga", isPublished: false, sortOrder: 2 },
     ]);
     assert.deepEqual(out?.map((s) => s.key), ["a", "b"]);
-  });
-
-  it("ulasan: lokasi/peran kosong menjadi string kosong", () => {
-    const out = selectReviews([
-      { id: "a", quote: " q ", name: " N ", location: null, role: undefined, isPublished: true, sortOrder: 0 },
-    ]);
-    assert.deepEqual(out, [{ key: "a", quote: "q", name: "N", location: "", role: "" }]);
   });
 
   it("Instagram: URL tak valid dibuang, kembar dihitung sekali, maks 12", () => {
@@ -261,14 +251,6 @@ describe("statistik, ulasan, feed Instagram", () => {
     assert.equal(validateStatInput({ value: "12", label: "" }).ok, false);
     assert.equal(validateStatInput({ value: "1".repeat(21), label: "x" }).ok, false);
     assert.equal(validateStatInput({ value: "12", label: "years" }).ok, true);
-  });
-
-  it("validasi ulasan", () => {
-    assert.equal(validateReviewInput({ quote: "", name: "A" }).ok, false);
-    assert.equal(validateReviewInput({ quote: "q", name: "" }).ok, false);
-    assert.equal(validateReviewInput({ quote: "q".repeat(601), name: "A" }).ok, false);
-    const ok = validateReviewInput({ quote: "q", name: "A", location: " ", isPublished: true });
-    assert.ok(ok.ok && ok.data.location === null && ok.data.isPublished);
   });
 
   it("validasi Instagram", () => {

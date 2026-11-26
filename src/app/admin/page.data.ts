@@ -50,14 +50,12 @@ export function emptyContentSummary(buckets: MonthBucket[]): ContentSummary {
 export async function contentSpotCounts(): Promise<Record<string, number>> {
   const [
     homepageHighlight,
-    homepageReview,
     homepageStat,
     instagramPost,
     galleryPhoto,
     retailProduct,
   ] = await Promise.all([
     prisma.homepageHighlight.count(),
-    prisma.homepageReview.count(),
     prisma.homepageStat.count(),
     prisma.instagramPost.count(),
     prisma.galleryPhoto.count(),
@@ -66,7 +64,6 @@ export async function contentSpotCounts(): Promise<Record<string, number>> {
 
   return {
     homepageHighlight,
-    homepageReview,
     homepageStat,
     instagramPost,
     galleryPhoto,

@@ -1,7 +1,7 @@
 /**
- * Server Action statistik Brand Intro (`HomepageStat`), ulasan
- * (`HomepageReview`), dan embed feed Instagram (`InstagramPost`). Aturan isi
- * ada di `@/lib/domain/homepage`. Pola sama dengan `homepage-highlights.ts`.
+ * Server Action statistik Brand Intro (`HomepageStat`) dan embed feed
+ * Instagram (`InstagramPost`). Aturan isi ada di `@/lib/domain/homepage`.
+ * Pola sama dengan `homepage-highlights.ts`.
  *
  * Barrel: implementasi dipecah ke modul saudara per entity.
  */
@@ -15,15 +15,7 @@ export {
   moveHomepageStatAction,
   toggleHomepageStatAction,
 } from "./homepage-content.stats";
-export {
-  listHomepageReviews,
-  getHomepageReview,
-  saveHomepageReviewAction,
-  deleteHomepageReviewAction,
-  moveHomepageReviewAction,
-  toggleHomepageReviewAction,
-} from "./homepage-content.reviews";
-export { importDefaultStatsAction, importDefaultReviewsAction } from "./homepage-content.imports";
+export { importDefaultStatsAction } from "./homepage-content.imports";
 export {
   listInstagramPosts,
   getInstagramPost,

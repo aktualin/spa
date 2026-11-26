@@ -11,10 +11,6 @@ export const SECTION_SOURCE: Record<
     text: "Kartu “What’s New” diatur di Highlight Homepage (gambar, label, judul, tautan, periode tampil). Judul section, deskripsi, dan tombol diisi di bawah ini — bagian yang dikosongkan tidak tampil di homepage.",
     link: { href: "/admin/homepage/highlights", label: "Kelola highlight" },
   },
-  reviews: {
-    text: "Kartu ulasan pelanggan diatur di Ulasan Pelanggan (isi, nama, lokasi, urutan, tampil/sembunyi). Judul section diisi di bawah ini.",
-    link: { href: "/admin/homepage/reviews", label: "Kelola ulasan" },
-  },
   "brand-intro": {
     text: "Kotak angka “KAMA at a glance” diatur di Statistik Brand Intro. Cerita lengkap brand diatur di halaman Our Story.",
     link: { href: "/admin/homepage/stats", label: "Kelola statistik" },

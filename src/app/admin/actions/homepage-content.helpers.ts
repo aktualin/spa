@@ -11,7 +11,6 @@ import { text } from "../promos/_kit/schema";
 export type ActionState = { error: string | null; ok?: boolean };
 
 export const STATS_PATH = "/admin/homepage/stats";
-export const REVIEWS_PATH = "/admin/homepage/reviews";
 export const INSTAGRAM_PATH = "/admin/homepage/instagram";
 
 export function revalidateAll(path: string) {
@@ -28,9 +27,9 @@ export function idOf(formData: FormData): string {
 }
 
 /**
- * Pola bersama tiga modul homepage (statistik, ulasan, Instagram): geser
- * urutan, terbitkan/sembunyikan, dan hapus baris. Delegate dikirim sebagai
- * closure supaya tiap model tetap memakai tipe Prisma aslinya.
+ * Pola bersama modul homepage (statistik, Instagram): geser urutan,
+ * terbitkan/sembunyikan, dan hapus baris. Delegate dikirim sebagai closure
+ * supaya tiap model tetap memakai tipe Prisma aslinya.
  */
 export async function moveHomepageRow(
   formData: FormData,

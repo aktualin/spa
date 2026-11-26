@@ -9,7 +9,6 @@ export const DEFAULT_VISIBLE_SECTION_KEYS = [
   "hero",
   "membership-banner",
   "whats-new",
-  "reviews",
   "brand-intro",
   "socials",
   "booking-banner",

@@ -39,7 +39,6 @@ export const GLOBAL_GROUPS: readonly PageCopyGroup[] = [
       { key: "home.brand_intro.stats_label", label: "Brand Intro — label statistik", type: "text", maxLength: 80 },
       { key: "home.whats_new.card_eyebrow", label: "What’s New — eyebrow kartu cadangan", type: "text", maxLength: 60 },
       { key: "home.whats_new.empty", label: "What’s New — pesan kosong", type: "textarea", maxLength: 240 },
-      { key: "home.reviews.empty", label: "Reviews — pesan kosong", type: "textarea", maxLength: 240 },
       { key: "home.socials.empty", label: "Socials — pesan feed kosong", type: "textarea", maxLength: 240 },
       { key: "home.promo.eyebrow", label: "Promo Highlight — eyebrow promo", type: "text", maxLength: 40 },
       { key: "home.promo.event_eyebrow", label: "Promo Highlight — eyebrow event", type: "text", maxLength: 40 },

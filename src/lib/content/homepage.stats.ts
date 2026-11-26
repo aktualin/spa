@@ -1,12 +1,10 @@
-/** Bacaan statistik, ulasan, dan feed Instagram homepage — lihat `homepage.ts`. */
+/** Bacaan statistik dan feed Instagram homepage — lihat `homepage.ts`. */
 import { cacheLife, cacheTag } from "next/cache";
 
 import {
   selectInstagramPosts,
-  selectReviews,
   selectStats,
   type InstagramItem,
-  type ReviewItem,
   type StatItem,
 } from "@/lib/domain/homepage";
 import { safeQueryWithMeta } from "@/lib/safe-query";
@@ -28,22 +26,6 @@ export async function getHomepageStats(): Promise<StatItem[]> {
       orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
     });
     return selectStats(rows) ?? [];
-  }, []);
-  return data;
-}
-
-/** Ulasan section Reviews; pola sama dengan `getHomepageStats`. */
-export async function getHomepageReviews(): Promise<ReviewItem[]> {
-  "use cache";
-  cacheTag(CONTENT_TAGS.homepage);
-  cacheLife("minutes");
-
-  const { data } = await safeQueryWithMeta<ReviewItem[]>(async () => {
-    const { prisma } = await import("@/lib/prisma");
-    const rows = await prisma.homepageReview.findMany({
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-    });
-    return selectReviews(rows) ?? [];
   }, []);
   return data;
 }

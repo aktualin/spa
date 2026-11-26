@@ -1,4 +1,4 @@
-/** Helper bersama section homepage (statistik, ulasan, feed). */
+/** Helper bersama section homepage (statistik, feed). */
 
 export type OrderedRow = { isPublished: boolean; sortOrder: number };
 

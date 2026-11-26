@@ -16,9 +16,9 @@
  * nol (mis. semua masih draf) — supaya draf tidak memunculkan kembali konten
  * lama secara diam-diam.
  *
- * Statistik dan ulasan memakai pola fallback yang sama: tabel KOSONG (belum
- * pernah diisi) → pemanggil memakai data statis lama; ada baris tetapi tak
- * satu pun terbit → section tampil tanpa item. Feed Instagram berisi URL
+ * Statistik memakai pola fallback yang sama: tabel KOSONG (belum pernah
+ * diisi) → pemanggil memakai data statis lama; ada baris tetapi tak satu pun
+ * terbit → section tampil tanpa item. Feed Instagram berisi URL
  * postingan untuk di-embed (tanpa foto statis); tabel kosong → section
  * menampilkan pesan feed kosong.
  */
@@ -58,15 +58,6 @@ export {
   type StatData,
   validateStatInput,
 } from "./homepage.stats.ts";
-export {
-  REVIEW_LIMITS,
-  type ReviewItem,
-  type ReviewRowLike,
-  selectReviews,
-  type ReviewRawInput,
-  type ReviewData,
-  validateReviewInput,
-} from "./homepage.reviews.ts";
 export {
   INSTAGRAM_LIMITS,
   type InstagramItem,

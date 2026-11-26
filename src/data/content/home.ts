@@ -40,27 +40,3 @@ export const journalPosts = [
     image: asset("img/kama/06-bride.jpg"),
   },
 ];
-
-export const testimonials = [
-  {
-    quote:
-      "Sukma Laya is unlike any massage I have ever had. The pressure was exactly right and the foot bath at the start set the whole tone. I will be back.",
-    name: "Amalia P.",
-    location: "Jakarta | Sudirman",
-    role: "Guest",
-  },
-  {
-    quote:
-      "We booked the in-office program for our team and it was a complete reset. The chair massage was smooth, professional, and genuinely relaxing.",
-    name: "Bagus W.",
-    location: "Jakarta | Kebayoran",
-    role: "Guest",
-  },
-  {
-    quote:
-      "The Åroha package is worth every rupiah. From the body massage to the bath ritual, every step felt intentional. My skin has never felt this good.",
-    name: "Clarissa N.",
-    location: "Jakarta | South Jakarta",
-    role: "Guest",
-  },
-];

@@ -56,11 +56,6 @@ export const HOMEPAGE_SECTIONS: SectionSeed[] = [
     ],
   },
   {
-    key: "reviews",
-    title: "Reviews",
-    legacyTitles: ["Reviews"],
-  },
-  {
     key: "brand-intro",
     eyebrow: "A sanctuary in the heart of South Jakarta",
     title: "More than relaxation",
@@ -137,7 +132,6 @@ export const CONTENT_BLOCKS: { key: string; value: string }[] = [
   { key: "home.brand_intro.stats_label", value: "KAMA at a glance" },
   { key: "home.whats_new.card_eyebrow", value: "KAMA Journal" },
   { key: "home.whats_new.empty", value: "No recent articles yet." },
-  { key: "home.reviews.empty", value: "No reviews yet." },
   {
     key: "home.socials.empty",
     value:
@@ -507,10 +501,6 @@ export const LINKS_MICROCOPY_FORMS_BLOCKS: { key: string; value: string }[] = [
   { key: "home.hero.slider_aria", value: "Choose hero visual" },
   { key: "home.hero.dot_aria", value: "Show visual {n} of {m}" },
   { key: "home.whats_new.cta_fallback", value: "Learn More" },
-  { key: "home.reviews.aria_prev", value: "Previous review" },
-  { key: "home.reviews.aria_next", value: "Next review" },
-  { key: "home.reviews.aria_list", value: "Customer reviews" },
-  { key: "home.reviews.dot_aria", value: "Go to review by {name}" },
   { key: "menu.scan_alt", value: "KAMA Spa menu book — page {n}" },
   { key: "menu.scan_aria", value: "Open menu book page {n}" },
   { key: "catalog.seo_category_description", value: "{name} at KAMA Spa — full durations and prices." },

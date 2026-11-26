@@ -85,7 +85,7 @@ console.log(`✔ ${e.changed} perubahan field, ${e.fwd.length} statement forward
 console.log("=== coverage (field berubah per tabel) ===");
 for (const [t, c] of [...e.coverage].sort((a, b) => b[1] - a[1])) console.log(`  ${t.padEnd(22)} ${c}`);
 console.log("=== permukaan butuh inventaris DB (belum tercakup git) ===");
-console.log("  HomepageHighlight/Stat/Review, GalleryAlbum/Photo, ContentImage, EventItem/Photo,");
+console.log("  HomepageHighlight/Stat, GalleryAlbum/Photo, ContentImage, EventItem/Photo,");
 console.log("  Promo, RetailProduct, CorporateClient, OurStoryContent, HeroSlide.imageAlt,");
 console.log("  JournalPost.bodyHtml (admin), CorporateContent.inOffice/inSpa/stepsHtml,");
 console.log("  GiftCardInfo.termsHtml, HomepageSection.bodyHtml, Treatment/Package seo+whatsapp,");

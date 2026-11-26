@@ -23,8 +23,4 @@ export type {
 } from "./homepage.types";
 export { getHomepageSections } from "./homepage.sections";
 export { getHeroSlides, getWhatsNewCards } from "./homepage.media";
-export {
-  getHomepageStats,
-  getHomepageReviews,
-  getInstagramPosts,
-} from "./homepage.stats";
+export { getHomepageStats, getInstagramPosts } from "./homepage.stats";

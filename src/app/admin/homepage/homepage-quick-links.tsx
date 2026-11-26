@@ -6,7 +6,6 @@ export function HomepageQuickLinks() {
     { href: "/admin/homepage/hero", label: "Kelola slide Hero →" },
     { href: "/admin/homepage/highlights", label: "Kelola highlight “What’s New” →" },
     { href: "/admin/homepage/stats", label: "Statistik Brand Intro →" },
-    { href: "/admin/homepage/reviews", label: "Ulasan →" },
     { href: "/admin/homepage/instagram", label: "Feed Instagram →" },
     { href: "/admin/our-story", label: "Edit Our Story →" },
   ];

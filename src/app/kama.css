@@ -1339,62 +1339,6 @@ html[data-js="true"] .kama-reveal.is-visible {
   }
 }
 
-/* ---- Reviews marquee ---------------------------------------------------
-   Track berjalan terus ke kiri; hover/fokus/sentuh menjedanya. Konten
-   digandakan (translateX -50% = satu salinan) supaya loopnya mulus. */
-
-.kama-marquee {
-  overflow: hidden;
-}
-
-.kama-marquee-track {
-  display: flex;
-  width: max-content;
-  animation: kama-marquee-scroll var(--kama-marquee-duration, 40s) linear infinite;
-}
-
-.kama-marquee:hover .kama-marquee-track,
-.kama-marquee:focus-within .kama-marquee-track,
-.kama-marquee:active .kama-marquee-track {
-  animation-play-state: paused;
-}
-
-@keyframes kama-marquee-scroll {
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-/* Reduced motion: tanpa animasi, track jadi daftar statis yang bisa
-   digeser manual; salinan duplikat disembunyikan. */
-@media (prefers-reduced-motion: reduce) {
-  .kama-marquee {
-    overflow-x: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--kama-periwinkle-100) transparent;
-  }
-
-  .kama-marquee::-webkit-scrollbar {
-    height: 4px;
-  }
-
-  .kama-marquee::-webkit-scrollbar-thumb {
-    background: var(--kama-periwinkle-100);
-  }
-
-  .kama-marquee::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .kama-marquee-track {
-    animation: none;
-  }
-
-  .kama-marquee-copy {
-    display: none;
-  }
-}
-
 /* ---- Card consistency -------------------------------------------------
    Every card of a row must fill its cell, keep its price row and its
    call-to-action at the bottom, and stay centred on every device
@@ -1406,8 +1350,7 @@ html[data-js="true"] .kama-reveal.is-visible {
 .contact-card,
 .contact-info-card,
 .benefits_card,
-.whats-new_card,
-.review_card {
+.whats-new_card {
   min-width: 0;
 }
 
@@ -1416,8 +1359,7 @@ html[data-js="true"] .kama-reveal.is-visible {
 .contact-card,
 .contact-info-card,
 .benefits_card,
-.whats-new_card,
-.review_card {
+.whats-new_card {
   height: 100%;
 }
 
@@ -1446,8 +1388,7 @@ html[data-js="true"] .kama-reveal.is-visible {
 .package-card_body > .button:last-child,
 .benefits_card > .btn:last-child,
 .benefits_card > .button:last-child,
-.contact-card_body > .btn:last-child,
-.review_card > .btn:last-child {
+.contact-card_body > .btn:last-child {
   margin-top: auto;
 }
 

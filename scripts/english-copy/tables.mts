@@ -22,7 +22,6 @@ export const INVENTORY_TABLES: InventoryTable[] = [
   { table: "HomepageSection", identity: ["id", "key"], copy: ["eyebrow", "title", "subtitle", "bodyHtml", "imageAlt", "ctaLabel"] },
   { table: "HomepageHighlight", identity: ["id"], copy: ["eyebrow", "title", "body", "imageAlt", "ctaLabel"] },
   { table: "HomepageStat", identity: ["id"], copy: ["value", "label"] },
-  { table: "HomepageReview", identity: ["id"], copy: ["quote", "name", "location", "role"] },
   { table: "HeroSlide", identity: ["id"], copy: ["imageAlt"] },
   { table: "OurStoryContent", identity: ["id"], copy: ["heroTitle", "philosophyHtml", "valuesHtml", "seoTitle", "seoDescription"] },
   { table: "JournalCategory", identity: ["id", "slug"], copy: ["name"], slug: true },
@@ -55,7 +54,6 @@ export const INVENTORY_TABLES: InventoryTable[] = [
 export const KEEP_AS_IS: Record<string, string[]> = {
   WhatsAppTemplate: ["label"],
   ContentBlock: ["group"],
-  HomepageReview: ["name"],
   CorporateContent: ["picName"],
   CorporateClient: ["name"],
   Branch: ["name", "area", "address"],

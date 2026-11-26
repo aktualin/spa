@@ -506,8 +506,8 @@ async function seedWhatsAppTemplates() {
 //
 // `title` section banner tetap berupa LABEL ADMIN — frontend menyaringnya
 // lewat `isPlaceholderTitle` dan memakai teks bawaannya sendiri. Section yang
-// judulnya benar-benar dirender di homepage (whats-new, reviews) diisi teks
-// tampil, dan `keepText` menandai bahwa isinya tidak boleh ditimpa saat seed
+// judulnya benar-benar dirender di homepage (whats-new) diisi teks tampil,
+// dan `keepText` menandai bahwa isinya tidak boleh ditimpa saat seed
 // dijalankan ulang supaya suntingan admin bertahan.
 const HOMEPAGE_SECTIONS: {
   key: string;
@@ -526,7 +526,6 @@ const HOMEPAGE_SECTIONS: {
       "We believe authentic beauty reaches far beyond the superficial, through consistent self-care you let the beauty shine both externally and internally.",
     keepText: true,
   },
-  { key: "reviews", title: "Reviews", keepText: true },
   { key: "brand-intro", title: "Brand Intro" },
   { key: "socials", title: "Gallery Teaser & Instagram" },
   { key: "booking-banner", title: "Booking Banner" },

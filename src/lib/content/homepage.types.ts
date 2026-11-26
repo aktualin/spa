@@ -5,7 +5,6 @@ export type HomepageSectionKey =
   | "hero"
   | "membership-banner"
   | "whats-new"
-  | "reviews"
   | "brand-intro"
   | "socials"
   | "booking-banner"
