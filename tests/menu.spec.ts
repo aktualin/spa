@@ -3,9 +3,9 @@ import { expect, test } from "@playwright/test";
 /**
  * Menu page regression tests.
  *
- * The header mega menu and the footer link to `/menu#face`, `/menu#head` and
- * `/menu#bath`. Those anchors only work when the section exists *and* clears
- * the fixed header — the second half is easy to break with a spacing change.
+ * The footer and the Service Menu dropdown link to `/menu#…` anchors. Those
+ * anchors only work when the section exists *and* clears the fixed header —
+ * the second half is easy to break with a spacing change.
  */
 
 const SECTIONS = ["massage", "body", "face", "head", "bath", "packages", "gallery"] as const;

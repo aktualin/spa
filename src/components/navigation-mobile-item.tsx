@@ -14,6 +14,7 @@ export function MobileNavItem({
   item,
   group,
   isOpen,
+  isActive,
   onToggle,
   onNavigate,
 }: {
@@ -21,6 +22,7 @@ export function MobileNavItem({
   /** null = item biasa tanpa mega group. */
   group: NavMegaGroup | null;
   isOpen: boolean;
+  isActive: boolean;
   onToggle: () => void;
   onNavigate: () => void;
 }) {
@@ -48,7 +50,12 @@ export function MobileNavItem({
 
     return (
       <li className="m-0 border-b border-tan/40">
-        <Link href={item.href} onClick={onNavigate} className={itemLinkClass}>
+        <Link
+          href={item.href}
+          onClick={onNavigate}
+          aria-current={isActive ? "page" : undefined}
+          className={`${itemLinkClass}${isActive ? " text-ink" : ""}`}
+        >
           {item.label}
         </Link>
       </li>
@@ -61,8 +68,9 @@ export function MobileNavItem({
         type="button"
         onClick={onToggle}
         aria-expanded={isOpen}
+        aria-current={isActive ? "page" : undefined}
         aria-controls={`mobile-group-${group.id}`}
-        className="flex w-full items-center justify-between py-3.5 text-[1rem] text-cocoa/90 transition-colors hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cocoa"
+        className={`flex w-full items-center justify-between py-3.5 text-[1rem] text-cocoa/90 transition-colors hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cocoa${isActive ? " text-ink" : ""}`}
       >
         {item.label}
         <ChevronDown

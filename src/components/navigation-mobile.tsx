@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { isNavGroupActive, isNavLinkActive } from "@/lib/domain/nav-active";
 import { WhatsApp } from "./icons";
 import { MobileNavItem } from "./navigation-mobile-item";
 import type { MobileDrawerProps } from "./navigation-types";
@@ -19,6 +20,7 @@ export function MobileDrawer({
   bookNowHref,
   whatsappHref,
   fabAria,
+  pathname,
   openGroup,
   setOpenGroup,
   onClose,
@@ -36,12 +38,16 @@ export function MobileDrawer({
             {mobile.primary.map((item) => {
               const group = item.mega ? mobile.megaGroups[item.mega] : null;
               const isOpen = group ? openGroup === group.id : false;
+              const isActive = group
+                ? isNavGroupActive(pathname, item, group)
+                : isNavLinkActive(pathname, item.href);
               return (
                 <MobileNavItem
                   key={group ? group.id : item.label}
                   item={item}
                   group={group}
                   isOpen={isOpen}
+                  isActive={isActive}
                   onToggle={() => group && setOpenGroup(isOpen ? null : group.id)}
                   onNavigate={onClose}
                 />

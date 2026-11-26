@@ -82,6 +82,7 @@ export function NavigationClient({
           bookNowHref={bookNowHref}
           whatsappHref={whatsappHref}
           fabAria={fabAria}
+          pathname={pathname}
           openGroup={openGroup}
           setOpenGroup={setOpenGroup}
           onClose={closeMobileMenu}

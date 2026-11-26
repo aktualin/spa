@@ -29,7 +29,8 @@ export function NavigationHeader({
   onToggleMobile: () => void;
   navOpen: string;
   navClose: string;
-  desktop: DesktopNavProps;
+  /* pathname disuntikkan sendiri di bawah (dipakai juga untuk aria logo). */
+  desktop: Omit<DesktopNavProps, "pathname">;
 }) {
   const scrolled = useScrollShadow();
 
@@ -61,7 +62,7 @@ export function NavigationHeader({
 
         {/* Desktop navigation — stretched to the full header height so the
             mega panel starts exactly at the header's bottom edge. */}
-        <DesktopNav {...desktop} />
+        <DesktopNav {...desktop} pathname={pathname} />
       </nav>
     </header>
   );

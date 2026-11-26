@@ -4,24 +4,17 @@ import type { NavMegaGroup } from "./nav-types.ts";
 export const megaGroups: Record<string, NavMegaGroup> = {
   services: {
     id: "services",
-    label: "Menu",
-    panel: "wide",
+    label: "Service Menu",
+    panel: "narrow",
     columns: [
       {
-        title: "Treatments",
+        title: "Layanan",
         links: [
-          { label: "Massage", href: "/menu#massage" },
-          { label: "Body & Scrub", href: "/menu#body" },
-          { label: "Face Ritual", href: "/menu#face" },
-          { label: "Head & Scalp", href: "/menu#head" },
-          { label: "Bath Ritual", href: "/menu#bath" },
-        ],
-      },
-      {
-        title: "More",
-        links: [
+          { label: "Body Massage", href: "/menu#massage" },
+          { label: "Chair Services", href: "/menu#massage" },
+          { label: "Add Ons", href: "/menu#body" },
           { label: "All Day Spa Packages", href: "/menu#packages" },
-          { label: "Membership", href: "/membership" },
+          { label: "Loyalty Member", href: "/membership" },
         ],
       },
     ],
@@ -32,13 +25,6 @@ export const megaGroups: Record<string, NavMegaGroup> = {
         eyebrow: "Just Rp 1.5jt a month",
         label: "Join KAMA Now",
         href: "/membership",
-      },
-      {
-        image: asset("img/kama/06-bride.jpg"),
-        badge: "new",
-        eyebrow: "2 – 4 hour rituals",
-        label: "All Day Spa",
-        href: "/menu#packages",
       },
     ],
     footerLink: { label: "Lihat semua treatment", href: "/menu" },
