@@ -1,5 +1,6 @@
 /** Pembacaan sesi admin — lihat `auth.ts`. */
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import { cache } from "react";
 
 import { prisma } from "@/lib/prisma";
@@ -52,10 +53,14 @@ const getBypassSession = cache(async (): Promise<SessionPayload> => {
  * dan Server Action dalam satu render hanya memicu satu query.
  */
 export const getSession = cache(async (): Promise<SessionPayload | null> => {
+  // Di bawah Cache Components `cookies()` saja tidak lagi membuat route jadi
+  // dinamis: verifikasi JWT (jose memanggil `new Date()` internal) bisa ikut
+  // jalan di pass prerender dan memicu error "unstable value" (mis. route
+  // /admin/reservations). `connection()` menunda seluruh pembacaan sesi —
+  // cookie, JWT, dan query admin — ke waktu request yang sebenarnya.
+  await connection();
+
   if (ADMIN_AUTH_DISABLED) {
-    // Tetap baca cookie: tanpa ini route admin tidak punya dependensi request
-    // dan ikut di-prerender statis (dashboard beku + `new Date()` error).
-    await cookies();
     return getBypassSession();
   }
 
