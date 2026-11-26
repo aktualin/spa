@@ -1,10 +1,12 @@
 /**
  * Generate migrasi English visitor copy dari pasangan old↔new (tanpa tulis tangan).
  *
- *   node scripts/generate-english-copy-migration.mts old.json [new.json]
+ *   node scripts/generate-english-copy-migration.mts old.json [new.json] [missing.json]
  *
  * old.json = nilai live (inventaris DB, atau ekstraksi git HEAD sebagai baseline).
  * new.json = nilai kanonik current (default: collectAll()).
+ * missing.json = baris {table, match} yang belum ada di DB live → ContentBlock
+ *   di-INSERT English (reader tanpa fallback statis), bukan UPDATE no-op.
  * Output: prisma/migrations/20261127090000_english_visitor_copy/migration.sql
  *         scripts/english-copy/rollback.sql + laporan coverage (stdout).
  */
@@ -16,7 +18,7 @@ import { fileURLToPath } from "node:url";
 import { collectAll, type CopyRow } from "./english-copy/collect.mts";
 import { INLINE_LITERALS } from "./english-copy/inline-literals.mts";
 import { rowKey, type Emitter } from "./english-copy/generate.helpers.mts";
-import { emitGeneric, emitMenu, emitTier, emitFormsInsert } from "./english-copy/generate.emit.mts";
+import { emitGeneric, emitMenu, emitTier, emitFormsInsert, emitContentBlockInsert } from "./english-copy/generate.emit.mts";
 import { q, sqlString } from "./english-copy/sql.mts";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -37,12 +39,18 @@ const newRows = process.argv[3]
   : collectAll();
 checkInvariants(newRows);
 
+const missingRows = process.argv[4]
+  ? (JSON.parse(readFileSync(process.argv[4], "utf8")) as { table: string; match: Record<string, string | number> }[])
+  : [];
+const missingKeys = new Set(missingRows.map((r) => rowKey({ ...r, fields: {} })));
+
 const oldMap = new Map(oldRows.map((r) => [rowKey(r), r]));
 const e: Emitter = { fwd: [], rev: [], changed: 0, coverage: new Map() };
 
 for (const n of newRows) {
   const o = oldMap.get(rowKey(n));
   if (n.table === "ContentBlock" && String(n.match.key).startsWith("forms.reservation.")) emitFormsInsert(e, n);
+  else if (n.table === "ContentBlock" && missingKeys.has(rowKey(n))) emitContentBlockInsert(e, n);
   if (n.table === "MenuItem") emitMenu(e, o, n);
   else if (n.table === "MembershipTier") emitTier(e, o!, n);
   else emitGeneric(e, o, n);
@@ -50,8 +58,10 @@ for (const n of newRows) {
 
 for (const lit of INLINE_LITERALS) {
   const where = Object.entries(lit.match).map(([k, v]) => `${q(k)} = ${sqlString(v)}`).join(" AND ");
-  e.fwd.push(`UPDATE ${q(lit.table)} SET ${q(lit.field)} = ${sqlString(lit.new)} WHERE ${where} AND ${q(lit.field)} = ${sqlString(lit.old)};`);
-  e.rev.push(`UPDATE ${q(lit.table)} SET ${q(lit.field)} = ${sqlString(lit.old)} WHERE ${where} AND ${q(lit.field)} = ${sqlString(lit.new)};`);
+  const guardOld = lit.old === null ? `${q(lit.field)} IS NULL` : `${q(lit.field)} = ${sqlString(lit.old)}`;
+  const setOld = lit.old === null ? "NULL" : sqlString(lit.old);
+  e.fwd.push(`UPDATE ${q(lit.table)} SET ${q(lit.field)} = ${sqlString(lit.new)} WHERE ${where} AND ${guardOld};`);
+  e.rev.push(`UPDATE ${q(lit.table)} SET ${q(lit.field)} = ${setOld} WHERE ${where} AND ${q(lit.field)} = ${sqlString(lit.new)};`);
   e.changed++;
   e.coverage.set(lit.table, (e.coverage.get(lit.table) ?? 0) + 1);
 }

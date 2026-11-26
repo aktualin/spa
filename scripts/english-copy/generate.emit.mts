@@ -61,5 +61,18 @@ export function emitTier(e: Emitter, oldRow: CopyRow, newRow: CopyRow): void {
 export function emitFormsInsert(e: Emitter, newRow: CopyRow): void {
   const key = sqlString(String(newRow.match.key));
   const val = sqlString(String(newRow.fields.value));
-  e.fwd.push(`INSERT INTO "ContentBlock" ("key", "group", "value") VALUES (${key}, 'forms', ${val}) ON CONFLICT ("key") DO NOTHING;`);
+  e.fwd.push(`INSERT INTO "ContentBlock" ("key", "group", "value", "updatedAt") VALUES (${key}, 'forms', ${val}, now()) ON CONFLICT ("key") DO NOTHING;`);
+}
+
+/** Key ContentBlock yang belum ada di DB live (reader tanpa fallback statis):
+ *  INSERT nilai English agar tidak render kosong; rollback DELETE ter-guard. */
+export function emitContentBlockInsert(e: Emitter, newRow: CopyRow): void {
+  const key = String(newRow.match.key);
+  const group = key.split(".")[0];
+  const k = sqlString(key);
+  const val = sqlString(String(newRow.fields.value));
+  e.fwd.push(`INSERT INTO "ContentBlock" ("key", "group", "value", "updatedAt") VALUES (${k}, ${sqlString(group)}, ${val}, now()) ON CONFLICT ("key") DO NOTHING;`);
+  e.rev.push(`DELETE FROM "ContentBlock" WHERE "key" = ${k} AND "value" = ${val};`);
+  e.changed++;
+  e.coverage.set("ContentBlock", (e.coverage.get("ContentBlock") ?? 0) + 1);
 }
