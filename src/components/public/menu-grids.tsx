@@ -30,7 +30,7 @@ export function MassageGrid({
             <div className="body-m text-color-gray">{t.tagline}</div>
             <div className="treatment-card_price-row">
               <span className="caption-s text-color-gray">{t.prices[0].duration}</span>
-              <span className="price-row_value">{t.prices[0].price}</span>
+              <span className="font-small text-title-sm">{t.prices[0].price}</span>
             </div>
           </div>
         </Link>
@@ -62,7 +62,7 @@ export function PackagesGrid({ items }: { items: StaticPackage[] }) {
             <div className="spacer-small" />
             <div className="treatment-card_price-row">
               <span className="caption-s text-color-gray">{p.duration}</span>
-              <span className="price-row_value">{p.price}</span>
+              <span className="font-small text-title-sm">{p.price}</span>
             </div>
           </div>
         </Link>

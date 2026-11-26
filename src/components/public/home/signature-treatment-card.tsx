@@ -49,11 +49,11 @@ export function SignatureTreatmentCard({
           </p>
         ) : null}
         {price ? (
-          <div className="mt-auto flex items-baseline gap-2 pt-2">
+          <div className="mt-auto flex justify-between items-baseline gap-2 pt-2">
             <span className="caption-s text-cocoa/60">
               {price.label}
             </span>
-            <span className="font-display text-title-sm">
+            <span className="font-small text-title-sm">
               {toPriceLabel(price.priceIdr)}
             </span>
           </div>
