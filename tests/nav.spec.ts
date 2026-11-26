@@ -89,7 +89,7 @@ test("mobile drawer keeps the call to action pinned to the bottom", async ({
   await page.getByRole("button", { name: /buka menu/i }).click();
 
   const drawer = page.locator("#mobile-navigation");
-  const accordion = drawer.getByRole("button", { name: "Menu" });
+  const accordion = drawer.getByRole("button", { name: "Service Menu" });
   await accordion.click();
 
   // The accordion list is long enough to push the content past the fold.
@@ -134,12 +134,12 @@ test("mobile accordion lists the menu links", async ({ page }, testInfo) => {
 
   const accordion = page
     .locator("#mobile-navigation")
-    .getByRole("button", { name: "Menu" });
+    .getByRole("button", { name: "Service Menu" });
   await accordion.click();
 
   const group = page.locator("#mobile-group-services");
   await expect(group).toBeVisible();
-  await expect(group.getByRole("link", { name: "Massage" })).toBeVisible();
+  await expect(group.getByRole("link", { name: "Body Massage" })).toBeVisible();
   await expect(
     group.getByRole("link", { name: "All Day Spa Packages" }),
   ).toBeVisible();
@@ -170,31 +170,42 @@ test("desktop header keeps the dropdown groups first", async ({
   const cta = await nav.getByRole("link", { name: "Book Now" }).textContent();
 
   expect([...items.map((t) => t.trim()), cta?.trim()]).toEqual([
-    "Menu",
-    "Corporate Wellness",
-    "Gallery",
-    "Contact",
-    "Reservation",
+    "Our Story",
     "Service Menu",
+    "Gallery",
+    "Corporate Wellness",
     "Book Now",
   ]);
 });
 
-test("the Service Menu link opens the price list in a new tab", async ({
+test("the Service Menu dropdown lists the five service categories", async ({
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== DESKTOP, "desktop only");
 
-  const link = page
+  await page
     .locator("header nav")
-    .getByRole("link", { name: "Service Menu" });
+    .getByRole("button", { name: "Service Menu" })
+    .click();
 
-  await expect(link).toHaveAttribute("target", "_blank");
-  await expect(link).toHaveAttribute("rel", /noopener/);
-  await expect(link).toHaveAttribute(
-    "href",
-    /drive\.google\.com\/file\/d\/1UfW-JFOno47KCLi-PwID4XdrCDHkwIfc/,
-  );
+  const panel = page.locator("#desktop-group-services");
+  await expect(panel).toBeVisible();
+
+  // Only the column links live in a `ul`; the highlight card and the footer
+  // link are bare anchors, so `ul > li` isolates the five categories.
+  const labels = await panel.locator("ul > li").allTextContents();
+  expect(labels.map((t) => t.trim())).toEqual([
+    "Body Massage",
+    "Chair Services",
+    "Add Ons",
+    "All Day Spa Packages",
+    "Loyalty Member",
+  ]);
+
+  // The old external Google Drive price list is gone from the header.
+  await expect(
+    page.locator('header nav a[href*="drive.google.com"]'),
+  ).toHaveCount(0);
 });
 
 test("desktop mega menu is attached to its trigger", async ({
@@ -204,7 +215,7 @@ test("desktop mega menu is attached to its trigger", async ({
 
   const trigger = page
     .locator("header nav")
-    .getByRole("button", { name: "Menu" });
+    .getByRole("button", { name: "Service Menu" });
   await trigger.click();
 
   const panel = page.locator("#desktop-group-services");
@@ -237,7 +248,7 @@ test("desktop mega menu opens on hover and closes on escape", async ({
 
   const trigger = page
     .locator("header nav")
-    .getByRole("button", { name: "Menu" });
+    .getByRole("button", { name: "Service Menu" });
   const panel = page.locator("#desktop-group-services");
 
   await trigger.hover();
@@ -257,7 +268,7 @@ test("desktop mega menu has no duplicated corporate links", async ({
 
   await page
     .locator("header nav")
-    .getByRole("button", { name: "Menu" })
+    .getByRole("button", { name: "Service Menu" })
     .click();
 
   const links = await page
@@ -267,4 +278,52 @@ test("desktop mega menu has no duplicated corporate links", async ({
 
   const corporate = links.filter((l) => l.trim() === "Corporate Wellness");
   expect(corporate).toHaveLength(0);
+});
+
+test("desktop nav marks the current page link active", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== DESKTOP, "desktop only");
+
+  await page.goto("/gallery");
+  await page.waitForLoadState("networkidle");
+
+  const nav = page.locator("header nav");
+  await expect(nav.getByRole("link", { name: "Gallery" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+  // A group whose route does not match stays idle.
+  await expect(
+    nav.getByRole("button", { name: "Service Menu" }),
+  ).not.toHaveAttribute("aria-current", "page");
+});
+
+test("desktop nav marks the Service Menu group active on /menu", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== DESKTOP, "desktop only");
+
+  await page.goto("/menu");
+  await page.waitForLoadState("networkidle");
+
+  await expect(
+    page.locator("header nav").getByRole("button", { name: "Service Menu" }),
+  ).toHaveAttribute("aria-current", "page");
+});
+
+test("mobile drawer marks the current page link active", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name === DESKTOP, "desktop has no drawer");
+
+  await page.goto("/gallery");
+  await page.waitForLoadState("networkidle");
+  await page.getByRole("button", { name: /buka menu/i }).click();
+
+  const drawer = page.locator("#mobile-navigation");
+  await expect(drawer.getByRole("link", { name: "Gallery" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
 });

@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 /**
  * Halaman reservasi publik (/reservation): form lengkap dengan field jadwal
- * & treatment, dan tautan menu "Reservation" di header/drawer.
+ * & treatment, dan CTA "Book Now" di header/drawer yang menuju ke sini.
  *
  * Sengaja tanpa submit sungguhan: pengiriman yang berhasil menulis baris ke
  * inbox admin (database bersama), jadi perilaku endpoint diuji unit
@@ -40,18 +40,18 @@ test("/reservation merender form reservasi lengkap", async ({ page }) => {
   await expect(form.locator('input[type="submit"]')).toBeVisible();
 });
 
-test("tautan menu Reservation menuju /reservation", async ({ page }, testInfo) => {
+test("CTA Book Now menuju /reservation", async ({ page }, testInfo) => {
   await page.goto("/reservation");
 
   if (testInfo.project.name === "desktop") {
-    const link = page.locator("header nav").getByRole("link", { name: "Reservation" });
-    await expect(link).toHaveAttribute("href", "/reservation");
+    const cta = page.locator("header nav").getByRole("link", { name: "Book Now" });
+    await expect(cta).toHaveAttribute("href", "/reservation");
   } else {
     await page.getByRole("button", { name: /buka menu/i }).click();
-    const link = page
+    const cta = page
       .locator("#mobile-navigation")
-      .getByRole("link", { name: "Reservation" });
-    await expect(link).toBeVisible();
-    await expect(link).toHaveAttribute("href", "/reservation");
+      .getByRole("link", { name: "Book Now" });
+    await expect(cta).toBeVisible();
+    await expect(cta).toHaveAttribute("href", "/reservation");
   }
 });

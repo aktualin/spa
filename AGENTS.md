@@ -19,17 +19,20 @@ npm run dev          # http://localhost:3000
 npm run build        # production build; also runs the TypeScript check
 npm start            # serve the build
 npx tsc --noEmit     # typecheck only
-npm run test:e2e     # Playwright (builds + serves on :3311, then runs tests/)
+npm run test:unit    # node --test tests/unit/*.test.mts (pure domain logic)
+npm run test:e2e     # Playwright (webServer builds + serves on :3311, then runs tests/*.spec.ts)
 ```
 
-There is **no** lint, format, or unit-test script, and no ESLint/Prettier config.
-Verification = `npm run build` (it type-checks) + `npm run test:e2e` + a visual pass.
+There is **no** lint or format script and no ESLint/Prettier config. Unit tests
+(`npm run test:unit`) cover the pure domain modules; Playwright only loads
+`*.spec.ts` (`testMatch`), so the two suites never overlap.
+Verification = `npm run build` (it type-checks) + `npm run test:unit` + `npm run test:e2e` + a visual pass.
 
 **Playwright** (`@playwright/test`, `playwright.config.ts`, `tests/`):
 
 - The tests run against a **production build** on port **3311** (`npm run build && npx next start --port 3311`), never against the dev server — HMR makes interaction tests flaky. The dev server on :3000 may keep running alongside.
-- Three projects: `mobile` 390×844, `tablet` 768×1024, `desktop` 1440×900.
-- Run one project or one test: `npx playwright test --project=desktop`, `npx playwright test -g "mega menu"`.
+- Four projects: `mobile` 390×844, `tablet` 768×1024, `desktop` 1440×900, plus `admin-flows` (1440×900) which runs `admin-catalog.spec.ts` **last** (`dependencies` on the three viewport projects, which `testIgnore` it) so data-mutating admin tests don't race the header/footer specs.
+- Run one project or one test: `npx playwright test --project=desktop`, `npx playwright test -g "mega menu"`. Through the npm script, pass flags after `--`: `npm run test:e2e -- --project=desktop`.
 - Chromium is already in the Playwright cache; `npx playwright install chromium` only if the version changed.
 
 Screenshot helper (writes `/tmp/kama-{mobile,tablet,desktop}.png` and prints each viewport's `scrollWidth` — use it to catch horizontal overflow):
@@ -47,9 +50,10 @@ node scripts/screenshot.mjs http://localhost:3000 /tmp/kama mobile   # one viewp
 - `src/data/content.ts` — site config, nav, footer links, treatments, packages, locations, journal posts, membership, testimonials.
 - `src/data/pages.ts` — long-form page content (spa-101, membership, gift cards, careers, privacy policy, terms).
   - Trap: `membership` and `journalPosts` are exported from **both** data files. Check which one the page you are editing imports before changing data.
-- `src/components/navigation.tsx` — `"use client"`. Desktop mega menu (hover + click, Escape closes and returns focus) and the mobile drawer are hand-written React (state, body scroll lock). It only borrows FlyonUI *class names*; FlyonUI's JS is not running.
+- `src/components/navigation.tsx` — **server component** (async): reads the menu from the `MenuItem` table via `getNavigationData()` and hands it to `navigation-client.tsx` (`"use client"`). Desktop mega menu (hover + click, Escape closes and returns focus) and the mobile drawer are hand-written React (state, body scroll lock). It only borrows FlyonUI *class names*; FlyonUI's JS is not running.
   - Header height comes from one token, `--kama-header-h` (`globals.css`, `@layer base`): the header, the drawer (`top-…`) and the page spacer all read it, so they cannot drift apart. Desktop nav appears at `xl` (1280px); below that it is the drawer.
-  - Mega-menu content lives in `nav.megaGroups` (`src/data/content.ts`); `nav.primary` defines the header order (dropdown groups first).
+  - Mega-menu content lives in `nav.megaGroups` (`src/data/content/nav-mega-groups.ts`); `nav.primary` (`src/data/content/nav.ts`) defines the header order: **Our Story · Service Menu (dropdown) · Gallery · Corporate Wellness (dropdown)**, with the **Book Now** CTA rendered *outside* the primary `<ul>` (desktop) and in the pinned drawer bar (mobile). `tests/nav.spec.ts` pins that exact order. The runtime menu is DB-driven and frozen (no admin menu editor) — see `### External links`.
+  - Active/focus state: `src/lib/domain/nav-active.ts` (pure, unit-tested) derives the current item from `usePathname()`; the active link/trigger gets `aria-current="page"` + the `linkActive` utility (`navigation-styles.ts`). A mega group is active on its root route, any child route, or when a column link matches (e.g. `/membership` activates Service Menu). Focus-visible outlines already exist on every item.
 - `src/components/icons.tsx` — all inline SVG icons. Add new icons there, not inline in pages.
 - `src/lib/whatsapp.ts` — the only place that builds a `wa.me` URL (see `## Architecture decisions`).
 - `src/components/reveal.tsx` — client component that reveals a block when it scrolls into view.
@@ -59,7 +63,7 @@ node scripts/screenshot.mjs http://localhost:3000 /tmp/kama mobile   # one viewp
 - `src/components/home/hero.tsx` — server wrapper for the homepage hero/banners; `src/components/home/hero-slider.tsx` is the client hero media slider.
 - `src/lib/domain/hero-slide.ts` — pure media URL validation + `HeroSlide` fallback/resolve rules (unit tested).
 - `src/components/forms/*` — reservation form, wired to `POST /api/reservation` with an admin inbox (see `## Architecture decisions`). It takes `{ branches, services, copy }` props (services = pilihan treatment/package dari `getReservationServices()`, copy dari `getFormsCopy()`) and is used by both `/contact` and `/reservation`. (The newsletter form only lives on the `feat/newsletter` branch.)
-- `src/app/reservation/page.tsx` — public reservation page: tujuan CTA "Book Now" kartu putih hero, tombol Book Now header, dan item menu "Reservation".
+- `src/app/reservation/page.tsx` — public reservation page: tujuan CTA "Book Now" kartu putih hero dan tombol Book Now header/drawer (tidak ada lagi item menu "Reservation" terpisah di navigasi).
 - `public/fonts`, `public/img`, `public/video` — locally hosted fonts (Faesa Breages for display, POI Carbonic for body/labels), imagery, and the hero video. `@font-face` rules live in `src/app/kama.css`; the old family names (`Romie trial`, `Ft regola neue trial`) are kept only as aliases because `hiatus.css` hardcodes them on legacy classes.
 - `references/` — source PDFs (menu, colour reference). PDFs are gitignored.
 - `.opencode/` — project tooling for opencode: `skills/` (nextjs-frontend, tailwind-kama-styling, kama-content-data, visual-verification), `agent/ui-reviewer`, `command/` (`/verify`, `/new-page`, `/new-treatment`, `/ui-review`), `plugins/kama-guardrails.js` (blocks edits to `hiatus.css`/`kama.css.bak`, protects the `@layer` order, enforces `<Navigation>`/`<main>`/`<Footer>` on route pages). See `.opencode/README.md`.
@@ -89,7 +93,7 @@ Conventions:
 - `next.config.ts` enables `cacheComponents: true` (Cache Components), `partialPrefetching: true`, `reactCompiler: true` (React Compiler runs via `babel-plugin-react-compiler`). Dynamic APIs need explicit handling under Cache Components — check `node_modules/next/dist/docs/` before adding dynamic data.
 - `next dev` rewrites the managed block at the top of this file. Keep it byte-identical or every dev run produces a diff.
 - `opencode.json` is gitignored but holds a hardcoded provider API key — never commit it or paste it into files.
-- The menu page anchors are `#massage`, `#body`, `#face`, `#head`, `#bath`, `#packages`, `#gallery` — in that order, matching the mega menu. `additionalServices` (`AdditionalService[]`) carries the `category` + `anchor` that decide where each add-on is rendered.
+- The menu page anchors are `#massage`, `#body`, `#face`, `#head`, `#bath`, `#packages`, `#gallery` — in that order. The Service Menu dropdown links `#massage` (Body Massage + Chair Services), `#body` (Add Ons) and `#packages` (All Day Spa Packages); `#face`/`#head`/`#bath` are reached from the footer, not the header. `additionalServices` (`AdditionalService[]`) carries the `category` + `anchor` that decide where each add-on is rendered.
 - The fixed header clearance comes from **one** token, `--kama-header-h`: the header, the drawer, the page spacer (`Navigation`) and the anchor offset (`:where([id]) { scroll-margin-top: calc(var(--kama-header-h) + 1rem) }`) all read it. Never add a hardcoded header-sized padding: `.main-wrapper` has `padding-top: 0 !important` precisely because the Navigation spacer already reserves that space (a second offset is the classic "content starts too low" bug here).
 - Files are split to **≤100 lines** (≤110 only when a split would be truly awkward): implementation lives in sibling modules (`foo.helpers.ts`, `foo.save.ts`, `foo-parts.tsx`, …) and the original path stays a **barrel** re-exporting the same public symbols, so imports never break. Server-action barrels must **not** carry `"use server"` — the directive belongs on each implementation module; a `"use server"` file may only export async functions defined in it, so re-exports there fail the build. Relative imports in chains reachable from `node --test` need explicit `.ts` extensions (`allowImportingTsExtensions` is on).
 - Git: branch `main`, remote `origin` = `git@github.com:adamhavva/spa.git`, deploy target is Vercel.
@@ -127,7 +131,7 @@ Numbers and messages live in the database (`SiteSettings` + `WhatsAppTemplate`),
 - Fields: nama, telepon, email, cabang, jenis treatment (select optgroup per kategori + grup "Packages"), tanggal, jam, jumlah orang, catatan. Jadwal & layanan disimpan di `ReservationRequest.preferredDate` ("YYYY-MM-DD"), `preferredTime` ("HH:MM"), `treatment` (nama tampil, bukan slug — inbox tetap terbaca walau treatment diganti) dan `guests` (6 = "6+"); detail admin merendernya lewat `src/app/admin/reservations/reservation-detail-list.tsx`.
 - The route follows the corporate-inquiry defense pattern: same-origin check, per-IP hashed rate limit, body size cap, honeypot + elapsed-time bot detection (fake success), zod validation (`src/lib/domain/forms.ts`). No Turnstile, no email. The elapsed timer is set in `useEffect` (not render) so Cache Components prerender does not freeze `Date.now()`.
 - Admin inbox: `/admin/reservations` (status NEW/HANDLED, notes, delete).
-- Public page `/reservation` is the destination of the hero white-card "Book Now" CTA, the header Book Now button and the "Reservation" menu item. Migrations: `20261116150000_public_reservation` (columns, menu item, CTA/Book Now retarget, label form baru) and `20261116160000_reservation_form_copy` (guarantees the `forms.reservation.*` ContentBlocks — deploys never run `seed-content.mts`, so copy that only lives in the seed would render empty).
+- Public page `/reservation` is the destination of the hero white-card "Book Now" CTA and the header/drawer Book Now button (`SiteSettings.bookNowHref`, default `/reservation`). The standalone "Reservation" header item added by `20261116150000_public_reservation` was later removed by `20261126090000_nav_restructure`. Migrations: `20261116150000_public_reservation` (columns, menu item, CTA/Book Now retarget, label form baru) and `20261116160000_reservation_form_copy` (guarantees the `forms.reservation.*` ContentBlocks — deploys never run `seed-content.mts`, so copy that only lives in the seed would render empty).
 
 ### Maps
 
@@ -138,10 +142,15 @@ Numbers and messages live in the database (`SiteSettings` + `WhatsAppTemplate`),
 
 ### External links
 
-- `nav.primary` entries may carry `external: true`. External items render as `<a target="_blank" rel="noopener noreferrer">` in **both** the desktop nav and the mobile drawer (never `next/link`).
-- "Gallery" (`/gallery`) is a plain header link between Corporate Wellness and Contact, and also sits in the footer About group. Because the admin menu module was removed (the menu structure is frozen/DB-driven), the item was added both to the static seed data (`src/data/content/nav.ts`, `footer.ts`) and to existing databases via migration `20261116090000_menu_gallery_link`.
-- "Reservation" (`/reservation`) is a plain header/drawer link between Contact and Service Menu, added the same way: static seed (`src/data/content/nav.ts`) + migration `20261116150000_public_reservation` for existing databases.
-- "Service Menu" is a Google Drive PDF (service/menu price list) and lives at the **end** of `nav.primary` — the dropdown groups must stay first (`tests/nav.spec.ts` asserts that exact order).
+- `nav.primary` entries may carry `external: true`. External items render as `<a target="_blank" rel="noopener noreferrer">` in **both** the desktop nav and the mobile drawer (never `next/link`). There are currently **no** external items in the header — the old Google Drive "Service Menu" PDF link was removed.
+- **Header structure (frozen, DB-driven).** The admin menu editor was removed, so the runtime menu comes from the `MenuItem` table (`getNavigationData()` falls back to an *empty* nav, never the seed). Any structural change must land in **both** the static seed (`src/data/content/nav.ts` + `nav-mega-groups.ts`, used by fresh DBs and the unit parity tests) **and** an idempotent SQL migration for existing DBs. The current order — pinned by `tests/nav.spec.ts` — is:
+  1. **Our Story** → `/our-story` (plain link).
+  2. **Service Menu** → `/menu`, mega group `services`: one column "Layanan" listing, in order, **Body Massage** (`/menu#massage`), **Chair Services** (`/menu#massage`), **Add Ons** (`/menu#body`), **All Day Spa Packages** (`/menu#packages`), **Loyalty Member** (`/membership`), plus the membership highlight card and a "Lihat semua treatment" footer link.
+  3. **Gallery** → `/gallery` (plain link; also in the footer About group).
+  4. **Corporate Wellness** → `/corporate`, mega group `corporate` (content unchanged).
+  5. **Book Now** → CTA from `SiteSettings.bookNowLabel/bookNowHref` (default `/reservation`), rendered *outside* the primary `<ul>` on desktop and in the pinned drawer bar on mobile — never a primary `<li>`.
+- Contact and the standalone Reservation item are **no longer top-level header entries** (the footer is untouched). Migration `20261126090000_nav_restructure` deletes the `/contact`, `/reservation` and `drive.google.com` header roots, rebuilds the `services` children, adds Our Story, reorders the roots and backfills the Book Now CTA. It early-returns on an empty DB (so `scripts/seed.mts` still seeds fresh databases) and is idempotent on re-run. Earlier migrations: `20261116090000_menu_gallery_link` (Gallery), `20261116150000_public_reservation` (Reservation, since removed).
+- Active/focus state is documented under `src/components/navigation.tsx` in `## Where things live` (`nav-active.ts` + `aria-current="page"`).
 - Social + partnership live in `site.social`: Instagram `kama__spa`, TikTok `@kama__spa`, partnership email `marketing@kamaspa.id`. Facebook was dropped (no brand account).
 - Icons for socials live in `src/components/icons.tsx` and must match the platform (Instagram / TikTok / envelope for email) — no generic globe/link glyphs.
 

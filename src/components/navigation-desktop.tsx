@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 
-import { ExternalLink } from "./icons";
+import { isNavGroupActive } from "@/lib/domain/nav-active";
 import { DesktopMegaItem } from "./navigation-desktop-item";
-import { linkBase } from "./navigation-styles";
+import { DesktopNavLink } from "./navigation-desktop-link";
 import type { DesktopNavProps } from "./navigation-types";
 
 /** Navigasi desktop (xl ke atas) beserta tombol Book Now. */
@@ -12,6 +12,7 @@ export function DesktopNav({
   header,
   bookNow,
   bookNowHref,
+  pathname,
   openGroup,
   setOpenGroup,
   hover,
@@ -23,34 +24,13 @@ export function DesktopNav({
       <ul className="m-0 flex list-none items-stretch gap-0.5 p-0">
         {header.primary.map((item) => {
           if (!item.mega) {
-            /* External links open in a new tab — never `next/link`. */
-            if (item.external) {
-              return (
-                <li key={item.label} className="m-0 flex flex-col justify-center">
-                  <a
-                    href={item.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => setOpenGroup(null)}
-                    className={`${linkBase} text-cocoa/85 hover:bg-cocoa/5 hover:text-ink`}
-                  >
-                    {item.label}
-                    <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-                  </a>
-                </li>
-              );
-            }
-
             return (
-              <li key={item.label} className="m-0 flex flex-col justify-center">
-                <Link
-                  href={item.href}
-                  onClick={() => setOpenGroup(null)}
-                  className={`${linkBase} text-cocoa/85 hover:bg-cocoa/5 hover:text-ink`}
-                >
-                  {item.label}
-                </Link>
-              </li>
+              <DesktopNavLink
+                key={item.label}
+                item={item}
+                pathname={pathname}
+                onNavigate={() => setOpenGroup(null)}
+              />
             );
           }
 
@@ -63,6 +43,7 @@ export function DesktopNav({
               item={item}
               group={group}
               isOpen={isOpen}
+              isActive={isNavGroupActive(pathname, item, group)}
               onToggle={() => {
                 hover.clearTimers();
                 setOpenGroup(isOpen ? null : group.id);

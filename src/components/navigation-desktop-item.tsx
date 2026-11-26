@@ -5,7 +5,7 @@ import type { RefObject } from "react";
 import type { NavMegaGroup, NavPrimaryItem } from "@/data/content";
 import { ChevronDown } from "./icons";
 import { MegaPanel } from "./navigation-mega-panel";
-import { linkBase } from "./navigation-styles";
+import { linkActive, linkBase, linkIdle } from "./navigation-styles";
 import type { HoverIntent } from "./navigation-types";
 
 /** Satu item mega menu desktop: tombol pemicu + panel dropdown-nya. */
@@ -13,6 +13,7 @@ export function DesktopMegaItem({
   item,
   group,
   isOpen,
+  isActive,
   onToggle,
   onArrowDown,
   onNavigate,
@@ -23,6 +24,7 @@ export function DesktopMegaItem({
   item: NavPrimaryItem;
   group: NavMegaGroup;
   isOpen: boolean;
+  isActive: boolean;
   onToggle: () => void;
   onArrowDown: () => void;
   onNavigate: () => void;
@@ -51,11 +53,8 @@ export function DesktopMegaItem({
         aria-expanded={isOpen}
         aria-haspopup="true"
         aria-controls={panelId}
-        className={`${linkBase} ${
-          isOpen
-            ? "bg-cocoa/8 text-ink"
-            : "text-cocoa/85 hover:bg-cocoa/5 hover:text-ink"
-        }`}
+        aria-current={isActive ? "page" : undefined}
+        className={`${linkBase} ${isOpen || isActive ? linkActive : linkIdle}`}
       >
         {item.label}
         <ChevronDown

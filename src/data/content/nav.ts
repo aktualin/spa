@@ -7,20 +7,15 @@ export const nav: {
   megaGroups: Record<string, NavMegaGroup>;
 } = {
   /**
-   * Header order matters: the dropdown groups come first, the plain links
-   * after. `mega` points at a key in `nav.megaGroups`.
+   * Header order (seed blueprint; runtime is DB-driven via MenuItem).
+   * `mega` points at a key in `nav.megaGroups`. Book Now is a separate CTA
+   * from SiteSettings, not a primary item.
    */
   primary: [
-    { label: "Menu", href: "/menu", mega: "services" },
-    { label: "Corporate Wellness", href: "/corporate", mega: "corporate" },
+    { label: "Our Story", href: "/our-story" },
+    { label: "Service Menu", href: "/menu", mega: "services" },
     { label: "Gallery", href: "/gallery" },
-    { label: "Contact", href: "/contact" },
-    { label: "Reservation", href: "/reservation" },
-    {
-      label: "Service Menu",
-      href: "https://drive.google.com/file/d/1UfW-JFOno47KCLi-PwID4XdrCDHkwIfc/view?usp=sharing",
-      external: true,
-    },
+    { label: "Corporate Wellness", href: "/corporate", mega: "corporate" },
   ],
   bookNow: "Book Now",
   megaGroups,

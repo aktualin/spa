@@ -42,6 +42,7 @@ export type DesktopNavProps = {
   header: NavData;
   bookNow: string;
   bookNowHref: string;
+  pathname: string;
   openGroup: string | null;
   setOpenGroup: SetOpenGroup;
   hover: HoverIntent;
@@ -55,6 +56,7 @@ export type MobileDrawerProps = {
   bookNowHref: string;
   whatsappHref: string | null;
   fabAria: string;
+  pathname: string;
   openGroup: string | null;
   setOpenGroup: SetOpenGroup;
   onClose: () => void;
