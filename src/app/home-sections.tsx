@@ -57,14 +57,10 @@ export function HomeSection({
       return <HeroStats stats={stats} section={section} copyBlocks={pageCopy} />;
     case "socials":
       return <SocialsSection section={section} copyBlocks={pageCopy} />;
-    case "booking-banner":
-      return <BookingBanner section={section} copyBlocks={pageCopy} />;
     case "signature-treatments":
       return <SignatureTreatmentsSection section={section} copyBlocks={pageCopy} />;
     case "promo-highlight":
       return <PromoHighlightSection copyBlocks={pageCopy} />;
-    case "gallery-teaser":
-      return <GalleryTeaserSection section={section} copyBlocks={pageCopy} />;
     default:
       return key.startsWith("custom-") && section ? (
         <CustomSection section={section} />
