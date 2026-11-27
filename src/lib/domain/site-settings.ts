@@ -44,7 +44,6 @@ export {
   MAX_PARTNERSHIP_INTRO,
   MAX_PRICE_DISCLAIMER,
   MAX_BOOK_NOW_LABEL,
-  MAX_MENU_SCANS,
 } from "./site-settings.input.ts";
 export {
   siteSettingsInputSchema,

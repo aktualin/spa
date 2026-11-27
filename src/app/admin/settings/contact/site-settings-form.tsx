@@ -10,7 +10,7 @@ import {
 import { ErrorMessage, SaveButton } from "../_components/form-ui";
 import { BrandFields, FooterLinkFields } from "./brand-fields";
 import { ContactFields } from "./site-settings-contact";
-import { AnalyticsFields, MenuScanFields } from "./site-settings-extra";
+import { AnalyticsFields } from "./site-settings-extra";
 import { LocationFields } from "./site-settings-location";
 import { SocialFields } from "./site-settings-social";
 import { SiteTextFields } from "./site-settings-text";
@@ -48,7 +48,6 @@ export function SiteSettingsForm({
         <BrandFields values={values} />
         <SiteTextFields values={values} />
         <FooterLinkFields values={values} />
-        <MenuScanFields values={values} />
         <AnalyticsFields values={values} />
 
         <ErrorMessage error={state.error} />

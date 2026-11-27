@@ -8,7 +8,6 @@ import { copy, getPageCopy } from "@/lib/content/page-copy";
 import { MenuBodyAddOns, MenuHero, MenuMassage } from "./menu-sections";
 import { MenuFeatures } from "./menu-features";
 import { MenuPackages } from "./menu-packages";
-import { MenuBook } from "./menu-book";
 
 export async function generateMetadata(): Promise<Metadata> {
   return withPageSeo("/menu", {});
@@ -29,7 +28,7 @@ export default async function MenuPage() {
     Bath: copy(pageCopy, "menu.category.bath"),
   };
   const bodyAddOns = additionalServices.filter((s) => s.category === "Body");
-  const { priceDisclaimer, menuScanUrls, menuPdfUrl } = settings;
+  const { priceDisclaimer } = settings;
 
   return (
     <>
@@ -52,7 +51,6 @@ export default async function MenuPage() {
           pageCopy={pageCopy}
         />
         <MenuPackages priceDisclaimer={priceDisclaimer} pageCopy={pageCopy} />
-        <MenuBook menuScanUrls={menuScanUrls} menuPdfUrl={menuPdfUrl} pageCopy={pageCopy} />
       </main>
       <Footer />
     </>

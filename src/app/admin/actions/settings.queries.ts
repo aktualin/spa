@@ -37,8 +37,6 @@ export async function getContactSettingsRow() {
       priceDisclaimer: true,
       bookNowLabel: true,
       bookNowHref: true,
-      menuScanUrls: true,
-      menuPdfUrl: true,
       logoMarkLightUrl: true,
       logoMarkDarkUrl: true,
       logoLockupUrl: true,

@@ -24,8 +24,6 @@ export type SiteSettingsInput = {
   priceDisclaimer: string;
   bookNowLabel: string;
   bookNowHref: string;
-  menuScanUrls: string[];
-  menuPdfUrl: string;
   logoMarkLightUrl: string;
   logoMarkDarkUrl: string;
   logoLockupUrl: string;
@@ -50,4 +48,3 @@ export const MAX_FOOTER_MEMBERSHIP_LABEL = 60;
 export const MAX_PARTNERSHIP_INTRO = 120;
 export const MAX_PRICE_DISCLAIMER = 300;
 export const MAX_BOOK_NOW_LABEL = 40;
-export const MAX_MENU_SCANS = 30;

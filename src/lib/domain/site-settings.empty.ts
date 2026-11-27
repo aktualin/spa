@@ -29,8 +29,6 @@ export function emptySiteSettings(): SiteSettings {
     priceDisclaimer: "",
     bookNowLabel: "",
     bookNowHref: "",
-    menuScanUrls: [],
-    menuPdfUrl: "",
     logoMarkLightUrl: "",
     logoMarkDarkUrl: "",
     logoLockupUrl: "",

@@ -46,8 +46,6 @@ export async function getSiteSettings(): Promise<SiteSettings> {
           priceDisclaimer: true,
           bookNowLabel: true,
           bookNowHref: true,
-          menuScanUrls: true,
-          menuPdfUrl: true,
           logoMarkLightUrl: true,
           logoMarkDarkUrl: true,
           logoLockupUrl: true,

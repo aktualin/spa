@@ -35,10 +35,6 @@ export type SiteSettings = {
   /** Label & tujuan tombol Book Now di header; kosong → tombol disembunyikan. */
   bookNowLabel: string;
   bookNowHref: string;
-  /** Halaman scan menu book, berurutan. */
-  menuScanUrls: string[];
-  /** Berkas PDF menu yang bisa diunduh. */
-  menuPdfUrl: string;
   /** Identitas brand (mark header, lockup footer/hero, wordmark, alt). */
   logoMarkLightUrl: string;
   logoMarkDarkUrl: string;

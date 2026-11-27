@@ -8,7 +8,7 @@ import { expect, test } from "@playwright/test";
  * the second half is easy to break with a spacing change.
  */
 
-const SECTIONS = ["massage", "body", "face", "head", "bath", "packages", "gallery"] as const;
+const SECTIONS = ["massage", "body", "face", "head", "bath", "packages"] as const;
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/menu");

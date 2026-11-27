@@ -72,8 +72,6 @@ export function siteSettingsFormDefaults(row: SiteSettingsRow | null): FormDefau
       priceDisclaimer: text(row.priceDisclaimer),
       bookNowLabel: text(row.bookNowLabel),
       bookNowHref: text(row.bookNowHref),
-      menuScanUrls: normalizeMenuScanUrls(row.menuScanUrls ?? []),
-      menuPdfUrl: text(row.menuPdfUrl),
       logoMarkLightUrl: text(row.logoMarkLightUrl),
       logoMarkDarkUrl: text(row.logoMarkDarkUrl),
       logoLockupUrl: text(row.logoLockupUrl),

@@ -31,8 +31,6 @@ export type SiteSettingsRow = {
   priceDisclaimer: string | null;
   bookNowLabel: string | null;
   bookNowHref: string | null;
-  menuScanUrls: string[];
-  menuPdfUrl: string | null;
   logoMarkLightUrl: string | null;
   logoMarkDarkUrl: string | null;
   logoLockupUrl: string | null;

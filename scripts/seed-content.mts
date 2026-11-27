@@ -217,14 +217,6 @@ export const CONTENT_BLOCKS: { key: string; value: string }[] = [
     value:
       "Our thoughtfully curated spa bundles combine massages, treatments, and rituals designed to pamper, restore balance, and leave you refreshed all day long.",
   },
-  { key: "menu.menu_book.eyebrow", value: "Menu Book" },
-  { key: "menu.menu_book.title", value: "KAMA Spa Menu Gallery 2026" },
-  {
-    key: "menu.menu_book.description",
-    value:
-      "Explore our full menu as it appears in the official menu book — or download the PDF to take home.",
-  },
-  { key: "menu.menu_book.download_label", value: "Download Menu (PDF)" },
   { key: "menu.detail.eyebrow", value: "KAMA Spa" },
   { key: "menu.detail.loading_title", value: "Loading treatment…" },
   { key: "menu.detail.pricing_label", value: "Pricing" },
@@ -495,8 +487,6 @@ export const LINKS_MICROCOPY_FORMS_BLOCKS: { key: string; value: string }[] = [
   { key: "home.hero.slider_aria", value: "Choose hero visual" },
   { key: "home.hero.dot_aria", value: "Show visual {n} of {m}" },
   { key: "home.whats_new.cta_fallback", value: "Learn More" },
-  { key: "menu.scan_alt", value: "KAMA Spa menu book — page {n}" },
-  { key: "menu.scan_aria", value: "Open menu book page {n}" },
   { key: "catalog.seo_category_description", value: "{name} at KAMA Spa — full durations and prices." },
   { key: "catalog.seo_treatment_description", value: "{name} at KAMA Spa — full durations and prices." },
   { key: "catalog.seo_package_description", value: "{name} at KAMA Spa — what's included, duration, and price." },
@@ -640,22 +630,13 @@ export async function seedContent(prisma: PrismaClient): Promise<void> {
     }
     if (!settings.bookNowLabel?.trim()) update.bookNowLabel = "Book Now";
     if (!settings.bookNowHref?.trim()) update.bookNowHref = "/reservation";
-    // Galeri menu book (section #gallery di /menu): 10 halaman scan + PDF di
-    // bucket S3 — dulu statis di public/img, kini dikelola dari Pengaturan.
-    const menuScans =
-      (settings.menuScanUrls ?? []).length === 0
-        ? Array.from({ length: 10 }, (_, i) =>
-            asset(`img/kama/menu/menu-page-${String(i + 1).padStart(2, "0")}.jpg`),
-          )
-        : null;
-    if (!settings.menuPdfUrl?.trim()) update.menuPdfUrl = asset("img/kama/menu/kama-menu-2026.pdf");
-    if (Object.keys(update).length > 0 || menuScans) {
+    if (Object.keys(update).length > 0) {
       await prisma.siteSettings.update({
         where: { id: "singleton" },
-        data: { ...update, ...(menuScans ? { menuScanUrls: menuScans } : {}) },
+        data: update,
       });
     }
-    console.log("✔ pengaturan teks footer/partnership & galeri menu");
+    console.log("✔ pengaturan teks footer/partnership");
   }
 
   console.log(

@@ -28,8 +28,6 @@ export function toSiteSettingsWrite(parsed: SiteSettingsParsed): SiteSettingsWri
     priceDisclaimer: orNull(parsed.priceDisclaimer),
     bookNowLabel: orNull(parsed.bookNowLabel),
     bookNowHref: orNull(parsed.bookNowHref),
-    menuScanUrls: parsed.menuScanUrls,
-    menuPdfUrl: orNull(parsed.menuPdfUrl),
     logoMarkLightUrl: orNull(parsed.logoMarkLightUrl),
     logoMarkDarkUrl: orNull(parsed.logoMarkDarkUrl),
     logoLockupUrl: orNull(parsed.logoLockupUrl),

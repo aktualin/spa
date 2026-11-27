@@ -15,8 +15,6 @@ export const MICROCOPY_GROUPS: readonly PageCopyGroup[] = [
       { key: "home.hero.slider_aria", label: "Aria grup slider hero", type: "text", maxLength: 60 },
       { key: "home.hero.dot_aria", label: "Aria titik hero ({n}/{m})", type: "text", maxLength: 80 },
       { key: "home.whats_new.cta_fallback", label: "What’s New — label CTA cadangan", type: "text", maxLength: 40 },
-      { key: "menu.scan_alt", label: "Menu book — alt halaman ({n})", type: "text", maxLength: 80 },
-      { key: "menu.scan_aria", label: "Menu book — aria buka halaman ({n})", type: "text", maxLength: 80 },
       { key: "catalog.seo_category_description", label: "SEO — deskripsi kategori ({name})", type: "textarea", maxLength: 300 },
       { key: "catalog.seo_treatment_description", label: "SEO — deskripsi treatment ({name})", type: "textarea", maxLength: 300 },
       { key: "catalog.seo_package_description", label: "SEO — deskripsi paket ({name})", type: "textarea", maxLength: 300 },

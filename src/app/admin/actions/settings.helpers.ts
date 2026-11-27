@@ -45,9 +45,6 @@ export function readSiteSettingsInput(formData: FormData): SiteSettingsInput {
     priceDisclaimer: field("priceDisclaimer"),
     bookNowLabel: field("bookNowLabel"),
     bookNowHref: field("bookNowHref"),
-    // Satu URL per baris; baris kosong dibuang oleh normalizer di schema.
-    menuScanUrls: field("menuScanUrls").split("\n"),
-    menuPdfUrl: field("menuPdfUrl"),
     logoMarkLightUrl: field("logoMarkLightUrl"),
     logoMarkDarkUrl: field("logoMarkDarkUrl"),
     logoLockupUrl: field("logoLockupUrl"),

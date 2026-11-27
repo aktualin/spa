@@ -66,8 +66,6 @@ export function mergeSiteSettings(row: SiteSettingsRow | null): SiteSettings {
     // Tujuan yang tidak aman diperlakukan kosong supaya tombolnya disembunyikan,
     // bukan dirender dengan tautan yang bisa menyesatkan.
     bookNowHref: isSafeCtaHref(text(row.bookNowHref)) ? text(row.bookNowHref) : "",
-    menuScanUrls: normalizeMenuScanUrls(row.menuScanUrls ?? []).filter(isSafeImageUrl),
-    menuPdfUrl: isSafeCtaHref(text(row.menuPdfUrl)) ? text(row.menuPdfUrl) : "",
     logoMarkLightUrl: safeImage(row.logoMarkLightUrl),
     logoMarkDarkUrl: safeImage(row.logoMarkDarkUrl),
     logoLockupUrl: safeImage(row.logoLockupUrl),

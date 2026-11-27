@@ -41,8 +41,6 @@ const CURRENT_ROW: SiteSettingsRow = {
   priceDisclaimer: null,
   bookNowLabel: null,
   bookNowHref: null,
-  menuScanUrls: [],
-  menuPdfUrl: null,
   footerMembershipTitle: null,
   footerMembershipLearnLabel: null,
   footerMembershipJoinLabel: null,
@@ -88,8 +86,6 @@ function input(overrides: Partial<SiteSettingsInput> = {}): SiteSettingsInput {
     priceDisclaimer: "",
     bookNowLabel: "",
     bookNowHref: "",
-    menuScanUrls: [],
-    menuPdfUrl: "",
     footerMembershipTitle: "",
     footerMembershipLearnLabel: "",
     footerMembershipJoinLabel: "",
@@ -213,7 +209,6 @@ describe("siteSettingsInputSchema", () => {
         footerTagline: "  Your ritual, your pace.  ",
         bookNowLabel: " Book Now ",
         bookNowHref: "/contact",
-        menuScanUrls: [" https://cdn.example.com/menu-01.jpg ", "", "https://cdn.example.com/img/menu-02.jpg"],
       }),
     );
     assert.equal(parsed.whatsappNumber, "6281316052040");
@@ -225,10 +220,6 @@ describe("siteSettingsInputSchema", () => {
     assert.equal(parsed.ga4MeasurementId, "G-ABCDEF1234");
     assert.equal(parsed.footerTagline, "Your ritual, your pace.");
     assert.equal(parsed.bookNowLabel, "Book Now");
-    assert.deepEqual(parsed.menuScanUrls, [
-      "https://cdn.example.com/menu-01.jpg",
-      "https://cdn.example.com/img/menu-02.jpg",
-    ]);
     const write = toSiteSettingsWrite(parsed);
     assert.equal(write.facebookUrl, null);
     assert.equal(write.phone, null);
@@ -264,8 +255,6 @@ describe("siteSettingsInputSchema", () => {
     fail({ ga4MeasurementId: "UA-1234" });
     fail({ phone: "12ab" });
     fail({ bookNowHref: "javascript:alert(1)" });
-    fail({ menuScanUrls: ["bukan-url"] });
-    fail({ menuPdfUrl: "javascript:alert(1)" });
     fail({ logoMarkLightUrl: "javascript:alert(1)" });
     fail({ logoLockupUrl: "/img/logo.png" });
     fail({ brandWordmarkTop: "x".repeat(21) });
