@@ -70,7 +70,7 @@ export function ReservationForm({
       <ReservationFields branches={branches} services={services} copy={copy} />
       {/* Honeypot: tidak terlihat manusia, bot mengisinya → ditolak server. */}
       <input name="website" type="text" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
-      <input className="button is-tertiary w-button" type="submit" value={copy.submitLabel} disabled={state === "sending"} />
+      <input className="button w-full is-tertiary w-button" type="submit" value={copy.submitLabel} disabled={state === "sending"} />
       {state === "error" && (
         <div className="w-form-fail" style={{ display: "block" }}>
           <div className="body-m">{copy.error}</div>

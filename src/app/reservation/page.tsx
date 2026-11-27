@@ -34,42 +34,40 @@ export default async function ReservationPage() {
   return (
     <>
       <Navigation />
+
       <main className="main-wrapper">
+        {/* Hero */}
         <Reveal as="section" className="page-hero">
           <div className="padding-global">
             <div className="container-large">
-              <div className="section-header">
-                <h1 className="header-xxl">{reservation.title}</h1>
+              <div className="section-header mx-auto max-w-2xl text-center">
+                <h1 className="header-xxl text-balance">{reservation.title}</h1>
                 {reservation.description ? (
-                  <p className="body-m text-color-gray">{reservation.description}</p>
-                ) : null}
-              </div>
-            </div>
-          </div>
-        </Reveal>
-
-        <Reveal as="section" className="padding-section-global home-locations">
-          <div className="padding-global">
-            <div className="container-large">
-              <div className="mx-auto w-full max-w-[42rem]">
-                <ReservationForm branches={branches} services={services} copy={reservation} />
-                {waHref ? (
-                  <p className="body-m text-color-gray mt-6 text-center">
-                    <a
-                      href={waHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-cocoa underline"
-                    >
-                      {copy(pageCopy, "global.book_via_whatsapp")}
-                    </a>
+                  <p className="body-m text-color-gray mt-4 text-pretty">
+                    {reservation.description}
                   </p>
                 ) : null}
               </div>
             </div>
           </div>
         </Reveal>
+
+        {/* Form */}
+        <Reveal as="section" className="padding-section-global">
+          <div className="padding-global">
+            <div className="container-large">
+              <div className="mx-auto w-full max-w-2xl">
+                <ReservationForm
+                  branches={branches}
+                  services={services}
+                  copy={reservation}
+                />
+              </div>
+            </div>
+          </div>
+        </Reveal>
       </main>
+
       <Footer />
     </>
   );
