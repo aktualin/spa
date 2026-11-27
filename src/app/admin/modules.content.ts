@@ -14,7 +14,7 @@ export const CONTENT_MODULES: readonly AdminModule[] = [
     ready: true,
     children: [
       { label: "Highlight", href: "/admin/homepage/highlights" },
-      { label: "Stats", href: "/admin/homepage/stats" },
+      // { label: "Stats", href: "/admin/homepage/stats" },
       { label: "Feed Instagram", href: "/admin/homepage/instagram" },
       { label: "Our Story", href: "/admin/our-story" },
     ],
