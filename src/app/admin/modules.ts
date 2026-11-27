@@ -22,8 +22,10 @@ import { ADMIN_GROUPS, type AdminModule } from "./modules.types.ts";
  *
  * Matriks akses:
  * - ADMIN & EDITOR (CONTENT_ROLES): semua modul konten — treatment, harga,
- *   gallery, media, promo, membership, journal, events, retail, corporate,
- *   homepage.
+ *   gallery, media, journal, corporate, homepage.
+ * - Menu Promos & Gift Card (4), Membership (5), Events (7), dan KAMA Retail
+ *   (8) dihapus dari sidebar per 27 Nov 2026; halamannya tidak terdaftar di
+ *   matriks sehingga fail-closed khusus ADMIN lewat URL langsung.
  * - ADMIN saja (ADMIN_ONLY_ROLES): modul pengaturan sistem —
  *   - Pengguna Admin: membuat akun & memberi role = bisa menaikkan hak akses.
  *   - Kontak & Umum (termasuk Template WhatsApp): nomor WhatsApp, email,

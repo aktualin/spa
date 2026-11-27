@@ -20,16 +20,6 @@ export const CONTENT_MODULES: readonly AdminModule[] = [
     ],
   },
   {
-    no: 4,
-    label: "Promos & Gift Card",
-    href: "/admin/promos",
-    group: "konten",
-    hint: "Halaman Promos, Gift Card, dan section Promo Highlight di homepage.",
-    roles: CONTENT_ROLES,
-    ready: true,
-    children: [{ label: "Gift Card", href: "/admin/gift-card" }],
-  },
-  {
     no: 6,
     label: "Journal",
     href: "/admin/journal",
@@ -38,15 +28,6 @@ export const CONTENT_MODULES: readonly AdminModule[] = [
     roles: CONTENT_ROLES,
     ready: true,
     children: [{ label: "Kategori", href: "/admin/journal/categories" }],
-  },
-  {
-    no: 7,
-    label: "Events",
-    href: "/admin/events",
-    group: "konten",
-    hint: "Halaman Events dan Collaborations.",
-    roles: CONTENT_ROLES,
-    ready: true,
   },
   {
     no: 3,
@@ -91,4 +72,8 @@ export const CONTENT_MODULES: readonly AdminModule[] = [
     roles: CONTENT_ROLES,
     ready: true,
   },
+  // Modul kontrak no. 4 (Promos & Gift Card, termasuk anak /admin/gift-card)
+  // dan no. 7 (Events) sengaja tidak didaftarkan: menu dihapus dari sidebar
+  // per 27 Nov 2026. Halamannya masih ada dan fail-closed khusus ADMIN
+  // (lihat modules.ts).
 ];

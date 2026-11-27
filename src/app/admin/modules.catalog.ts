@@ -27,22 +27,7 @@ export const CATALOG_MODULES: readonly AdminModule[] = [
     roles: CONTENT_ROLES,
     ready: true,
   },
-  {
-    no: 5,
-    label: "Membership",
-    href: "/admin/membership",
-    group: "katalog",
-    hint: "Halaman Membership, banner membership di homepage, dan tautan di footer.",
-    roles: CONTENT_ROLES,
-    ready: true,
-  },
-  {
-    no: 8,
-    label: "KAMA Retail",
-    href: "/admin/retail",
-    group: "katalog",
-    hint: "Produk yang tampil di halaman KAMA Retail.",
-    roles: CONTENT_ROLES,
-    ready: true,
-  },
+  // Modul kontrak no. 5 (Membership) dan no. 8 (KAMA Retail) sengaja tidak
+  // didaftarkan: menu dihapus dari sidebar per 27 Nov 2026. Halamannya masih
+  // ada dan fail-closed khusus ADMIN (lihat modules.ts).
 ];

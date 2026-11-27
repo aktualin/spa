@@ -52,12 +52,7 @@ describe("BUILD-17 — matriks role → modul", () => {
       "/admin/treatments/packages/x",
       "/admin/gallery/albums/a",
       "/admin/media/1",
-      "/admin/promos",
-      "/admin/gift-card",
-      "/admin/membership/program",
       "/admin/journal/1/preview",
-      "/admin/events/1",
-      "/admin/retail/1",
       "/admin/corporate/inquiries/1",
       "/admin/corporate/programs/1",
       "/admin/homepage/highlights/1",
@@ -79,6 +74,18 @@ describe("BUILD-17 — matriks role → modul", () => {
     assert.deepEqual([...rolesForPath("/admin/modul-baru")], ["ADMIN"]);
     assert.deepEqual([...rolesForPath("/admin/settings")], ["ADMIN"]);
     assert.equal(canAccessPath("EDITOR", "/admin/settings/lainnya"), false);
+    // Menu Promos & Gift Card, Events, Membership, dan KAMA Retail dihapus
+    // dari sidebar (27 Nov 2026); halamannya tetap ada tetapi fail-closed.
+    for (const path of [
+      "/admin/promos",
+      "/admin/gift-card",
+      "/admin/events/1",
+      "/admin/membership/program",
+      "/admin/retail/1",
+    ]) {
+      assert.deepEqual([...rolesForPath(path)], ["ADMIN"], path);
+      assert.equal(canAccessPath("EDITOR", path), false, path);
+    }
   });
 
   it("pencocokan per segmen, bukan sekadar awalan teks", () => {
