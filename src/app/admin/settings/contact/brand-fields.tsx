@@ -9,30 +9,30 @@ import { Field, inputClass } from "../_components/form-ui";
 export function BrandFields({ values }: { values: SiteSettingsInput }) {
   return (
     <fieldset className="space-y-5">
-      <legend className="text-base font-semibold text-neutral-900">Identitas brand</legend>
+      <legend className="text-base font-semibold text-neutral-900">Brand identity</legend>
       <p className="text-xs text-neutral-500">
-        Logo untuk header, footer, dan halaman masuk dashboard. Kosong = aset bawaan.
+        Logos for the header, footer, and dashboard sign-in page. Empty = default asset.
       </p>
       <ImageField
         name="logoMarkLightUrl"
-        label="Mark logo terang (untuk latar gelap)"
+        label="Light logo mark (for dark backgrounds)"
         folder="brand"
         defaultValue={values.logoMarkLightUrl}
       />
       <ImageField
         name="logoMarkDarkUrl"
-        label="Mark logo gelap (untuk latar terang)"
+        label="Dark logo mark (for light backgrounds)"
         folder="brand"
         defaultValue={values.logoMarkDarkUrl}
       />
       <ImageField
         name="logoLockupUrl"
-        label="Lockup logo (mark + nama, untuk footer/hero)"
+        label="Logo lockup (mark + name, for footer/hero)"
         folder="brand"
         defaultValue={values.logoLockupUrl}
       />
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Wordmark atas" htmlFor="brandWordmarkTop" hint="Maks. 20 karakter.">
+        <Field label="Top wordmark" htmlFor="brandWordmarkTop" hint="Max. 20 characters.">
           <input
             id="brandWordmarkTop"
             name="brandWordmarkTop"
@@ -42,7 +42,7 @@ export function BrandFields({ values }: { values: SiteSettingsInput }) {
             className={inputClass}
           />
         </Field>
-        <Field label="Wordmark bawah" htmlFor="brandWordmarkBottom" hint="Maks. 20 karakter.">
+        <Field label="Bottom wordmark" htmlFor="brandWordmarkBottom" hint="Max. 20 characters.">
           <input
             id="brandWordmarkBottom"
             name="brandWordmarkBottom"
@@ -54,9 +54,9 @@ export function BrandFields({ values }: { values: SiteSettingsInput }) {
         </Field>
       </div>
       <Field
-        label="Alt logo"
+        label="Logo alt"
         htmlFor="brandLogoAlt"
-        hint="Teks alternatif logo untuk pembaca layar, maks. 60 karakter."
+        hint="Alternative logo text for screen readers, max. 60 characters."
       >
         <input
           id="brandLogoAlt"
@@ -74,16 +74,16 @@ export function BrandFields({ values }: { values: SiteSettingsInput }) {
 /** Tujuan tautan struktural footer (Learn More, Privacy, Terms). */
 export function FooterLinkFields({ values }: { values: SiteSettingsInput }) {
   const links = [
-    { name: "footerMembershipLearnHref", label: "Tujuan Learn More membership", placeholder: "/membership" },
-    { name: "footerPrivacyHref", label: "Tujuan Privacy Policy", placeholder: "/privacy-policy" },
-    { name: "footerTermsHref", label: "Tujuan Terms & Conditions", placeholder: "/terms" },
+    { name: "footerMembershipLearnHref", label: "Membership Learn More destination", placeholder: "/membership" },
+    { name: "footerPrivacyHref", label: "Privacy Policy destination", placeholder: "/privacy-policy" },
+    { name: "footerTermsHref", label: "Terms & Conditions destination", placeholder: "/terms" },
   ] as const;
   return (
     <fieldset className="space-y-5">
-      <legend className="text-base font-semibold text-neutral-900">Tautan footer</legend>
+      <legend className="text-base font-semibold text-neutral-900">Footer links</legend>
       <p className="text-xs text-neutral-500">
-        Path internal (/membership), anchor (#booking), atau URL https://.
-        Tautan yang dikosongkan tidak ditampilkan di footer.
+        Internal path (/membership), anchor (#booking), or https:// URL.
+        Links left empty are not shown in the footer.
       </p>
       {links.map((link) => (
         <Field key={link.name} label={link.label} htmlFor={link.name}>

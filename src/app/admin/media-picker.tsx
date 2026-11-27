@@ -52,14 +52,14 @@ export function MediaPicker({
       <div className="flex max-h-[85vh] flex-col">
         <div className="flex items-center justify-between gap-3 border-b border-neutral-200 px-4 py-3">
           <h2 id={titleId} className="text-base font-semibold text-neutral-900">
-            Pilih dari Media Library
+            Select from Media Library
           </h2>
           <button
             type="button"
             onClick={onClose}
             className="rounded-md px-2 py-1 text-sm text-neutral-600 hover:bg-neutral-100"
           >
-            Tutup
+            Close
           </button>
         </div>
 
@@ -71,10 +71,10 @@ export function MediaPicker({
               {error}
             </p>
           ) : loading && assets.length === 0 ? (
-            <p className="text-sm text-neutral-500">Memuat…</p>
+            <p className="text-sm text-neutral-500">Loading…</p>
           ) : assets.length === 0 ? (
             <p className="text-sm text-neutral-500">
-              Tidak ada berkas. Unggah gambar di halaman Media Library atau lewat field gambar.
+              No files yet. Upload images on the Media Library page or through an image field.
             </p>
           ) : (
             <PickerGrid assets={assets} loading={loading} onSelect={onSelect} />

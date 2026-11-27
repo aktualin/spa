@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   // Tolak POST lintas-situs. Cookie sesi sendiri sudah sameSite=lax, ini
   // lapis kedua.
   if (!isSameOrigin(request.headers)) {
-    return new NextResponse("Origin tidak diizinkan.", { status: 403 });
+    return new NextResponse("Origin not allowed.", { status: 403 });
   }
 
   // 303 supaya browser mengikuti redirect dengan GET.

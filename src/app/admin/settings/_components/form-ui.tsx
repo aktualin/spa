@@ -22,8 +22,8 @@ export function ErrorMessage({ error }: { error: string | null }) {
 export function StatusBanner({
   saved,
   deleted,
-  savedText = "Perubahan tersimpan.",
-  deletedText = "Data dihapus.",
+  savedText = "Changes saved.",
+  deletedText = "Data deleted.",
 }: {
   saved?: string;
   deleted?: string;

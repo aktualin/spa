@@ -26,10 +26,10 @@ export default async function AdminEventsPage({
     <div className="mx-auto max-w-4xl">
       <PageHeader
         title="Events"
-        subtitle={`${events.length} event terdaftar.`}
+        subtitle={`${events.length} events listed.`}
         action={
           <Link href="/admin/events/new" className={primaryLinkClass}>
-            Tambah event
+            Add event
           </Link>
         }
       />
@@ -37,7 +37,7 @@ export default async function AdminEventsPage({
       <StatusBanners
         saved={params.saved}
         deleted={params.deleted}
-        deletedLabel="Event dihapus."
+        deletedLabel="Event deleted."
       />
 
       <div className="mt-6">

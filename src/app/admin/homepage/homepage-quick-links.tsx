@@ -3,9 +3,9 @@ import Link from "next/link";
 /** Tautan cepat ke sub-modul homepage dari halaman Section Homepage. */
 export function HomepageQuickLinks() {
   const links = [
-    { href: "/admin/homepage/hero", label: "Kelola slide Hero →" },
-    { href: "/admin/homepage/highlights", label: "Kelola highlight “What’s New” →" },
-    { href: "/admin/homepage/stats", label: "Statistik Brand Intro →" },
+    { href: "/admin/homepage/hero", label: "Manage Hero slides →" },
+    { href: "/admin/homepage/highlights", label: "Manage “What’s New” highlights →" },
+    { href: "/admin/homepage/stats", label: "Brand Intro stats →" },
     { href: "/admin/homepage/instagram", label: "Feed Instagram →" },
     { href: "/admin/our-story", label: "Edit Our Story →" },
   ];

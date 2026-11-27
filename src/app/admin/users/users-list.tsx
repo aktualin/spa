@@ -31,30 +31,30 @@ export function UserRow({
           </span>
           {user.id === selfId ? (
             <span className="rounded bg-sky-100 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-sky-800">
-              Anda
+              You
             </span>
           ) : null}
           {user.mustChangePassword ? (
             <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-neutral-600">
-              Wajib ganti kata sandi
+              Must change password
             </span>
           ) : null}
           {!user.isActive ? (
             <span className="rounded bg-neutral-900 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-white">
-              Nonaktif
+              Inactive
             </span>
           ) : null}
           {locked ? (
             <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-amber-800">
-              Terkunci
+              Locked
             </span>
           ) : null}
         </div>
         <p className="mt-0.5 truncate text-xs text-neutral-500">
-          {user.email} · login terakhir{" "}
+          {user.email} · last login{" "}
           {user.lastLoginAt
             ? formatDateTime(user.lastLoginAt)
-            : "belum pernah"}
+            : "never"}
         </p>
       </div>
 
@@ -65,7 +65,7 @@ export function UserRow({
             type="submit"
             className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-50"
           >
-            Buka kunci
+            Unlock
           </button>
         </form>
       ) : null}

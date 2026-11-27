@@ -12,13 +12,13 @@ export function CoverField({ coverUrl }: { coverUrl: string }) {
     <div className="space-y-1.5">
       <ImageField
         name="coverUrl"
-        label="Gambar sampul"
+        label="Cover image"
         folder="journal"
         defaultValue={coverUrl}
       />
       <p className="text-xs text-neutral-500">
-        Tampil di daftar dan di atas artikel, sekaligus menjadi gambar pratinjau saat
-        tautan artikel dibagikan (WhatsApp, Facebook, dsb.).
+        Shown in the list and at the top of the article, and also used as the preview
+        image when the article link is shared (WhatsApp, Facebook, etc.).
       </p>
     </div>
   );
@@ -29,11 +29,11 @@ export function JournalFormHeader({ post }: { post: JournalFormData }) {
   return (
     <>
       <Link href="/admin/journal" className="text-sm text-neutral-600 hover:underline">
-        ← Kembali ke daftar artikel
+        ← Back to articles list
       </Link>
 
       <h1 className="mt-3 text-xl font-semibold text-neutral-900">
-        {post.id ? `Ubah artikel ${post.title}` : "Tulis artikel"}
+        {post.id ? `Edit article ${post.title}` : "Write article"}
       </h1>
     </>
   );
@@ -45,13 +45,13 @@ export function ArticleBodyField({ bodyHtml }: { bodyHtml: string }) {
     <>
       <RichTextField
         name="bodyHtml"
-        label="Isi artikel"
+        label="Article content"
         folder="journal"
         defaultValue={bodyHtml}
       />
       <p className="-mt-3 text-xs text-neutral-500">
-        Tombol <strong>Gambar</strong> di editor menyisipkan gambar di dalam isi artikel
-        (JPG/PNG/WebP/AVIF/GIF, maksimal 4 MB).
+        The <strong>Image</strong> button in the editor inserts an image inside the
+        article content (JPG/PNG/WebP/AVIF/GIF, maximum 4 MB).
       </p>
     </>
   );

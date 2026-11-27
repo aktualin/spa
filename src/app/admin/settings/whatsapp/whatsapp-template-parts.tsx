@@ -26,7 +26,7 @@ export function OtherTemplates({ others }: { others: OtherTemplateRow[] }) {
   return (
     <div className="space-y-3 rounded-lg border border-neutral-200 bg-white p-4">
       <h2 className="text-sm font-semibold text-neutral-900">
-        Template lain (tidak dipakai website)
+        Other templates (not used by the website)
       </h2>
       {others.map((row) => (
         <div key={row.id} className="border-t border-neutral-100 pt-3 text-sm">
@@ -36,8 +36,8 @@ export function OtherTemplates({ others }: { others: OtherTemplateRow[] }) {
           <p className="mt-1 whitespace-pre-wrap text-neutral-600">{row.message}</p>
           <form action={deleteWhatsAppTemplateAction} className="mt-2">
             <input type="hidden" name="id" value={row.id} />
-            <ConfirmSubmit message={`Hapus template "${row.label}"?`}>
-              Hapus template
+            <ConfirmSubmit message={`Delete template "${row.label}"?`}>
+              Delete template
             </ConfirmSubmit>
           </form>
         </div>

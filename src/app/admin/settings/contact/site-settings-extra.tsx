@@ -8,13 +8,13 @@ export function AnalyticsFields({ values }: { values: SiteSettingsInput }) {
   return (
     <fieldset className="space-y-5">
       <legend className="text-base font-semibold text-neutral-900">
-        Analitik
+        Analytics
       </legend>
 
       <Field
         label="GA4 Measurement ID"
         htmlFor="ga4MeasurementId"
-        hint="Format G-XXXXXXXXXX (Google Analytics → Admin → Data streams). Saat ini hanya disimpan; pemasangan script Google Analytics menyusul."
+        hint="Format G-XXXXXXXXXX (Google Analytics → Admin → Data streams). Currently only stored; the Google Analytics script installation will follow."
       >
         <input
           id="ga4MeasurementId"

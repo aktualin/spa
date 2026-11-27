@@ -39,7 +39,7 @@ export function useBulkUpload(
       setItems([]);
       setMessage({
         tone: "error",
-        text: `Maksimal ${MAX_BATCH_PHOTOS} foto sekali unggah. Anda memilih ${files.length} file.`,
+        text: `Max ${MAX_BATCH_PHOTOS} photos per upload. You selected ${files.length} files.`,
       });
       if (fileRef.current) fileRef.current.value = "";
       return;
@@ -77,7 +77,7 @@ export function useBulkUpload(
 
       const failed = batch.length - urls.length;
       if (urls.length === 0) {
-        setMessage({ tone: "error", text: "Tidak ada foto yang berhasil diunggah." });
+        setMessage({ tone: "error", text: "No photos were uploaded successfully." });
         return;
       }
 
@@ -85,7 +85,7 @@ export function useBulkUpload(
       if (saved.error) {
         setMessage({
           tone: "error",
-          text: `${saved.error} Berkas yang terunggah tetap tersimpan di Media Library.`,
+          text: `${saved.error} Uploaded files are still saved in the Media Library.`,
         });
         return;
       }
@@ -94,8 +94,8 @@ export function useBulkUpload(
         tone: failed > 0 ? "error" : "ok",
         text:
           failed > 0
-            ? `${saved.count ?? urls.length} foto ditambahkan ke ${noun}, ${failed} file gagal (lihat daftar di bawah).`
-            : `${saved.count ?? urls.length} foto ditambahkan ke ${noun}.`,
+            ? `${saved.count ?? urls.length} photos added to ${noun}, ${failed} files failed (see the list below).`
+            : `${saved.count ?? urls.length} photos added to ${noun}.`,
       });
       startTransition(() => router.refresh());
     } finally {

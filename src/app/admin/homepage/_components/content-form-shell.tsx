@@ -49,7 +49,7 @@ export function Shell({
         <div className="flex items-center gap-3 border-t border-neutral-200 pt-4">
           <SaveButton />
           <Link href={listPath} className="text-sm text-neutral-600 hover:underline">
-            Batal
+            Cancel
           </Link>
         </div>
       </form>

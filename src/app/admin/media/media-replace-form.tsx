@@ -26,7 +26,7 @@ export function ReplaceFileForm({
   return (
     <div className="space-y-2">
       <label htmlFor={inputId} className="block text-sm font-medium text-neutral-700">
-        Ganti berkas
+        Replace file
       </label>
       <input
         id={inputId}
@@ -42,7 +42,7 @@ export function ReplaceFileForm({
       />
       <p className="text-xs text-neutral-500">
         {busy ??
-          "JPG, PNG, WebP, AVIF, atau GIF. Maksimal 4 MB. Berkas baru mendapat alamat baru; semua konten yang memakai berkas ini ikut diperbarui."}
+          "JPG, PNG, WebP, AVIF, or GIF. Maximum 4 MB. The new file gets a new address; all content using this file is updated as well."}
       </p>
       {message ? (
         <p role="status" className="text-xs text-green-700">

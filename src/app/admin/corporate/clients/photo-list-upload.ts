@@ -26,7 +26,7 @@ export function usePhotoListUpload(
     const problems: string[] = [];
     if (files.length > room) {
       problems.push(
-        `Maksimal ${max} foto per klien — ${files.length - Math.max(0, room)} file tidak diunggah.`,
+        `Max ${max} photos per client — ${files.length - Math.max(0, room)} file(s) not uploaded.`,
       );
     }
 
@@ -40,7 +40,7 @@ export function usePhotoListUpload(
           problems.push(`${file.name}: ${precheck}`);
           continue;
         }
-        setProgress(`Mengunggah ${index + 1} dari ${batch.length}…`);
+        setProgress(`Uploading ${index + 1} of ${batch.length}…`);
         const result = await uploadOne(file, folder);
         if ("url" in result) add(result.url);
         else problems.push(`${file.name}: ${result.error}`);

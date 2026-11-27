@@ -11,23 +11,23 @@ export function promoStatus(promo: {
   isPublished: boolean;
   startDate: Date | null;
   endDate: Date | null;
-}): "Draf" | "Aktif" | "Terjadwal" | "Kedaluwarsa" {
-  if (!promo.isPublished) return "Draf";
+}): "Draft" | "Active" | "Scheduled" | "Expired" {
+  if (!promo.isPublished) return "Draft";
 
   const now = new Date();
-  if (isPromoActive(promo, now)) return "Aktif";
+  if (isPromoActive(promo, now)) return "Active";
   if (promo.startDate && promo.startDate.getTime() > now.getTime()) {
-    return "Terjadwal";
+    return "Scheduled";
   }
-  return "Kedaluwarsa";
+  return "Expired";
 }
 
 export const promoStatusTone: Record<
   ReturnType<typeof promoStatus>,
   "muted" | "green" | "blue" | "red"
 > = {
-  Draf: "muted",
-  Aktif: "green",
-  Terjadwal: "blue",
-  Kedaluwarsa: "red",
+  Draft: "muted",
+  Active: "green",
+  Scheduled: "blue",
+  Expired: "red",
 };

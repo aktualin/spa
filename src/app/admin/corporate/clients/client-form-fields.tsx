@@ -15,7 +15,7 @@ export function ClientFields({
 }) {
   return (
     <>
-      <Field label="Nama klien / perusahaan" htmlFor="name" hint="Juga dipakai sebagai teks alternatif logo.">
+      <Field label="Client / company name" htmlFor="name" hint="Also used as the logo's alternative text.">
         <input
           id="name"
           name="name"
@@ -28,15 +28,15 @@ export function ClientFields({
 
       <ImageField
         name="logoUrl"
-        label="Logo (opsional — tanpa logo, nama klien yang tampil)"
+        label="Logo (optional — without a logo, the client name is shown)"
         folder="corporate"
         defaultValue={client.logoUrl}
       />
 
       <Field
-        label="Website (opsional)"
+        label="Website (optional)"
         htmlFor="websiteUrl"
-        hint='Contoh: perusahaan.co.id — "https://" ditambahkan otomatis. Logo menjadi tautan ke website ini.'
+        hint='Example: company.co.id — "https://" is added automatically. The logo links to this website.'
       >
         <input
           id="websiteUrl"
@@ -50,14 +50,14 @@ export function ClientFields({
 
       <PhotoListField
         name="photoUrls"
-        label="Foto dokumentasi kegiatan"
+        label="Event documentation photos"
         folder="corporate"
         defaultValue={client.photoUrls}
         max={maxPhotos}
       />
 
       <Checkbox name="isPublished" defaultChecked={client.isPublished}>
-        Tampilkan di website
+        Show on website
       </Checkbox>
     </>
   );

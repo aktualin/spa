@@ -34,7 +34,7 @@ export function GenericSectionForm({
     <form action={formAction} className="mt-4 space-y-4">
       <input type="hidden" name="id" value={section.id} />
 
-      <Field label="Judul" htmlFor={`title-${section.id}`}>
+      <Field label="Title" htmlFor={`title-${section.id}`}>
         <input
           id={`title-${section.id}`}
           name="title"
@@ -44,7 +44,7 @@ export function GenericSectionForm({
         />
       </Field>
 
-      <Field label="Subjudul" htmlFor={`subtitle-${section.id}`}>
+      <Field label="Subtitle" htmlFor={`subtitle-${section.id}`}>
         <input
           id={`subtitle-${section.id}`}
           name="subtitle"
@@ -55,21 +55,21 @@ export function GenericSectionForm({
 
       <RichTextField
         name="bodyHtml"
-        label="Isi"
+        label="Body"
         defaultValue={section.bodyHtml}
         folder="homepage"
       />
 
       <ImageField
         name="imageUrl"
-        label="Gambar"
+        label="Image"
         folder="homepage"
         defaultValue={section.imageUrl}
       />
 
       {withCta ? (
         <>
-          <Field label="Label tombol" htmlFor={`ctaLabel-${section.id}`}>
+          <Field label="Button label" htmlFor={`ctaLabel-${section.id}`}>
             <input
               id={`ctaLabel-${section.id}`}
               name="ctaLabel"
@@ -78,7 +78,7 @@ export function GenericSectionForm({
             />
           </Field>
 
-          <Field label="Tujuan tombol" htmlFor={`ctaHref-${section.id}`}>
+          <Field label="Button destination" htmlFor={`ctaHref-${section.id}`}>
             <input
               id={`ctaHref-${section.id}`}
               name="ctaHref"
@@ -87,8 +87,8 @@ export function GenericSectionForm({
               className={inputClass}
             />
             <p className="mt-1 text-xs text-neutral-500">
-              Path internal (mis. /menu), anchor (mis. #footer), atau alamat
-              https://…. Kosongkan keduanya untuk menyembunyikan tombol.
+              Internal path (e.g. /menu), anchor (e.g. #footer), or an
+              https://… address. Leave both empty to hide the button.
             </p>
           </Field>
         </>
@@ -97,7 +97,7 @@ export function GenericSectionForm({
       <ErrorMessage error={state.error} />
 
       <div className="flex items-center gap-3 border-t border-neutral-200 pt-3">
-        <SaveButton label="Simpan section" />
+        <SaveButton label="Save section" />
       </div>
     </form>
   );

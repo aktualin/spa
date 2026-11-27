@@ -15,7 +15,7 @@ export const journalStatusMeta: Record<
   JournalStatus,
   { label: string; tone: "muted" | "blue" | "green" }
 > = {
-  DRAFT: { label: "Draf", tone: "muted" },
-  SCHEDULED: { label: "Terjadwal", tone: "blue" },
-  PUBLISHED: { label: "Terbit", tone: "green" },
+  DRAFT: { label: "Draft", tone: "muted" },
+  SCHEDULED: { label: "Scheduled", tone: "blue" },
+  PUBLISHED: { label: "Published", tone: "green" },
 };

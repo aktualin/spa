@@ -28,17 +28,17 @@ export function LoginBrandPanel({ markUrl }: { markUrl: string }) {
           Welcome to KAMASPA
         </h2>
         <p className="mt-4 max-w-md text-sm leading-relaxed text-cream/60">
-          Seluruh isi situs — treatment, harga, promo, galeri, hingga teks
-          tiap halaman — dikelola dari satu dashboard ini.
+          The entire site — treatments, prices, promos, galleries, and the
+          text of every page — is managed from this one dashboard.
         </p>
 
         <div className="mt-10 rounded-2xl border border-cream/10 bg-cream/[0.04] p-6 backdrop-blur-sm">
           <p className="text-lg font-medium leading-snug text-cream">
-            Satu sumber untuk semua konten
+            One source for all content
           </p>
           <p className="mt-2 text-sm leading-relaxed text-cream/55">
-            Perubahan yang Anda simpan di sini langsung tampil di situs —
-            tanpa perlu menyentuh kode.
+            Changes you save here appear on the site right away — no need
+            to touch any code.
           </p>
         </div>
       </div>

@@ -20,33 +20,33 @@ export function CollaborationFields({ values }: { values: EventFormData }) {
           className="mt-0.5 size-4 rounded border-neutral-300"
         />
         <span>
-          Event <strong>kolaborasi</strong> dengan mitra/brand/perusahaan. Setelah
-          lewat, event pindah ke halaman <strong>Past Collaborations</strong>{" "}
-          (<code>/events/collaborations</code>), bukan ke “Telah berlalu”.
+          <strong>Collaboration</strong> event with a partner/brand/company. Once it
+          passes, the event moves to the <strong>Past Collaborations</strong> page{" "}
+          (<code>/events/collaborations</code>) instead of “Past”.
         </span>
       </label>
 
       {/* Disembunyikan saja (tidak dilepas) supaya isian tidak hilang. */}
       <div className={isCollaboration ? "space-y-4 pt-2" : "hidden"}>
-        <Field label="Nama mitra" htmlFor="partnerName">
+        <Field label="Partner name" htmlFor="partnerName">
           <input
             id="partnerName"
             name="partnerName"
             defaultValue={values.partnerName}
-            placeholder="Contoh: PT Sehat Sentosa"
+            placeholder="e.g. PT Sehat Sentosa"
             className={inputClass}
           />
         </Field>
         <ImageField
           name="partnerLogoUrl"
-          label="Logo mitra (opsional — hanya tampil bila diisi)"
+          label="Partner logo (optional — only shown when filled in)"
           folder="events"
           defaultValue={values.partnerLogoUrl}
         />
         <Field
-          label="Tautan mitra"
+          label="Partner link"
           htmlFor="partnerUrl"
-          hint="Opsional. Situs/Instagram mitra, contoh: https://namabrand.com"
+          hint="Optional. Partner website/Instagram, e.g. https://brandname.com"
         >
           <input
             id="partnerUrl"

@@ -4,10 +4,10 @@ import type { listCorporateInquiries } from "../../actions/corporate";
 import { listHref } from "./inquiries-list";
 
 const FILTERS = [
-  { value: undefined, label: "Semua" },
-  { value: "NEW", label: "Baru" },
-  { value: "CONTACTED", label: "Sudah dihubungi" },
-  { value: "CLOSED", label: "Ditutup" },
+  { value: undefined, label: "All" },
+  { value: "NEW", label: "New" },
+  { value: "CONTACTED", label: "Contacted" },
+  { value: "CLOSED", label: "Closed" },
 ] as const;
 
 type InquiryData = Awaited<ReturnType<typeof listCorporateInquiries>>;
@@ -21,7 +21,7 @@ export function InquiryFilters({
   countByStatus: InquiryData["countByStatus"];
 }) {
   return (
-    <nav aria-label="Filter status" className="mt-6 flex flex-wrap gap-2">
+    <nav aria-label="Status filter" className="mt-6 flex flex-wrap gap-2">
       {FILTERS.map((filter) => {
         const active = (filter.value ?? null) === status;
         const count = filter.value ? countByStatus[filter.value] : null;

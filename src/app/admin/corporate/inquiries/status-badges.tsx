@@ -1,9 +1,9 @@
 import { Badge } from "../../promos/_kit/list-ui";
 
 export const INQUIRY_STATUS_LABEL: Record<string, string> = {
-  NEW: "Baru",
-  CONTACTED: "Sudah dihubungi",
-  CLOSED: "Ditutup",
+  NEW: "New",
+  CONTACTED: "Contacted",
+  CLOSED: "Closed",
 };
 
 export function InquiryStatusBadge({ status }: { status: string }) {
@@ -19,7 +19,7 @@ export function EmailStatusBadge({
   sentAt: Date | null;
   error: string | null;
 }) {
-  if (sentAt) return <Badge tone="green">Email terkirim</Badge>;
-  if (error) return <Badge tone="red">Email gagal</Badge>;
-  return <Badge tone="muted">Email diproses</Badge>;
+  if (sentAt) return <Badge tone="green">Email sent</Badge>;
+  if (error) return <Badge tone="red">Email failed</Badge>;
+  return <Badge tone="muted">Email processing</Badge>;
 }

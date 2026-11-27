@@ -6,8 +6,8 @@ export function AlertList({ alerts }: { alerts: DashboardAlert[] }) {
   if (alerts.length === 0) {
     return (
       <p className="mt-3 rounded-xl border border-neutral-200/80 bg-white px-4 py-3 text-sm text-neutral-500">
-        Tidak ada yang perlu ditindaklanjuti. Semua bagian situs sudah terisi,
-        tidak ada inquiry baru, dan tidak ada promo yang segera berakhir.
+        Nothing needs follow-up. All site sections are filled, there are no new
+        inquiries, and no promos are ending soon.
       </p>
     );
   }

@@ -18,17 +18,17 @@ export function StatForm({ stat }: { stat: StatFormData }) {
   return (
     <Shell
       listPath="/admin/homepage/stats"
-      backLabel="Kembali ke daftar statistik"
-      heading={stat.id ? "Ubah statistik" : "Tambah statistik"}
-      intro="Tampil sebagai kotak angka di section Brand Intro (“KAMA at a glance”)."
+      backLabel="Back to the stats list"
+      heading={stat.id ? "Edit stat" : "Add stat"}
+      intro="Shown as number boxes in the Brand Intro section (“KAMA at a glance”)."
       id={stat.id}
       formAction={formAction}
       error={state.error}
       deleteAction={deleteHomepageStatAction}
-      deleteMessage="Hapus statistik ini?"
-      deleteLabel="Hapus statistik ini"
+      deleteMessage="Delete this stat?"
+      deleteLabel="Delete this stat"
     >
-      <Field label="Angka / nilai" htmlFor="value" hint="Mis. 12 atau 40+.">
+      <Field label="Number / value" htmlFor="value" hint="E.g. 12 or 40+.">
         <input
           id="value"
           name="value"
@@ -38,7 +38,7 @@ export function StatForm({ stat }: { stat: StatFormData }) {
           className={inputClass}
         />
       </Field>
-      <Field label="Label" htmlFor="label" hint="Mis. years of care. Ditampilkan di bawah angka.">
+      <Field label="Label" htmlFor="label" hint="E.g. years of care. Shown below the number.">
         <input
           id="label"
           name="label"
@@ -49,7 +49,7 @@ export function StatForm({ stat }: { stat: StatFormData }) {
         />
       </Field>
       <Checkbox name="isPublished" defaultChecked={stat.isPublished}>
-        Terbitkan di homepage
+        Publish on the homepage
       </Checkbox>
     </Shell>
   );

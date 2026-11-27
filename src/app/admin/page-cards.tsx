@@ -6,11 +6,11 @@ export function ContentStatCards({ summary }: { summary: Summary }) {
   return (
     <section className="mt-7">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-        <StatCard label="Treatment terbit" value={summary.treatmentsPublished} />
-        <StatCard label="Package terbit" value={summary.packages} />
-        <StatCard label="Promo aktif" value={summary.promosActive} />
-        <StatCard label="Journal terbit" value={summary.journalPublished} />
-        <StatCard label="Event mendatang" value={summary.eventsUpcoming} />
+        <StatCard label="Published treatments" value={summary.treatmentsPublished} />
+        <StatCard label="Published packages" value={summary.packages} />
+        <StatCard label="Active promos" value={summary.promosActive} />
+        <StatCard label="Published journal posts" value={summary.journalPublished} />
+        <StatCard label="Upcoming events" value={summary.eventsUpcoming} />
       </div>
     </section>
   );

@@ -3,9 +3,9 @@ import Link from "next/link";
 const TABS = [
   { key: "treatments", label: "Treatments", href: "/admin/treatments" },
   { key: "addons", label: "Add-on", href: "/admin/treatments/addons" },
-  { key: "categories", label: "Kategori", href: "/admin/treatments/categories" },
+  { key: "categories", label: "Category", href: "/admin/treatments/categories" },
   { key: "packages", label: "Packages", href: "/admin/treatments/packages" },
-  { key: "prices", label: "Harga", href: "/admin/treatments/prices" },
+  { key: "prices", label: "Price", href: "/admin/treatments/prices" },
 ] as const;
 
 export type CatalogTabKey = (typeof TABS)[number]["key"];

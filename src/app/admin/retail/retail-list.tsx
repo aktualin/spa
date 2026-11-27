@@ -44,13 +44,13 @@ export function RetailProductRow({
             >
               {product.name}
             </Link>
-            {product.isHighlight ? <Badge>Highlight/Kolaborasi</Badge> : null}
-            {!product.isPublished ? <Badge tone="muted">Disembunyikan</Badge> : null}
+            {product.isHighlight ? <Badge>Highlight/Collaboration</Badge> : null}
+            {!product.isPublished ? <Badge tone="muted">Hidden</Badge> : null}
           </div>
           <p className="mt-0.5 truncate text-xs text-neutral-500">
             /{product.slug} ·{" "}
             {product.priceIdr === null
-              ? "Hubungi kami (tanpa harga)"
+              ? "Contact us (no price)"
               : formatIdr(product.priceIdr)}
           </p>
         </div>
@@ -62,7 +62,7 @@ export function RetailProductRow({
             <input type="hidden" name="id" value={product.id} />
             <input type="hidden" name="direction" value="up" />
             <SmallSubmit
-              title={`Naikkan urutan ${product.name}`}
+              title={`Move ${product.name} up`}
               disabled={!canMoveRetail(products, index, "up")}
             >
               ↑
@@ -72,7 +72,7 @@ export function RetailProductRow({
             <input type="hidden" name="id" value={product.id} />
             <input type="hidden" name="direction" value="down" />
             <SmallSubmit
-              title={`Turunkan urutan ${product.name}`}
+              title={`Move ${product.name} down`}
               disabled={!canMoveRetail(products, index, "down")}
             >
               ↓
@@ -84,18 +84,18 @@ export function RetailProductRow({
           <SmallSubmit
             title={
               product.isPublished
-                ? `Sembunyikan ${product.name} dari website`
-                : `Tampilkan ${product.name} di website`
+                ? `Hide ${product.name} from the website`
+                : `Show ${product.name} on the website`
             }
           >
-            {product.isPublished ? "Sembunyikan" : "Tampilkan"}
+            {product.isPublished ? "Hide" : "Show"}
           </SmallSubmit>
         </form>
         <Link
           href={`/admin/retail/${product.id}`}
           className="text-neutral-800 underline"
         >
-          Ubah
+          Edit
         </Link>
       </div>
     </li>

@@ -18,11 +18,11 @@ export function CopyUrlButton({ url }: { url: string }) {
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);
         } catch {
-          window.prompt("Salin URL berikut:", url);
+          window.prompt("Copy the following URL:", url);
         }
       }}
     >
-      {copied ? "URL tersalin" : "Salin URL"}
+      {copied ? "URL copied" : "Copy URL"}
     </button>
   );
 }

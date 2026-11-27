@@ -30,7 +30,7 @@ export function PickerFilters({
         onChange={(event) => setFolder(event.target.value)}
         className="rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900"
       >
-        <option value="">Semua folder</option>
+        <option value="">All folders</option>
         {folders.map((name) => (
           <option key={name} value={name}>
             {name}
@@ -39,8 +39,8 @@ export function PickerFilters({
       </select>
       <input
         type="search"
-        aria-label="Cari berkas"
-        placeholder="Cari nama, judul, atau alt text…"
+        aria-label="Search files"
+        placeholder="Search name, title, or alt text…"
         value={q}
         onChange={(event) => setQ(event.target.value)}
         // Dialog ini biasanya berada di dalam <form> konten: Enter jangan

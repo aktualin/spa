@@ -30,7 +30,7 @@ export function UploadProgressList({
                       : "text-neutral-500"
                 }`}
               >
-                {item.status === "mengunggah" ? `Mengunggah ${item.progress}%` : item.status === "selesai" ? "Selesai" : item.status === "gagal" ? "Gagal" : "Menunggu"}
+                {item.status === "mengunggah" ? `Uploading ${item.progress}%` : item.status === "selesai" ? "Done" : item.status === "gagal" ? "Failed" : "Waiting"}
               </span>
             </div>
             <div className="h-1.5 overflow-hidden rounded bg-neutral-100">
@@ -50,7 +50,7 @@ export function UploadProgressList({
 
       {!busy ? (
         <button type="button" onClick={onClear} className={secondaryButtonClass}>
-          Bersihkan daftar
+          Clear list
         </button>
       ) : null}
     </>

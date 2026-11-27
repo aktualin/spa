@@ -25,7 +25,7 @@ export function EventFields({
 
       <RichTextField
         name="description"
-        label="Deskripsi"
+        label="Description"
         defaultValue={values.description}
         folder="events"
         compact
@@ -33,17 +33,17 @@ export function EventFields({
 
       <ImageField
         name="coverUrl"
-        label="Gambar sampul"
+        label="Cover image"
         folder="events"
         defaultValue={values.coverUrl}
       />
 
-      <Field label="Lokasi" htmlFor="location">
+      <Field label="Location" htmlFor="location">
         <input
           id="location"
           name="location"
           defaultValue={values.location}
-          placeholder="Contoh: KAMA Spa, Jakarta Selatan"
+          placeholder="e.g. KAMA Spa, South Jakarta"
           className={inputClass}
         />
       </Field>
@@ -53,9 +53,9 @@ export function EventFields({
       <EventStatusRules compact />
 
       <Field
-        label="Urutan tampil"
+        label="Display order"
         htmlFor="sortOrder"
-        hint="Bawaan 0. Makin kecil makin atas di kelompoknya; bila sama, diurutkan menurut tanggal."
+        hint="Default 0. Lower values appear higher in their group; equal values are sorted by date."
       >
         <input
           id="sortOrder"
@@ -70,7 +70,7 @@ export function EventFields({
       <CollaborationFields values={values} />
 
       <Checkbox name="isPublished" defaultChecked={values.isPublished}>
-        Tampilkan di website
+        Show on website
       </Checkbox>
     </>
   );

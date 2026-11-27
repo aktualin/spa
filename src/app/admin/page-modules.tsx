@@ -7,10 +7,10 @@ import type { AdminModule } from "./modules";
 export function ModulesSection({ groups }: { groups: GroupedModules<AdminModule>[] }) {
   return (
     <section className="mt-8">
-      <h2 className="text-sm font-semibold text-neutral-900">Modul</h2>
+      <h2 className="text-sm font-semibold text-neutral-900">Modules</h2>
       <p className="mt-0.5 text-xs text-neutral-400">
-        Dikelompokkan mengikuti alur kerja: katalog, konten, halaman, lalu
-        pengaturan sistem.
+        Grouped by workflow: catalog, content, pages, then system
+        settings.
       </p>
       {groups.map((group) => (
         <div key={group.id} className="mt-4">
@@ -37,7 +37,7 @@ export function ModulesSection({ groups }: { groups: GroupedModules<AdminModule>
                   </Link>
                 ) : (
                   <span className="flex h-full flex-col rounded-xl border border-dashed border-neutral-200 px-4 py-3 text-[13px] text-neutral-400">
-                    {m.label} (segera)
+                    {m.label} (coming soon)
                   </span>
                 )}
               </li>
@@ -52,8 +52,8 @@ export function ModulesSection({ groups }: { groups: GroupedModules<AdminModule>
 export function SummaryErrorNote() {
   return (
     <p className="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
-      Ringkasan konten tidak dapat dimuat karena kesalahan database. Halaman
-      dashboard tetap bisa digunakan.
+      The content summary could not be loaded due to a database error. The
+      dashboard page is still usable.
     </p>
   );
 }
@@ -62,9 +62,9 @@ export function ProgressFooter({ ready, total }: { ready: number; total: number 
   return (
     <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-neutral-200/80 bg-white px-4 py-3">
       <p className="text-xs text-neutral-500">
-        Progres modul{" "}
+        Module progress{" "}
         <strong className="font-semibold text-neutral-800">{ready}</strong>{" "}
-        dari <strong className="font-semibold text-neutral-800">{total}</strong>
+        of <strong className="font-semibold text-neutral-800">{total}</strong>
       </p>
       <div
         className="h-1.5 min-w-24 flex-1 overflow-hidden rounded-full bg-neutral-100"
@@ -79,8 +79,8 @@ export function ProgressFooter({ ready, total }: { ready: number; total: number 
         />
       </div>
       <p className="text-[11px] text-neutral-400">
-        Modul “segera” sedang dalam pengerjaan (Tahap 2 — target 30 November
-        2026).
+        Modules marked “coming soon” are in progress (Phase 2 — target 30
+        November 2026).
       </p>
     </div>
   );

@@ -26,32 +26,32 @@ export default async function AdminHomepageInstagramPage({
 
   return (
     <ContentList
-      title="Feed Instagram"
-      subtitle="Postingan yang di-embed di section Instagram homepage. Cukup tempel tautan postingan — tidak ada foto yang diunggah. Urutan di daftar ini sama dengan urutan di homepage."
+      title="Instagram Feed"
+      subtitle="Posts embedded in the homepage Instagram section. Just paste the post link — no photos are uploaded. The order in this list matches the order on the homepage."
       basePath="/admin/homepage/instagram"
-      addLabel="Tambah postingan"
+      addLabel="Add post"
       addDisabledNote={
         posts.length >= INSTAGRAM_LIMITS.max
-          ? `Maksimal ${INSTAGRAM_LIMITS.max} postingan.`
+          ? `Max ${INSTAGRAM_LIMITS.max} posts.`
           : null
       }
       rows={posts.map((p) => ({
         id: p.id,
         title: shortLabel(p.postUrl),
-        meta: "embed Instagram",
+        meta: "Instagram embed",
         isPublished: p.isPublished,
       }))}
       saved={params.saved}
       deleted={params.deleted}
-      deletedLabel="Postingan dihapus."
+      deletedLabel="Post deleted."
       emptyNote={
         <p>
-          Belum ada postingan. Tambahkan tautan postingan Instagram (foto, reel, atau IGTV) untuk
-          menampilkan embednya di homepage.
+          No posts yet. Add Instagram post links (photo, reel, or IGTV) to
+          show their embeds on the homepage.
         </p>
       }
-      noLiveNote="Tidak ada postingan yang tayang, jadi feed Instagram kosong (judul dan tombol Follow tetap tampil). Terbitkan minimal satu postingan, atau matikan section Socials di halaman Section Homepage."
-      footnote={`Maksimal ${INSTAGRAM_LIMITS.max} postingan. Setiap postingan di-embed langsung dari Instagram, jadi postingan yang dihapus/diprivat oleh pemiliknya ikut hilang dari feed.`}
+      noLiveNote="No posts are published, so the Instagram feed is empty (the title and Follow button still appear). Publish at least one post, or turn off the Socials section on the Homepage Sections page."
+      footnote={`Max ${INSTAGRAM_LIMITS.max} posts. Each post is embedded directly from Instagram, so posts deleted or made private by their owner also disappear from the feed.`}
       toggleAction={toggleInstagramPostAction}
       moveAction={moveInstagramPostAction}
     />

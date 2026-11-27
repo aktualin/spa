@@ -8,17 +8,17 @@ export function AnalyticsHeader({ days }: { days: number }) {
     <header className="flex flex-wrap items-end justify-between gap-4">
       <div>
         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">
-          Analitik
+          Analytics
         </p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-neutral-900">
-          Pengunjung &amp; Halaman
+          Visitors &amp; Pages
         </h1>
         <p className="mt-1 max-w-2xl text-sm text-neutral-500">
-          Halaman publik yang dibuka pengunjung. Tanpa IP atau User-Agent —
-          pengunjung unik dihitung dari ID acak di cookie.
+          Public pages opened by visitors. No IP or User-Agent — unique
+          visitors are counted from a random ID in a cookie.
         </p>
       </div>
-      <nav aria-label="Periode" className="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white p-1">
+      <nav aria-label="Period" className="flex items-center gap-1 rounded-lg border border-neutral-200 bg-white p-1">
         {TRAFFIC_PERIOD_DAYS.map((period) => (
           <Link
             key={period}
@@ -30,7 +30,7 @@ export function AnalyticsHeader({ days }: { days: number }) {
                 : "text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900"
             }`}
           >
-            {period} hari
+            {period} days
           </Link>
         ))}
       </nav>

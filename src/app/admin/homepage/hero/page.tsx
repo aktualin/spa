@@ -24,16 +24,16 @@ export default async function AdminHeroSlidesPage({
   return (
     <div className="mx-auto max-w-4xl">
       <Link href="/admin/homepage" className="text-sm text-neutral-600 hover:underline">
-        ← Kembali ke Section Homepage
+        ← Back to Homepage Sections
       </Link>
 
       <div className="mt-3">
         <PageHeader
-          title="Slide Hero"
-          subtitle="Media slider di bagian paling atas homepage. Teks, eyebrow, dan tombol hero tetap diatur di Section Homepage."
+          title="Hero Slides"
+          subtitle="Media slider at the very top of the homepage. The hero text, eyebrow, and button are still managed in Homepage Sections."
           action={
             <Link href="/admin/homepage/hero/new" className={primaryLinkClass}>
-              Tambah slide
+              Add slide
             </Link>
           }
         />
@@ -42,20 +42,20 @@ export default async function AdminHeroSlidesPage({
       <StatusBanners
         saved={params.saved}
         deleted={params.deleted}
-        deletedLabel="Slide dihapus."
+        deletedLabel="Slide deleted."
       />
 
       <p className="mt-4 rounded-md bg-neutral-50 px-3 py-2 text-sm text-neutral-600">
-        Slide terbit tampil berurutan sesuai daftar ini. Selama tabel slide
-        masih kosong, hero memakai gambar fallback dari Section Homepage.
-        Setelah ada slide, gambar fallback tidak dipakai lagi.
+        Published slides appear in order, following this list. While the slide
+        table is still empty, the hero uses the fallback image from Homepage Sections.
+        Once there are slides, the fallback image is no longer used.
       </p>
 
       {slides.length === 0 ? (
         <p className="mt-6 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          Belum ada slide. Hero saat ini menampilkan gambar fallback dari
-          Section Homepage. Tambahkan minimal satu slide untuk mengaktifkan
-          slider.
+          No slides yet. The hero currently shows the fallback image from
+          Homepage Sections. Add at least one slide to enable
+          the slider.
         </p>
       ) : null}
 
@@ -68,10 +68,10 @@ export default async function AdminHeroSlidesPage({
       ) : null}
 
       <p className="mt-6 text-xs text-neutral-500">
-        Video memakai URL file langsung (.mp4/.webm), bukan tautan halaman
-        YouTube/Vimeo. Poster wajib diisi agar hero tetap tampil saat video
-        belum dimuat atau autoplay diblokir. Perubahan tampil di homepage
-        dalam beberapa menit.
+        Videos use direct file URLs (.mp4/.webm), not YouTube/Vimeo page
+        links. The poster is required so the hero still appears while the video
+        has not loaded or autoplay is blocked. Changes appear on the homepage
+        within a few minutes.
       </p>
     </div>
   );

@@ -25,14 +25,14 @@ export default async function AdminCorporateContentPage({
   return (
     <div className="mx-auto max-w-2xl">
       <Link href="/admin/corporate" className="text-sm text-neutral-600 hover:underline">
-        ← Kembali ke Corporate Wellness
+        ← Back to Corporate Wellness
       </Link>
-      <h1 className="mt-3 text-xl font-semibold text-neutral-900">Konten halaman /corporate</h1>
+      <h1 className="mt-3 text-xl font-semibold text-neutral-900">/corporate page content</h1>
       <p className="mt-1 text-sm text-neutral-600">
-        Hero, intro, benefit, blok solusi, dan bagian In-Spa.
+        Hero, intro, benefits, solution blocks, and the In-Spa section.
         {saved
           ? ""
-          : " Belum pernah disimpan — form berisi teks bawaan yang sekarang tampil di situs."}
+          : " Never saved — the form contains the default text currently shown on the site."}
       </p>
 
       <StatusBanners saved={params.saved} />

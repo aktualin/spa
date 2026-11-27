@@ -16,7 +16,7 @@ export function NewUserForm() {
   if (state.ok && state.temporaryPassword) {
     return (
       <div className="mx-auto max-w-xl">
-        <h1 className="text-xl font-semibold text-neutral-900">Akun dibuat</h1>
+        <h1 className="text-xl font-semibold text-neutral-900">Account created</h1>
         <TemporaryPasswordNotice
           email={state.email ?? ""}
           password={state.temporaryPassword}
@@ -25,7 +25,7 @@ export function NewUserForm() {
           href="/admin/users?saved=1"
           className="mt-6 inline-block rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
         >
-          Selesai, kembali ke daftar akun
+          Done, back to the account list
         </Link>
       </div>
     );
@@ -34,11 +34,11 @@ export function NewUserForm() {
   return (
     <div className="mx-auto max-w-xl">
       <Link href="/admin/users" className="text-sm text-neutral-600 hover:underline">
-        ← Kembali ke daftar akun
+        ← Back to the account list
       </Link>
 
       <h1 className="mt-3 text-xl font-semibold text-neutral-900">
-        Tambah akun admin
+        Add admin account
       </h1>
 
       <form action={formAction} className="mt-6 space-y-5">
@@ -47,9 +47,9 @@ export function NewUserForm() {
         <ErrorAlert message={state.error} />
 
         <div className="flex items-center gap-3 border-t border-neutral-200 pt-4">
-          <SaveButton label="Tambah akun" />
+          <SaveButton label="Add account" />
           <Link href="/admin/users" className="text-sm text-neutral-600 hover:underline">
-            Batal
+            Cancel
           </Link>
         </div>
       </form>

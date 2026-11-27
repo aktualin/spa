@@ -32,8 +32,8 @@ export default async function AdminContactSettingsPage({
           className="mx-auto mt-4 max-w-2xl rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800"
         >
           {defaults.noRow
-            ? "Pengaturan kontak belum pernah disimpan. Form ini diisi nilai bawaan yang saat ini tampil di situs; tekan Simpan untuk menyimpannya ke database."
-            : `Field berikut belum tersimpan di database dan diisi dari nilai yang saat ini tampil di situs: ${defaults.prefilled.join(", ")}. Tekan Simpan untuk menyimpannya.`}
+            ? "Contact settings have never been saved. This form is prefilled with the default values currently shown on the site; press Save to store them in the database."
+            : `The following fields are not yet saved in the database and are filled from the values currently shown on the site: ${defaults.prefilled.join(", ")}. Press Save to store them.`}
         </p>
       ) : null}
       <SiteSettingsForm settings={defaults.values} maxHours={MAX_OPENING_HOURS} />

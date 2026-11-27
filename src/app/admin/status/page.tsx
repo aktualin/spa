@@ -46,12 +46,12 @@ export default async function AdminStatusPage({
     <div className="mx-auto max-w-4xl">
       <PageHeader
         title="Backup & Status"
-        subtitle="Info backup terakhir, status domain & SSL, versi platform, dan konfigurasi. Khusus role ADMIN."
+        subtitle="Latest backup info, domain & SSL status, platform versions, and configuration. ADMIN role only."
       />
 
       {params.handover ? (
         <p role="status" className="mt-4 rounded-md bg-green-50 px-3 py-2 text-sm text-green-800">
-          Backup serah terima tercatat.
+          Handover backup recorded.
         </p>
       ) : null}
       {exportError ? (
@@ -65,11 +65,11 @@ export default async function AdminStatusPage({
       <HandoverSection />
       <BackupHistory overview={overview} />
 
-      <Section title="Status situs">
+      <Section title="Site status">
         <Suspense
           fallback={
             <p className="rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-500">
-              Memeriksa domain dan sertifikat SSL…
+              Checking the domain and SSL certificate…
             </p>
           }
         >

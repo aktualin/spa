@@ -85,7 +85,7 @@ export function RichTextField({
 
       <p className="text-xs text-neutral-500">
         {hint ??
-          "Format teks lewat toolbar, atau pindah ke tab HTML untuk menulis/menempel HTML. Script, iframe, dan atribut berbahaya otomatis dibuang."}
+          "Format text via the toolbar, or switch to the HTML tab to write/paste HTML. Scripts, iframes, and dangerous attributes are removed automatically."}
       </p>
 
       {error ? (

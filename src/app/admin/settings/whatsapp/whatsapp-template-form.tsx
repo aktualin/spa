@@ -47,16 +47,16 @@ export function WhatsAppTemplateForm({
         </h2>
         {template.message === null ? (
           <span className="rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-800">
-            Belum tersimpan — memakai teks bawaan
+            Not saved yet — using the built-in text
           </span>
         ) : null}
       </div>
-      <p className="text-xs text-neutral-500">Dipakai di: {context.usedOn}</p>
+      <p className="text-xs text-neutral-500">Used on: {context.usedOn}</p>
 
       <Field
-        label="Pesan"
+        label="Message"
         htmlFor={fieldId}
-        hint={`${message.trim().length}/${MAX_TEMPLATE_LENGTH} karakter.`}
+        hint={`${message.trim().length}/${MAX_TEMPLATE_LENGTH} characters.`}
       >
         <textarea
           id={fieldId}
@@ -83,14 +83,14 @@ export function WhatsAppTemplateForm({
       <ErrorMessage error={state.error} />
 
       <div className="flex flex-wrap items-center gap-3 border-t border-neutral-100 pt-3">
-        <SaveButton label="Simpan template" />
+        <SaveButton label="Save template" />
         {message !== context.builtIn ? (
           <button
             type="button"
             onClick={() => setMessage(context.builtIn)}
             className="text-sm text-neutral-600 hover:underline"
           >
-            Kembalikan teks bawaan
+            Restore built-in text
           </button>
         ) : null}
       </div>

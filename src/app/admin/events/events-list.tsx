@@ -11,7 +11,7 @@ import {
 /** Tab filter event dengan jumlah per filter. */
 export function EventTabs({ rows, tab }: { rows: EventRow[]; tab: TabKey }) {
   return (
-    <nav aria-label="Saring event" className="mt-6 flex flex-wrap gap-2">
+    <nav aria-label="Filter events" className="mt-6 flex flex-wrap gap-2">
       {TABS.map((item) => {
         const active = item.key === tab;
         const count = rows.filter((row) => matchesTab(row, item.key)).length;
@@ -45,7 +45,7 @@ export function EventList({
   if (visible.length === 0) {
     return (
       <p className="text-sm text-neutral-500">
-        {total === 0 ? "Belum ada event." : "Tidak ada event pada filter ini."}
+        {total === 0 ? "No events yet." : "No events match this filter."}
       </p>
     );
   }

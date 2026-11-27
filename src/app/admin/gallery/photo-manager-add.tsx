@@ -16,11 +16,11 @@ export function AddPhotoSection({
   return (
     <section className="space-y-4">
       <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
-        Tambah satu foto
+        Add a single photo
       </h2>
       <p className="text-sm text-neutral-600">
-        Untuk satu foto dengan caption & alt text sekaligus, atau foto yang sudah
-        ada di Media Library.
+        For one photo with its caption & alt text at once, or a photo that already
+        exists in the Media Library.
       </p>
 
       <form action={formAction} className="space-y-4">
@@ -28,7 +28,7 @@ export function AddPhotoSection({
 
         <ImageField
           name="imageUrl"
-          label="Foto"
+          label="Photo"
           folder="gallery"
           defaultValue=""
         />
@@ -43,9 +43,9 @@ export function AddPhotoSection({
         </Field>
 
         <Field
-          label="Teks alternatif (alt)"
+          label="Alternative text (alt)"
           htmlFor="altText"
-          hint="Deskripsi singkat foto untuk aksesibilitas dan SEO."
+          hint="A short description of the photo for accessibility and SEO."
         >
           <input
             id="altText"
@@ -57,7 +57,7 @@ export function AddPhotoSection({
 
         <ErrorAlert message={error} />
 
-        <SaveButton label="Tambah foto" />
+        <SaveButton label="Add photo" />
       </form>
     </section>
   );

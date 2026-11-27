@@ -16,7 +16,7 @@ export function ProgramFields({
 }) {
   return (
     <>
-      <Field label="Nama program" htmlFor="name" hint="Contoh: Essential, Signature, Executive.">
+      <Field label="Program name" htmlFor="name" hint="Example: Essential, Signature, Executive.">
         <input
           id="name"
           name="name"
@@ -29,7 +29,7 @@ export function ProgramFields({
 
       <RichTextField
         name="description"
-        label="Deskripsi"
+        label="Description"
         defaultValue={program.description}
         folder="corporate"
         compact
@@ -37,23 +37,23 @@ export function ProgramFields({
 
       <StringListField
         name="features"
-        legend="Fitur"
-        hint="Satu fitur per baris, tampil sebagai daftar centang. Baris kosong diabaikan."
-        itemLabel="fitur"
-        placeholder="Contoh: Chair massage"
+        legend="Features"
+        hint="One feature per line, shown as a checklist. Empty lines are ignored."
+        itemLabel="feature"
+        placeholder="Example: Chair massage"
         defaultValue={program.features}
         max={maxFeatures}
       />
 
       <ImageField
         name="imageUrl"
-        label="Foto program (opsional, tampil di atas kartu)"
+        label="Program photo (optional, shown at the top of the card)"
         folder="corporate"
         defaultValue={program.imageUrl}
       />
 
       <Checkbox name="isPublished" defaultChecked={program.isPublished}>
-        Tampilkan di website
+        Show on website
       </Checkbox>
     </>
   );

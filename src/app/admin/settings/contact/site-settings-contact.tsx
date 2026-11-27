@@ -8,13 +8,13 @@ export function ContactFields({ values }: { values: SiteSettingsInput }) {
   return (
     <fieldset className="space-y-5">
       <legend className="text-base font-semibold text-neutral-900">
-        Kontak
+        Contact
       </legend>
 
       <Field
-        label="Nomor WhatsApp booking"
+        label="Booking WhatsApp number"
         htmlFor="whatsappNumber"
-        hint="Boleh ditulis 08xx atau +62xx; otomatis disimpan sebagai 628xx. Dipakai tombol WhatsApp booking: tombol melayang, drawer, reservasi, dan kartu cabang."
+        hint="Can be written as 08xx or +62xx; automatically saved as 628xx. Used by booking WhatsApp buttons: the floating button, drawer, reservations, and branch cards."
       >
         <input
           id="whatsappNumber"
@@ -28,9 +28,9 @@ export function ContactFields({ values }: { values: SiteSettingsInput }) {
       </Field>
 
       <Field
-        label="Nomor WhatsApp kantor (opsional)"
+        label="Office WhatsApp number (optional)"
         htmlFor="officeWhatsappNumber"
-        hint="Ditampilkan bersama nomornya (mis. 0811 8807 2287) di bagian “Connect With Us” footer. Terpisah dari nomor booking di atas — kosongkan untuk menyembunyikannya dari footer."
+        hint="Shown with its number (e.g. 0811 8807 2287) in the “Connect With Us” section of the footer. Separate from the booking number above — leave empty to hide it from the footer."
       >
         <input
           id="officeWhatsappNumber"
@@ -45,7 +45,7 @@ export function ContactFields({ values }: { values: SiteSettingsInput }) {
       <Field
         label="Email"
         htmlFor="email"
-        hint="Dipakai ikon email di bagian “Connect with us” pada footer."
+        hint="Used by the email icon in the “Connect with us” section of the footer."
       >
         <input
           id="email"
@@ -58,9 +58,9 @@ export function ContactFields({ values }: { values: SiteSettingsInput }) {
       </Field>
 
       <Field
-        label="Telepon (opsional)"
+        label="Phone (optional)"
         htmlFor="phone"
-        hint="Nomor telepon biasa (bukan WhatsApp). Saat ini belum ditampilkan di situs."
+        hint="Regular phone number (not WhatsApp). Currently not shown on the site."
       >
         <input
           id="phone"

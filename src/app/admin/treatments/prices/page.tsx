@@ -22,12 +22,7 @@ export default async function AdminPricesPage({
       <CatalogTabs active="prices" />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-neutral-900">Harga</h1>
-          <p className="mt-1 text-sm text-neutral-600">
-            Ubah harga treatment, add-on, package, membership, dan produk
-            retail. Harga dalam rupiah penuh tanpa titik, contoh: 145000.
-            Perubahan langsung tampil di situs setelah disimpan.
-          </p>
+          <h1 className="text-xl font-semibold text-neutral-900">Price</h1>
         </div>
       </div>
 

@@ -53,7 +53,7 @@ export function placeSelectedImage(
   sync: () => void,
 ): void {
   if (!applyImagePlacement(editor, placement)) {
-    window.alert("Klik gambar yang ingin diatur posisinya terlebih dahulu.");
+    window.alert("Click the image you want to position first.");
     return;
   }
   sync();

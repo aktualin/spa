@@ -34,11 +34,11 @@ export function SiteSettingsForm({
   return (
     <div className="mx-auto max-w-2xl">
       <h1 className="text-xl font-semibold text-neutral-900">
-        Kontak &amp; Informasi Umum
+        Contact &amp; General Information
       </h1>
       <p className="mt-1 text-sm text-neutral-600">
-        Data ini dipakai di halaman kontak, footer, dan tombol WhatsApp publik.
-        Perubahan langsung tampil setelah disimpan.
+        This data is used on the contact page, in the footer, and on the public
+        WhatsApp button. Changes appear immediately after saving.
       </p>
 
       <form action={formAction} className="mt-6 space-y-8" key={state.attempt ?? 0}>

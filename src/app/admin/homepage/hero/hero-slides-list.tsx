@@ -30,20 +30,20 @@ export function HeroSlideListItem({
               href={`/admin/homepage/hero/${row.id}`}
               className="font-medium text-neutral-900 hover:underline"
             >
-              {row.mediaType === "VIDEO" ? "Slide video" : "Slide foto"}
+              {row.mediaType === "VIDEO" ? "Video slide" : "Photo slide"}
             </Link>
             <Badge tone={row.mediaType === "VIDEO" ? "blue" : "muted"}>
-              {row.mediaType === "VIDEO" ? "Video" : "Foto"}
+              {row.mediaType === "VIDEO" ? "Video" : "Photo"}
             </Badge>
             <Badge tone={row.isPublished ? "green" : "muted"}>
-              {row.isPublished ? "Tayang" : "Draf"}
+              {row.isPublished ? "Published" : "Draft"}
             </Badge>
           </div>
           <p className="mt-0.5 truncate text-xs text-neutral-500">
-            urutan {row.sortOrder + 1} ·{" "}
+            order {row.sortOrder + 1} ·{" "}
             {row.mediaType === "VIDEO"
-              ? row.videoUrl ?? "video belum diisi"
-              : row.imageUrl ?? "gambar belum diisi"}
+              ? row.videoUrl ?? "video not set yet"
+              : row.imageUrl ?? "image not set yet"}
           </p>
         </div>
       </div>
@@ -57,22 +57,22 @@ export function HeroSlideListItem({
             value={row.isPublished ? "0" : "1"}
           />
           <SmallSubmit
-            title={row.isPublished ? "Jadikan draf" : "Terbitkan"}
+            title={row.isPublished ? "Set to draft" : "Publish"}
           >
-            {row.isPublished ? "Jadikan draf" : "Terbitkan"}
+            {row.isPublished ? "Set to draft" : "Publish"}
           </SmallSubmit>
         </form>
         <form action={moveHeroSlideAction}>
           <input type="hidden" name="id" value={row.id} />
           <input type="hidden" name="direction" value="up" />
-          <SmallSubmit title="Naikkan" disabled={index === 0}>
+          <SmallSubmit title="Move up" disabled={index === 0}>
             ↑
           </SmallSubmit>
         </form>
         <form action={moveHeroSlideAction}>
           <input type="hidden" name="id" value={row.id} />
           <input type="hidden" name="direction" value="down" />
-          <SmallSubmit title="Turunkan" disabled={index === count - 1}>
+          <SmallSubmit title="Move down" disabled={index === count - 1}>
             ↓
           </SmallSubmit>
         </form>

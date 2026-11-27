@@ -21,18 +21,18 @@ export default async function AdminUsersPage({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-neutral-900">
-            Pengguna Admin
+            Admin Users
           </h1>
           <p className="mt-1 text-sm text-neutral-600">
-            {users.length} akun terdaftar. Modul ini hanya bisa dikelola role
-            ADMIN.
+            {users.length} registered accounts. This module can only be managed
+            by the ADMIN role.
           </p>
         </div>
         <Link
           href="/admin/users/new"
           className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
         >
-          Tambah akun
+          Add account
         </Link>
       </div>
 
@@ -41,7 +41,7 @@ export default async function AdminUsersPage({
           role="status"
           className="mt-4 rounded-md bg-green-50 px-3 py-2 text-sm text-green-800"
         >
-          Perubahan akun tersimpan.
+          Account changes saved.
         </p>
       ) : null}
       {params.deleted ? (
@@ -49,7 +49,7 @@ export default async function AdminUsersPage({
           role="status"
           className="mt-4 rounded-md bg-green-50 px-3 py-2 text-sm text-green-800"
         >
-          Akun berhasil dihapus.
+          Account deleted successfully.
         </p>
       ) : null}
       {params.unlocked ? (
@@ -57,7 +57,7 @@ export default async function AdminUsersPage({
           role="status"
           className="mt-4 rounded-md bg-green-50 px-3 py-2 text-sm text-green-800"
         >
-          Akun berhasil dibuka kuncinya.
+          Account unlocked successfully.
         </p>
       ) : null}
 

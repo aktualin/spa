@@ -34,7 +34,7 @@ export function BulkPhotoUploader({
   return (
     <div className="space-y-3">
       <label htmlFor={inputId} className="block text-sm font-medium text-neutral-700">
-        Pilih beberapa foto sekaligus
+        Select multiple photos at once
       </label>
       <input
         id={inputId}
@@ -50,15 +50,15 @@ export function BulkPhotoUploader({
         className="block w-full text-sm text-neutral-700 file:mr-3 file:rounded-md file:border-0 file:bg-neutral-900 file:px-3 file:py-1.5 file:text-sm file:text-white hover:file:bg-neutral-700 disabled:opacity-60"
       />
       <p className="text-xs text-neutral-500">
-        JPG, PNG, WebP, AVIF, atau GIF. Maksimal 4 MB per file dan {MAX_BATCH_PHOTOS} file
-        sekali unggah. Foto ditambahkan di urutan paling akhir; {hintTail}
+        JPG, PNG, WebP, AVIF, or GIF. Max 4 MB per file and {MAX_BATCH_PHOTOS} files
+        per upload. Photos are added at the end of the list; {hintTail}
       </p>
 
       {busy ? (
         <p role="status" className="text-sm text-blue-700">
           {remaining > 0
-            ? `Mengunggah… ${done} selesai, ${remaining} tersisa.`
-            : `Menyimpan foto ke ${noun}…`}
+            ? `Uploading… ${done} done, ${remaining} remaining.`
+            : `Saving photos to ${noun}…`}
         </p>
       ) : null}
 

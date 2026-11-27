@@ -16,11 +16,11 @@ export default async function AdminGalleryPage({
   return (
     <div className="mx-auto max-w-4xl">
       <PageHeader
-        title="Foto & Gallery"
-        subtitle={`${albums.length} album foto. Urutan di daftar ini sama dengan urutan di halaman /gallery.`}
+        title="Photos & Gallery"
+        subtitle={`${albums.length} photo albums. The order in this list matches the order on the /gallery page.`}
         action={
           <Link href="/admin/gallery/albums/new" className={primaryLinkClass}>
-            Tambah album
+            Add album
           </Link>
         }
       />
@@ -28,13 +28,13 @@ export default async function AdminGalleryPage({
       <StatusBanners
         saved={params.saved}
         deleted={params.deleted}
-        deletedLabel="Album dihapus."
+        deletedLabel="Album deleted."
       />
 
       <div className="mt-6">
         {albums.length === 0 ? (
           <p className="text-sm text-neutral-500">
-            Belum ada album. Buat album pertama untuk mulai menambah foto.
+            No albums yet. Create your first album to start adding photos.
           </p>
         ) : (
           <ul className="divide-y divide-neutral-200 overflow-hidden rounded-lg border border-neutral-200 bg-white">

@@ -27,11 +27,11 @@ export function MembershipTierForm({ tier }: { tier: TierFormData }) {
   return (
     <div className="mx-auto max-w-2xl">
       <Link href="/admin/membership" className="text-sm text-neutral-600 hover:underline">
-        ← Kembali ke daftar tier
+        ← Back to tiers list
       </Link>
 
       <h1 className="mt-3 text-xl font-semibold text-neutral-900">
-        {tier.id ? `Ubah tier ${tier.name}` : "Tambah tier membership"}
+        {tier.id ? `Edit tier ${tier.name}` : "Add membership tier"}
       </h1>
 
       <form action={formAction} className="mt-6 space-y-5">
@@ -41,7 +41,7 @@ export function MembershipTierForm({ tier }: { tier: TierFormData }) {
 
         <RichTextField
           name="summary"
-          label="Ringkasan"
+          label="Summary"
           defaultValue={tier.summary}
           folder="membership"
           compact
@@ -51,12 +51,12 @@ export function MembershipTierForm({ tier }: { tier: TierFormData }) {
 
         <RichTextField
           name="terms"
-          label="Syarat & ketentuan tier (opsional)"
+          label="Tier terms & conditions (optional)"
           folder="membership"
           defaultValue={plainTextToHtml(tier.terms)}
         />
 
-        <Field label="Urutan tampil" htmlFor="sortOrder">
+        <Field label="Display order" htmlFor="sortOrder">
           <input
             id="sortOrder"
             name="sortOrder"
@@ -68,7 +68,7 @@ export function MembershipTierForm({ tier }: { tier: TierFormData }) {
         </Field>
 
         <Checkbox name="isPublished" defaultChecked={tier.isPublished}>
-          Tampilkan di website
+          Show on website
         </Checkbox>
 
         <ErrorAlert message={state.error} />
@@ -76,7 +76,7 @@ export function MembershipTierForm({ tier }: { tier: TierFormData }) {
         <div className="flex items-center gap-3 border-t border-neutral-200 pt-4">
           <SaveButton />
           <Link href="/admin/membership" className="text-sm text-neutral-600 hover:underline">
-            Batal
+            Cancel
           </Link>
         </div>
       </form>
@@ -84,8 +84,8 @@ export function MembershipTierForm({ tier }: { tier: TierFormData }) {
       {tier.id ? (
         <form action={deleteTierAction} className="mt-8 border-t border-neutral-200 pt-4">
           <input type="hidden" name="id" value={tier.id} />
-          <ConfirmDeleteButton message="Hapus tier membership ini?">
-            Hapus tier ini
+          <ConfirmDeleteButton message="Delete this membership tier?">
+            Delete this tier
           </ConfirmDeleteButton>
         </form>
       ) : null}

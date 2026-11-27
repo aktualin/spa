@@ -89,7 +89,7 @@ export function AdminModuleHint() {
 
   return (
     <p className="mb-5 rounded-xl border border-neutral-200/80 bg-white px-4 py-2.5 text-xs text-neutral-500">
-      <span className="font-medium text-neutral-700">Tampil di situs: </span>
+      <span className="font-medium text-neutral-700">Shown on site: </span>
       {hint}
     </p>
   );

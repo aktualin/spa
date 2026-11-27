@@ -35,8 +35,8 @@ export function BannerFields({
   return (
     <>
       <p className="rounded-md bg-neutral-50 px-3 py-2 text-xs text-neutral-600">
-        Kosongkan field untuk memakai teks/gambar bawaan (ditampilkan samar
-        sebagai contoh di dalam kotak isian).
+        Leave a field empty to use the default text/image (shown faintly
+        as an example inside the input box).
       </p>
 
       {config.image ? (

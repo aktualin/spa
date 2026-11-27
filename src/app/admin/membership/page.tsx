@@ -20,10 +20,10 @@ export default async function AdminMembershipPage({
     <div className="mx-auto max-w-4xl">
       <PageHeader
         title="Membership"
-        subtitle={`${tiers.length} tier membership.`}
+        subtitle={`${tiers.length} membership tiers.`}
         action={
           <Link href="/admin/membership/new" className={primaryLinkClass}>
-            Tambah tier
+            Add tier
           </Link>
         }
       />
@@ -31,7 +31,7 @@ export default async function AdminMembershipPage({
       <StatusBanners
         saved={params.saved}
         deleted={params.deleted}
-        deletedLabel="Tier membership dihapus."
+        deletedLabel="Membership tier deleted."
       />
 
       <Link
@@ -39,23 +39,23 @@ export default async function AdminMembershipPage({
         className="mt-6 flex items-center justify-between gap-3 rounded-lg border border-neutral-200 bg-white px-4 py-3 hover:bg-neutral-50"
       >
         <div>
-          <p className="font-medium text-neutral-900">Program membership</p>
+          <p className="font-medium text-neutral-900">Membership program</p>
           <p className="mt-0.5 text-xs text-neutral-500">
-            Judul, intro, kalimat harga, main benefits, essential services, dan S&amp;K
-            halaman /membership — termasuk teks banner membership di homepage.
-            {program ? "" : " Belum pernah disimpan (memakai teks bawaan)."}
+            Title, intro, pricing sentence, main benefits, essential services, and T&amp;C
+            of the /membership page — including the membership banner text on the homepage.
+            {program ? "" : " Never saved (using the default text)."}
           </p>
         </div>
-        <span className="text-sm text-neutral-600">Ubah →</span>
+        <span className="text-sm text-neutral-600">Edit →</span>
       </Link>
 
       <h2 className="mt-8 text-sm font-semibold uppercase tracking-wide text-neutral-500">
-        Tier / paket
+        Tiers / packages
       </h2>
 
       <div className="mt-3">
         {tiers.length === 0 ? (
-          <p className="text-sm text-neutral-500">Belum ada tier membership.</p>
+          <p className="text-sm text-neutral-500">No membership tiers yet.</p>
         ) : (
           <ul className="divide-y divide-neutral-200 overflow-hidden rounded-lg border border-neutral-200 bg-white">
             {tiers.map((tier) => (
@@ -72,13 +72,13 @@ export default async function AdminMembershipPage({
                       {tier.name}
                     </Link>
                     {tier.isPublished ? (
-                      <Badge tone="green">Tayang</Badge>
+                      <Badge tone="green">Published</Badge>
                     ) : (
-                      <Badge tone="muted">Draf</Badge>
+                      <Badge tone="muted">Draft</Badge>
                     )}
                   </div>
                   <p className="mt-0.5 truncate text-xs text-neutral-500">
-                    /{tier.slug} · {tier.benefits.length} benefit
+                    /{tier.slug} · {tier.benefits.length} benefits
                   </p>
                 </div>
 

@@ -20,21 +20,21 @@ export function NewUserFields() {
         />
       </Field>
 
-      <Field label="Nama lengkap" htmlFor="name">
+      <Field label="Full name" htmlFor="name">
         <input id="name" name="name" required maxLength={100} className={inputClass} />
       </Field>
 
       <Field label="Role" htmlFor="role">
         <select id="role" name="role" className={inputClass} defaultValue="EDITOR">
-          <option value="EDITOR">EDITOR — mengelola modul konten</option>
-          <option value="ADMIN">ADMIN — akses penuh, termasuk pengaturan sistem</option>
+          <option value="EDITOR">EDITOR — manages content modules</option>
+          <option value="ADMIN">ADMIN — full access, including system settings</option>
         </select>
       </Field>
 
       <Field
-        label="Kata sandi awal (opsional)"
+        label="Initial password (optional)"
         htmlFor="password"
-        hint={`Kosongkan agar sistem membuatkan kata sandi acak yang ditampilkan sekali. Bila diisi: minimal ${MIN_PASSWORD_LENGTH} karakter. Pemilik akun wajib menggantinya saat login pertama.`}
+        hint={`Leave empty so the system generates a random password that is shown once. If filled in: at least ${MIN_PASSWORD_LENGTH} characters. The account owner must change it at their first login.`}
       >
         <input
           id="password"

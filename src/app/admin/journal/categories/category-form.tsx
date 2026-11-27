@@ -32,16 +32,16 @@ export function JournalCategoryForm({
   return (
     <div className="mx-auto max-w-2xl">
       <Link href={LIST_PATH} className="text-sm text-neutral-600 hover:underline">
-        ← Kembali ke daftar kategori
+        ← Back to categories list
       </Link>
       <h1 className="mt-3 text-xl font-semibold text-neutral-900">
-        {isNew ? "Tambah kategori journal" : `Ubah ${category.name}`}
+        {isNew ? "Add journal category" : `Edit ${category.name}`}
       </h1>
 
       {notEmpty ? (
         <p className="mt-4 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">
-          Kategori ini masih dipakai {category.postCount} artikel. Pindahkan
-          artikelnya ke kategori lain dulu.
+          This category is still used by {category.postCount} articles. Move
+          those articles to another category first.
         </p>
       ) : null}
 
@@ -63,7 +63,7 @@ export function JournalCategoryForm({
         <div className="flex items-center gap-3 border-t border-neutral-200 pt-4">
           <SaveButton />
           <Link href={LIST_PATH} className="text-sm text-neutral-600 hover:underline">
-            Batal
+            Cancel
           </Link>
         </div>
       </form>
@@ -72,14 +72,14 @@ export function JournalCategoryForm({
         <div className="mt-8 border-t border-neutral-200 pt-4">
           {category.postCount > 0 ? (
             <p className="text-sm text-neutral-500">
-              Kategori ini dipakai {category.postCount} artikel, jadi belum bisa
-              dihapus. Pindahkan artikelnya ke kategori lain terlebih dahulu.
+              This category is used by {category.postCount} articles, so it cannot
+              be deleted yet. Move those articles to another category first.
             </p>
           ) : (
             <form action={deleteJournalCategoryAction}>
               <input type="hidden" name="id" value={category.id} />
-              <ConfirmSubmit message={`Hapus kategori "${category.name}"?`}>
-                Hapus kategori ini
+              <ConfirmSubmit message={`Delete category "${category.name}"?`}>
+                Delete this category
               </ConfirmSubmit>
             </form>
           )}

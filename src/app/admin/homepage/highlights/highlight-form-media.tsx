@@ -10,21 +10,21 @@ import type { HighlightFormData } from "./highlight-form.types";
 export function HighlightImageFields({ highlight }: { highlight: HighlightFormData }) {
   return (
     <fieldset className="space-y-4 rounded-md border border-neutral-200 p-4">
-      <legend className="px-1 text-sm font-medium text-neutral-700">Gambar</legend>
+      <legend className="px-1 text-sm font-medium text-neutral-700">Image</legend>
       <ImageField
         name="imageUrl"
-        label="Gambar kartu"
+        label="Card image"
         folder="homepage"
         defaultValue={highlight.imageUrl}
       />
       <p className="text-xs text-neutral-500">
-        Dipotong rasio 16:11. Disarankan minimal 1200×825 px, JPG/WebP di
-        bawah 1 MB. Kosong = kotak polos berwarna krem.
+        Cropped to a 16:11 ratio. At least 1200×825 px recommended, JPG/WebP
+        under 1 MB. Empty = a plain cream-colored box.
       </p>
       <Field
-        label="Teks alt (opsional)"
+        label="Alt text (optional)"
         htmlFor="imageAlt"
-        hint="Judul kartu sudah dibacakan pembaca layar, jadi alt boleh dikosongkan bila gambar hanya hiasan."
+        hint="The card title is already read out by screen readers, so alt may be left empty if the image is purely decorative."
       >
         <input
           id="imageAlt"

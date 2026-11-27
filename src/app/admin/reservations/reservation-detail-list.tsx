@@ -29,7 +29,7 @@ export function ReservationDetailList({ row }: { row: ReservationRequest }) {
 
   return (
     <dl className="mt-6 grid grid-cols-1 gap-x-4 gap-y-3 rounded-lg border border-neutral-200 bg-white p-4 text-sm sm:grid-cols-[9rem_1fr]">
-      <dt className="text-neutral-500">Telepon</dt>
+      <dt className="text-neutral-500">Phone</dt>
       <dd className="break-words text-neutral-900">
         {row.phone}
         {waNumber ? (
@@ -56,15 +56,15 @@ export function ReservationDetailList({ row }: { row: ReservationRequest }) {
           "—"
         )}
       </dd>
-      <dt className="text-neutral-500">Cabang</dt>
+      <dt className="text-neutral-500">Branch</dt>
       <dd className="break-words text-neutral-900">{row.branchSlug ?? "—"}</dd>
-      <dt className="text-neutral-500">Jadwal</dt>
+      <dt className="text-neutral-500">Schedule</dt>
       <dd className="break-words text-neutral-900">{schedule ?? "—"}</dd>
       <dt className="text-neutral-500">Treatment</dt>
       <dd className="break-words text-neutral-900">{row.treatment ?? "—"}</dd>
-      <dt className="text-neutral-500">Jumlah orang</dt>
+      <dt className="text-neutral-500">Number of guests</dt>
       <dd className="break-words text-neutral-900">{formatGuests(row.guests)}</dd>
-      <dt className="text-neutral-500">Pesan</dt>
+      <dt className="text-neutral-500">Message</dt>
       <dd className="whitespace-pre-wrap break-words text-neutral-900">{row.message ?? "—"}</dd>
     </dl>
   );

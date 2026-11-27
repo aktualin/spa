@@ -26,7 +26,7 @@ export function PasswordField({ className }: { className: string }) {
       <button
         type="button"
         onClick={() => setVisible((v) => !v)}
-        aria-label={visible ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
+        aria-label={visible ? "Hide password" : "Show password"}
         aria-pressed={visible}
         className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-lg text-ink/45 transition hover:text-espresso focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-cocoa"
       >

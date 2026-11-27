@@ -16,16 +16,16 @@ export function ProgramsSection({ programs }: { programs: Items["programs"] }) {
   return (
     <Section
       id="program"
-      title="Program In-Office"
-      description="Kartu program di bagian #in-office (mis. Essential, Signature, Executive)."
+      title="In-Office programs"
+      description="Program cards in the #in-office section (e.g. Essential, Signature, Executive)."
       addHref="/admin/corporate/programs/new"
-      addLabel="Tambah program"
+      addLabel="Add program"
     >
       {programs.length === 0 ? (
         <EmptyDefaults
-          text="Belum ada program di database — halaman publik menampilkan 3 program bawaan (Essential, Signature, Executive)."
+          text="No programs in the database yet — the public page shows 3 default programs (Essential, Signature, Executive)."
           action={importDefaultProgramsAction}
-          buttonLabel="Salin program bawaan agar bisa diubah"
+          buttonLabel="Copy default programs so they can be edited"
         />
       ) : (
         <SortableList>
@@ -39,8 +39,8 @@ export function ProgramsSection({ programs }: { programs: Items["programs"] }) {
               href={`/admin/corporate/programs/${program.id}`}
               thumb={<Thumb src={program.imageUrl} alt="" />}
               title={program.name}
-              badge={program.isPublished ? <Badge tone="green">Tayang</Badge> : <Badge tone="muted">Draf</Badge>}
-              meta={`${program.features.length} fitur`}
+              badge={program.isPublished ? <Badge tone="green">Published</Badge> : <Badge tone="muted">Draft</Badge>}
+              meta={`${program.features.length} features`}
             />
           ))}
         </SortableList>
@@ -54,16 +54,16 @@ export function StepsSection({ steps }: { steps: Items["steps"] }) {
   return (
     <Section
       id="langkah"
-      title="Langkah kolaborasi"
-      description='Bagian "A Simple 4-Step Collaboration Process" — jumlah langkah di judul mengikuti daftar ini.'
+      title="Collaboration steps"
+      description='The "A Simple 4-Step Collaboration Process" section — the step count in the heading follows this list.'
       addHref="/admin/corporate/steps/new"
-      addLabel="Tambah langkah"
+      addLabel="Add step"
     >
       {steps.length === 0 ? (
         <EmptyDefaults
-          text="Belum ada langkah di database — halaman publik menampilkan 4 langkah bawaan."
+          text="No steps in the database yet — the public page shows 4 default steps."
           action={importDefaultStepsAction}
-          buttonLabel="Salin langkah bawaan agar bisa diubah"
+          buttonLabel="Copy default steps so they can be edited"
         />
       ) : (
         <SortableList>

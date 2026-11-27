@@ -26,39 +26,39 @@ export async function SiteHealthSection() {
       <Row label="Domain">
         <span className="font-mono">{health.host ?? "—"}</span>
         <span className="ml-2 text-xs text-neutral-500">
-          {health.explicitSiteUrl ? "dari NEXT_PUBLIC_SITE_URL" : "bawaan (NEXT_PUBLIC_SITE_URL kosong)"}
+          {health.explicitSiteUrl ? "from NEXT_PUBLIC_SITE_URL" : "default (NEXT_PUBLIC_SITE_URL empty)"}
         </span>
       </Row>
       <Row label="HTTPS">
         {health.isHttps ? (
-          <Badge tone="green">Ya</Badge>
+          <Badge tone="green">Yes</Badge>
         ) : (
-          <Badge tone="red">Tidak — alamat situs bukan https://</Badge>
+          <Badge tone="red">No — the site address is not https://</Badge>
         )}
       </Row>
-      <Row label="Respons situs">
+      <Row label="Site response">
         {!health.http ? (
-          "Alamat situs tidak valid."
+          "The site address is not valid."
         ) : health.http.ok ? (
           <>
             <Badge tone={health.http.status < 400 ? "green" : "red"}>HTTP {health.http.status}</Badge>
             <span className="ml-2 text-xs text-neutral-500">
               {health.http.ms} ms
-              {health.http.location ? ` · dialihkan ke ${health.http.location}` : ""}
+              {health.http.location ? ` · redirected to ${health.http.location}` : ""}
             </span>
           </>
         ) : (
           <>
-            <Badge tone="red">Tidak terjangkau</Badge>
+            <Badge tone="red">Unreachable</Badge>
             <span className="ml-2 text-xs text-neutral-500">{health.http.error}</span>
           </>
         )}
       </Row>
-      <Row label="Sertifikat SSL">
+      <Row label="SSL certificate">
         <CertRowContent health={health} now={now} />
       </Row>
-      <Row label="Diperiksa">
-        <span className="text-neutral-500">{formatWibDateTime(new Date(health.checkedAt))} (cache ± 5 menit)</span>
+      <Row label="Checked">
+        <span className="text-neutral-500">{formatWibDateTime(new Date(health.checkedAt))} (cache ± 5 minutes)</span>
       </Row>
     </dl>
   );

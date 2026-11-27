@@ -47,7 +47,7 @@ export function HomepageSectionCard({
           </h2>
           <p className="text-xs text-neutral-500">
             key: {section.key} ·{" "}
-            {fixedPosition ? "selalu paling bawah" : `urutan ${section.sortOrder}`}
+            {fixedPosition ? "always at the bottom" : `order ${section.sortOrder}`}
           </p>
         </div>
 
@@ -72,7 +72,7 @@ export function HomepageSectionCard({
           <ErrorMessage error={state.error} />
 
           <div className="flex items-center gap-3 border-t border-neutral-200 pt-3">
-            <SaveButton label="Simpan section" />
+            <SaveButton label="Save section" />
           </div>
         </form>
       ) : (

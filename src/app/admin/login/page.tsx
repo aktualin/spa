@@ -7,7 +7,7 @@ import { LoginBrandPanel } from "./login-brand-panel";
 import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = {
-  title: "Masuk Dashboard — KAMASPA",
+  title: "Sign in — KAMASPA Dashboard",
   robots: { index: false, follow: false },
 };
 
@@ -46,7 +46,7 @@ export default async function AdminLoginPage({
               Sign in
             </h1>
             <p className="mt-2 text-sm text-ink/60">
-              Masuk untuk mengelola konten situs KAMASPA.
+              Sign in to manage the KAMASPA site content.
             </p>
 
             {expired ? (
@@ -54,16 +54,16 @@ export default async function AdminLoginPage({
                 role="alert"
                 className="mt-6 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2.5 text-sm text-amber-900"
               >
-                Sesi Anda berakhir karena kata sandi, peran, atau status akun
-                berubah. Silakan masuk kembali.
+                Your session ended because your password, role, or account
+                status changed. Please log in again.
               </p>
             ) : null}
 
             <LoginForm next={next} />
 
             <p className="mt-8 text-xs text-ink/45">
-              Halaman ini khusus pengelola KAMASPA. Akun dibuat oleh
-              administrator — tidak ada pendaftaran mandiri.
+              This page is for KAMASPA administrators only. Accounts are
+              created by an administrator — there is no self-registration.
             </p>
           </div>
         </section>

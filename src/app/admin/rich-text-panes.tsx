@@ -24,7 +24,7 @@ export function HtmlEditor({
       onChange={(event) => setHtml(event.target.value)}
       className={`${minHeight} block w-full resize-y bg-neutral-950 px-3 py-2 font-mono text-xs leading-relaxed text-neutral-100 outline-none`}
       rows={compact ? 6 : 14}
-      placeholder="<h2>Judul</h2>&#10;<p>Paragraf dengan <strong>teks tebal</strong> dan <a href=&quot;https://…&quot;>tautan</a>.</p>"
+      placeholder="<h2>Heading</h2>&#10;<p>Paragraph with <strong>bold text</strong> and a <a href=&quot;https://…&quot;>link</a>.</p>"
     />
   );
 }
@@ -42,6 +42,6 @@ export function PreviewPane({
   return html.trim() ? (
     <div className={`${surface} bg-[#f6f1e9]`} dangerouslySetInnerHTML={{ __html: toSafeHtml(html) }} />
   ) : (
-    <p className={`${minHeight} px-3 py-2 text-sm text-neutral-400`}>Belum ada isi.</p>
+    <p className={`${minHeight} px-3 py-2 text-sm text-neutral-400`}>No content yet.</p>
   );
 }

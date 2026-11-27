@@ -24,17 +24,13 @@ export default async function AdminTreatmentsPage({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-neutral-900">Treatments</h1>
-          <p className="mt-1 text-sm text-neutral-600">
-            {total} treatment dalam {categories.length} kategori. Tampil di halaman Menu
-            dan Treatments.
-          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link
             href="/admin/treatments/new"
             className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
           >
-            Tambah treatment
+            Add treatment
           </Link>
         </div>
       </div>
@@ -44,7 +40,7 @@ export default async function AdminTreatmentsPage({
           role="status"
           className="mt-4 rounded-md bg-green-50 px-3 py-2 text-sm text-green-800"
         >
-          Perubahan tersimpan.
+          Change saved.
         </p>
       ) : null}
       {params.deleted ? (
@@ -52,7 +48,7 @@ export default async function AdminTreatmentsPage({
           role="status"
           className="mt-4 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800"
         >
-          Treatment dihapus.
+          Treatment deleted.
         </p>
       ) : null}
 

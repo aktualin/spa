@@ -18,20 +18,20 @@ export function DeleteAccountSection({
   return (
     <form action={deleteAction} className="mt-10 space-y-4 border-t border-red-200 pt-6">
       <input type="hidden" name="id" value={user.id} />
-      <h2 className="text-sm font-semibold text-red-800">Hapus akun</h2>
+      <h2 className="text-sm font-semibold text-red-800">Delete account</h2>
       {user.isActive ? (
         <p className="text-sm text-neutral-600">
-          Akun aktif tidak bisa dihapus. Hapus centang <em>Akun aktif</em>{" "}
-          di atas lalu simpan; setelah itu akun bisa dihapus permanen.
+          Active accounts cannot be deleted. Untick <em>Active account</em>{" "}
+          above and save; after that the account can be deleted permanently.
         </p>
       ) : (
         <>
           <p className="text-sm text-neutral-600">
-            Penghapusan permanen dan tidak bisa dibatalkan. Media yang
-            pernah diunggah akun ini tetap ada.
+            Deletion is permanent and cannot be undone. Media this account
+            ever uploaded will remain.
           </p>
           <Field
-            label={`Ketik ulang email "${user.email}" untuk konfirmasi`}
+            label={`Type the email "${user.email}" again to confirm`}
             htmlFor="confirmEmail"
           >
             <input

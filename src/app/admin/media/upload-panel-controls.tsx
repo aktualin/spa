@@ -37,7 +37,7 @@ export function UploadControls({
     <div className="grid gap-3 sm:grid-cols-2">
       <div className="space-y-1.5">
         <label htmlFor={folderId} className="block text-sm font-medium text-neutral-700">
-          Folder tujuan
+          Destination folder
         </label>
         <select
           id={folderId}
@@ -51,27 +51,27 @@ export function UploadControls({
               {folder}
             </option>
           ))}
-          <option value={NEW_FOLDER}>+ Folder baru…</option>
+          <option value={NEW_FOLDER}>+ New folder…</option>
         </select>
         {folderChoice === NEW_FOLDER ? (
           <input
-            aria-label="Nama folder baru"
+            aria-label="New folder name"
             value={newFolder}
             disabled={busy}
             onChange={(event) => setNewFolder(event.target.value)}
-            placeholder="mis. interior"
+            placeholder="e.g. interior"
             className={inputClass}
           />
         ) : null}
         <p className="text-xs text-neutral-500">
-          Nama folder hanya huruf kecil, angka, dan tanda hubung.
-          {folderChoice === NEW_FOLDER && targetFolder ? ` Disimpan sebagai “${targetFolder}”.` : ""}
+          Folder names may only contain lowercase letters, numbers, and hyphens.
+          {folderChoice === NEW_FOLDER && targetFolder ? ` Saved as “${targetFolder}”.` : ""}
         </p>
       </div>
 
       <div className="space-y-1.5">
         <label htmlFor={fileId} className="block text-sm font-medium text-neutral-700">
-          Berkas gambar
+          Image files
         </label>
         <input
           id={fileId}
@@ -86,7 +86,7 @@ export function UploadControls({
           className="block w-full text-sm text-neutral-700 file:mr-3 file:rounded-md file:border-0 file:bg-neutral-900 file:px-3 file:py-1.5 file:text-sm file:text-white hover:file:bg-neutral-700 disabled:opacity-60"
         />
         <p className="text-xs text-neutral-500">
-          Boleh memilih beberapa berkas sekaligus. JPG, PNG, WebP, AVIF, atau GIF. Maksimal 4 MB per berkas.
+          You may select multiple files at once. JPG, PNG, WebP, AVIF, or GIF. Maximum 4 MB per file.
         </p>
       </div>
     </div>

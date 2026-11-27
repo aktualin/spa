@@ -46,9 +46,9 @@ export function CorporateContentForm({
   return (
     <form action={formAction} className="mt-6 space-y-6">
       <Field
-        label="Judul hero"
+        label="Hero title"
         htmlFor="heroTitle"
-        hint="Judul besar di bagian atas halaman /corporate."
+        hint="The large title at the top of the /corporate page."
       >
         <input
           id="heroTitle"
@@ -65,7 +65,7 @@ export function CorporateContentForm({
         label="Intro"
         defaultValue={content.intro}
         folder="corporate"
-        hint='Paragraf di bawah judul "Healthy Employees Build Stronger Companies". Kosongkan untuk memakai teks bawaan.'
+        hint='Paragraph under the "Healthy Employees Build Stronger Companies" title. Leave empty to use the default text.'
         compact
       />
 
@@ -78,7 +78,7 @@ export function CorporateContentForm({
       <div className="flex items-center gap-3 border-t border-neutral-200 pt-4">
         <SaveButton />
         <Link href="/admin/corporate" className="text-sm text-neutral-600 hover:underline">
-          Batal
+          Cancel
         </Link>
       </div>
     </form>

@@ -26,26 +26,26 @@ export function BenefitsFieldset({ initial }: { initial: string[] }) {
 
   return (
     <fieldset className="space-y-3">
-      <legend className="text-sm font-medium text-neutral-700">Benefit</legend>
+      <legend className="text-sm font-medium text-neutral-700">Benefits</legend>
       <p className="text-xs text-neutral-500">
-        Satu benefit per baris. Baris kosong diabaikan saat disimpan. Urutan
-        baris menentukan urutan tampil.
+        One benefit per row. Empty rows are ignored when saving. The row
+        order determines the display order.
       </p>
 
       {benefits.map((benefit, index) => (
         <div key={index} className="flex flex-wrap gap-2">
           <input
-            aria-label={`Benefit baris ${index + 1}`}
+            aria-label={`Benefit row ${index + 1}`}
             name="benefits"
             value={benefit}
             onChange={(event) => updateBenefit(index, event.target.value)}
-            placeholder="Contoh: 1 sesi treatment 60 menit per bulan"
+            placeholder="e.g. 1 session of a 60-minute treatment per month"
             className={`${inputClass} min-w-48 flex-1`}
           />
           <button
             type="button"
             onClick={() => moveBenefit(index, -1)}
-            aria-label={`Naikkan benefit baris ${index + 1}`}
+            aria-label={`Move benefit row ${index + 1} up`}
             className={secondaryButtonClass}
           >
             ↑
@@ -53,7 +53,7 @@ export function BenefitsFieldset({ initial }: { initial: string[] }) {
           <button
             type="button"
             onClick={() => moveBenefit(index, 1)}
-            aria-label={`Turunkan benefit baris ${index + 1}`}
+            aria-label={`Move benefit row ${index + 1} down`}
             className={secondaryButtonClass}
           >
             ↓
@@ -63,10 +63,10 @@ export function BenefitsFieldset({ initial }: { initial: string[] }) {
             onClick={() =>
               setBenefits((rows) => rows.filter((_, i) => i !== index))
             }
-            aria-label={`Hapus benefit baris ${index + 1}`}
+            aria-label={`Delete benefit row ${index + 1}`}
             className={`${secondaryButtonClass} text-red-700`}
           >
-            Hapus
+            Delete
           </button>
         </div>
       ))}
@@ -76,7 +76,7 @@ export function BenefitsFieldset({ initial }: { initial: string[] }) {
         onClick={() => setBenefits((rows) => [...rows, ""])}
         className={secondaryButtonClass}
       >
-        + Tambah benefit
+        + Add benefit
       </button>
     </fieldset>
   );

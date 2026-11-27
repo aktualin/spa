@@ -45,11 +45,11 @@ export function ImageFieldControls({
         onClick={onOpenPicker}
         className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-50 disabled:opacity-50"
       >
-        Pilih dari Media Library
+        Select from Media Library
       </button>
 
       <p className="text-xs text-neutral-500">
-        {busy ? "Mengunggah…" : "JPG, PNG, WebP, AVIF, atau GIF. Maksimal 4 MB."}
+        {busy ? "Uploading…" : "JPG, PNG, WebP, AVIF, or GIF. Max 4 MB."}
       </p>
 
       {url ? (
@@ -62,7 +62,7 @@ export function ImageFieldControls({
             onClick={onClear}
             className="shrink-0 text-xs text-red-700 hover:underline"
           >
-            Hapus
+            Delete
           </button>
         </div>
       ) : null}

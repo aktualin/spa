@@ -28,9 +28,9 @@ export function StatusDonut({
         viewBox={`0 0 ${size} ${size}`}
         className="size-40 shrink-0"
         role="img"
-        aria-label={`${label}: ${total} artikel`}
+        aria-label={`${label}: ${total} articles`}
       >
-        <title>{`${label}: ${total} artikel`}</title>
+        <title>{`${label}: ${total} articles`}</title>
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -75,7 +75,7 @@ export function StatusDonut({
           letterSpacing={1}
           fill="#a3a3a3"
         >
-          ARTIKEL
+          ARTICLES
         </text>
       </svg>
 

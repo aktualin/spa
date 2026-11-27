@@ -56,7 +56,7 @@ export function AdminSidebar({
             href={CHANGE_PASSWORD_PATH}
             className="text-xs text-neutral-500 underline-offset-2 hover:text-neutral-900 hover:underline"
           >
-            Kata sandi
+            Password
           </Link>
           <LogoutButton />
         </div>
@@ -73,7 +73,7 @@ export function LogoutButton({ className }: { className?: string }) {
         type="submit"
         className="text-xs text-neutral-500 underline-offset-2 hover:text-neutral-900 hover:underline"
       >
-        Keluar
+        Log out
       </button>
     </form>
   );

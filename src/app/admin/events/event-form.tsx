@@ -31,11 +31,11 @@ export function EventForm({
   return (
     <div className="mx-auto max-w-2xl">
       <Link href="/admin/events" className="text-sm text-neutral-600 hover:underline">
-        ← Kembali ke daftar event
+        ← Back to events list
       </Link>
 
       <h1 className="mt-3 text-xl font-semibold text-neutral-900">
-        {event.id ? `Ubah event ${event.title}` : "Tambah event"}
+        {event.id ? `Edit event ${event.title}` : "Add event"}
       </h1>
 
       <form action={formAction} className="mt-6 space-y-5" key={state.attempt ?? 0}>
@@ -48,7 +48,7 @@ export function EventForm({
         <div className="flex items-center gap-3 border-t border-neutral-200 pt-4">
           <SaveButton />
           <Link href="/admin/events" className="text-sm text-neutral-600 hover:underline">
-            Batal
+            Cancel
           </Link>
         </div>
       </form>
@@ -56,8 +56,8 @@ export function EventForm({
       {event.id ? (
         <form action={deleteEventAction} className="mt-8 border-t border-neutral-200 pt-4">
           <input type="hidden" name="id" value={event.id} />
-          <ConfirmDeleteButton message="Hapus event ini? Semua fotonya juga dihapus.">
-            Hapus event ini
+          <ConfirmDeleteButton message="Delete this event? All of its photos will be deleted too.">
+            Delete this event
           </ConfirmDeleteButton>
         </form>
       ) : null}

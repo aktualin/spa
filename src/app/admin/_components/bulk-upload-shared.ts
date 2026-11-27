@@ -9,10 +9,10 @@ export type UploadItem = {
 };
 
 export const STATUS_LABEL: Record<ItemStatus, string> = {
-  menunggu: "Menunggu",
-  mengunggah: "Mengunggah…",
-  berhasil: "Terunggah",
-  gagal: "Gagal",
+  menunggu: "Waiting",
+  mengunggah: "Uploading…",
+  berhasil: "Uploaded",
+  gagal: "Failed",
 };
 
 export const STATUS_CLASS: Record<ItemStatus, string> = {
@@ -35,11 +35,11 @@ export async function uploadOne(file: File, folder: string): Promise<{ url: stri
       | null;
 
     if (!response.ok || !data?.url) {
-      if (response.status === 413) return { error: "Ukuran file melebihi batas 4 MB." };
-      return { error: data?.error ?? "Gagal mengunggah gambar." };
+      if (response.status === 413) return { error: "File size exceeds the 4 MB limit." };
+      return { error: data?.error ?? "Failed to upload the image." };
     }
     return { url: data.url };
   } catch {
-    return { error: "Gagal menghubungi server saat mengunggah." };
+    return { error: "Failed to reach the server while uploading." };
   }
 }

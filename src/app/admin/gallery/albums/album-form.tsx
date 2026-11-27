@@ -33,11 +33,11 @@ export function AlbumForm({ album }: { album: AlbumFormData }) {
   return (
     <div className="mx-auto max-w-2xl">
       <Link href="/admin/gallery" className="text-sm text-neutral-600 hover:underline">
-        ← Kembali ke daftar album
+        ← Back to albums list
       </Link>
 
       <h1 className="mt-3 text-xl font-semibold text-neutral-900">
-        {album.id ? `Ubah album ${album.name}` : "Tambah album"}
+        {album.id ? `Edit album ${album.name}` : "Add album"}
       </h1>
 
       <form action={formAction} className="mt-6 space-y-5">
@@ -50,7 +50,7 @@ export function AlbumForm({ album }: { album: AlbumFormData }) {
         <div className="flex items-center gap-3 border-t border-neutral-200 pt-4">
           <SaveButton />
           <Link href="/admin/gallery" className="text-sm text-neutral-600 hover:underline">
-            Batal
+            Cancel
           </Link>
         </div>
       </form>
@@ -58,8 +58,8 @@ export function AlbumForm({ album }: { album: AlbumFormData }) {
       {album.id ? (
         <form action={deleteAlbumAction} className="mt-8 border-t border-neutral-200 pt-4">
           <input type="hidden" name="id" value={album.id} />
-          <ConfirmDeleteButton message="Hapus album ini? Semua foto di dalamnya ikut terhapus.">
-            Hapus album ini
+          <ConfirmDeleteButton message="Delete this album? All photos inside it will be deleted too.">
+            Delete this album
           </ConfirmDeleteButton>
         </form>
       ) : null}

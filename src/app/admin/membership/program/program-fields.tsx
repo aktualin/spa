@@ -9,10 +9,10 @@ import { RichTextField } from "../../rich-text-field";
 export function ProgramHeaderFields({ program }: { program: MembershipProgramData }) {
   return (
     <>
-      <Field label="Eyebrow" htmlFor="eyebrow" hint="Label kecil di atas judul.">
+      <Field label="Eyebrow" htmlFor="eyebrow" hint="The small label above the title.">
         <input id="eyebrow" name="eyebrow" defaultValue={program.eyebrow} required maxLength={PROGRAM_LIMITS.eyebrow} className={inputClass} />
       </Field>
-      <Field label="Judul" htmlFor="title">
+      <Field label="Title" htmlFor="title">
         <textarea id="title" name="title" defaultValue={program.title} required maxLength={PROGRAM_LIMITS.title} rows={2} className={inputClass} />
       </Field>
       <RichTextField
@@ -20,20 +20,20 @@ export function ProgramHeaderFields({ program }: { program: MembershipProgramDat
         label="Intro"
         defaultValue={program.intro}
         folder="membership"
-        hint={`Wajib diisi, maksimal ${PROGRAM_LIMITS.intro} karakter teks (format/HTML tidak dihitung).`}
+        hint={`Required, maximum ${PROGRAM_LIMITS.intro} characters of text (formatting/HTML not counted).`}
         compact
       />
       <Field
-        label="Kalimat harga"
+        label="Pricing sentence"
         htmlFor="priceHeadline"
-        hint='Contoh "Just Rp 1,500,000 a month." Tampil di banner membership homepage dan bagian Main Benefits. Harga per tier diatur di tier atau modul Harga.'
+        hint='e.g. "Just Rp 1,500,000 a month." Shown in the homepage membership banner and the Main Benefits section. Per-tier prices are set in the tier or the Pricing module.'
       >
         <input id="priceHeadline" name="priceHeadline" defaultValue={program.priceHeadline} required maxLength={PROGRAM_LIMITS.priceHeadline} className={inputClass} />
       </Field>
       <Field
-        label="Deskripsi banner homepage"
+        label="Homepage banner description"
         htmlFor="bannerBody"
-        hint="Teks di banner membership homepage. Bila diisi di modul Homepage (Banner Membership → subjudul), isian di sana yang dipakai."
+        hint="The text in the homepage membership banner. If filled in the Homepage module (Membership Banner → subtitle), the value there is used instead."
       >
         <textarea id="bannerBody" name="bannerBody" defaultValue={program.bannerBody} required maxLength={PROGRAM_LIMITS.bannerBody} rows={3} className={inputClass} />
       </Field>

@@ -26,7 +26,7 @@ export function ChangePasswordForm({ minLength }: { minLength: number }) {
       action={formAction}
       className="space-y-4 rounded-lg border border-neutral-200 bg-white p-5"
     >
-      <Field label="Kata sandi saat ini" htmlFor="currentPassword">
+      <Field label="Current password" htmlFor="currentPassword">
         <input
           id="currentPassword"
           name="currentPassword"
@@ -38,9 +38,9 @@ export function ChangePasswordForm({ minLength }: { minLength: number }) {
       </Field>
 
       <Field
-        label="Kata sandi baru"
+        label="New password"
         htmlFor="newPassword"
-        hint={`Minimal ${minLength} karakter. Gunakan kalimat yang mudah diingat tapi sulit ditebak.`}
+        hint={`At least ${minLength} characters. Use a phrase that is easy to remember but hard to guess.`}
       >
         <input
           id="newPassword"
@@ -53,7 +53,7 @@ export function ChangePasswordForm({ minLength }: { minLength: number }) {
         />
       </Field>
 
-      <Field label="Ulangi kata sandi baru" htmlFor="confirmPassword">
+      <Field label="Confirm new password" htmlFor="confirmPassword">
         <input
           id="confirmPassword"
           name="confirmPassword"
@@ -67,7 +67,7 @@ export function ChangePasswordForm({ minLength }: { minLength: number }) {
 
       <ErrorMessage error={state.error} />
 
-      <SaveButton label="Simpan kata sandi" />
+      <SaveButton label="Save password" />
     </form>
   );
 }

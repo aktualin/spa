@@ -35,7 +35,7 @@ export function ContentRow({
               {row.title}
             </Link>
             <Badge tone={row.isPublished ? "green" : "muted"}>
-              {row.isPublished ? "Tayang" : "Draf"}
+              {row.isPublished ? "Published" : "Draft"}
             </Badge>
           </div>
           <p className="mt-0.5 truncate text-xs text-neutral-500">{row.meta}</p>
@@ -46,21 +46,21 @@ export function ContentRow({
         <form action={toggleAction}>
           <input type="hidden" name="id" value={row.id} />
           <input type="hidden" name="isPublished" value={row.isPublished ? "0" : "1"} />
-          <SmallSubmit title={row.isPublished ? "Jadikan draf" : "Terbitkan"}>
-            {row.isPublished ? "Jadikan draf" : "Terbitkan"}
+          <SmallSubmit title={row.isPublished ? "Set to draft" : "Publish"}>
+            {row.isPublished ? "Set to draft" : "Publish"}
           </SmallSubmit>
         </form>
         <form action={moveAction}>
           <input type="hidden" name="id" value={row.id} />
           <input type="hidden" name="direction" value="up" />
-          <SmallSubmit title="Naikkan" disabled={index === 0}>
+          <SmallSubmit title="Move up" disabled={index === 0}>
             ↑
           </SmallSubmit>
         </form>
         <form action={moveAction}>
           <input type="hidden" name="id" value={row.id} />
           <input type="hidden" name="direction" value="down" />
-          <SmallSubmit title="Turunkan" disabled={index === count - 1}>
+          <SmallSubmit title="Move down" disabled={index === count - 1}>
             ↓
           </SmallSubmit>
         </form>

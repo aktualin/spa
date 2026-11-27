@@ -27,14 +27,14 @@ export function ReservationStatusForm({
           Status
         </label>
         <select id="status" name="status" defaultValue={status} className={`${inputClass} sm:w-60`}>
-          <option value="NEW">Baru</option>
-          <option value="CONTACTED">Sudah dihubungi</option>
-          <option value="CLOSED">Ditutup</option>
+          <option value="NEW">New</option>
+          <option value="CONTACTED">Contacted</option>
+          <option value="CLOSED">Closed</option>
         </select>
       </div>
       <div className="space-y-1">
         <label htmlFor="notes" className="block text-sm font-medium text-neutral-700">
-          Catatan internal
+          Internal note
         </label>
         <textarea
           id="notes"
@@ -42,13 +42,13 @@ export function ReservationStatusForm({
           defaultValue={notes}
           rows={4}
           maxLength={2000}
-          placeholder="Mis. hasil telepon, jadwal treatment, alasan ditutup."
+          placeholder="E.g. call outcome, treatment schedule, reason for closing."
           className={inputClass}
         />
-        <p className="text-xs text-neutral-500">Hanya terlihat oleh tim di dashboard.</p>
+        <p className="text-xs text-neutral-500">Only visible to the team in the dashboard.</p>
       </div>
       <ErrorAlert message={state.error} />
-      <SaveButton label="Simpan status" />
+      <SaveButton label="Save status" />
     </form>
   );
 }

@@ -31,14 +31,14 @@ export function OurStoryForm({
     <div className="mx-auto max-w-2xl">
       <h1 className="text-xl font-semibold text-neutral-900">Our Story</h1>
       <p className="mt-1 text-sm text-neutral-600">
-        Konten halaman <code>/our-story</code> beserta meta SEO-nya. Daftar
-        tulisan terbaru di bagian bawah halaman diambil otomatis dari Journal.
+        Content of the <code>/our-story</code> page along with its SEO meta. The
+        list of latest writings at the bottom of the page is pulled automatically from the Journal.
       </p>
 
       {isNew ? (
         <p className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          Our Story belum pernah disimpan. Form ini berisi teks bawaan yang
-          sekarang tampil di situs — ubah lalu tekan Simpan.
+          Our Story has never been saved. This form contains the default text
+          currently shown on the site — edit it and press Save.
         </p>
       ) : null}
 

@@ -28,7 +28,7 @@ export default async function AdminReservationDetailPage({
   return (
     <div className="mx-auto max-w-2xl">
       <Link href="/admin/reservations" className="text-sm text-neutral-600 hover:underline">
-        ← Kembali ke daftar reservasi
+        ← Back to the reservations list
       </Link>
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -36,8 +36,8 @@ export default async function AdminReservationDetailPage({
         <InquiryStatusBadge status={row.status} />
       </div>
       <p className="mt-1 text-sm text-neutral-600">
-        Masuk {formatWibDateTime(row.createdAt)}. Data pribadi (UU PDP) — gunakan hanya untuk
-        menindaklanjuti permintaan ini.
+        Received {formatWibDateTime(row.createdAt)}. Personal data (PDP Law) — use only to
+        follow up on this request.
       </p>
 
       <StatusBanners saved={query.saved} />
@@ -45,7 +45,7 @@ export default async function AdminReservationDetailPage({
       <ReservationDetailList row={row} />
 
       <section className="mt-6 rounded-lg border border-neutral-200 bg-white p-4">
-        <h2 className="mb-3 text-sm font-semibold text-neutral-900">Tindak lanjut</h2>
+        <h2 className="mb-3 text-sm font-semibold text-neutral-900">Follow-up</h2>
         <ReservationStatusForm
           reservationId={row.id}
           status={row.status}
@@ -55,8 +55,8 @@ export default async function AdminReservationDetailPage({
 
       <form action={deleteReservationAction} className="mt-8 border-t border-neutral-200 pt-4">
         <input type="hidden" name="id" value={row.id} />
-        <ConfirmDeleteButton message="Hapus permintaan reservasi ini beserta seluruh data pengirimnya? Tindakan ini tidak bisa dibatalkan.">
-          Hapus permintaan (spam / permintaan penghapusan data)
+        <ConfirmDeleteButton message="Delete this reservation request along with all of the sender's data? This action cannot be undone.">
+          Delete request (spam / data erasure request)
         </ConfirmDeleteButton>
       </form>
     </div>

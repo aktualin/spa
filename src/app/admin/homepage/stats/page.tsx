@@ -22,12 +22,12 @@ export default async function AdminHomepageStatsPage({
 
   return (
     <ContentList
-      title="Statistik Brand Intro"
-      subtitle="Kotak angka “KAMA at a glance” di section Brand Intro. Urutan di daftar ini sama dengan urutan di homepage."
+      title="Brand Intro Stats"
+      subtitle="The “KAMA at a glance” number boxes in the Brand Intro section. The order in this list matches the order on the homepage."
       basePath="/admin/homepage/stats"
-      addLabel="Tambah statistik"
+      addLabel="Add stat"
       addDisabledNote={
-        stats.length >= STAT_LIMITS.max ? `Maksimal ${STAT_LIMITS.max} statistik.` : null
+        stats.length >= STAT_LIMITS.max ? `Max ${STAT_LIMITS.max} stats.` : null
       }
       rows={stats.map((s) => ({
         id: s.id,
@@ -37,21 +37,21 @@ export default async function AdminHomepageStatsPage({
       }))}
       saved={params.saved}
       deleted={params.deleted}
-      deletedLabel="Statistik dihapus."
+      deletedLabel="Stat deleted."
       emptyNote={
         <>
           <p>
-            Belum ada statistik. Saat ini Brand Intro menampilkan 3 statistik bawaan situs.
-            Begitu statistik pertama disimpan, statistik bawaan{" "}
-            <strong>diganti seluruhnya</strong> oleh daftar ini.
+            No stats yet. Currently Brand Intro shows the site’s 3 default stats.
+            As soon as the first stat is saved, the default stats are{" "}
+            <strong>replaced entirely</strong> by this list.
           </p>
-          <p>Agar tampilan tidak berubah, salin dulu statistik bawaan, lalu ubah sesuai kebutuhan.</p>
+          <p>To keep the appearance unchanged, copy the default stats first, then edit them as needed.</p>
         </>
       }
-      importLabel="Salin statistik bawaan"
+      importLabel="Copy default stats"
       importAction={importDefaultStatsAction}
-      noLiveNote="Tidak ada statistik yang tayang, jadi kotak angka di Brand Intro kosong. Terbitkan minimal satu statistik."
-      footnote="Tata letak berupa 3 kolom, jadi kelipatan 3 paling rapi. Seluruh section Brand Intro bisa disembunyikan dari halaman Section Homepage."
+      noLiveNote="No stats are published, so the number boxes in Brand Intro are empty. Publish at least one stat."
+      footnote="The layout uses 3 columns, so multiples of 3 look tidiest. The entire Brand Intro section can be hidden from the Homepage Sections page."
       toggleAction={toggleHomepageStatAction}
       moveAction={moveHomepageStatAction}
     />

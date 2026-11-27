@@ -21,7 +21,7 @@ function SubmitButton() {
       disabled={pending}
       className="mt-2 w-full rounded-lg bg-espresso px-4 py-2.5 text-sm font-medium text-cream transition hover:bg-cocoa focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cocoa disabled:cursor-not-allowed disabled:opacity-60"
     >
-      {pending ? "Memproses…" : "Sign in"}
+      {pending ? "Processing…" : "Sign in"}
     </button>
   );
 }
@@ -42,7 +42,7 @@ export function LoginForm({ next }: { next?: string }) {
           name="email"
           type="email"
           autoComplete="username"
-          placeholder="nama@kamaspa.id"
+          placeholder="name@kamaspa.id"
           required
           autoFocus
           className={fieldClass}
@@ -67,7 +67,7 @@ export function LoginForm({ next }: { next?: string }) {
           value="on"
           className="h-4 w-4 rounded border-tan accent-espresso"
         />
-        Ingat saya
+        Remember me
       </label>
 
       {state.error ? (

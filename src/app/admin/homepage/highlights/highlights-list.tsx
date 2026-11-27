@@ -18,6 +18,14 @@ const STATUS_TONE: Record<HighlightStatus, BadgeTone> = {
   Tayang: "green",
 };
 
+// Label tampil (bahasa Inggris) untuk status internal dari domain.
+const STATUS_LABEL: Record<HighlightStatus, string> = {
+  Draf: "Draft",
+  Terjadwal: "Scheduled",
+  Berakhir: "Ended",
+  Tayang: "Published",
+};
+
 export type HighlightRow = Awaited<ReturnType<typeof listHomepageHighlights>>[number] & {
   status: HighlightStatus;
 };
@@ -44,11 +52,11 @@ export function HighlightListItem({
             >
               {row.title}
             </Link>
-            <Badge tone={STATUS_TONE[row.status]}>{row.status}</Badge>
+            <Badge tone={STATUS_TONE[row.status]}>{STATUS_LABEL[row.status]}</Badge>
           </div>
           <p className="mt-0.5 truncate text-xs text-neutral-500">
             {row.eyebrow ? `${row.eyebrow} · ` : ""}
-            {row.href ?? "tanpa tautan"}
+            {row.href ?? "no link"}
             {row.startDate || row.endDate
               ? ` · ${formatWibDate(row.startDate)} – ${formatWibDate(row.endDate)}`
               : ""}
@@ -65,21 +73,21 @@ export function HighlightListItem({
             name="isPublished"
             value={row.isPublished ? "0" : "1"}
           />
-          <SmallSubmit title={row.isPublished ? "Jadikan draf" : "Terbitkan"}>
-            {row.isPublished ? "Jadikan draf" : "Terbitkan"}
+          <SmallSubmit title={row.isPublished ? "Set to draft" : "Publish"}>
+            {row.isPublished ? "Set to draft" : "Publish"}
           </SmallSubmit>
         </form>
         <form action={moveHomepageHighlightAction}>
           <input type="hidden" name="id" value={row.id} />
           <input type="hidden" name="direction" value="up" />
-          <SmallSubmit title="Naikkan" disabled={index === 0}>
+          <SmallSubmit title="Move up" disabled={index === 0}>
             ↑
           </SmallSubmit>
         </form>
         <form action={moveHomepageHighlightAction}>
           <input type="hidden" name="id" value={row.id} />
           <input type="hidden" name="direction" value="down" />
-          <SmallSubmit title="Turunkan" disabled={index === count - 1}>
+          <SmallSubmit title="Move down" disabled={index === count - 1}>
             ↓
           </SmallSubmit>
         </form>

@@ -14,10 +14,10 @@ export type HomepageSectionKey = (typeof HOMEPAGE_SECTION_KEYS)[number];
 
 const KEY_LABEL: Record<string, string> = {
   hero: "Hero",
-  "membership-banner": "Banner Membership",
+  "membership-banner": "Membership Banner",
   "whats-new": "What's New",
   "brand-intro": "Brand Intro",
-  "booking-banner": "Banner Booking",
+  "booking-banner": "Booking Banner",
   "signature-treatments": "Signature Treatments",
   "promo-highlight": "Promo Highlight",
   "gallery-teaser": "Gallery Teaser",
@@ -49,7 +49,7 @@ export function customSectionKey(name: string): string | null {
 }
 
 export function sectionKeyLabel(key: string): string {
-  if (isCustomSectionKey(key)) return "Section konten";
+  if (isCustomSectionKey(key)) return "Content section";
   return KEY_LABEL[key] ?? key;
 }
 

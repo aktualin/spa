@@ -23,11 +23,11 @@ export function RetailForm({ product }: { product: RetailFormData }) {
   return (
     <div className="mx-auto max-w-2xl">
       <Link href="/admin/retail" className="text-sm text-neutral-600 hover:underline">
-        ← Kembali ke daftar
+        ← Back to the list
       </Link>
 
       <h1 className="mt-3 text-xl font-semibold text-neutral-900">
-        {product.id ? `Ubah ${product.name}` : "Tambah produk retail"}
+        {product.id ? `Edit ${product.name}` : "Add retail product"}
       </h1>
 
       <form action={formAction} className="mt-6 space-y-5">
@@ -37,13 +37,13 @@ export function RetailForm({ product }: { product: RetailFormData }) {
 
         <RichTextField
           name="description"
-          label="Deskripsi"
+          label="Description"
           defaultValue={product.description}
           folder="retail"
           compact
         />
 
-        <ImageField name="imageUrl" label="Foto produk" folder="retail" defaultValue={product.imageUrl} />
+        <ImageField name="imageUrl" label="Product photo" folder="retail" defaultValue={product.imageUrl} />
 
         <RetailMetaFields product={product} />
 
@@ -52,7 +52,7 @@ export function RetailForm({ product }: { product: RetailFormData }) {
         <div className="flex items-center gap-3 border-t border-neutral-200 pt-4">
           <SaveButton />
           <Link href="/admin/retail" className="text-sm text-neutral-600 hover:underline">
-            Batal
+            Cancel
           </Link>
         </div>
       </form>
@@ -60,8 +60,8 @@ export function RetailForm({ product }: { product: RetailFormData }) {
       {product.id ? (
         <form action={deleteRetailAction} className="mt-8 border-t border-neutral-200 pt-4">
           <input type="hidden" name="id" value={product.id} />
-          <ConfirmSubmit message={`Hapus produk "${product.name}"?`}>
-            Hapus produk ini
+          <ConfirmSubmit message={`Delete product "${product.name}"?`}>
+            Delete this product
           </ConfirmSubmit>
         </form>
       ) : null}

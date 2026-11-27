@@ -54,12 +54,12 @@ export function RowList({
       {rows.map((row, index) => (
         <div key={row.key} className="space-y-2 rounded-md bg-neutral-50 p-3">
           <div className="flex items-center justify-between gap-2 text-xs text-neutral-500">
-            <span>Baris {index + 1}</span>
+            <span>Row {index + 1}</span>
             <span className="flex gap-1.5">
-              <button type="button" onClick={() => move(index, -1)} disabled={index === 0} className={secondaryButtonClass} aria-label={`Naikkan baris ${index + 1}`}>
+              <button type="button" onClick={() => move(index, -1)} disabled={index === 0} className={secondaryButtonClass} aria-label={`Move row ${index + 1} up`}>
                 ↑
               </button>
-              <button type="button" onClick={() => move(index, 1)} disabled={index === rows.length - 1} className={secondaryButtonClass} aria-label={`Turunkan baris ${index + 1}`}>
+              <button type="button" onClick={() => move(index, 1)} disabled={index === rows.length - 1} className={secondaryButtonClass} aria-label={`Move row ${index + 1} down`}>
                 ↓
               </button>
               <button
@@ -67,14 +67,14 @@ export function RowList({
                 onClick={() => setRows((current) => current.filter((r) => r.key !== row.key))}
                 className={secondaryButtonClass}
               >
-                Hapus
+                Delete
               </button>
             </span>
           </div>
           <input
             name={titleName}
             defaultValue={row.title}
-            aria-label={`${titleLabel} baris ${index + 1}`}
+            aria-label={`${titleLabel} row ${index + 1}`}
             placeholder={titleLabel}
             maxLength={PROGRAM_LIMITS.itemTitle}
             className={inputClass}
@@ -82,7 +82,7 @@ export function RowList({
           <textarea
             name={bodyName}
             defaultValue={row.body}
-            aria-label={`${bodyLabel} baris ${index + 1}`}
+            aria-label={`${bodyLabel} row ${index + 1}`}
             placeholder={bodyLabel}
             maxLength={PROGRAM_LIMITS.itemBody}
             rows={2}
@@ -96,7 +96,7 @@ export function RowList({
           onClick={() => setRows((current) => [...current, { key: nextKey++, title: "", body: "" }])}
           className={secondaryButtonClass}
         >
-          + Tambah baris
+          + Add row
         </button>
       ) : null}
     </fieldset>

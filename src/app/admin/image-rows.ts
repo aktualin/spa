@@ -47,7 +47,7 @@ export function useImageRows(
     try {
       for (const file of files) {
         if (!file.type.startsWith("image/")) {
-          setError(`"${file.name}" bukan berkas gambar dan dilewati.`);
+          setError(`"${file.name}" is not an image file and was skipped.`);
           continue;
         }
 
@@ -59,14 +59,14 @@ export function useImageRows(
         const data = await response.json();
 
         if (!response.ok) {
-          setError(data.error ?? `Gagal mengunggah "${file.name}".`);
+          setError(data.error ?? `Failed to upload "${file.name}".`);
           continue;
         }
         uploaded.push(data.url);
       }
       addImages(uploaded);
     } catch {
-      setError("Gagal menghubungi server saat mengunggah.");
+      setError("Failed to reach the server while uploading.");
     } finally {
       setBusy(false);
       if (fileRef.current) fileRef.current.value = "";

@@ -25,39 +25,39 @@ export function ContentTrendsSection({
   return (
     <section className="mt-8">
       <div>
-        <h2 className="text-sm font-semibold text-neutral-900">Tren konten</h2>
+        <h2 className="text-sm font-semibold text-neutral-900">Content trends</h2>
         <p className="mt-0.5 text-xs text-neutral-400">
-          Enam bulan terakhir · waktu Jakarta
+          Last six months · Jakarta time
         </p>
       </div>
       <div className="mt-3 grid gap-3 lg:grid-cols-3">
         <ChartCard
-          title="Journal terbit"
-          subtitle={`${journalTotal} artikel`}
+          title="Published journal posts"
+          subtitle={`${journalTotal} articles`}
         >
           <TrendBars
             points={journalTrend}
-            label="Journal terbit per bulan"
-            suffix=" artikel"
+            label="Published journal posts per month"
+            suffix=" articles"
           />
         </ChartCard>
         <ChartCard
-          title="Inquiry corporate"
-          subtitle={`${inquiryTotal} inquiry`}
+          title="Corporate inquiries"
+          subtitle={`${inquiryTotal} inquiries`}
         >
           <TrendArea
             points={inquiryTrend}
-            label="Inquiry corporate per bulan"
-            suffix=" inquiry"
+            label="Corporate inquiries per month"
+            suffix=" inquiries"
           />
         </ChartCard>
         <ChartCard
-          title="Status journal"
-          subtitle={`${journalPublished} terbit`}
+          title="Journal status"
+          subtitle={`${journalPublished} published`}
         >
           <StatusDonut
             segments={statusSegments}
-            label="Komposisi status journal"
+            label="Journal status breakdown"
           />
         </ChartCard>
       </div>
@@ -70,7 +70,7 @@ export function AlertsSection({ alerts }: { alerts: DashboardAlert[] }) {
     <section className="mt-8">
       <div className="flex items-center gap-2">
         <h2 className="text-sm font-semibold text-neutral-900">
-          Perlu perhatian
+          Needs attention
         </h2>
         {alerts.length > 0 ? (
           <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold tabular-nums text-amber-700">

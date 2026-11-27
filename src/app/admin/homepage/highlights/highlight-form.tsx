@@ -32,21 +32,21 @@ export function HighlightForm({ highlight }: { highlight: HighlightFormData }) {
   return (
     <div className="mx-auto max-w-2xl">
       <Link href={LIST_PATH} className="text-sm text-neutral-600 hover:underline">
-        ← Kembali ke daftar highlight
+        ← Back to the highlight list
       </Link>
 
       <h1 className="mt-3 text-xl font-semibold text-neutral-900">
-        {highlight.id ? "Ubah highlight" : "Tambah highlight"}
+        {highlight.id ? "Edit highlight" : "Add highlight"}
       </h1>
       <p className="mt-1 text-sm text-neutral-600">
-        Tampil sebagai kartu di section “What’s New” homepage: gambar, label
-        kategori, judul, dan tautan dengan teks tombol opsional.
+        Shown as a card in the homepage’s “What’s New” section: image, category
+        label, title, and a link with optional button text.
       </p>
 
       <form action={formAction} className="mt-6 space-y-5">
         {highlight.id ? <input type="hidden" name="id" value={highlight.id} /> : null}
 
-        <Field label="Judul" htmlFor="title">
+        <Field label="Title" htmlFor="title">
           <input
             id="title"
             name="title"
@@ -58,9 +58,9 @@ export function HighlightForm({ highlight }: { highlight: HighlightFormData }) {
         </Field>
 
         <Field
-          label="Label kategori (opsional)"
+          label="Category label (optional)"
           htmlFor="eyebrow"
-          hint="Teks kecil di atas judul, mis. Massage, Promo, Event. Ditampilkan sebelum “KAMA Journal”."
+          hint="Small text above the title, e.g. Massage, Promo, Event. Shown before “KAMA Journal”."
         >
           <input
             id="eyebrow"
@@ -76,7 +76,7 @@ export function HighlightForm({ highlight }: { highlight: HighlightFormData }) {
         <HighlightPeriodFields highlight={highlight} />
 
         <Checkbox name="isPublished" defaultChecked={highlight.isPublished}>
-          Terbitkan di homepage
+          Publish on the homepage
         </Checkbox>
 
         <ErrorAlert message={state.error} />
@@ -84,7 +84,7 @@ export function HighlightForm({ highlight }: { highlight: HighlightFormData }) {
         <div className="flex items-center gap-3 border-t border-neutral-200 pt-4">
           <SaveButton />
           <Link href={LIST_PATH} className="text-sm text-neutral-600 hover:underline">
-            Batal
+            Cancel
           </Link>
         </div>
       </form>
@@ -95,8 +95,8 @@ export function HighlightForm({ highlight }: { highlight: HighlightFormData }) {
           className="mt-8 border-t border-neutral-200 pt-4"
         >
           <input type="hidden" name="id" value={highlight.id} />
-          <ConfirmDeleteButton message="Hapus highlight ini? Gambar yang tercatat di Media Library tetap tersimpan.">
-            Hapus highlight ini
+          <ConfirmDeleteButton message="Delete this highlight? Images recorded in the Media Library are kept.">
+            Delete this highlight
           </ConfirmDeleteButton>
         </form>
       ) : null}

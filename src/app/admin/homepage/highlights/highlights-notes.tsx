@@ -8,16 +8,16 @@ export function HighlightNotes({ rows, liveCount }: { rows: HighlightRow[]; live
     return (
       <div className="mt-6 space-y-3 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-800">
         <p>
-          Belum ada highlight. Saat ini “What’s New” menampilkan 3 kartu
-          bawaan situs. Begitu highlight pertama disimpan, kartu bawaan
-          <strong> diganti seluruhnya</strong> oleh highlight dari daftar ini.
+          No highlights yet. Currently “What’s New” shows the site’s 3 default
+          cards. As soon as the first highlight is saved, the default cards are
+          <strong> replaced entirely</strong> by highlights from this list.
         </p>
         <p>
-          Agar tampilan tidak berubah, salin dulu 3 kartu bawaan menjadi
-          highlight, lalu ubah/tambah sesuai kebutuhan.
+          To keep the appearance unchanged, first copy the 3 default cards into
+          highlights, then edit/add as needed.
         </p>
         <form action={importDefaultHighlightsAction}>
-          <SmallSubmit>Salin 3 kartu bawaan</SmallSubmit>
+          <SmallSubmit>Copy the 3 default cards</SmallSubmit>
         </form>
       </div>
     );
@@ -25,9 +25,9 @@ export function HighlightNotes({ rows, liveCount }: { rows: HighlightRow[]; live
   if (liveCount === 0) {
     return (
       <p className="mt-6 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-800">
-        Tidak ada highlight yang sedang tayang, jadi section “What’s New”
-        tampil tanpa kartu. Terbitkan minimal satu highlight, atau matikan
-        section “What’s New” di halaman Section Homepage.
+        No highlights are currently published, so the “What’s New” section
+        appears without cards. Publish at least one highlight, or turn off the
+        “What’s New” section on the Homepage Sections page.
       </p>
     );
   }

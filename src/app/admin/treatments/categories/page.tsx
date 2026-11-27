@@ -19,16 +19,12 @@ export default async function AdminCategoriesPage({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-neutral-900">Kategori</h1>
-          <p className="mt-1 text-sm text-neutral-600">
-            Pengelompokan treatment dan add-on. Kategori berjenis Treatment punya halaman
-            sendiri di <code>/treatments/&lt;slug&gt;</code>.
-          </p>
         </div>
         <Link
           href="/admin/treatments/categories/new"
           className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
         >
-          Tambah kategori
+          Add category
         </Link>
       </div>
 

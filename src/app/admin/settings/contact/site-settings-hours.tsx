@@ -27,16 +27,16 @@ export function OpeningHoursField({ initial, max }: { initial: string[]; max: nu
   return (
     <fieldset className="space-y-2">
       <legend className="text-sm font-medium text-neutral-700">
-        Jam operasional
+        Opening hours
       </legend>
       <p className="text-xs text-neutral-500">
-        Satu baris per jadwal, contoh: <em>Mon – Sun. 10 AM – 8 PM</em>. Baris
-        kosong diabaikan; minimal satu baris.
+        One line per schedule, e.g. <em>Mon – Sun. 10 AM – 8 PM</em>. Empty
+        lines are ignored; at least one line is required.
       </p>
       {rows.map((row, index) => (
         <div key={row.id} className="flex flex-wrap gap-2">
           <input
-            aria-label={`Jam operasional baris ${index + 1}`}
+            aria-label={`Opening hours line ${index + 1}`}
             name={`openingHours[${index}]`}
             value={row.value}
             maxLength={120}
@@ -51,7 +51,7 @@ export function OpeningHoursField({ initial, max }: { initial: string[]; max: nu
           />
           <button
             type="button"
-            aria-label={`Naikkan baris ${index + 1}`}
+            aria-label={`Move line ${index + 1} up`}
             disabled={index === 0}
             onClick={() => move(index, -1)}
             className={smallButton}
@@ -60,7 +60,7 @@ export function OpeningHoursField({ initial, max }: { initial: string[]; max: nu
           </button>
           <button
             type="button"
-            aria-label={`Turunkan baris ${index + 1}`}
+            aria-label={`Move line ${index + 1} down`}
             disabled={index === rows.length - 1}
             onClick={() => move(index, 1)}
             className={smallButton}
@@ -75,7 +75,7 @@ export function OpeningHoursField({ initial, max }: { initial: string[]; max: nu
             }
             className={`${smallButton} px-3`}
           >
-            Hapus
+            Delete
           </button>
         </div>
       ))}
@@ -85,7 +85,7 @@ export function OpeningHoursField({ initial, max }: { initial: string[]; max: nu
         onClick={() => setRows((current) => [...current, makeRow("")])}
         className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-50 disabled:opacity-40"
       >
-        + Tambah baris
+        + Add line
       </button>
     </fieldset>
   );

@@ -20,8 +20,8 @@ export function useReplaceFile(id: string, folder: string, usageCount: number) {
   async function handleFile(file: File) {
     const warning =
       usageCount > 0
-        ? `Ganti berkas ini? ${usageCount} pemakaian di situs akan langsung memakai gambar baru dan berkas lama dihapus.`
-        : "Ganti berkas ini? Berkas lama akan dihapus.";
+        ? `Replace this file? ${usageCount} usages on the site will immediately use the new image and the old file will be deleted.`
+        : "Replace this file? The old file will be deleted.";
     if (!window.confirm(warning)) {
       if (fileRef.current) fileRef.current.value = "";
       return;
@@ -29,7 +29,7 @@ export function useReplaceFile(id: string, folder: string, usageCount: number) {
 
     setError(null);
     setMessage(null);
-    setBusy("Mengunggah berkas baru…");
+    setBusy("Uploading new file…");
 
     try {
       const body = new FormData();
@@ -41,13 +41,13 @@ export function useReplaceFile(id: string, folder: string, usageCount: number) {
       if (!response.ok || !data.id) {
         setError(
           response.status === 413
-            ? "Berkas terlalu besar (maksimal 4 MB)."
-            : (data.error ?? "Gagal mengunggah berkas."),
+            ? "File is too large (maximum 4 MB)."
+            : (data.error ?? "Failed to upload file."),
         );
         return;
       }
 
-      setBusy("Memperbarui pemakaian…");
+      setBusy("Updating usages…");
       const result = await replaceMediaAction(id, data.id);
       if (result.error) {
         setError(result.error);
@@ -56,10 +56,10 @@ export function useReplaceFile(id: string, folder: string, usageCount: number) {
         return;
       }
 
-      setMessage(result.message ?? "Berkas berhasil diganti.");
+      setMessage(result.message ?? "File replaced successfully.");
       router.refresh();
     } catch {
-      setError("Gagal menghubungi server. Periksa Media Library: unggahan sementara mungkin perlu dihapus manual.");
+      setError("Failed to reach the server. Check the Media Library: the temporary upload may need to be deleted manually.");
     } finally {
       setBusy(null);
       if (fileRef.current) fileRef.current.value = "";

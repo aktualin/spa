@@ -24,25 +24,25 @@ export default async function AdminHomepagePage({
   return (
     <div className="mx-auto max-w-3xl">
       <h1 className="text-xl font-semibold text-neutral-900">
-        Section Homepage
+        Homepage Sections
       </h1>
       <p className="mt-1 text-sm text-neutral-600">
-        Nyalakan/matikan tiap section, atur urutannya, dan edit teksnya. Urutan
-        di sini sama dengan urutan render di homepage.
+        Turn each section on/off, set its order, and edit its text. The order
+        here is the same as the render order on the homepage.
       </p>
       <HomepageQuickLinks />
 
-      <StatusBanner saved={params.saved} deleted={params.deleted} deletedText="Section konten dihapus." />
+      <StatusBanner saved={params.saved} deleted={params.deleted} deletedText="Content section deleted." />
       {params.error === "custom-name" ? (
         <p role="alert" className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
-          Nama section konten wajib berisi huruf atau angka.
+          The content section name must contain letters or numbers.
         </p>
       ) : null}
 
       {sections.length === 0 ? (
         <p className="mt-6 text-sm text-neutral-500">
-          Belum ada section homepage. Tambahkan section yang dibutuhkan di
-          bawah.
+          No homepage sections yet. Add the sections you need
+          below.
         </p>
       ) : null}
 

@@ -15,20 +15,20 @@ export function ListPagination({
 }) {
   if (pageCount <= 1) return null;
   return (
-    <nav aria-label="Halaman" className="mt-4 flex items-center justify-between text-sm">
+    <nav aria-label="Pages" className="mt-4 flex items-center justify-between text-sm">
       {page > 1 ? (
         <Link href={hrefFor(page - 1)} className="text-neutral-700 hover:underline">
-          ← Sebelumnya
+          ← Previous
         </Link>
       ) : (
         <span />
       )}
       <span className="text-neutral-500">
-        Halaman {page} dari {pageCount}
+        Page {page} of {pageCount}
       </span>
       {page < pageCount ? (
         <Link href={hrefFor(page + 1)} className="text-neutral-700 hover:underline">
-          Berikutnya →
+          Next →
         </Link>
       ) : (
         <span />

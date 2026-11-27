@@ -49,7 +49,7 @@ export default async function AdminDashboardPage({
     now,
     await trafficPromise,
   );
-  const numberFormat = new Intl.NumberFormat("id-ID", {
+  const numberFormat = new Intl.NumberFormat("en-US", {
     maximumFractionDigits: 1,
   });
 

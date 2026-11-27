@@ -9,7 +9,7 @@ import type { RetailFormData } from "./retail-form.types";
 export function RetailIdentityFields({ product }: { product: RetailFormData }) {
   return (
     <>
-      <Field label="Nama" htmlFor="name">
+      <Field label="Name" htmlFor="name">
         <input
           id="name"
           name="name"
@@ -23,7 +23,7 @@ export function RetailIdentityFields({ product }: { product: RetailFormData }) {
       <Field
         label="Slug"
         htmlFor="slug"
-        hint="Penanda unik produk. Huruf kecil, angka, dan tanda hubung, contoh: minyak-sukma-laya."
+        hint="Unique product identifier. Lowercase letters, numbers, and hyphens, e.g. minyak-sukma-laya."
       >
         <input
           id="slug"

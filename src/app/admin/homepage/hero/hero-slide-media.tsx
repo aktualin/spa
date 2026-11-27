@@ -20,22 +20,22 @@ export function HeroSlideMediaFields({
 
       <ImageField
         name="imageUrl"
-        label={isVideo ? "Poster video (wajib)" : "Gambar slide (wajib)"}
+        label={isVideo ? "Video poster (required)" : "Slide image (required)"}
         folder="homepage"
         defaultValue={slide.imageUrl}
       />
       <p className="text-xs text-neutral-500">
         {isVideo
-          ? "Poster tampil sebelum video dimuat dan saat autoplay diblokir. Disarankan lanskap minimal 1920×1080 px, JPG/WebP di bawah 1 MB."
-          : "Disarankan lanskap minimal 1920×1080 px, JPG/WebP di bawah 1 MB."}
+          ? "The poster is shown before the video loads and when autoplay is blocked. Landscape, at least 1920×1080 px, JPG/WebP under 1 MB recommended."
+          : "Landscape, at least 1920×1080 px, JPG/WebP under 1 MB recommended."}
       </p>
 
       {isVideo ? (
         <>
           <Field
-            label="URL video"
+            label="Video URL"
             htmlFor="videoUrl"
-            hint="File langsung .mp4/.webm dari bucket S3, mis. https://…/storage/v1/object/public/kama/video/incense-smoke.mp4. Tautan halaman YouTube/Vimeo tidak didukung."
+            hint="Direct .mp4/.webm file from the S3 bucket, e.g. https://…/storage/v1/object/public/kama/video/incense-smoke.mp4. YouTube/Vimeo page links are not supported."
           >
             <input
               id="videoUrl"
@@ -50,30 +50,30 @@ export function HeroSlideMediaFields({
             />
           </Field>
           <p className="text-xs text-neutral-500">
-            Video tidak diunggah ke Media Library; unggah file ke hosting
-            atau letakkan di folder <code>public/video</code>, lalu isi
-            URL-nya di sini.
+            Videos are not uploaded to the Media Library; upload the file to hosting
+            or place it in the <code>public/video</code> folder, then fill in
+            its URL here.
           </p>
         </>
       ) : (
         <>
           <ImageField
             name="mobileImageUrl"
-            label="Gambar khusus mobile (opsional)"
+            label="Mobile-only image (optional)"
             folder="homepage"
             defaultValue={slide.mobileImageUrl}
           />
           <p className="text-xs text-neutral-500">
-            Dipakai pada layar di bawah 768 px. Kosong = gambar utama juga
-            dipakai di mobile. Disarankan potret, mis. 1080×1350 px.
+            Used on screens below 768 px. Empty = the main image is also
+            used on mobile. Portrait recommended, e.g. 1080×1350 px.
           </p>
         </>
       )}
 
       <Field
-        label="Teks alt (opsional)"
+        label="Alt text (optional)"
         htmlFor="imageAlt"
-        hint="Judul hero sudah dibacakan pembaca layar. Isi hanya bila media membawa informasi penting."
+        hint="The hero title is already read out by screen readers. Fill in only if the media carries important information."
       >
         <input
           id="imageAlt"

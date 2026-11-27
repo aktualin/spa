@@ -30,7 +30,7 @@ export function PhotoManager({
     <div className="space-y-8">
       <section className="space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
-          Unggah banyak foto
+          Upload multiple photos
         </h2>
         <BulkUploader albumId={albumId} />
       </section>
@@ -39,12 +39,12 @@ export function PhotoManager({
 
       <section className="space-y-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
-          Foto dalam album ({photos.length})
+          Photos in album ({photos.length})
         </h2>
 
         {photos.length === 0 ? (
           <p className="text-sm text-neutral-500">
-            Belum ada foto di album ini.
+            No photos in this album yet.
           </p>
         ) : (
           <ul className="space-y-3">

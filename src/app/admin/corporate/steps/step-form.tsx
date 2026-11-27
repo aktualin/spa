@@ -23,21 +23,21 @@ export function CorporateStepForm({ step }: { step: StepFormData }) {
   return (
     <div className="mx-auto max-w-2xl">
       <Link href="/admin/corporate#langkah" className="text-sm text-neutral-600 hover:underline">
-        ← Kembali ke Corporate Wellness
+        ← Back to Corporate Wellness
       </Link>
 
       <h1 className="mt-3 text-xl font-semibold text-neutral-900">
-        {step.id ? "Ubah langkah kolaborasi" : "Tambah langkah kolaborasi"}
+        {step.id ? "Edit collaboration step" : "Add collaboration step"}
       </h1>
       <p className="mt-1 text-sm text-neutral-600">
-        Nomor &quot;Step&quot; dan jumlah langkah di judul (&quot;A Simple 4-Step …&quot;)
-        dihitung otomatis dari urutan.
+        The &quot;Step&quot; number and the step count in the heading (&quot;A Simple 4-Step …&quot;)
+        are computed automatically from the order.
       </p>
 
       <form action={formAction} className="mt-6 space-y-5">
         {step.id ? <input type="hidden" name="id" value={step.id} /> : null}
 
-        <Field label="Judul" htmlFor="title" hint="Contoh: Discovery & Consultation.">
+        <Field label="Title" htmlFor="title" hint="Example: Discovery & Consultation.">
           <input
             id="title"
             name="title"
@@ -50,10 +50,10 @@ export function CorporateStepForm({ step }: { step: StepFormData }) {
 
         <RichTextField
           name="body"
-          label="Keterangan"
+          label="Description"
           defaultValue={step.body}
           folder="corporate"
-          hint="Contoh: Understand your goals."
+          hint="Example: Understand your goals."
           compact
         />
 
@@ -62,7 +62,7 @@ export function CorporateStepForm({ step }: { step: StepFormData }) {
         <div className="flex items-center gap-3 border-t border-neutral-200 pt-4">
           <SaveButton />
           <Link href="/admin/corporate#langkah" className="text-sm text-neutral-600 hover:underline">
-            Batal
+            Cancel
           </Link>
         </div>
       </form>
@@ -70,7 +70,7 @@ export function CorporateStepForm({ step }: { step: StepFormData }) {
       {step.id ? (
         <form action={deleteStepAction} className="mt-8 border-t border-neutral-200 pt-4">
           <input type="hidden" name="id" value={step.id} />
-          <ConfirmDeleteButton message="Hapus langkah ini?">Hapus langkah ini</ConfirmDeleteButton>
+          <ConfirmDeleteButton message="Delete this step?">Delete this step</ConfirmDeleteButton>
         </form>
       ) : null}
     </div>

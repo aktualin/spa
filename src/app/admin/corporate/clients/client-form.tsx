@@ -38,15 +38,15 @@ export function CorporateClientForm({
   return (
     <div className="mx-auto max-w-2xl">
       <Link href="/admin/corporate#klien" className="text-sm text-neutral-600 hover:underline">
-        ← Kembali ke Corporate Wellness
+        ← Back to Corporate Wellness
       </Link>
 
       <h1 className="mt-3 text-xl font-semibold text-neutral-900">
-        {client.id ? `Ubah klien ${client.name}` : "Tambah klien corporate"}
+        {client.id ? `Edit client ${client.name}` : "Add corporate client"}
       </h1>
       <p className="mt-1 text-sm text-neutral-600">
-        Logo tampil di bagian &quot;Past Collaborations&quot; halaman /corporate, foto
-        dokumentasi tampil di bawahnya.
+        The logo appears in the &quot;Past Collaborations&quot; section of the /corporate page;
+        documentation photos appear below it.
       </p>
 
       <form action={formAction} className="mt-6 space-y-5">
@@ -59,7 +59,7 @@ export function CorporateClientForm({
         <div className="flex items-center gap-3 border-t border-neutral-200 pt-4">
           <SaveButton />
           <Link href="/admin/corporate#klien" className="text-sm text-neutral-600 hover:underline">
-            Batal
+            Cancel
           </Link>
         </div>
       </form>
@@ -67,8 +67,8 @@ export function CorporateClientForm({
       {client.id ? (
         <form action={deleteClientAction} className="mt-8 border-t border-neutral-200 pt-4">
           <input type="hidden" name="id" value={client.id} />
-          <ConfirmDeleteButton message="Hapus klien ini beserta daftar fotonya? Berkas foto tetap ada di Media Library.">
-            Hapus klien ini
+          <ConfirmDeleteButton message="Delete this client along with its photo list? The photo files stay in the Media Library.">
+            Delete this client
           </ConfirmDeleteButton>
         </form>
       ) : null}

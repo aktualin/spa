@@ -17,7 +17,7 @@ type InquiryData = Awaited<ReturnType<typeof listCorporateInquiries>>;
 /** Daftar inquiry ringkas (nama, perusahaan, tanggal, status email & inquiry). */
 export function InquiryList({ rows }: { rows: InquiryData["rows"] }) {
   if (rows.length === 0) {
-    return <p className="mt-6 text-sm text-neutral-500">Belum ada inquiry pada filter ini.</p>;
+    return <p className="mt-6 text-sm text-neutral-500">No inquiries under this filter yet.</p>;
   }
   return (
     <ul className="mt-4 divide-y divide-neutral-200 overflow-hidden rounded-lg border border-neutral-200 bg-white">
@@ -61,20 +61,20 @@ export function InquiryPagination({
 }) {
   if (pageCount <= 1) return null;
   return (
-    <nav aria-label="Halaman" className="mt-4 flex items-center justify-between text-sm">
+    <nav aria-label="Pagination" className="mt-4 flex items-center justify-between text-sm">
       {page > 1 ? (
         <Link href={listHref(status, page - 1)} className="text-neutral-700 hover:underline">
-          ← Sebelumnya
+          ← Previous
         </Link>
       ) : (
         <span />
       )}
       <span className="text-neutral-500">
-        Halaman {page} dari {pageCount}
+        Page {page} of {pageCount}
       </span>
       {page < pageCount ? (
         <Link href={listHref(status, page + 1)} className="text-neutral-700 hover:underline">
-          Berikutnya →
+          Next →
         </Link>
       ) : (
         <span />

@@ -21,12 +21,12 @@ export default async function AdminCorporatePicPage({
   return (
     <div className="mx-auto max-w-2xl">
       <Link href="/admin/corporate" className="text-sm text-neutral-600 hover:underline">
-        ← Kembali ke Corporate Wellness
+        ← Back to Corporate Wellness
       </Link>
-      <h1 className="mt-3 text-xl font-semibold text-neutral-900">PIC Corporate Wellness</h1>
+      <h1 className="mt-3 text-xl font-semibold text-neutral-900">Corporate Wellness PIC</h1>
       <p className="mt-1 text-sm text-neutral-600">
-        Kontak penanggung jawab program korporat. Ketiganya tampil publik di banner
-        &quot;Let&apos;s build your wellness program.&quot; pada halaman /corporate.
+        Contact of the corporate program person in charge. All three appear publicly in the
+        &quot;Let&apos;s build your wellness program.&quot; banner on the /corporate page.
       </p>
 
       <StatusBanners saved={params.saved} />

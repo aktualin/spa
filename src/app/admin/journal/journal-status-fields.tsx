@@ -37,7 +37,7 @@ export function StatusFields({
       </Field>
 
       <Field
-        label="Tanggal publikasi (WIB)"
+        label="Publication date (WIB)"
         htmlFor="publishedAt"
         hint={scheduleHint[status]}
       >

@@ -13,7 +13,7 @@ export function SiteTextFields({ values }: { values: SiteSettingsInput }) {
   return (
     <fieldset className="space-y-5">
       <legend className="text-base font-semibold text-neutral-900">
-        Teks &amp; tombol situs
+        Site text &amp; buttons
       </legend>
       <FooterTextFields values={values} />
       <BookingTextFields values={values} />
@@ -26,9 +26,9 @@ function BookingTextFields({ values }: { values: SiteSettingsInput }) {
   return (
     <>
       <Field
-        label="Label tombol Book Now"
+        label="Book Now button label"
         htmlFor="bookNowLabel"
-        hint={`Teks tombol booking di header, maks. ${MAX_BOOK_NOW_LABEL} karakter.`}
+        hint={`Booking button text in the header, max. ${MAX_BOOK_NOW_LABEL} characters.`}
       >            <input
           id="bookNowLabel"
           name="bookNowLabel"
@@ -40,9 +40,9 @@ function BookingTextFields({ values }: { values: SiteSettingsInput }) {
       </Field>
 
       <Field
-        label="Tujuan tombol Book Now"
+        label="Book Now button destination"
         htmlFor="bookNowHref"
-        hint="Path internal (/contact), anchor (#booking), atau URL https://."
+        hint="Internal path (/contact), anchor (#booking), or https:// URL."
       >
         <input
           id="bookNowHref"
@@ -54,9 +54,9 @@ function BookingTextFields({ values }: { values: SiteSettingsInput }) {
       </Field>
 
       <Field
-        label="Catatan harga di halaman menu"
+        label="Price note on the menu page"
         htmlFor="priceDisclaimer"
-        hint={`Tampil di bawah daftar harga treatment. Maks. ${MAX_PRICE_DISCLAIMER} karakter.`}
+        hint={`Shown below the treatment price list. Max. ${MAX_PRICE_DISCLAIMER} characters.`}
       >
         <textarea
           id="priceDisclaimer"

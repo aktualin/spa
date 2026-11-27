@@ -23,16 +23,13 @@ export default async function AdminPackagesPage({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-neutral-900">Packages</h1>
-          <p className="mt-1 text-sm text-neutral-600">
-            {packages.length} package (bundel treatment lintas kategori).
-          </p>
         </div>
         <div className="flex gap-2">
           <Link
             href="/admin/treatments/packages/new"
             className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
           >
-            Tambah package
+            Add package
           </Link>
         </div>
       </div>

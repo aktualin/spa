@@ -10,9 +10,9 @@ export function HeroFields({ content }: { content: OurStoryFormData }) {
   return (
     <>
       <Field
-        label="Judul hero"
+        label="Hero title"
         htmlFor="heroTitle"
-        hint="Judul besar di bagian atas halaman. Juga dipakai sebagai teks alt gambar hero."
+        hint="The big heading at the top of the page. Also used as the alt text of the hero image."
       >
         <input
           id="heroTitle"
@@ -27,27 +27,27 @@ export function HeroFields({ content }: { content: OurStoryFormData }) {
       <div className="space-y-1.5">
         <ImageField
           name="heroImageUrl"
-          label="Gambar hero"
+          label="Hero image"
           folder="our-story"
           defaultValue={content.heroImageUrl}
         />
         <p className="text-xs text-neutral-500">
-          Ditampilkan lebar dengan rasio 16:9 di bawah judul. Disarankan
-          minimal 1920×1080 px, JPG/WebP di bawah 1 MB. Kosongkan untuk
-          menyembunyikan gambar.
+          Displayed wide with a 16:9 ratio below the title. Recommended at
+          least 1920×1080 px, JPG/WebP under 1 MB. Leave empty to hide
+          the image.
         </p>
       </div>
 
       <RichTextField
         name="philosophyHtml"
-        label="Filosofi (bagian “Philosophy — Cara kami bekerja”)"
+        label="Philosophy (the “Philosophy — How we work” section)"
         defaultValue={content.philosophyHtml}
         folder="our-story"
       />
 
       <RichTextField
         name="valuesHtml"
-        label="Nilai-nilai (bagian “Values — Yang kami pegang”)"
+        label="Values (the “Values — What we stand for” section)"
         defaultValue={content.valuesHtml}
         folder="our-story"
       />
@@ -62,7 +62,7 @@ export function OurStorySeoFields({ content }: { content: OurStoryFormData }) {
       <Field
         label="SEO title"
         htmlFor="seoTitle"
-        hint="Idealnya maksimal 60 karakter. Kosong = “Our Story”. Bila /our-story diatur di modul SEO, isian modul SEO yang dipakai."
+        hint="Ideally a maximum of 60 characters. Empty = “Our Story”. If /our-story is configured in the SEO module, the SEO module value is used."
       >
         <input
           id="seoTitle"
@@ -76,7 +76,7 @@ export function OurStorySeoFields({ content }: { content: OurStoryFormData }) {
       <Field
         label="SEO description"
         htmlFor="seoDescription"
-        hint="Idealnya maksimal 160 karakter. Kosong = deskripsi bawaan halaman."
+        hint="Ideally a maximum of 160 characters. Empty = the page's default description."
       >
         <textarea
           id="seoDescription"

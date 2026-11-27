@@ -30,11 +30,11 @@ export function EditUserForm({ user }: { user: EditUserData }) {
   return (
     <div className="mx-auto max-w-xl">
       <Link href="/admin/users" className="text-sm text-neutral-600 hover:underline">
-        ← Kembali ke daftar akun
+        ← Back to the account list
       </Link>
 
       <h1 className="mt-3 text-xl font-semibold text-neutral-900">
-        Ubah akun {user.name}
+        Edit account {user.name}
       </h1>
       <p className="mt-1 text-sm text-neutral-600">{user.email}</p>
 
@@ -46,9 +46,9 @@ export function EditUserForm({ user }: { user: EditUserData }) {
         <ErrorAlert message={state.error} />
 
         <div className="flex items-center gap-3 border-t border-neutral-200 pt-4">
-          <SaveButton label="Simpan perubahan" />
+          <SaveButton label="Save changes" />
           <Link href="/admin/users" className="text-sm text-neutral-600 hover:underline">
-            Batal
+            Cancel
           </Link>
         </div>
       </form>

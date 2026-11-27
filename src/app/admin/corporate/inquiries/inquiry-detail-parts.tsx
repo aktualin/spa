@@ -9,7 +9,7 @@ type Inquiry = NonNullable<Awaited<ReturnType<typeof getCorporateInquiry>>>;
 export function InquiryDetails({ inquiry }: { inquiry: Inquiry }) {
   return (
     <dl className="mt-6 grid grid-cols-1 gap-x-4 gap-y-3 rounded-lg border border-neutral-200 bg-white p-4 text-sm sm:grid-cols-[9rem_1fr]">
-      <dt className="text-neutral-500">Perusahaan</dt>
+      <dt className="text-neutral-500">Company</dt>
       <dd className="break-words text-neutral-900">{inquiry.company ?? "—"}</dd>
       <dt className="text-neutral-500">Email</dt>
       <dd className="break-words">
@@ -17,9 +17,9 @@ export function InquiryDetails({ inquiry }: { inquiry: Inquiry }) {
           {inquiry.email}
         </a>
       </dd>
-      <dt className="text-neutral-500">Telepon</dt>
+      <dt className="text-neutral-500">Phone</dt>
       <dd className="break-words text-neutral-900">{inquiry.phone ?? "—"}</dd>
-      <dt className="text-neutral-500">Pesan</dt>
+      <dt className="text-neutral-500">Message</dt>
       <dd className="whitespace-pre-wrap break-words text-neutral-900">{inquiry.message}</dd>
     </dl>
   );
@@ -30,19 +30,19 @@ export function InquiryEmailSection({ inquiry }: { inquiry: Inquiry }) {
   return (
     <section className="mt-6 rounded-lg border border-neutral-200 bg-white p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold text-neutral-900">Email ke pihak pertama</h2>
+        <h2 className="text-sm font-semibold text-neutral-900">Email to first party</h2>
         <EmailStatusBadge sentAt={inquiry.emailSentAt} error={inquiry.emailError} />
       </div>
       <p className="mt-2 text-sm text-neutral-600">
         {inquiry.emailSentAt
-          ? `Terkirim ${formatWibDateTime(inquiry.emailSentAt)}.`
+          ? `Sent ${formatWibDateTime(inquiry.emailSentAt)}.`
           : inquiry.emailError
-            ? `Gagal: ${inquiry.emailError}`
-            : "Belum ada catatan pengiriman (sedang diproses atau server email belum dikonfigurasi)."}
+            ? `Failed: ${inquiry.emailError}`
+            : "No delivery record yet (still processing or the email server is not configured)."}
       </p>
       <form action={resendInquiryEmailAction} className="mt-3">
         <input type="hidden" name="id" value={inquiry.id} />
-        <SmallSubmit>{inquiry.emailSentAt ? "Kirim ulang email" : "Coba kirim email lagi"}</SmallSubmit>
+        <SmallSubmit>{inquiry.emailSentAt ? "Resend email" : "Try sending the email again"}</SmallSubmit>
       </form>
     </section>
   );

@@ -24,16 +24,12 @@ export default async function AdminAddonsPage({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-neutral-900">Add-on</h1>
-          <p className="mt-1 text-sm text-neutral-600">
-            {total} add-on. Tampil di bagian Layanan Tambahan halaman Menu, sesuai letak
-            masing-masing.
-          </p>
         </div>
         <Link
           href="/admin/treatments/new?kind=addon"
           className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
         >
-          Tambah add-on
+          Add new add-on
         </Link>
       </div>
 

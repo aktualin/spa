@@ -10,7 +10,7 @@ import { JOURNAL_STATUSES, journalStatusMeta, type JournalStatus } from "./journ
 export const instant = false;
 
 const FILTERS: { value: JournalStatus | null; label: string }[] = [
-  { value: null, label: "Semua" },
+  { value: null, label: "All" },
   ...JOURNAL_STATUSES.map((value) => ({ value, label: journalStatusMeta[value].label })),
 ];
 
@@ -32,10 +32,10 @@ export default async function AdminJournalPage({
     <div className="mx-auto max-w-4xl">
       <PageHeader
         title="Journal"
-        subtitle={`${posts.length} artikel.`}
+        subtitle={`${posts.length} articles.`}
         action={
           <Link href="/admin/journal/new" className={primaryLinkClass}>
-            Tulis artikel
+            Write article
           </Link>
         }
       />
@@ -43,10 +43,10 @@ export default async function AdminJournalPage({
       <StatusBanners
         saved={params.saved}
         deleted={params.deleted}
-        deletedLabel="Artikel dihapus."
+        deletedLabel="Article deleted."
       />
 
-      <nav aria-label="Saring status" className="mt-6 flex flex-wrap gap-2">
+      <nav aria-label="Filter by status" className="mt-6 flex flex-wrap gap-2">
         {FILTERS.map((filter) => {
           const current = filter.value === active;
           return (
@@ -69,7 +69,7 @@ export default async function AdminJournalPage({
       <div className="mt-4">
         {shown.length === 0 ? (
           <p className="text-sm text-neutral-500">
-            {posts.length === 0 ? "Belum ada artikel journal." : "Tidak ada artikel dengan status ini."}
+            {posts.length === 0 ? "No journal articles yet." : "No articles with this status."}
           </p>
         ) : (
           <ul className="divide-y divide-neutral-200 overflow-hidden rounded-lg border border-neutral-200 bg-white">

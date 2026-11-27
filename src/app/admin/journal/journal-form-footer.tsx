@@ -15,11 +15,11 @@ export function JournalFormFooter({ postId }: { postId: string | null }) {
           href={`/admin/journal/${postId}/preview`}
           className="rounded-md border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
         >
-          Lihat preview
+          View preview
         </Link>
       ) : null}
       <Link href="/admin/journal" className="text-sm text-neutral-600 hover:underline">
-        Batal
+        Cancel
       </Link>
     </div>
   );
@@ -29,8 +29,8 @@ export function JournalDeleteForm({ postId }: { postId: string }) {
   return (
     <form action={deletePostAction} className="mt-8 border-t border-neutral-200 pt-4">
       <input type="hidden" name="id" value={postId} />
-      <ConfirmDeleteButton message="Hapus artikel ini? Sampul di storage juga dihapus (kecuali berkas Media Library), dan artikel tidak bisa dipulihkan.">
-        Hapus artikel ini
+      <ConfirmDeleteButton message="Delete this article? The cover in storage is also deleted (except Media Library files), and the article cannot be recovered.">
+        Delete this article
       </ConfirmDeleteButton>
     </form>
   );

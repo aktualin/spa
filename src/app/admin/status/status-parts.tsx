@@ -16,12 +16,12 @@ export type EnvGroups = Awaited<ReturnType<typeof getEnvStatus>>;
 export type DeployInfo = ReturnType<typeof getDeployInfo>;
 export type GithubConfig = ReturnType<typeof getGithubBackupConfig>;
 
-export const KIND_LABEL = { AUTO: "Otomatis", MANUAL: "Manual", HANDOVER: "Serah terima" } as const;
+export const KIND_LABEL = { AUTO: "Automatic", MANUAL: "Manual", HANDOVER: "Handover" } as const;
 
 export const EXPORT_ERRORS: Record<string, string> = {
-  confirm: "Centang pernyataan data pribadi terlebih dahulu sebelum mengunduh ekspor.",
-  rate: "Ekspor dibatasi 3 kali per 15 menit. Coba lagi nanti.",
-  invalid: "Permintaan ekspor tidak valid. Muat ulang halaman lalu coba lagi.",
+  confirm: "Tick the personal data statement first before downloading the export.",
+  rate: "Exports are limited to 3 times per 15 minutes. Try again later.",
+  invalid: "Invalid export request. Reload the page and try again.",
 };
 
 export function Section({

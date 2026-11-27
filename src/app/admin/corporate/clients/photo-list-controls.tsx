@@ -31,7 +31,7 @@ export function PhotoListControls({
   return (
     <div className="space-y-2">
       <label htmlFor={inputId} className="block text-sm text-neutral-700">
-        Unggah beberapa foto sekaligus
+        Upload several photos at once
       </label>
       <input
         id={inputId}
@@ -52,12 +52,12 @@ export function PhotoListControls({
         onClick={onOpenPicker}
         className={secondaryButtonClass}
       >
-        Pilih dari Media Library
+        Select from Media Library
       </button>
       <p className="text-xs text-neutral-500">
-        JPG, PNG, WebP, AVIF, atau GIF. Maksimal 4 MB per file dan {max} foto per klien.
-        &quot;Lepas&quot; hanya melepas foto dari klien ini — berkasnya tetap ada di Media
-        Library. Perubahan tersimpan setelah menekan Simpan.
+        JPG, PNG, WebP, AVIF, or GIF. Max 4 MB per file and {max} photos per client.
+        &quot;Detach&quot; only removes the photo from this client — the file stays in the
+        Media Library. Changes are saved after pressing Save.
       </p>
       {progress ? (
         <p role="status" className="text-sm text-blue-700">

@@ -30,24 +30,24 @@ export function EventPhotoManager({
     <div id="foto" className="scroll-mt-6 space-y-8">
       <section className="space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
-          Unggah banyak foto event
+          Upload multiple event photos
         </h2>
         <EventBulkUploader eventId={eventId} />
       </section>
 
       <section className="space-y-4">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
-          Tambah satu foto
+          Add a single photo
         </h2>
         <p className="text-sm text-neutral-600">
-          Untuk satu foto dengan caption sekaligus, atau foto yang sudah ada di Media
-          Library.
+          For one photo with its caption at once, or a photo that already exists in the
+          Media Library.
         </p>
 
         <form action={formAction} className="space-y-4">
           <input type="hidden" name="eventId" value={eventId} />
 
-          <ImageField name="imageUrl" label="Foto" folder="events" defaultValue="" />
+          <ImageField name="imageUrl" label="Photo" folder="events" defaultValue="" />
 
           <Field label="Caption" htmlFor="caption">
             <input id="caption" name="caption" defaultValue="" className={inputClass} />
@@ -55,20 +55,20 @@ export function EventPhotoManager({
 
           <ErrorAlert message={state.error} />
 
-          <SaveButton label="Tambah foto" />
+          <SaveButton label="Add photo" />
         </form>
       </section>
 
       <section className="space-y-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
-          Foto event ({photos.length})
+          Event photos ({photos.length})
         </h2>
         <p className="text-xs text-neutral-500">
-          Urutan di bawah sama dengan urutan galeri di halaman detail event.
+          The order below matches the gallery order on the event detail page.
         </p>
 
         {photos.length === 0 ? (
-          <p className="text-sm text-neutral-500">Belum ada foto untuk event ini.</p>
+          <p className="text-sm text-neutral-500">No photos for this event yet.</p>
         ) : (
           <ul className="space-y-3">
             {photos.map((photo, index) => (

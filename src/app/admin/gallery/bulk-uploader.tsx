@@ -12,7 +12,7 @@ export function BulkUploader({ albumId }: { albumId: string }) {
     <BulkPhotoUploader
       folder="gallery"
       noun="album"
-      hintTail="caption & alt text bisa diisi setelahnya."
+      hintTail="captions & alt text can be filled in afterwards."
       onSave={(urls) => addPhotosAction(albumId, urls)}
     />
   );

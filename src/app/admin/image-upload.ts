@@ -23,12 +23,12 @@ export function useInlineImageUpload(folder: string, insertImage: (url: string) 
       const response = await fetch("/api/admin/upload", { method: "POST", body });
       const data = await response.json();
       if (!response.ok) {
-        setError(data.error ?? "Gagal mengunggah gambar.");
+        setError(data.error ?? "Failed to upload the image.");
         return;
       }
       insertImage(data.url);
     } catch {
-      setError("Gagal menghubungi server saat mengunggah.");
+      setError("Failed to reach the server while uploading.");
     } finally {
       setBusy(false);
       if (fileRef.current) fileRef.current.value = "";

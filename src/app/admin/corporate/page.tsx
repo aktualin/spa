@@ -30,10 +30,10 @@ export default async function AdminCorporatePage({
     <div className="mx-auto max-w-4xl">
       <PageHeader
         title="Corporate Wellness"
-        subtitle="Konten halaman /corporate, program, langkah kolaborasi, klien, PIC, dan inquiry masuk."
+        subtitle="Content of the /corporate page, programs, collaboration steps, clients, PIC, and incoming inquiries."
         action={
           <a href="/corporate" target="_blank" rel="noopener noreferrer" className={secondaryLinkClass}>
-            Lihat halaman ↗
+            View page ↗
           </a>
         }
       />
@@ -43,11 +43,11 @@ export default async function AdminCorporatePage({
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
         <HubCard
           href="/admin/corporate/content"
-          title="Konten halaman"
+          title="Page content"
           body={
             saved
-              ? "Hero, intro, benefit, blok solusi, In-Spa."
-              : "Belum pernah disimpan — memakai teks bawaan."
+              ? "Hero, intro, benefits, solution blocks, In-Spa."
+              : "Never saved — using the default text."
           }
         />
         <HubCard
@@ -57,8 +57,8 @@ export default async function AdminCorporatePage({
         />
         <HubCard
           href="/admin/corporate/inquiries"
-          title="Inquiry masuk"
-          body={newInquiries > 0 ? `${newInquiries} inquiry baru belum ditindaklanjuti.` : "Tidak ada inquiry baru."}
+          title="Incoming inquiries"
+          body={newInquiries > 0 ? `${newInquiries} new inquiries not yet followed up.` : "No new inquiries."}
           highlight={newInquiries > 0}
         />
       </div>

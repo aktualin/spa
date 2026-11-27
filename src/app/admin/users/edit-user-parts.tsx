@@ -23,7 +23,7 @@ export function DeleteButton() {
       disabled={pending}
       className="rounded-md bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 disabled:opacity-60"
     >
-      {pending ? "Menghapus…" : "Hapus akun permanen"}
+      {pending ? "Deleting…" : "Delete account permanently"}
     </button>
   );
 }

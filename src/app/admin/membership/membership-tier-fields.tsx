@@ -7,7 +7,7 @@ import type { TierFormData } from "./membership-tier-form.types";
 export function TierIdentityFields({ tier }: { tier: TierFormData }) {
   return (
     <>
-      <Field label="Nama tier" htmlFor="name">
+      <Field label="Tier name" htmlFor="name">
         <input
           id="name"
           name="name"
@@ -20,7 +20,7 @@ export function TierIdentityFields({ tier }: { tier: TierFormData }) {
       <Field
         label="Slug"
         htmlFor="slug"
-        hint="Dipakai di URL. Huruf kecil, angka, dan tanda hubung."
+        hint="Used in the URL. Lowercase letters, numbers, and hyphens."
       >
         <input
           id="slug"
@@ -33,9 +33,9 @@ export function TierIdentityFields({ tier }: { tier: TierFormData }) {
       </Field>
 
       <Field
-        label="Label harga"
+        label="Price label"
         htmlFor="priceLabel"
-        hint='Contoh "Rp 1,5jt" atau "Custom". Kalimat harga di banner homepage diatur terpisah di Program membership — ubah juga bila harga berubah.'
+        hint='e.g. "Rp 1.5M" or "Custom". The pricing sentence in the homepage banner is set separately in Membership program — update it too when the price changes.'
       >
         <input
           id="priceLabel"
@@ -47,9 +47,9 @@ export function TierIdentityFields({ tier }: { tier: TierFormData }) {
       </Field>
 
       <Field
-        label="Catatan penagihan"
+        label="Billing note"
         htmlFor="billingNote"
-        hint="Contoh: per bulan, minimal 3 bulan."
+        hint="e.g. per month, minimum 3 months."
       >
         <input
           id="billingNote"

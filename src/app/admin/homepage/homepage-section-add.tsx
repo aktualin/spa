@@ -14,13 +14,13 @@ export function AddMissingSections({ missing }: { missing: string[] }) {
   return (
     <section className="rounded-lg border border-dashed border-neutral-300 bg-neutral-50 p-4">
       <h2 className="text-sm font-semibold text-neutral-800">
-        Tambahkan section
+        Add sections
       </h2>
       <p className="mt-1 text-xs text-neutral-600">
-        Status awal mengikuti homepage sekarang: section bawaan yang sudah
-        tampil (mis. Footer) dibuat <strong>aktif</strong>, section baru
-        dibuat <strong>mati</strong> sampai admin menyalakannya. Jadi
-        homepage tidak berubah saat tombol ini ditekan.
+        The initial status follows the current homepage: default sections that
+        are already shown (e.g. Footer) are created <strong>active</strong>; new
+        sections are created <strong>inactive</strong> until an admin enables
+        them. So the homepage does not change when this button is pressed.
       </p>
       <ul className="mt-3 flex flex-wrap gap-2">
         {missing.map((key) => (
@@ -31,8 +31,8 @@ export function AddMissingSections({ missing }: { missing: string[] }) {
                 type="submit"
                 className="rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm text-neutral-800 hover:bg-neutral-100"
               >
-                Tambahkan {sectionKeyLabel(key)}
-                {isDefaultVisibleSection(key) ? " (aktif)" : " (mati)"}
+                Add {sectionKeyLabel(key)}
+                {isDefaultVisibleSection(key) ? " (active)" : " (inactive)"}
               </button>
             </form>
           </li>
@@ -46,29 +46,29 @@ export function AddMissingSections({ missing }: { missing: string[] }) {
 export function AddCustomSection() {
   return (
     <section className="rounded-lg border border-dashed border-neutral-300 bg-neutral-50 p-4">
-      <h2 className="text-sm font-semibold text-neutral-800">Tambah section konten</h2>
+      <h2 className="text-sm font-semibold text-neutral-800">Add content section</h2>
       <p className="mt-1 text-xs text-neutral-600">
-        Section bebas berisi judul, subjudul, isi berformat (HTML), gambar, dan tombol.
-        Dibuat dalam keadaan <strong>mati</strong> — isi dulu, lalu nyalakan dan atur
-        urutannya. Section konten bisa dihapus kapan saja.
+        A free-form section with a title, subtitle, formatted content (HTML), image, and button.
+        Created in an <strong>inactive</strong> state — fill it in first, then enable it and set
+        its order. Content sections can be deleted at any time.
       </p>
       <form action={createCustomSectionAction} className="mt-3 flex flex-wrap gap-2">
         <label htmlFor="custom-section-name" className="sr-only">
-          Nama section
+          Section name
         </label>
         <input
           id="custom-section-name"
           name="name"
           required
           maxLength={120}
-          placeholder="mis. Ritual Musim Hujan"
+          placeholder="e.g. Rainy Season Ritual"
           className={`${inputClass} max-w-xs`}
         />
         <button
           type="submit"
           className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-neutral-700"
         >
-          Tambah section
+          Add section
         </button>
       </form>
     </section>

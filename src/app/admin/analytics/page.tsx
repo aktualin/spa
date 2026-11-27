@@ -39,45 +39,45 @@ export default async function AdminAnalyticsPage({
           role="alert"
           className="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800"
         >
-          Data pengunjung tidak dapat dimuat karena kesalahan database. Coba
-          muat ulang halaman beberapa saat lagi.
+          Visitor data could not be loaded due to a database error. Try
+          reloading the page in a few moments.
         </p>
       ) : null}
 
       <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Metric label="Pengunjung unik" value={number.format(uniqueVisitors)} detail={`${days} hari terakhir`} />
-        <Metric label="Tampilan halaman" value={number.format(views)} detail="Semua halaman publik" />
+        <Metric label="Unique visitors" value={number.format(uniqueVisitors)} detail={`Last ${days} days`} />
+        <Metric label="Page views" value={number.format(views)} detail="All public pages" />
         <Metric
-          label="Rata-rata per pengunjung"
+          label="Average per visitor"
           value={decimal.format(averageViews)}
-          detail="Halaman dibuka"
+          detail="Pages opened"
         />
         <Metric
-          label="Halaman berbeda"
+          label="Distinct pages"
           value={number.format(distinctPaths)}
-          detail="URL yang pernah dibuka"
+          detail="URLs ever opened"
         />
       </section>
 
       <section className="mt-4 grid gap-3 lg:grid-cols-2">
         <ChartCard
-          title="Pengunjung unik per hari"
-          subtitle={`${number.format(uniqueVisitors)} pengunjung unik · ${days} hari`}
+          title="Unique visitors per day"
+          subtitle={`${number.format(uniqueVisitors)} unique visitors · ${days} days`}
         >
           <TrendArea
             points={visitorTrend}
-            label="Pengunjung unik per hari"
-            suffix=" pengunjung"
+            label="Unique visitors per day"
+            suffix=" visitors"
           />
         </ChartCard>
         <ChartCard
-          title="Tampilan halaman per hari"
-          subtitle={`${number.format(views)} tampilan · ${days} hari`}
+          title="Page views per day"
+          subtitle={`${number.format(views)} views · ${days} days`}
         >
           <TrendBars
             points={viewTrend}
-            label="Tampilan halaman per hari"
-            suffix=" tampilan"
+            label="Page views per day"
+            suffix=" views"
           />
         </ChartCard>
       </section>
@@ -85,9 +85,9 @@ export default async function AdminAnalyticsPage({
       <TopPagesSection topPages={topPages} views={views} days={days} />
 
       <p className="mt-6 rounded-xl border border-neutral-200/80 bg-white px-4 py-3 text-[11px] leading-relaxed text-neutral-500">
-        Yang tidak dihitung: halaman <code>/admin</code>, API, aset, bot/crawler,
-        dan prefetch tautan. Pengunjung yang menghapus cookie akan dihitung
-        sebagai pengunjung baru. Data dihitung dengan kalender WIB (UTC+7).
+        Not counted: <code>/admin</code> pages, APIs, assets, bots/crawlers,
+        and link prefetches. Visitors who delete their cookies are counted
+        as new visitors. Data is calculated on the WIB (UTC+7) calendar.
       </p>
     </div>
   );

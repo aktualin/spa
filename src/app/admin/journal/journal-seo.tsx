@@ -36,8 +36,8 @@ export function JournalSeoFields({
         htmlFor="seoTitle"
         hint={
           <>
-            Kosongkan untuk memakai judul artikel. Ideal ±{JOURNAL_SEO_TITLE_IDEAL}{" "}
-            karakter. <SeoCounter value={seoTitle} ideal={JOURNAL_SEO_TITLE_IDEAL} />
+            Leave empty to use the article title. Ideal ±{JOURNAL_SEO_TITLE_IDEAL}{" "}
+            characters. <SeoCounter value={seoTitle} ideal={JOURNAL_SEO_TITLE_IDEAL} />
           </>
         }
       >
@@ -55,8 +55,8 @@ export function JournalSeoFields({
         htmlFor="seoDescription"
         hint={
           <>
-            Kosongkan untuk memakai ringkasan. Ideal ±{JOURNAL_SEO_DESCRIPTION_IDEAL}{" "}
-            karakter.{" "}
+            Leave empty to use the summary. Ideal ±{JOURNAL_SEO_DESCRIPTION_IDEAL}{" "}
+            characters.{" "}
             <SeoCounter value={seoDescription} ideal={JOURNAL_SEO_DESCRIPTION_IDEAL} />
           </>
         }

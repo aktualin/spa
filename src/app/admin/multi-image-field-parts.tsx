@@ -42,10 +42,10 @@ export function ImageRowItem({
 
       <div className="min-w-0 flex-1 space-y-1.5">
         <input
-          aria-label={`Teks alt gambar ${index + 1}`}
+          aria-label={`Alt text for image ${index + 1}`}
           value={row.altText}
           maxLength={160}
-          placeholder="Teks alt (opsional)"
+          placeholder="Alt text (optional)"
           onChange={(event) => onAltChange(event.target.value)}
           className="w-full rounded-md border border-neutral-300 px-2.5 py-1.5 text-sm outline-none focus:border-neutral-900"
         />
@@ -53,7 +53,7 @@ export function ImageRowItem({
         <div className="flex items-center gap-2 text-xs">
           <button
             type="button"
-            aria-label={`Naikkan gambar ${index + 1}`}
+            aria-label={`Move image ${index + 1} up`}
             disabled={index === 0}
             onClick={() => onMove("up")}
             className="rounded border border-neutral-300 px-2 py-0.5 text-neutral-700 hover:bg-neutral-50 disabled:opacity-40"
@@ -62,7 +62,7 @@ export function ImageRowItem({
           </button>
           <button
             type="button"
-            aria-label={`Turunkan gambar ${index + 1}`}
+            aria-label={`Move image ${index + 1} down`}
             disabled={index === total - 1}
             onClick={() => onMove("down")}
             className="rounded border border-neutral-300 px-2 py-0.5 text-neutral-700 hover:bg-neutral-50 disabled:opacity-40"
@@ -74,7 +74,7 @@ export function ImageRowItem({
             onClick={onRemove}
             className="ml-auto text-red-700 hover:underline"
           >
-            Hapus
+            Delete
           </button>
         </div>
       </div>

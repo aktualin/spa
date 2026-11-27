@@ -20,14 +20,14 @@ export {
 } from "./wib";
 
 export function firstIssue(error: z.ZodError): string {
-  return error.issues[0]?.message ?? "Input tidak valid.";
+  return error.issues[0]?.message ?? "Invalid input.";
 }
 
 export const slugSchema = z
   .string()
   .trim()
-  .min(1, "Slug wajib diisi.")
-  .regex(SLUG_PATTERN, "Slug hanya boleh huruf kecil, angka, dan tanda hubung.");
+  .min(1, "Slug is required.")
+  .regex(SLUG_PATTERN, "Slug may only contain lowercase letters, numbers, and hyphens.");
 
 /** Teks opsional: string kosong disimpan sebagai null. */
 export const optionalText = z
@@ -46,23 +46,23 @@ export const optionalImageUrl = z
   .optional()
   .refine(
     (value) => !value || /^https:\/\/\S+$/.test(value),
-    "URL gambar tidak valid.",
+    "Invalid image URL.",
   )
   .transform((value) => (value ? value : null));
 
 export const requiredImageUrl = z
   .string()
   .trim()
-  .min(1, "Gambar wajib diunggah.")
+  .min(1, "An image must be uploaded.")
   .refine(
     (value) => /^https:\/\/\S+$/.test(value),
-    "URL gambar tidak valid.",
+    "Invalid image URL.",
   );
 
 export const sortOrderSchema = z.coerce
   .number()
-  .int("Urutan harus bilangan bulat.")
-  .min(0, "Urutan tidak boleh negatif.")
+  .int("Order must be an integer.")
+  .min(0, "Order must not be negative.")
   .default(0);
 
 /** Nilai string dari FormData; null (field tidak ada) → undefined. */

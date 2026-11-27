@@ -18,10 +18,10 @@ export default async function AdminPromosPage({
     <div className="mx-auto max-w-4xl">
       <PageHeader
         title="Promos"
-        subtitle={`${promos.length} promo terdaftar.`}
+        subtitle={`${promos.length} promos listed.`}
         action={
           <Link href="/admin/promos/new" className={primaryLinkClass}>
-            Tambah promo
+            Add promo
           </Link>
         }
       />
@@ -29,12 +29,12 @@ export default async function AdminPromosPage({
       <StatusBanners
         saved={params.saved}
         deleted={params.deleted}
-        deletedLabel="Promo dihapus."
+        deletedLabel="Promo deleted."
       />
 
       <div className="mt-6">
         {promos.length === 0 ? (
-          <p className="text-sm text-neutral-500">Belum ada promo.</p>
+          <p className="text-sm text-neutral-500">No promos yet.</p>
         ) : (
           <ul className="divide-y divide-neutral-200 overflow-hidden rounded-lg border border-neutral-200 bg-white">
             {promos.map((promo) => {
@@ -64,7 +64,7 @@ export default async function AdminPromosPage({
                   </div>
 
                   <span className="text-xs text-neutral-500">
-                    Urutan {promo.sortOrder}
+                    Order {promo.sortOrder}
                   </span>
                 </li>
               );
@@ -74,8 +74,8 @@ export default async function AdminPromosPage({
       </div>
 
       <p className="mt-6 text-xs text-neutral-500">
-        Promo yang periodenya sudah lewat otomatis disembunyikan dari halaman
-        publik tanpa perlu dihapus manual.
+        Promos whose period has passed are automatically hidden from the public
+        pages without needing manual deletion.
       </p>
     </div>
   );

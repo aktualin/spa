@@ -49,20 +49,20 @@ export function PhotoMoveButtons({
         <input type="hidden" name="id" value={photoId} />
         <input type="hidden" name="direction" value="up" />
         <SmallSubmit
-          title={`Naikkan urutan foto ${index + 1}`}
+          title={`Move photo ${index + 1} up`}
           disabled={index === 0}
         >
-          ↑ Naikkan
+          ↑ Move up
         </SmallSubmit>
       </form>
       <form action={moveAction}>
         <input type="hidden" name="id" value={photoId} />
         <input type="hidden" name="direction" value="down" />
         <SmallSubmit
-          title={`Turunkan urutan foto ${index + 1}`}
+          title={`Move photo ${index + 1} down`}
           disabled={index === count - 1}
         >
-          ↓ Turunkan
+          ↓ Move down
         </SmallSubmit>
       </form>
     </>
@@ -90,19 +90,19 @@ export function ReplacePhotoForm({
   return (
     <details className="rounded-md border border-neutral-200 px-3 py-2">
       <summary className="cursor-pointer text-sm text-neutral-700">
-        Ganti foto
+        Replace photo
       </summary>
       <form action={formAction} className="mt-3 space-y-3">
         <input type="hidden" name="id" value={photoId} />
         <ImageField
           name="imageUrl"
-          label={`Foto pengganti untuk ${label}`}
+          label={`Replacement photo for ${label}`}
           folder={folder}
           defaultValue={imageUrl}
         />
         <p className="text-xs text-neutral-500">{hint}</p>
         <ErrorAlert message={state.error} />
-        <SmallSubmit title="Simpan foto pengganti">Simpan foto pengganti</SmallSubmit>
+        <SmallSubmit title="Save replacement photo">Save replacement photo</SmallSubmit>
       </form>
     </details>
   );

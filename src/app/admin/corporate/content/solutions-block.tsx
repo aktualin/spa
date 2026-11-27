@@ -24,19 +24,19 @@ export function SolutionBlock({
     <div className="space-y-2 rounded-md border border-neutral-200 p-3">
       <div className="flex flex-wrap items-center gap-2">
         <input
-          aria-label={`Judul blok ${index + 1}`}
+          aria-label={`Block ${index + 1} title`}
           name="solutionTitle"
           value={block.title}
           maxLength={200}
           onChange={(event) => patch(block.key, { title: event.target.value })}
-          placeholder="Judul blok, mis. In-Office Wellness Program"
+          placeholder="Block title, e.g. In-Office Wellness Program"
           className={`${inputClass} min-w-48 flex-1`}
         />
         <button
           type="button"
           onClick={() => move(index, -1)}
           disabled={index === 0}
-          aria-label={`Naikkan blok ${index + 1}`}
+          aria-label={`Move block ${index + 1} up`}
           className={secondaryButtonClass}
         >
           ↑
@@ -45,7 +45,7 @@ export function SolutionBlock({
           type="button"
           onClick={() => move(index, 1)}
           disabled={index === count - 1}
-          aria-label={`Turunkan blok ${index + 1}`}
+          aria-label={`Move block ${index + 1} down`}
           className={secondaryButtonClass}
         >
           ↓
@@ -53,19 +53,19 @@ export function SolutionBlock({
         <button
           type="button"
           onClick={() => remove(block.key)}
-          aria-label={`Hapus blok ${index + 1}`}
+          aria-label={`Delete block ${index + 1}`}
           className={`${secondaryButtonClass} text-red-700`}
         >
-          Hapus
+          Delete
         </button>
       </div>
       <textarea
-        aria-label={`Poin blok ${index + 1} (satu per baris)`}
+        aria-label={`Block ${index + 1} points (one per line)`}
         name="solutionItems"
         value={block.items}
         onChange={(event) => patch(block.key, { items: event.target.value })}
         rows={4}
-        placeholder={"Satu poin per baris"}
+        placeholder={"One point per line"}
         className={inputClass}
       />
     </div>

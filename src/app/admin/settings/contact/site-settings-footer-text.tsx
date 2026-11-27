@@ -15,9 +15,9 @@ export function FooterTextFields({ values }: { values: SiteSettingsInput }) {
   return (
     <>
       <Field
-        label="Tagline footer"
+        label="Footer tagline"
         htmlFor="footerTagline"
-        hint="Kalimat besar di footer. Kosongkan bila tidak ingin ditampilkan."
+        hint="The big sentence in the footer. Leave empty to hide it."
       >
         <textarea
           id="footerTagline"
@@ -30,9 +30,9 @@ export function FooterTextFields({ values }: { values: SiteSettingsInput }) {
       </Field>
 
       <Field
-        label="Judul CTA membership footer"
+        label="Footer membership CTA title"
         htmlFor="footerMembershipTitle"
-        hint={`Kalimat ajakan membership di atas footer, maks. ${MAX_FOOTER_MEMBERSHIP_TITLE} karakter.`}
+        hint={`Membership call-to-action line above the footer, max. ${MAX_FOOTER_MEMBERSHIP_TITLE} characters.`}
       >
         <input
           id="footerMembershipTitle"
@@ -45,7 +45,7 @@ export function FooterTextFields({ values }: { values: SiteSettingsInput }) {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Field
-          label="Label tombol Learn More"
+          label="Learn More button label"
           htmlFor="footerMembershipLearnLabel"
         >
           <input
@@ -57,7 +57,7 @@ export function FooterTextFields({ values }: { values: SiteSettingsInput }) {
           />
         </Field>
         <Field
-          label="Label tombol Join"
+          label="Join button label"
           htmlFor="footerMembershipJoinLabel"
         >
           <input
@@ -71,9 +71,9 @@ export function FooterTextFields({ values }: { values: SiteSettingsInput }) {
       </div>
 
       <Field
-        label="Kalimat partnership"
+        label="Partnership line"
         htmlFor="partnershipIntro"
-        hint={`Ditampilkan sebelum alamat email partnership, maks. ${MAX_PARTNERSHIP_INTRO} karakter.`}
+        hint={`Shown before the partnership email address, max. ${MAX_PARTNERSHIP_INTRO} characters.`}
       >
         <input
           id="partnershipIntro"
@@ -84,7 +84,7 @@ export function FooterTextFields({ values }: { values: SiteSettingsInput }) {
         />
       </Field>
 
-      <Field label="Email partnership" htmlFor="partnershipEmail">
+      <Field label="Partnership email" htmlFor="partnershipEmail">
         <input
           id="partnershipEmail"
           name="partnershipEmail"

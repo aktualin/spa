@@ -22,7 +22,7 @@ export function TrendBars({
   suffix?: string;
 }) {
   if (points.length === 0 || points.every((point) => point.value === 0)) {
-    return <EmptyChart label="Belum ada data pada periode ini." />;
+    return <EmptyChart label="No data for this period yet." />;
   }
 
   const max = Math.max(...points.map((point) => point.value));

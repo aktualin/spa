@@ -26,7 +26,7 @@ export function SectionCardActions({
         <form
           action={deleteCustomSectionAction}
           onSubmit={(event) => {
-            if (!window.confirm(`Hapus section "${section.title}"? Tindakan ini tidak bisa dibatalkan.`)) {
+            if (!window.confirm(`Delete the section "${section.title}"? This action cannot be undone.`)) {
               event.preventDefault();
             }
           }}
@@ -36,7 +36,7 @@ export function SectionCardActions({
             type="submit"
             className="rounded-md border border-red-200 px-3 py-1.5 text-xs text-red-700 hover:bg-red-50"
           >
-            Hapus
+            Delete
           </button>
         </form>
       ) : null}
@@ -55,8 +55,8 @@ export function SectionCardActions({
           type="submit"
           title={
             section.isEnabled
-              ? "Klik untuk mematikan section ini"
-              : "Klik untuk menyalakan section ini"
+              ? "Click to disable this section"
+              : "Click to enable this section"
           }
           className={
             section.isEnabled
@@ -64,7 +64,7 @@ export function SectionCardActions({
               : "rounded-md border border-neutral-300 px-3 py-1.5 text-xs text-neutral-600 hover:bg-neutral-50"
           }
         >
-          {section.isEnabled ? "Aktif" : "Mati"}
+          {section.isEnabled ? "Active" : "Inactive"}
         </button>
       </form>
 

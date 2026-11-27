@@ -23,12 +23,12 @@ export function ModuleLink({
     return (
       <span
         aria-disabled="true"
-        title="Modul ini belum dibangun"
+        title="This module is not built yet"
         className="flex cursor-not-allowed items-center justify-between rounded-lg px-3 py-2 text-[13px] text-neutral-400"
       >
         <span>{m.label}</span>
         <span className="rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] uppercase tracking-wide">
-          segera
+          soon
         </span>
       </span>
     );

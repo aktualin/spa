@@ -7,7 +7,7 @@ import type { EditUserData } from "./edit-user-parts";
 export function ProfileFields({ user }: { user: EditUserData }) {
   return (
     <>
-      <Field label="Nama lengkap" htmlFor="name">
+      <Field label="Full name" htmlFor="name">
         <input
           id="name"
           name="name"
@@ -29,12 +29,12 @@ export function ProfileFields({ user }: { user: EditUserData }) {
           disabled={user.isSelf}
           className={inputClass}
         >
-          <option value="EDITOR">EDITOR — mengelola modul konten</option>
-          <option value="ADMIN">ADMIN — akses penuh, termasuk pengaturan sistem</option>
+          <option value="EDITOR">EDITOR — manages content modules</option>
+          <option value="ADMIN">ADMIN — full access, including system settings</option>
         </select>
         {user.isSelf ? (
           <p className="text-xs text-neutral-500">
-            Anda tidak boleh mengubah role akun Anda sendiri.
+            You are not allowed to change the role of your own account.
           </p>
         ) : null}
       </Field>
@@ -48,10 +48,10 @@ export function ProfileFields({ user }: { user: EditUserData }) {
           className="mt-0.5 size-4 rounded border-neutral-300"
         />
         <span>
-          Akun aktif (boleh login)
+          Active account (allowed to log in)
           {user.isSelf ? (
             <em className="block text-xs text-neutral-500">
-              Anda tidak boleh menonaktifkan akun Anda sendiri.
+              You are not allowed to deactivate your own account.
             </em>
           ) : null}
         </span>

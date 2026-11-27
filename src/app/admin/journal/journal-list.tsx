@@ -36,7 +36,7 @@ export function PostRow({ post, status }: { post: Post; status: JournalStatus })
 
       <div className="text-right text-xs text-neutral-500">
         <p>
-          {status === "SCHEDULED" ? "Terbit otomatis " : ""}
+          {status === "SCHEDULED" ? "Auto-publishes " : ""}
           {formatWibDateTime(post.publishedAt)}
         </p>
         <p className="mt-0.5 space-x-3">
@@ -53,7 +53,7 @@ export function PostRow({ post, status }: { post: Post; status: JournalStatus })
               rel="noreferrer"
               className="text-neutral-700 underline"
             >
-              Lihat di situs
+              View on site
             </a>
           ) : null}
         </p>

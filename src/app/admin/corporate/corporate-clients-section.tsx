@@ -13,15 +13,15 @@ export function ClientsSection({ clients }: { clients: Items["clients"] }) {
   return (
     <Section
       id="klien"
-      title="Klien & dokumentasi"
-      description='Logo klien dan foto kegiatan di bagian "Past Collaborations".'
+      title="Clients & documentation"
+      description='Client logos and event photos in the "Past Collaborations" section.'
       addHref="/admin/corporate/clients/new"
-      addLabel="Tambah klien"
+      addLabel="Add client"
     >
       {clients.length === 0 ? (
         <p className="rounded-md border border-dashed border-neutral-300 px-4 py-3 text-sm text-neutral-600">
-          Belum ada klien — halaman publik menampilkan 3 foto kolaborasi bawaan. Setelah klien
-          pertama ditambahkan, bagian ini memakai logo & foto dokumentasi klien.
+          No clients yet — the public page shows 3 default collaboration photos. Once the first
+          client is added, this section uses client logos & documentation photos.
         </p>
       ) : (
         <SortableList>
@@ -35,8 +35,8 @@ export function ClientsSection({ clients }: { clients: Items["clients"] }) {
               href={`/admin/corporate/clients/${client.id}`}
               thumb={<Thumb src={client.logoUrl} alt="" />}
               title={client.name}
-              badge={client.isPublished ? <Badge tone="green">Tayang</Badge> : <Badge tone="muted">Draf</Badge>}
-              meta={[`${client.photoUrls.length} foto`, client.websiteUrl].filter(Boolean).join(" · ")}
+              badge={client.isPublished ? <Badge tone="green">Published</Badge> : <Badge tone="muted">Draft</Badge>}
+              meta={[`${client.photoUrls.length} photos`, client.websiteUrl].filter(Boolean).join(" · ")}
             />
           ))}
         </SortableList>

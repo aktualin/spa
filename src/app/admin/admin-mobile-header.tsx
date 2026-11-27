@@ -26,7 +26,7 @@ export function AdminMobileHeader({ groups }: { groups: GroupedModules<AdminModu
             href={CHANGE_PASSWORD_PATH}
             className="text-xs text-neutral-500 hover:text-neutral-900"
           >
-            Kata sandi
+            Password
           </Link>
           <LogoutButton />
         </div>

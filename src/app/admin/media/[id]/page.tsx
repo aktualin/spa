@@ -29,7 +29,7 @@ export default async function AdminMediaDetailPage({
   return (
     <div className="mx-auto max-w-4xl">
       <Link href="/admin/media" className="text-sm text-neutral-600 hover:underline">
-        ← Kembali ke Media Library
+        ← Back to Media Library
       </Link>
 
       <h1 className="mt-3 break-all text-xl font-semibold text-neutral-900">
@@ -39,12 +39,12 @@ export default async function AdminMediaDetailPage({
       <StatusBanners saved={query.saved} />
       {query.blocked ? (
         <p role="alert" className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
-          Berkas tidak bisa dihapus karena masih dipakai. Lepaskan dulu dari konten di daftar “Dipakai di”.
+          The file cannot be deleted because it is still in use. Detach it from the content in the “Used in” list first.
         </p>
       ) : null}
       {query.error === "storage" ? (
         <p role="alert" className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
-          Gagal menghapus berkas dari penyimpanan. Coba lagi beberapa saat lagi.
+          Failed to delete the file from storage. Try again in a moment.
         </p>
       ) : null}
 
@@ -53,7 +53,7 @@ export default async function AdminMediaDetailPage({
 
         <div className="space-y-8">
           <section className="space-y-3">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">Informasi</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">Information</h2>
             <MediaMetaForm
               id={asset.id}
               fileName={asset.fileName}
@@ -64,7 +64,7 @@ export default async function AdminMediaDetailPage({
 
           <section className="space-y-3">
             <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
-              Dipakai di ({usages.length})
+              Used in ({usages.length})
             </h2>
             <UsageList usages={usages} />
           </section>

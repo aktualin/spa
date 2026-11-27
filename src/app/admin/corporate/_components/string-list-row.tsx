@@ -27,7 +27,7 @@ export function StringListRow({
   return (
     <div className="flex flex-wrap gap-2">
       <input
-        aria-label={`${itemLabel} baris ${index + 1}`}
+        aria-label={`${itemLabel} row ${index + 1}`}
         name={name}
         value={row.value}
         maxLength={200}
@@ -39,7 +39,7 @@ export function StringListRow({
         type="button"
         onClick={() => move(index, -1)}
         disabled={index === 0}
-        aria-label={`Naikkan ${itemLabel} baris ${index + 1}`}
+        aria-label={`Move ${itemLabel} row ${index + 1} up`}
         className={secondaryButtonClass}
       >
         ↑
@@ -48,7 +48,7 @@ export function StringListRow({
         type="button"
         onClick={() => move(index, 1)}
         disabled={index === count - 1}
-        aria-label={`Turunkan ${itemLabel} baris ${index + 1}`}
+        aria-label={`Move ${itemLabel} row ${index + 1} down`}
         className={secondaryButtonClass}
       >
         ↓
@@ -56,10 +56,10 @@ export function StringListRow({
       <button
         type="button"
         onClick={() => remove(row.key)}
-        aria-label={`Hapus ${itemLabel} baris ${index + 1}`}
+        aria-label={`Delete ${itemLabel} row ${index + 1}`}
         className={`${secondaryButtonClass} text-red-700`}
       >
-        Hapus
+        Delete
       </button>
     </div>
   );

@@ -40,19 +40,19 @@ export function Row({
         <form action={moveAction}>
           <input type="hidden" name="id" value={id} />
           <input type="hidden" name="direction" value="up" />
-          <SmallSubmit title="Naikkan" disabled={index === 0}>
+          <SmallSubmit title="Move up" disabled={index === 0}>
             ↑
           </SmallSubmit>
         </form>
         <form action={moveAction}>
           <input type="hidden" name="id" value={id} />
           <input type="hidden" name="direction" value="down" />
-          <SmallSubmit title="Turunkan" disabled={index === count - 1}>
+          <SmallSubmit title="Move down" disabled={index === count - 1}>
             ↓
           </SmallSubmit>
         </form>
         <Link href={href} className="ml-1 text-sm text-neutral-600 hover:underline">
-          Ubah
+          Edit
         </Link>
       </div>
     </li>

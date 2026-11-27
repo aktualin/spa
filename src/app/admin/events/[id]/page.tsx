@@ -24,7 +24,7 @@ export default async function EventEditPage({
       <div className="mx-auto max-w-2xl space-y-4">
         <EventForm event={newEventData()} />
         <p className="text-xs text-neutral-500">
-          Foto galeri event bisa ditambahkan setelah event pertama kali disimpan.
+          Event gallery photos can be added after the event is first saved.
         </p>
       </div>
     );
@@ -39,13 +39,13 @@ export default async function EventEditPage({
           role="status"
           className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-800"
         >
-          Event tersimpan. Tambahkan foto galeri di bagian bawah halaman ini.
+          Event saved. Add gallery photos at the bottom of this page.
         </p>
       ) : null}
       <StatusBanners
         saved={query.saved}
         deleted={query.photoDeleted}
-        deletedLabel="Foto event dihapus."
+        deletedLabel="Event photo deleted."
       />
 
       <EventForm event={data} publishedSlug={event.isPublished ? event.slug : null} />

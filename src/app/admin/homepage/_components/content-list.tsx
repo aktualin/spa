@@ -60,7 +60,7 @@ export function ContentList({
   return (
     <div className="mx-auto max-w-4xl">
       <Link href="/admin/homepage" className="text-sm text-neutral-600 hover:underline">
-        ← Kembali ke Section Homepage
+        ← Back to Homepage Sections
       </Link>
 
       <div className="mt-3">

@@ -21,16 +21,16 @@ export function TemporaryPasswordNotice({
       className="mt-4 space-y-3 rounded-md border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900"
     >
       <p>
-        Kata sandi sementara untuk <strong>{email}</strong>:
+        Temporary password for <strong>{email}</strong>:
       </p>
       <p className="select-all rounded bg-white px-3 py-2 font-mono text-base tracking-wide text-neutral-900">
         {password}
       </p>
       <p>
-        Salin dan sampaikan lewat jalur terpisah (misalnya pesan langsung).
-        Kata sandi ini <strong>hanya ditampilkan sekali</strong> dan tidak
-        disimpan dalam bentuk yang bisa dibaca. Pemilik akun wajib menggantinya
-        saat login pertama.
+        Copy it and share it through a separate channel (for example a direct
+        message). This password is <strong>shown only once</strong> and is not
+        stored in a readable form. The account owner must change it at their
+        first login.
       </p>
     </div>
   );

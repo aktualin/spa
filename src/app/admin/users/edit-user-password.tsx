@@ -22,10 +22,11 @@ export function ResetPasswordSection({
   if (user.isSelf) {
     return (
       <p className="mt-10 border-t border-neutral-200 pt-6 text-sm text-neutral-600">
-        Untuk mengganti kata sandi akun Anda sendiri, gunakan menu{" "}
+        To change the password of your own account, use the{" "}
         <Link href="/admin/account/password" className="underline">
-          Ganti kata sandi
+          Change password
         </Link>
+         menu
         .
       </p>
     );
@@ -35,7 +36,7 @@ export function ResetPasswordSection({
     return (
       <section className="mt-10 border-t border-neutral-200 pt-6">
         <h2 className="text-sm font-semibold text-neutral-800">
-          Kata sandi direset
+          Password reset
         </h2>
         <TemporaryPasswordNotice
           email={passwordState.email ?? user.email}
@@ -48,12 +49,12 @@ export function ResetPasswordSection({
   return (
     <form action={passwordAction} className="mt-10 space-y-5 border-t border-neutral-200 pt-6">
       <input type="hidden" name="id" value={user.id} />
-      <h2 className="text-sm font-semibold text-neutral-800">Reset kata sandi</h2>
+      <h2 className="text-sm font-semibold text-neutral-800">Reset password</h2>
 
       <Field
-        label="Kata sandi baru (opsional)"
+        label="New password (optional)"
         htmlFor="newPassword"
-        hint={`Kosongkan agar sistem membuatkan kata sandi acak yang ditampilkan sekali. Bila diisi: minimal ${MIN_PASSWORD_LENGTH} karakter. Akun ini akan keluar dari semua perangkat dan wajib mengganti kata sandi saat login berikutnya.`}
+        hint={`Leave empty so the system generates a random password that is shown once. If filled in: at least ${MIN_PASSWORD_LENGTH} characters. This account will be logged out on all devices and must change its password at the next login.`}
       >
         <input
           id="newPassword"
@@ -68,7 +69,7 @@ export function ResetPasswordSection({
 
       <ErrorAlert message={passwordState.error} />
 
-      <SaveButton label="Reset kata sandi" />
+      <SaveButton label="Reset password" />
     </form>
   );
 }

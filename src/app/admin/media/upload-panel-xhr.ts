@@ -30,10 +30,10 @@ export function uploadOne(
     xhr.onload = () => {
       const data = (xhr.response ?? {}) as { error?: string };
       if (xhr.status >= 200 && xhr.status < 300) resolve({ ok: true });
-      else if (xhr.status === 413) resolve({ ok: false, error: "Berkas terlalu besar (maksimal 4 MB)." });
-      else resolve({ ok: false, error: data.error ?? "Gagal mengunggah berkas." });
+      else if (xhr.status === 413) resolve({ ok: false, error: "File is too large (maximum 4 MB)." });
+      else resolve({ ok: false, error: data.error ?? "Failed to upload file." });
     };
-    xhr.onerror = () => resolve({ ok: false, error: "Gagal menghubungi server." });
+    xhr.onerror = () => resolve({ ok: false, error: "Failed to reach the server." });
     xhr.send(body);
   });
 }

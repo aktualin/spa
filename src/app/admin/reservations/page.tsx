@@ -11,10 +11,10 @@ import { formatReservationSchedule } from "./reservation-detail-list";
 export const instant = false;
 
 const FILTERS = [
-  { value: undefined, label: "Semua" },
-  { value: "NEW", label: "Baru" },
-  { value: "CONTACTED", label: "Sudah dihubungi" },
-  { value: "CLOSED", label: "Ditutup" },
+  { value: undefined, label: "All" },
+  { value: "NEW", label: "New" },
+  { value: "CONTACTED", label: "Contacted" },
+  { value: "CLOSED", label: "Closed" },
 ] as const;
 
 function listHref(status: string | null | undefined, page = 1): string {
@@ -39,13 +39,13 @@ export default async function AdminReservationsPage({
   return (
     <div className="mx-auto max-w-4xl">
       <PageHeader
-        title="Reservasi"
-        subtitle={`${total} permintaan${status ? " pada filter ini" : ""} dari form halaman kontak. Data pribadi (UU PDP) — hanya untuk tim, jangan dibagikan ke luar dashboard.`}
+        title="Reservations"
+        subtitle={`${total} requests${status ? " on this filter" : ""} from the contact page form. Personal data (PDP Law) — for the team only, do not share outside the dashboard.`}
       />
 
-      <StatusBanners deleted={params.deleted} deletedLabel="Permintaan reservasi dihapus." />
+      <StatusBanners deleted={params.deleted} deletedLabel="Reservation request deleted." />
 
-      <nav aria-label="Filter status" className="mt-6 flex flex-wrap gap-2">
+      <nav aria-label="Status filter" className="mt-6 flex flex-wrap gap-2">
         {FILTERS.map((filter) => {
           const active = (filter.value ?? null) === status;
           const count = filter.value ? countByStatus[filter.value] : null;
@@ -68,7 +68,7 @@ export default async function AdminReservationsPage({
       </nav>
 
       {rows.length === 0 ? (
-        <p className="mt-6 text-sm text-neutral-500">Belum ada permintaan pada filter ini.</p>
+        <p className="mt-6 text-sm text-neutral-500">No requests yet on this filter.</p>
       ) : (
         <ul className="mt-4 divide-y divide-neutral-200 overflow-hidden rounded-lg border border-neutral-200 bg-white">
           {rows.map((row) => (
@@ -84,7 +84,7 @@ export default async function AdminReservationsPage({
                   </p>
                   <p className="mt-0.5 text-xs text-neutral-500">
                     {formatWibDateTime(row.createdAt)}
-                    {row.branchSlug ? ` · cabang ${row.branchSlug}` : ""}
+                    {row.branchSlug ? ` · branch ${row.branchSlug}` : ""}
                     {row.treatment ? ` · ${row.treatment}` : ""}
                     {row.preferredDate || row.preferredTime
                       ? ` · ${formatReservationSchedule(row.preferredDate, row.preferredTime)}`

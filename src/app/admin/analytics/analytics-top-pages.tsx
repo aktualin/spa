@@ -21,28 +21,28 @@ export function TopPagesSection({
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <div>
           <h2 className="text-sm font-semibold text-neutral-900">
-            Halaman terpopuler
+            Most popular pages
           </h2>
           <p className="mt-0.5 text-xs text-neutral-400">
-            {days} hari terakhir · diurutkan dari tampilan terbanyak
+            Last {days} days · sorted by most views
           </p>
         </div>
         <p className="text-[11px] tabular-nums text-neutral-400">
-          {number.format(topPages.length)} halaman
+          {number.format(topPages.length)} pages
         </p>
       </div>
 
       {topPages.length === 0 ? (
         <p className="mt-3 rounded-xl border border-dashed border-neutral-200 bg-white px-4 py-8 text-center text-sm text-neutral-400">
-          Belum ada kunjungan pada periode ini. Data mulai terkumpul setelah
-          fitur analitik aktif dan ada pengunjung membuka situs.
+          No visits yet in this period. Data starts collecting once the
+          analytics feature is active and visitors open the site.
         </p>
       ) : (
         <div className="mt-3 overflow-hidden rounded-xl border border-neutral-200/80 bg-white">
           <div className="flex items-center gap-3 border-b border-neutral-100 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-neutral-400 sm:px-5">
             <span className="w-5 text-right">#</span>
-            <span className="min-w-0 flex-1">Halaman</span>
-            <span className="shrink-0 text-right">Tampilan</span>
+            <span className="min-w-0 flex-1">Page</span>
+            <span className="shrink-0 text-right">Views</span>
           </div>
           <ul className="divide-y divide-neutral-100">
             {topPages.map((page, index) => {
@@ -72,7 +72,7 @@ export function TopPagesSection({
                       title={page.path}
                       className="block truncate text-[13px] font-medium text-neutral-800 underline-offset-2 hover:text-cocoa hover:underline"
                     >
-                      {page.path === "/" ? "Beranda" : page.path}
+                      {page.path === "/" ? "Home" : page.path}
                     </Link>
                     <div className="mt-1.5 flex items-center gap-2">
                       <div className="h-1 min-w-0 flex-1 overflow-hidden rounded-full bg-neutral-100">
@@ -82,7 +82,7 @@ export function TopPagesSection({
                         />
                       </div>
                       <span className="shrink-0 text-[10px] tabular-nums text-neutral-400">
-                        {percent} dari total
+                        {percent} of total
                       </span>
                     </div>
                   </div>
@@ -91,7 +91,7 @@ export function TopPagesSection({
                       {number.format(page.views)}
                     </p>
                     <p className="text-[10px] tabular-nums text-neutral-400">
-                      {number.format(page.uniqueVisitors)} unik
+                      {number.format(page.uniqueVisitors)} unique
                     </p>
                   </div>
                 </li>
@@ -102,7 +102,7 @@ export function TopPagesSection({
       )}
       {topPages.length === 50 ? (
         <p className="mt-2 text-[11px] text-neutral-400">
-          Menampilkan 50 halaman teratas.
+          Showing the top 50 pages.
         </p>
       ) : null}
     </section>

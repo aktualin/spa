@@ -9,7 +9,7 @@ import type { GiftCardFormData } from "./gift-card-form";
 export function GiftCardFields({ giftCard }: { giftCard: GiftCardFormData }) {
   return (
     <>
-      <Field label="Judul" htmlFor="title">
+      <Field label="Title" htmlFor="title">
         <input
           id="title"
           name="title"
@@ -20,9 +20,9 @@ export function GiftCardFields({ giftCard }: { giftCard: GiftCardFormData }) {
       </Field>
 
       <Field
-        label="Subjudul"
+        label="Subtitle"
         htmlFor="subtitle"
-        hint="Kalimat di bawah judul. Dikosongkan → baris ini tidak tampil di halaman."
+        hint="The line under the title. Leave empty → this line is not shown on the page."
       >
         <input
           id="subtitle"
@@ -35,29 +35,29 @@ export function GiftCardFields({ giftCard }: { giftCard: GiftCardFormData }) {
 
       <RichTextField
         name="bodyHtml"
-        label="Isi gift card"
+        label="Gift card content"
         folder="gift-card"
         defaultValue={giftCard.bodyHtml}
       />
 
       <ImageField
         name="imageUrl"
-        label="Gambar gift card"
+        label="Gift card image"
         folder="gift-card"
         defaultValue={giftCard.imageUrl}
       />
 
       <RichTextField
         name="termsHtml"
-        label="Syarat & ketentuan (opsional)"
+        label="Terms & conditions (optional)"
         folder="gift-card"
         defaultValue={giftCard.termsHtml}
       />
 
       <Field
-        label="Pesan WhatsApp"
+        label="WhatsApp message"
         htmlFor="whatsappMessage"
-        hint='Teks awal chat tombol "Pesan via WhatsApp". Dikosongkan → memakai Template WhatsApp konteks "gift".'
+        hint='Opening chat text for the "Order via WhatsApp" button. Leave empty → uses the WhatsApp Template with the "gift" context.'
       >
         <input
           id="whatsappMessage"

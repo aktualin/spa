@@ -7,11 +7,11 @@ import { Badge, Thumb, type BadgeTone } from "../promos/_kit/list-ui";
 import { formatWibDate } from "../promos/_kit/schema";
 
 export const TABS = [
-  { key: "semua", label: "Semua" },
-  { key: "upcoming", label: "Akan datang" },
-  { key: "past", label: "Sudah lewat" },
-  { key: "kolaborasi", label: "Kolaborasi" },
-  { key: "draf", label: "Draf" },
+  { key: "semua", label: "All" },
+  { key: "upcoming", label: "Upcoming" },
+  { key: "past", label: "Past" },
+  { key: "kolaborasi", label: "Collaborations" },
+  { key: "draf", label: "Drafts" },
 ] as const;
 
 export type TabKey = (typeof TABS)[number]["key"];
@@ -47,7 +47,7 @@ export function matchesTab(row: EventRow, key: TabKey) {
 }
 
 export function formatRange(start: Date | null, end: Date | null): string {
-  if (!start) return "Tanggal menyusul";
+  if (!start) return "Date TBA";
   const first = formatWibDate(start);
   const last = end ? formatWibDate(end) : first;
   return last === first ? first : `${first} – ${last}`;
@@ -71,26 +71,26 @@ export function EventListItem({ event }: { event: EventRow }) {
               {EVENT_PHASE_LABEL[event.phase]}
             </Badge>
             {event.isCollaboration ? (
-              <Badge tone="blue">Kolaborasi</Badge>
+              <Badge tone="blue">Collaboration</Badge>
             ) : null}
             {event.isPublished ? (
-              <Badge tone="green">Tayang</Badge>
+              <Badge tone="green">Published</Badge>
             ) : (
-              <Badge tone="muted">Draf</Badge>
+              <Badge tone="muted">Draft</Badge>
             )}
           </div>
           <p className="mt-0.5 truncate text-xs text-neutral-500">
             /events/{event.slug} · {formatRange(event.startDate, event.endDate)} ·{" "}
-            {event._count.photos} foto
+            {event._count.photos} photos
             {event.isCollaboration && event.partnerName
-              ? ` · Mitra: ${event.partnerName}`
+              ? ` · Partner: ${event.partnerName}`
               : ""}
           </p>
         </div>
       </div>
 
       <p className="text-xs text-neutral-500">
-        {event.location ?? "—"} · Urutan {event.sortOrder}
+        {event.location ?? "—"} · Order {event.sortOrder}
       </p>
     </li>
   );

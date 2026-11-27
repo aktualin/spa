@@ -33,16 +33,16 @@ export default async function AdminHomepageHighlightsPage({
   return (
     <div className="mx-auto max-w-4xl">
       <Link href="/admin/homepage" className="text-sm text-neutral-600 hover:underline">
-        ← Kembali ke Section Homepage
+        ← Back to Homepage Sections
       </Link>
 
       <div className="mt-3">
         <PageHeader
-          title="Highlight Homepage"
-          subtitle="Kartu di section “What’s New” homepage. Urutan di daftar ini sama dengan urutan kartu di homepage."
+          title="Homepage Highlights"
+          subtitle="Cards in the homepage’s “What’s New” section. The order in this list matches the card order on the homepage."
           action={
             <Link href="/admin/homepage/highlights/new" className={primaryLinkClass}>
-              Tambah highlight
+              Add highlight
             </Link>
           }
         />
@@ -51,7 +51,7 @@ export default async function AdminHomepageHighlightsPage({
       <StatusBanners
         saved={params.saved}
         deleted={params.deleted}
-        deletedLabel="Highlight dihapus."
+        deletedLabel="Highlight deleted."
       />
 
       <HighlightNotes rows={rows} liveCount={liveCount} />
@@ -65,10 +65,10 @@ export default async function AdminHomepageHighlightsPage({
       ) : null}
 
       <p className="mt-6 text-xs text-neutral-500">
-        Highlight dengan periode otomatis muncul saat tanggal mulai tiba dan
-        hilang setelah tanggal berakhir (perubahan terlihat di homepage dalam
-        beberapa menit). Section “What’s New” bisa disembunyikan seluruhnya
-        dari halaman Section Homepage.
+        Highlights with a period appear automatically when the start date arrives
+        and disappear after the end date (changes become visible on the homepage
+        within a few minutes). The “What’s New” section can be hidden entirely
+        from the Homepage Sections page.
       </p>
     </div>
   );

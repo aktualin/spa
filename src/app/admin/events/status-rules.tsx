@@ -9,32 +9,32 @@ export function EventStatusRules({ compact = false }: { compact?: boolean }) {
       className="rounded-md border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900"
     >
       <summary className="cursor-pointer font-medium">
-        Bagaimana event masuk “Upcoming”, “Past”, atau “Past Collaborations”?
+        How do events end up in “Upcoming”, “Past”, or “Past Collaborations”?
       </summary>
       <ul className="mt-2 list-disc space-y-1 pl-5">
         <li>
-          Status dihitung otomatis dari tanggal (WIB), tidak perlu diubah manual. Event
-          dimulai pukul 00.00 pada tanggal mulai dan selesai pukul 23.59 pada tanggal
-          selesai (atau pada tanggal mulai bila tanggal selesai kosong).
+          Status is computed automatically from dates (WIB); no manual change needed. An
+          event starts at 00.00 on its start date and ends at 23.59 on its end date (or
+          on the start date when the end date is empty).
         </li>
         <li>
-          <strong>Upcoming</strong> (<code>/events</code>): event yang akan datang atau
-          sedang berlangsung, juga event tanpa tanggal (“Tanggal menyusul”). Event
-          kolaborasi yang belum lewat juga tampil di sini.
+          <strong>Upcoming</strong> (<code>/events</code>): events that are upcoming or
+          ongoing, plus events without dates (“Date TBA”). Collaboration events that have
+          not passed also appear here.
         </li>
         <li>
-          <strong>Past / Telah berlalu</strong> (<code>/events</code>): event biasa yang
-          tanggal selesainya sudah lewat.
+          <strong>Past</strong> (<code>/events</code>): regular events whose end date has
+          already passed.
         </li>
         <li>
           <strong>Past Collaborations</strong> (<code>/events/collaborations</code>):
-          event bertanda kolaborasi yang sudah lewat, atau kolaborasi tanpa tanggal
-          (arsip).
+          events marked as collaboration that have passed, or collaborations without
+          dates (archive).
         </li>
         <li>
-          Perpindahan kelompok terjadi sendiri, paling lambat beberapa menit setelah
-          event lewat — tanpa deploy ulang. Hanya event dengan “Tampilkan di website”
-          yang muncul di halaman publik.
+          The move between groups happens on its own, at most a few minutes after the
+          event passes — no redeploy needed. Only events with “Show on website” appear on
+          the public pages.
         </li>
       </ul>
     </details>

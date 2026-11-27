@@ -20,13 +20,13 @@ export function AssetPreview({ asset }: { asset: Asset }) {
       </div>
 
       <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 text-sm">
-        <dt className="text-neutral-500">Ukuran</dt>
+        <dt className="text-neutral-500">Size</dt>
         <dd className="text-neutral-900">{formatBytes(asset.sizeBytes)}</dd>
-        <dt className="text-neutral-500">Tipe</dt>
+        <dt className="text-neutral-500">Type</dt>
         <dd className="text-neutral-900">{asset.mimeType}</dd>
         {asset.width && asset.height ? (
           <>
-            <dt className="text-neutral-500">Dimensi</dt>
+            <dt className="text-neutral-500">Dimensions</dt>
             <dd className="text-neutral-900">
               {asset.width} × {asset.height} px
             </dd>
@@ -34,10 +34,10 @@ export function AssetPreview({ asset }: { asset: Asset }) {
         ) : null}
         <dt className="text-neutral-500">Folder</dt>
         <dd className="text-neutral-900">{asset.folder}</dd>
-        <dt className="text-neutral-500">Diunggah</dt>
+        <dt className="text-neutral-500">Uploaded</dt>
         <dd className="text-neutral-900">
           {formatWibDateTime(asset.createdAt)}
-          {asset.uploadedBy ? ` oleh ${asset.uploadedBy.name}` : ""}
+          {asset.uploadedBy ? ` by ${asset.uploadedBy.name}` : ""}
         </dd>
         <dt className="text-neutral-500">URL</dt>
         <dd className="break-all text-neutral-900">{asset.url}</dd>
@@ -46,7 +46,7 @@ export function AssetPreview({ asset }: { asset: Asset }) {
       <div className="flex flex-wrap gap-2">
         <CopyUrlButton url={asset.url} />
         <a href={asset.url} target="_blank" rel="noreferrer" className={secondaryButtonClass}>
-          Buka berkas
+          Open file
         </a>
       </div>
     </div>
@@ -56,7 +56,7 @@ export function AssetPreview({ asset }: { asset: Asset }) {
 /** Daftar "Dipakai di" konten. */
 export function UsageList({ usages }: { usages: MediaUsage[] }) {
   if (usages.length === 0) {
-    return <p className="text-sm text-neutral-500">Belum dipakai di konten mana pun.</p>;
+    return <p className="text-sm text-neutral-500">Not used in any content yet.</p>;
   }
   return (
     <ul className="divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-white text-sm">
@@ -64,11 +64,11 @@ export function UsageList({ usages }: { usages: MediaUsage[] }) {
         <li key={`${usage.label}-${usage.href}-${index}`} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
           <div className="min-w-0">
             <p className="text-xs text-neutral-500">{usage.label}</p>
-            <p className="truncate text-neutral-900">{usage.name || "(tanpa nama)"}</p>
+            <p className="truncate text-neutral-900">{usage.name || "(unnamed)"}</p>
           </div>
           {usage.href ? (
             <Link href={usage.href} className="shrink-0 text-neutral-700 underline">
-              Buka
+              Open
             </Link>
           ) : null}
         </li>
@@ -81,17 +81,17 @@ export function UsageList({ usages }: { usages: MediaUsage[] }) {
 export function DeleteAssetSection({ assetId, usageCount }: { assetId: string; usageCount: number }) {
   return (
     <section className="space-y-2 border-t border-neutral-200 pt-4">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">Hapus berkas</h2>
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">Delete file</h2>
       {usageCount > 0 ? (
         <p className="text-sm text-neutral-600">
-          Berkas masih dipakai di {usageCount} tempat, jadi belum bisa dihapus. Ganti atau
-          kosongkan gambar di konten tersebut terlebih dahulu.
+          The file is still used in {usageCount} places, so it cannot be deleted yet. Replace or
+          clear the image in that content first.
         </p>
       ) : (
         <form action={deleteMediaAction}>
           <input type="hidden" name="id" value={assetId} />
-          <ConfirmDeleteButton message="Hapus berkas ini secara permanen dari penyimpanan?">
-            Hapus berkas
+          <ConfirmDeleteButton message="Delete this file permanently from storage?">
+            Delete file
           </ConfirmDeleteButton>
         </form>
       )}

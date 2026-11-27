@@ -42,11 +42,11 @@ export function SolutionsField({
   return (
     <fieldset className="space-y-3">
       <legend className="text-sm font-medium text-neutral-700">
-        Blok solusi (&quot;Why Partner with KAMA?&quot;)
+        Solution blocks (&quot;Why Partner with KAMA?&quot;)
       </legend>
       <p className="text-xs text-neutral-500">
-        Tiap blok tampil sebagai satu kartu. Tulis satu poin per baris. Hapus semua blok untuk
-        kembali memakai isi bawaan.
+        Each block is shown as one card. Write one point per line. Delete all blocks to
+        fall back to the default content.
       </p>
 
       {blocks.map((block, index) => (
@@ -70,7 +70,7 @@ export function SolutionsField({
         }}
         className={secondaryButtonClass}
       >
-        + Tambah blok
+        + Add block
       </button>
     </fieldset>
   );

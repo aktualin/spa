@@ -35,7 +35,7 @@ export function PackageForm({
       </Link>
 
       <h1 className="mt-3 text-xl font-semibold text-neutral-900">
-        {pkg.id ? `Ubah ${pkg.name}` : "Tambah package"}
+        {pkg.id ? `Ubah ${pkg.name}` : "Add package"}
       </h1>
 
       <form action={formAction} className="mt-6 space-y-5">

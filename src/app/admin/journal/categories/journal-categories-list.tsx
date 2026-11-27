@@ -14,7 +14,7 @@ function MoveButton({
   direction: "up" | "down";
   disabled: boolean;
 }) {
-  const label = direction === "up" ? "Naikkan urutan" : "Turunkan urutan";
+  const label = direction === "up" ? "Move up" : "Move down";
   return (
     <form action={moveJournalCategoryAction}>
       <input type="hidden" name="id" value={id} />
@@ -52,13 +52,13 @@ export function JournalCategoryRow({
           >
             {category.name}
           </Link>
-          {!category.isPublished ? <Badge tone="warn">Disembunyikan</Badge> : null}
+          {!category.isPublished ? <Badge tone="warn">Hidden</Badge> : null}
         </div>
         <p className="mt-0.5 font-mono text-xs text-neutral-500">{category.slug}</p>
       </div>
 
       <div className="flex items-center gap-3">
-        <p className="text-sm text-neutral-600">{category._count.posts} artikel</p>
+        <p className="text-sm text-neutral-600">{category._count.posts} articles</p>
         <div className="flex items-center gap-1">
           <MoveButton id={category.id} direction="up" disabled={index === 0} />
           <MoveButton

@@ -61,7 +61,7 @@ export function UploadPanel({ folders }: { folders: string[] }) {
 
   return (
     <section className="space-y-3 rounded-lg border border-neutral-200 bg-white p-4">
-      <h2 className="text-sm font-semibold text-neutral-900">Unggah berkas</h2>
+      <h2 className="text-sm font-semibold text-neutral-900">Upload files</h2>
 
       <UploadControls
         folderId={folderId}

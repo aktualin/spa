@@ -34,8 +34,8 @@ export function MultiImageField({
     <div className="space-y-2">
       <span className="block text-sm font-medium text-neutral-700">{label}</span>
       <p className="text-xs text-neutral-500">
-        Urutan pertama tampil paling awal. Bila lebih dari satu gambar, halaman
-        publik menampilkannya sebagai carousel. Maksimal 12 gambar.
+        The first item shows first. With more than one image, the public page
+        displays them as a carousel. Max 12 images.
       </p>
 
       {rows.length > 0 ? (
@@ -44,11 +44,11 @@ export function MultiImageField({
           name={name}
           setRows={setRows}
           move={move}
-          onError={() => setError("Salah satu gambar tidak dapat dimuat.")}
+          onError={() => setError("One of the images could not be loaded.")}
         />
       ) : (
         <p className="rounded-md border border-dashed border-neutral-300 px-3 py-2 text-xs text-neutral-500">
-          Belum ada gambar tambahan.
+          No additional images yet.
         </p>
       )}
 
@@ -73,12 +73,12 @@ export function MultiImageField({
           onClick={() => setPickerOpen(true)}
           className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-50 disabled:opacity-50"
         >
-          Pilih dari Media Library
+          Select from Media Library
         </button>
       </div>
 
       <p className="text-xs text-neutral-500">
-        {busy ? "Mengunggah…" : "JPG, PNG, WebP, AVIF, atau GIF. Maksimal 4 MB per gambar."}
+        {busy ? "Uploading…" : "JPG, PNG, WebP, AVIF, or GIF. Max 4 MB per image."}
       </p>
 
       {error ? (

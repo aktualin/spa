@@ -40,13 +40,13 @@ export default async function JournalPreviewPage({
         href={`/admin/journal/${post.id}`}
         className="text-sm text-neutral-600 hover:underline"
       >
-        ← Kembali ke editor
+        ← Back to editor
       </Link>
 
       <p className="mt-3 rounded-md bg-blue-50 px-3 py-2 text-sm text-blue-800">
-        Preview artikel tersimpan. Konten di bawah belum tentu sama dengan
-        tampilan publik selama status artikel bukan Terbit atau jadwalnya belum
-        tiba.
+        Preview of the saved article. The content below may differ from the
+        public view as long as the article status is not Published or its
+        schedule has not arrived yet.
       </p>
 
       <article className="mt-6">

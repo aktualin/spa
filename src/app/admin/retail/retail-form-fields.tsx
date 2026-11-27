@@ -10,9 +10,9 @@ export function RetailMetaFields({ product }: { product: RetailFormData }) {
   return (
     <>
       <Field
-        label="Harga (opsional)"
+        label="Price (optional)"
         htmlFor="priceIdr"
-        hint="Rupiah penuh, contoh: 250000 atau 250.000. Kosongkan bila harga ditanyakan via WhatsApp — website menampilkan “Hubungi kami”."
+        hint="Full rupiah, e.g. 250000 or 250.000. Leave empty if the price is asked via WhatsApp — the website shows “Contact us”."
       >
         <input
           id="priceIdr"
@@ -25,13 +25,13 @@ export function RetailMetaFields({ product }: { product: RetailFormData }) {
       </Field>
 
       <Field
-        label="Pesan WhatsApp khusus"
+        label="Custom WhatsApp message"
         htmlFor="whatsappMessage"
         hint={
           <>
-            Kosongkan untuk memakai template “retail” di Kontak &amp; Umum →
-            WhatsApp (bawaan: “Halo kak, saya mau pesan produk [nama]” plus
-            harga bila ada). Boleh memakai {"{{product}}"} dan {"{{harga}}"}.
+            Leave empty to use the “retail” template in Contact &amp; General →
+            WhatsApp (default: “Halo kak, saya mau pesan produk [nama]” plus
+            the price if any). You may use {"{{product}}"} and {"{{harga}}"}.
           </>
         }
       >
@@ -46,9 +46,9 @@ export function RetailMetaFields({ product }: { product: RetailFormData }) {
       </Field>
 
       <Field
-        label="Urutan tampil"
+        label="Display order"
         htmlFor="sortOrder"
-        hint="Makin kecil makin atas. Kosongkan untuk meletakkan produk baru di akhir; urutan juga bisa diatur dengan tombol ↑/↓ di daftar."
+        hint="Lower numbers appear higher. Leave empty to place new products at the end; the order can also be set with the ↑/↓ buttons in the list."
       >
         <input
           id="sortOrder"
@@ -63,11 +63,11 @@ export function RetailMetaFields({ product }: { product: RetailFormData }) {
 
       <div className="space-y-2">
         <Checkbox name="isHighlight" defaultChecked={product.isHighlight}>
-          Tandai sebagai <strong>Highlight / Kolaborasi</strong> — tampil
-          paling atas dengan label “Highlight”
+          Mark as <strong>Highlight / Collaboration</strong> — appears at
+          the very top with a “Highlight” label
         </Checkbox>
         <Checkbox name="isPublished" defaultChecked={product.isPublished}>
-          Tampilkan di website
+          Show on the website
         </Checkbox>
       </div>
     </>

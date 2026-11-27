@@ -33,28 +33,28 @@ export default async function GalleryAlbumPhotosPage({
   return (
     <div className="mx-auto max-w-3xl">
       <Link href="/admin/gallery" className="text-sm text-neutral-600 hover:underline">
-        ← Kembali ke daftar album
+        ← Back to albums list
       </Link>
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-neutral-900">{album.name}</h1>
           <p className="mt-1 text-sm text-neutral-600">
-            /{album.slug} · {album.photos.length} foto
+            /{album.slug} · {album.photos.length} photos
           </p>
         </div>
         <Link
           href={`/admin/gallery/albums/${album.id}`}
           className="text-sm text-neutral-700 underline"
         >
-          Ubah data album
+          Edit album details
         </Link>
       </div>
 
       <StatusBanners
         saved={query.saved}
         deleted={query.deleted}
-        deletedLabel="Foto dihapus."
+        deletedLabel="Photo deleted."
       />
 
       <div className="mt-6">

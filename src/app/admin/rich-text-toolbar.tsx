@@ -25,32 +25,32 @@ export function RichTextToolbar({
   onImagePlacement: (placement: ImagePlacement) => void;
 }) {
   function addLink() {
-    const url = window.prompt("URL tautan (https://…, mailto:…, atau /halaman)");
+    const url = window.prompt("Link URL (https://…, mailto:…, or /page)");
     if (!url) return;
     run("createLink", url.trim());
   }
 
   return (
     <div className="flex flex-wrap gap-0.5 border-b border-neutral-200 bg-neutral-50 p-1">
-      <button type="button" title="Judul besar" className={tool} onClick={() => run("formatBlock", "H2")}>H2</button>
-      <button type="button" title="Sub judul" className={tool} onClick={() => run("formatBlock", "H3")}>H3</button>
-      <button type="button" title="Judul kecil" className={tool} onClick={() => run("formatBlock", "H4")}>H4</button>
-      <button type="button" title="Paragraf" className={tool} onClick={() => run("formatBlock", "P")}>¶</button>
+      <button type="button" title="Large heading" className={tool} onClick={() => run("formatBlock", "H2")}>H2</button>
+      <button type="button" title="Subheading" className={tool} onClick={() => run("formatBlock", "H3")}>H3</button>
+      <button type="button" title="Small heading" className={tool} onClick={() => run("formatBlock", "H4")}>H4</button>
+      <button type="button" title="Paragraph" className={tool} onClick={() => run("formatBlock", "P")}>¶</button>
       <span className="mx-1 w-px bg-neutral-200" aria-hidden="true" />
-      <button type="button" title="Tebal" className={`${tool} font-bold`} onClick={() => run("bold")}>B</button>
-      <button type="button" title="Miring" className={`${tool} italic`} onClick={() => run("italic")}>I</button>
-      <button type="button" title="Garis bawah" className={`${tool} underline`} onClick={() => run("underline")}>U</button>
-      <button type="button" title="Coret" className={`${tool} line-through`} onClick={() => run("strikeThrough")}>S</button>
+      <button type="button" title="Bold" className={`${tool} font-bold`} onClick={() => run("bold")}>B</button>
+      <button type="button" title="Italic" className={`${tool} italic`} onClick={() => run("italic")}>I</button>
+      <button type="button" title="Underline" className={`${tool} underline`} onClick={() => run("underline")}>U</button>
+      <button type="button" title="Strikethrough" className={`${tool} line-through`} onClick={() => run("strikeThrough")}>S</button>
       <span className="mx-1 w-px bg-neutral-200" aria-hidden="true" />
-      <button type="button" title="Daftar berpoin" className={tool} onClick={() => run("insertUnorderedList")}>• List</button>
-      <button type="button" title="Daftar bernomor" className={tool} onClick={() => run("insertOrderedList")}>1. List</button>
-      <button type="button" title="Kutipan" className={tool} onClick={() => run("formatBlock", "BLOCKQUOTE")}>❝ Kutip</button>
-      <button type="button" title="Garis pemisah" className={tool} onClick={() => run("insertHorizontalRule")}>―</button>
+      <button type="button" title="Bulleted list" className={tool} onClick={() => run("insertUnorderedList")}>• List</button>
+      <button type="button" title="Numbered list" className={tool} onClick={() => run("insertOrderedList")}>1. List</button>
+      <button type="button" title="Quote" className={tool} onClick={() => run("formatBlock", "BLOCKQUOTE")}>❝ Quote</button>
+      <button type="button" title="Divider" className={tool} onClick={() => run("insertHorizontalRule")}>―</button>
       <span className="mx-1 w-px bg-neutral-200" aria-hidden="true" />
-      <button type="button" title="Tautan" className={tool} onClick={addLink}>Link</button>
-      <button type="button" title="Hapus tautan" className={tool} onClick={() => run("unlink")}>Unlink</button>
-      <label className={`${tool} cursor-pointer font-normal`} title="Unggah gambar">
-        {busy ? "Mengunggah…" : "Gambar"}
+      <button type="button" title="Link" className={tool} onClick={addLink}>Link</button>
+      <button type="button" title="Remove link" className={tool} onClick={() => run("unlink")}>Unlink</button>
+      <label className={`${tool} cursor-pointer font-normal`} title="Upload image">
+        {busy ? "Uploading…" : "Image"}
         <input
           ref={fileRef}
           type="file"
@@ -63,18 +63,18 @@ export function RichTextToolbar({
           }}
         />
       </label>
-      <button type="button" title="Pilih gambar dari Media Library" className={tool} disabled={busy} onClick={onOpenPicker}>
+      <button type="button" title="Select an image from the Media Library" className={tool} disabled={busy} onClick={onOpenPicker}>
         Media Library
       </button>
       <span className="mx-1 w-px bg-neutral-200" aria-hidden="true" />
-      <button type="button" title="Gambar di kiri, teks mengalir di kanannya" className={tool} onClick={() => onImagePlacement("left")}>◧ Kiri</button>
-      <button type="button" title="Gambar di kanan, teks mengalir di kirinya" className={tool} onClick={() => onImagePlacement("right")}>◨ Kanan</button>
-      <button type="button" title="Gambar di tengah" className={tool} onClick={() => onImagePlacement("center")}>Tengah</button>
-      <button type="button" title="Gambar selebar kolom, teks di atas/bawahnya" className={tool} onClick={() => onImagePlacement("block")}>Blok</button>
+      <button type="button" title="Image on the left, text flows on the right" className={tool} onClick={() => onImagePlacement("left")}>◧ Left</button>
+      <button type="button" title="Image on the right, text flows on the left" className={tool} onClick={() => onImagePlacement("right")}>◨ Right</button>
+      <button type="button" title="Image centered" className={tool} onClick={() => onImagePlacement("center")}>Center</button>
+      <button type="button" title="Full-width image, text above/below" className={tool} onClick={() => onImagePlacement("block")}>Block</button>
       <span className="mx-1 w-px bg-neutral-200" aria-hidden="true" />
-      <button type="button" title="Hapus format" className={tool} onClick={() => run("removeFormat")}>Tx</button>
-      <button type="button" title="Urungkan" className={tool} onClick={() => run("undo")}>Undo</button>
-      <button type="button" title="Ulangi" className={tool} onClick={() => run("redo")}>Redo</button>
+      <button type="button" title="Clear formatting" className={tool} onClick={() => run("removeFormat")}>Tx</button>
+      <button type="button" title="Undo" className={tool} onClick={() => run("undo")}>Undo</button>
+      <button type="button" title="Redo" className={tool} onClick={() => run("redo")}>Redo</button>
     </div>
   );
 }

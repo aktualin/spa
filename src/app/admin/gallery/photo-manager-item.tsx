@@ -46,22 +46,22 @@ export function GalleryPhotoItem({
         >
           <input type="hidden" name="id" value={photo.id} />
           <input
-            aria-label={`Caption foto ${index + 1}`}
+            aria-label={`Photo ${index + 1} caption`}
             name="caption"
             defaultValue={photo.caption}
             placeholder="Caption"
             className={inputClass}
           />
           <input
-            aria-label={`Teks alternatif foto ${index + 1}`}
+            aria-label={`Photo ${index + 1} alt text`}
             name="altText"
             defaultValue={photo.altText}
             placeholder="Alt text"
             className={inputClass}
           />
           <div className="sm:col-span-2">
-            <SmallSubmit title="Simpan caption & alt text">
-              Simpan caption
+            <SmallSubmit title="Save caption & alt text">
+              Save caption
             </SmallSubmit>
           </div>
         </form>
@@ -77,10 +77,10 @@ export function GalleryPhotoItem({
             <input type="hidden" name="id" value={photo.id} />
             <input type="hidden" name="albumId" value={albumId} />
             <ConfirmDeleteButton
-              message="Hapus foto ini dari album? File gambarnya ikut dihapus dari storage, kecuali tersimpan di Media Library."
+              message="Delete this photo from the album? The image file will also be removed from storage, unless it is saved in the Media Library."
               className={`${secondaryButtonClass} text-red-700`}
             >
-              Hapus foto
+              Delete photo
             </ConfirmDeleteButton>
           </form>
         </div>
@@ -88,9 +88,9 @@ export function GalleryPhotoItem({
         <ReplacePhotoForm
           photoId={photo.id}
           imageUrl={photo.imageUrl}
-          label={`foto ${index + 1}`}
+          label={`photo ${index + 1}`}
           folder="gallery"
-          hint="Caption, alt text, dan urutan foto tidak berubah."
+          hint="The photo caption, alt text, and order stay the same."
           replaceAction={replacePhotoAction}
         />
       </div>

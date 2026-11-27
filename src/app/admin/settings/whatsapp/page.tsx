@@ -35,14 +35,14 @@ export default async function AdminWhatsAppSettingsPage({
   return (
     <div className="mx-auto max-w-3xl">
       <h1 className="text-xl font-semibold text-neutral-900">
-        Template Pesan WhatsApp
+        WhatsApp Message Templates
       </h1>
       <p className="mt-1 text-sm text-neutral-600">
-        Pesan awal yang otomatis terisi saat tamu menekan tombol WhatsApp
-        (click-to-chat <code>wa.me</code>, tanpa API berbayar). Satu template
-        per konteks; placeholder seperti {"{{treatment}}"} diganti otomatis.
-        Pesan khusus yang diisi di treatment, paket, promo, atau gift card
-        tetap diutamakan.
+        The opening message filled in automatically when a guest presses a
+        WhatsApp button (click-to-chat <code>wa.me</code>, no paid API). One
+        template per context; placeholders like {"{{treatment}}"} are replaced
+        automatically. Custom messages set on a treatment, package, promo, or
+        gift card still take priority.
       </p>
 
       <NumberNotice number={number} />
@@ -50,8 +50,8 @@ export default async function AdminWhatsAppSettingsPage({
       <StatusBanner
         saved={params.saved}
         deleted={params.deleted}
-        savedText="Template disimpan. Tombol WhatsApp di website langsung memakai pesan baru."
-        deletedText="Template dihapus."
+        savedText="Template saved. WhatsApp buttons on the website use the new message right away."
+        deletedText="Template deleted."
       />
       <SeededNote seeded={params.seeded} />
 

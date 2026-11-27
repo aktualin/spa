@@ -40,14 +40,14 @@ export function EventPhotoItem({
         >
           <input type="hidden" name="id" value={photo.id} />
           <input
-            aria-label={`Caption foto ${index + 1}`}
+            aria-label={`Photo ${index + 1} caption`}
             name="caption"
             defaultValue={photo.caption}
-            placeholder="Caption (opsional)"
+            placeholder="Caption (optional)"
             className={`${inputClass} min-w-0 flex-1`}
           />
-          <SmallSubmit title={`Simpan caption foto ${index + 1}`}>
-            Simpan caption
+          <SmallSubmit title={`Save photo ${index + 1} caption`}>
+            Save caption
           </SmallSubmit>
         </form>
 
@@ -61,10 +61,10 @@ export function EventPhotoItem({
           <form action={deleteEventPhotoAction}>
             <input type="hidden" name="id" value={photo.id} />
             <ConfirmDeleteButton
-              message="Hapus foto ini dari event? File gambarnya ikut dihapus dari storage, kecuali tersimpan di Media Library."
+              message="Delete this photo from the event? The image file will also be removed from storage, unless it is saved in the Media Library."
               className={`${secondaryButtonClass} text-red-700`}
             >
-              Hapus foto
+              Delete photo
             </ConfirmDeleteButton>
           </form>
         </div>
@@ -72,9 +72,9 @@ export function EventPhotoItem({
         <ReplacePhotoForm
           photoId={photo.id}
           imageUrl={photo.imageUrl}
-          label={`foto ${index + 1}`}
+          label={`photo ${index + 1}`}
           folder="events"
-          hint="Caption dan urutan foto tidak berubah."
+          hint="The photo caption and order stay the same."
           replaceAction={replaceEventPhotoAction}
         />
       </div>

@@ -52,20 +52,20 @@ export default async function AdminMediaPage({
       <div>
         <PageHeader
           title="Media Library"
-          subtitle={`${total} berkas di ${folders.length} folder. Semua gambar yang diunggah dari dashboard tercatat di sini.`}
+          subtitle={`${total} files in ${folders.length} folders. All images uploaded from the dashboard are recorded here.`}
           action={
             <form action={syncMediaAction}>
-              <SmallSubmit title="Catat berkas lama yang sudah dipakai konten tetapi belum ada di Media Library">
-                Sinkronkan berkas lama
+              <SmallSubmit title="Record legacy files already used by content but not yet in the Media Library">
+                Sync legacy files
               </SmallSubmit>
             </form>
           }
         />
 
-        <StatusBanners saved={params.saved} deleted={params.deleted} deletedLabel="Berkas dihapus." />
+        <StatusBanners saved={params.saved} deleted={params.deleted} deletedLabel="File deleted." />
         {params.synced !== undefined ? (
           <p role="status" className="mt-4 rounded-md bg-green-50 px-3 py-2 text-sm text-green-800">
-            Sinkronisasi selesai: {Number(params.synced) || 0} berkas lama baru dicatat.
+            Sync complete: {Number(params.synced) || 0} legacy files newly recorded.
           </p>
         ) : null}
       </div>

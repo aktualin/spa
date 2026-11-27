@@ -44,10 +44,10 @@ export function ImageField({
               src={url}
               alt=""
               className="size-full object-cover"
-              onError={() => setError("Gambar tidak dapat dimuat.")}
+              onError={() => setError("The image could not be loaded.")}
             />
           ) : (
-            <span className="text-[10px] text-neutral-400">kosong</span>
+            <span className="text-[10px] text-neutral-400">empty</span>
           )}
         </div>
 

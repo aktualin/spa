@@ -22,20 +22,20 @@ export function InstagramForm({ post }: { post: InstagramFormData }) {
   return (
     <Shell
       listPath="/admin/homepage/instagram"
-      backLabel="Kembali ke daftar postingan"
-      heading={post.id ? "Ubah postingan Instagram" : "Tambah postingan Instagram"}
-      intro="Postingan di-embed langsung dari Instagram di section feed homepage. Tidak ada foto yang diunggah."
+      backLabel="Back to the post list"
+      heading={post.id ? "Edit Instagram post" : "Add Instagram post"}
+      intro="Posts are embedded directly from Instagram in the homepage feed section. No photos are uploaded."
       id={post.id}
       formAction={formAction}
       error={state.error}
       deleteAction={deleteInstagramPostAction}
-      deleteMessage="Hapus postingan ini dari feed?"
-      deleteLabel="Hapus postingan ini"
+      deleteMessage="Delete this post from the feed?"
+      deleteLabel="Delete this post"
     >
       <Field
-        label="URL postingan Instagram"
+        label="Instagram post URL"
         htmlFor="postUrl"
-        hint="Tempel tautan postingan (Instagram → … → Salin tautan), mis. https://www.instagram.com/p/Cxxxx/ — foto, reel, dan IGTV didukung."
+        hint="Paste the post link (Instagram → … → Copy link), e.g. https://www.instagram.com/p/Cxxxx/ — photos, reels, and IGTV are supported."
       >
         <input
           id="postUrl"
@@ -50,7 +50,7 @@ export function InstagramForm({ post }: { post: InstagramFormData }) {
         />
       </Field>
       <Checkbox name="isPublished" defaultChecked={post.isPublished}>
-        Terbitkan di homepage
+        Publish on the homepage
       </Checkbox>
     </Shell>
   );

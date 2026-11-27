@@ -11,9 +11,9 @@ export function DateFields({ values }: { values: EventFormData }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       <Field
-        label="Tanggal mulai (WIB)"
+        label="Start date (WIB)"
         htmlFor="startDate"
-        hint="Kosongkan bila tanggal belum pasti (tampil “Tanggal menyusul”)."
+        hint="Leave empty if the date is not confirmed yet (shows “Date TBA”)."
       >
         <input
           id="startDate"
@@ -26,9 +26,9 @@ export function DateFields({ values }: { values: EventFormData }) {
       </Field>
 
       <Field
-        label="Tanggal selesai (WIB)"
+        label="End date (WIB)"
         htmlFor="endDate"
-        hint="Opsional, untuk event lebih dari satu hari. Tidak boleh sebelum tanggal mulai."
+        hint="Optional, for multi-day events. Must not be before the start date."
       >
         <input
           id="endDate"

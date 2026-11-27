@@ -21,7 +21,7 @@ export function ModeTabs({
   switchMode: (next: Mode) => void;
 }) {
   return (
-    <div role="tablist" aria-label={`Mode editor ${label}`} className="flex gap-1 rounded-md bg-neutral-100 p-0.5">
+    <div role="tablist" aria-label={`Editor mode ${label}`} className="flex gap-1 rounded-md bg-neutral-100 p-0.5">
       <button type="button" role="tab" aria-selected={mode === "visual"} className={tab(mode === "visual")} onClick={() => switchMode("visual")}>
         Visual
       </button>
@@ -29,7 +29,7 @@ export function ModeTabs({
         HTML
       </button>
       <button type="button" role="tab" aria-selected={mode === "preview"} className={tab(mode === "preview")} onClick={() => switchMode("preview")}>
-        Pratinjau
+        Preview
       </button>
     </div>
   );

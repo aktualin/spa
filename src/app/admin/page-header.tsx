@@ -19,9 +19,9 @@ export function DashboardBanners({
           className="mb-4 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800"
         >
           {forbiddenLabel
-            ? `Anda tidak punya akses ke modul “${forbiddenLabel}”. Modul ini hanya bisa dibuka role ${forbiddenRoles.join(" atau ")}.`
-            : "Anda tidak punya akses ke halaman tersebut."}{" "}
-          Hubungi pemegang role ADMIN bila Anda memerlukannya.
+            ? `You do not have access to the “${forbiddenLabel}” module. This module can only be opened by the ${forbiddenRoles.join(" or ")} role.`
+            : "You do not have access to that page."}{" "}
+          Contact an ADMIN if you need access.
         </p>
       ) : null}
       {password === "changed" ? (
@@ -29,7 +29,7 @@ export function DashboardBanners({
           role="status"
           className="mb-4 rounded-xl bg-green-50 px-4 py-3 text-sm text-green-800"
         >
-          Kata sandi berhasil diganti. Sesi di perangkat lain sudah dikeluarkan.
+          Password changed successfully. Sessions on other devices have been logged out.
         </p>
       ) : null}
     </>
@@ -45,7 +45,7 @@ export function DashboardHeader({
   role: string;
   now: Date;
 }) {
-  const formattedDate = new Intl.DateTimeFormat("id-ID", {
+  const formattedDate = new Intl.DateTimeFormat("en-GB", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -53,8 +53,8 @@ export function DashboardHeader({
   }).format(now);
   const roleNote =
     role === "ADMIN"
-      ? "Akses penuh, termasuk pengaturan sistem dan akun admin."
-      : "Mengelola konten situs. Pengaturan sistem hanya bisa dibuka ADMIN.";
+      ? "Full access, including system settings and admin accounts."
+      : "Manages site content. System settings can only be opened by ADMIN.";
   return (
     <header className="flex flex-wrap items-end justify-between gap-4">
       <div>
@@ -62,7 +62,7 @@ export function DashboardHeader({
           Dashboard
         </p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-neutral-900">
-          Ringkasan
+          Overview
         </h1>
         <p className="mt-1 text-sm text-neutral-500">
           <span className="font-medium text-neutral-700">{email}</span>
@@ -71,7 +71,7 @@ export function DashboardHeader({
         </p>
         <p className="mt-0.5 text-xs text-neutral-400">{roleNote}</p>
       </div>
-      <p className="text-xs text-neutral-400">Data per {formattedDate}</p>
+      <p className="text-xs text-neutral-400">Data as of {formattedDate}</p>
     </header>
   );
 }

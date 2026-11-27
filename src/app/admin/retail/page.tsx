@@ -22,27 +22,27 @@ export default async function AdminRetailPage({
         <div>
           <h1 className="text-xl font-semibold text-neutral-900">KAMA Retail</h1>
           <p className="mt-1 text-sm text-neutral-600">
-            {products.length} produk. Pemesanan dilakukan lewat WhatsApp, tanpa
-            keranjang belanja. Urutan di bawah sama dengan di website: produk
-            Highlight/Kolaborasi selalu tampil lebih dulu.
+            {products.length} products. Orders are placed via WhatsApp, with no
+            shopping cart. The order below matches the website: Highlight/Collaboration
+            products always appear first.
           </p>
         </div>
         <Link
           href="/admin/retail/new"
           className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
         >
-          Tambah produk
+          Add product
         </Link>
       </div>
 
       <StatusBanner
         saved={params.saved}
         deleted={params.deleted}
-        deletedText="Produk dihapus."
+        deletedText="Product deleted."
       />
 
       {products.length === 0 ? (
-        <p className="mt-6 text-sm text-neutral-500">Belum ada produk retail.</p>
+        <p className="mt-6 text-sm text-neutral-500">No retail products yet.</p>
       ) : (
         <ul className="mt-6 divide-y divide-neutral-200 overflow-hidden rounded-lg border border-neutral-200 bg-white">
           {products.map((product, index) => (

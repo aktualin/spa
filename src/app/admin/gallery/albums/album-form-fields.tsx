@@ -9,7 +9,7 @@ import type { AlbumFormData } from "./album-form";
 export function AlbumFields({ album }: { album: AlbumFormData }) {
   return (
     <>
-      <Field label="Nama album" htmlFor="name">
+      <Field label="Album name" htmlFor="name">
         <input
           id="name"
           name="name"
@@ -22,7 +22,7 @@ export function AlbumFields({ album }: { album: AlbumFormData }) {
       <Field
         label="Slug"
         htmlFor="slug"
-        hint="Dipakai di URL. Huruf kecil, angka, dan tanda hubung."
+        hint="Used in the URL. Lowercase letters, numbers, and hyphens."
       >
         <input
           id="slug"
@@ -36,7 +36,7 @@ export function AlbumFields({ album }: { album: AlbumFormData }) {
 
       <RichTextField
         name="description"
-        label="Deskripsi"
+        label="Description"
         defaultValue={album.description}
         folder="gallery"
         compact
@@ -44,15 +44,15 @@ export function AlbumFields({ album }: { album: AlbumFormData }) {
 
       <ImageField
         name="coverUrl"
-        label="Cover album"
+        label="Album cover"
         folder="gallery"
         defaultValue={album.coverUrl}
       />
 
       <Field
-        label="Urutan tampil"
+        label="Display order"
         htmlFor="sortOrder"
-        hint="Makin kecil makin atas. Lebih mudah diatur dengan tombol naik/turun di daftar album."
+        hint="Lower values appear higher. Easier to manage with the up/down buttons in the albums list."
       >
         <input
           id="sortOrder"
@@ -65,7 +65,7 @@ export function AlbumFields({ album }: { album: AlbumFormData }) {
       </Field>
 
       <Checkbox name="isPublished" defaultChecked={album.isPublished}>
-        Tampilkan di website
+        Show on website
       </Checkbox>
     </>
   );

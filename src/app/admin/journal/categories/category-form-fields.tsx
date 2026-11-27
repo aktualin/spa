@@ -23,7 +23,7 @@ export function NameSlugFields({
   const slugValid = slug === "" || SLUG_PATTERN.test(slug);
   return (
     <>
-      <Field label="Nama" htmlFor="name" hint="Tampil sebagai chip filter dan label di kartu artikel.">
+      <Field label="Name" htmlFor="name" hint="Shown as a filter chip and as the label on article cards.">
         <input
           id="name"
           name="name"
@@ -40,7 +40,7 @@ export function NameSlugFields({
       <Field
         label="Slug"
         htmlFor="slug"
-        hint="Dipakai sebagai penanda internal. Kosongkan untuk mengikuti nama."
+        hint="Used as an internal identifier. Leave empty to follow the name."
       >
         <input
           id="slug"
@@ -55,7 +55,7 @@ export function NameSlugFields({
         />
         {slugValid ? null : (
           <p className="mt-1 text-xs text-red-700">
-            Slug hanya boleh huruf kecil, angka, dan tanda hubung.
+            Slug may only contain lowercase letters, numbers, and hyphens.
           </p>
         )}
       </Field>
@@ -67,7 +67,7 @@ export function NameSlugFields({
 export function CategoryOrderFields({ category }: { category: JournalCategoryFormData }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      <Field label="Urutan" htmlFor="sortOrder" hint="Makin kecil makin kiri pada baris filter.">
+      <Field label="Order" htmlFor="sortOrder" hint="Lower values appear further left in the filter row.">
         <input
           id="sortOrder"
           name="sortOrder"
@@ -84,7 +84,7 @@ export function CategoryOrderFields({ category }: { category: JournalCategoryFor
           defaultChecked={category.isPublished}
           className="size-4 rounded border-neutral-300"
         />
-        Tampilkan di situs
+        Show on site
       </label>
     </div>
   );

@@ -19,13 +19,13 @@ export function BannerCtaFields({
   return (
     <fieldset className="space-y-4 rounded-md border border-neutral-200 p-3">
       <legend className="px-1 text-xs font-semibold uppercase tracking-wide text-neutral-500">
-        Tombol (CTA)
+        Button (CTA)
       </legend>
       <p className="text-xs text-neutral-500">
-        {ctaHint} Isi keduanya atau kosongkan keduanya.
+        {ctaHint} Fill in both or leave both empty.
       </p>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Label tombol" htmlFor={`ctaLabel-${id}`}>
+        <Field label="Button label" htmlFor={`ctaLabel-${id}`}>
           <input
             id={`ctaLabel-${id}`}
             name="ctaLabel"
@@ -36,9 +36,9 @@ export function BannerCtaFields({
           />
         </Field>
         <Field
-          label="Tujuan tombol"
+          label="Button destination"
           htmlFor={`ctaHref-${id}`}
-          hint="Path internal (/menu), anchor (#home_whats_new), atau https://…"
+          hint="Internal path (/menu), anchor (#home_whats_new), or https://…"
         >
           <input
             id={`ctaHref-${id}`}

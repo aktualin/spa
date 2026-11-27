@@ -22,7 +22,7 @@ export function TitleSlugFields({
 
   return (
     <>
-      <Field label="Judul event" htmlFor="title">
+      <Field label="Event title" htmlFor="title">
         <input
           id="title"
           name="title"
@@ -41,12 +41,12 @@ export function TitleSlugFields({
         htmlFor="slug"
         hint={
           <>
-            Alamat halaman: <code>/events/{slug || "…"}</code>. Huruf kecil, angka, dan
-            tanda hubung; harus unik.
+            Page address: <code>/events/{slug || "…"}</code>. Lowercase letters, numbers,
+            and hyphens; must be unique.
             {publishedSlug && slug !== publishedSlug ? (
               <span className="mt-1 block text-amber-700">
-                Slug diganti: alamat lama <code>/events/{publishedSlug}</code> otomatis
-                dialihkan (301) ke alamat baru setelah disimpan.
+                Slug changed: the old address <code>/events/{publishedSlug}</code> will
+                automatically redirect (301) to the new address once saved.
               </span>
             ) : null}
           </>

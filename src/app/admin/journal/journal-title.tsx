@@ -25,7 +25,7 @@ export function TitleSlugFields({
 }) {
   return (
     <>
-      <Field label="Judul artikel" htmlFor="title">
+      <Field label="Article title" htmlFor="title">
         <input
           id="title"
           name="title"
@@ -41,16 +41,16 @@ export function TitleSlugFields({
         htmlFor="slug"
         hint={
           <>
-            Kosongkan untuk dibuat otomatis dari judul. Huruf kecil, angka, dan tanda hubung.
+            Leave empty to generate automatically from the title. Lowercase letters, numbers, and hyphens.
             {effectiveSlug ? (
               <>
-                {" "}Alamat: <code>{journalPath(effectiveSlug)}</code>
+                {" "}Address: <code>{journalPath(effectiveSlug)}</code>
               </>
             ) : null}
             {slugChanged ? (
               <span className="mt-1 block text-amber-700">
-                Artikel ini sudah tampil di website. Setelah disimpan, alamat lama{" "}
-                <code>{journalPath(post.slug)}</code> otomatis dialihkan (301) ke alamat baru.
+                This article is already live on the website. Once saved, the old address{" "}
+                <code>{journalPath(post.slug)}</code> will automatically redirect (301) to the new address.
               </span>
             ) : null}
           </>
@@ -80,9 +80,9 @@ export function ExcerptField({
 }) {
   return (
     <Field
-      label="Ringkasan (excerpt)"
+      label="Summary (excerpt)"
       htmlFor="excerpt"
-      hint={`Teks singkat yang tampil di daftar artikel. ${excerpt.length}/${JOURNAL_EXCERPT_MAX} karakter.`}
+      hint={`Short text shown in the article list. ${excerpt.length}/${JOURNAL_EXCERPT_MAX} characters.`}
     >
       <textarea
         id="excerpt"

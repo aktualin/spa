@@ -20,15 +20,15 @@ export type JournalFormData = {
 export const initialState: ActionState = { error: null };
 
 export const statusLabel: Record<JournalFormData["status"], string> = {
-  DRAFT: "Draf — tidak tampil di website",
-  SCHEDULED: "Terjadwal — terbit otomatis pada tanggalnya",
-  PUBLISHED: "Terbit — tampil di website",
+  DRAFT: "Draft — not shown on the website",
+  SCHEDULED: "Scheduled — publishes automatically on its date",
+  PUBLISHED: "Published — shown on the website",
 };
 
 export const scheduleHint: Record<JournalFormData["status"], string> = {
-  DRAFT: "Opsional sebagai rencana; artikel draf tidak pernah tampil.",
+  DRAFT: "Optional as a plan; draft articles are never shown.",
   SCHEDULED:
-    "Wajib. Artikel tampil otomatis pada waktu ini (WIB) tanpa perlu disimpan ulang. Bila tanggalnya sudah lewat, artikel langsung terbit.",
+    "Required. The article appears automatically at this time (WIB) without needing to be saved again. If the date has already passed, the article publishes immediately.",
   PUBLISHED:
-    "Kosongkan untuk memakai waktu sekarang. Bila diisi tanggal di masa depan, artikel otomatis menjadi Terjadwal.",
+    "Leave empty to use the current time. If a future date is entered, the article automatically becomes Scheduled.",
 };

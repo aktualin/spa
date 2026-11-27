@@ -27,9 +27,9 @@ export function CategoryTagFields({
   return (
     <>
       <Field
-        label="Kategori"
+        label="Category"
         htmlFor="categoryId"
-        hint="Satu artikel satu kategori. Daftar dan urutannya diatur di Journal › Kategori."
+        hint="One article, one category. The list and its order are managed in Journal › Categories."
       >
         <select
           id="categoryId"
@@ -38,18 +38,18 @@ export function CategoryTagFields({
           onChange={(event) => setCategoryId(event.target.value)}
           className={inputClass}
         >
-          <option value="">Tanpa kategori</option>
+          <option value="">No category</option>
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
               {category.name}
-              {category.isPublished ? "" : " (belum terbit)"}
+              {category.isPublished ? "" : " (not published yet)"}
             </option>
           ))}
         </select>
         {categories.length === 0 ? (
           <p className="mt-1 text-xs text-neutral-500">
-            Belum ada kategori. Buat dulu di Journal › Kategori bila artikel
-            ini perlu dikelompokkan.
+            No categories yet. Create one first in Journal › Categories if this
+            article needs to be grouped.
           </p>
         ) : null}
       </Field>
@@ -57,7 +57,7 @@ export function CategoryTagFields({
       <Field
         label="Tag"
         htmlFor="tags"
-        hint="Pisahkan dengan koma, contoh: wellness, pijat, ritual. Disimpan dalam huruf kecil tanpa duplikat; maksimal 20 tag."
+        hint="Separate with commas, e.g.: wellness, massage, ritual. Stored in lowercase without duplicates; maximum 20 tags."
       >
         <input
           id="tags"
@@ -68,7 +68,7 @@ export function CategoryTagFields({
         />
         {suggestedTags.length > 0 ? (
           <div className="flex flex-wrap items-center gap-1.5 pt-1">
-            <span className="text-xs text-neutral-500">Tag yang sudah dipakai:</span>
+            <span className="text-xs text-neutral-500">Tags already used:</span>
             {suggestedTags.map((tag) => (
               <button
                 key={tag}

@@ -27,7 +27,7 @@ export function MediaGrid({
   if (items.length === 0) {
     return (
       <p className="text-sm text-neutral-500">
-        {filtered ? "Tidak ada berkas yang cocok dengan filter." : "Belum ada berkas. Unggah gambar pertama di atas."}
+        {filtered ? "No files match the filter." : "No files yet. Upload your first image above."}
       </p>
     );
   }
@@ -35,7 +35,7 @@ export function MediaGrid({
     <>
       {!canReorder ? (
         <p className="mb-3 text-xs text-neutral-500">
-          Untuk mengatur urutan, pilih satu folder tanpa pencarian atau filter lain.
+          To reorder, select a single folder without a search or other filters.
         </p>
       ) : null}
       <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
@@ -66,9 +66,9 @@ export function MediaGrid({
               <div className="flex flex-wrap items-center gap-1.5">
                 <Badge tone="muted">{item.folder}</Badge>
                 {item.usageCount > 0 ? (
-                  <Badge tone="green">Dipakai {item.usageCount}×</Badge>
+                  <Badge tone="green">Used {item.usageCount}×</Badge>
                 ) : (
-                  <Badge tone="amber">Tidak dipakai</Badge>
+                  <Badge tone="amber">Unused</Badge>
                 )}
               </div>
               {canReorder ? (
@@ -77,13 +77,13 @@ export function MediaGrid({
                     <input type="hidden" name="id" value={item.id} />
                     <input type="hidden" name="direction" value="up" />
                     <input type="hidden" name="back" value={back} />
-                    <SmallSubmit title={`Naikkan urutan ${item.fileName} di folder ${item.folder}`}>↑</SmallSubmit>
+                    <SmallSubmit title={`Move ${item.fileName} up in folder ${item.folder}`}>↑</SmallSubmit>
                   </form>
                   <form action={moveMediaAction}>
                     <input type="hidden" name="id" value={item.id} />
                     <input type="hidden" name="direction" value="down" />
                     <input type="hidden" name="back" value={back} />
-                    <SmallSubmit title={`Turunkan urutan ${item.fileName} di folder ${item.folder}`}>↓</SmallSubmit>
+                    <SmallSubmit title={`Move ${item.fileName} down in folder ${item.folder}`}>↓</SmallSubmit>
                   </form>
                 </div>
               ) : null}

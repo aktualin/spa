@@ -20,23 +20,23 @@ export function TrafficCharts({
   return (
     <section className="mt-4 grid gap-3 lg:grid-cols-2">
       <ChartCard
-        title="Pengunjung unik per hari"
-        subtitle={`${number.format(uniqueVisitors)} pengunjung unik · ${days} hari`}
+        title="Unique visitors per day"
+        subtitle={`${number.format(uniqueVisitors)} unique visitors · ${days} days`}
       >
         <TrendArea
           points={visitorTrend}
-          label="Pengunjung unik per hari"
-          suffix=" pengunjung"
+          label="Unique visitors per day"
+          suffix=" visitors"
         />
       </ChartCard>
       <ChartCard
-        title="Tampilan halaman per hari"
-        subtitle={`${number.format(views)} tampilan · ${days} hari`}
+        title="Page views per day"
+        subtitle={`${number.format(views)} views · ${days} days`}
       >
         <TrendBars
           points={viewTrend}
-          label="Tampilan halaman per hari"
-          suffix=" tampilan"
+          label="Page views per day"
+          suffix=" views"
         />
       </ChartCard>
     </section>

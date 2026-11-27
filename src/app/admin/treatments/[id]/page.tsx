@@ -39,7 +39,7 @@ export default async function EditTreatmentPage({
           href="/admin/treatments/categories/new"
           className="inline-block rounded-md bg-neutral-900 px-4 py-2 font-medium text-white"
         >
-          Tambah kategori
+          Add category
         </Link>
       </div>
     );

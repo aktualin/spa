@@ -36,7 +36,7 @@ export function usePickerAssets(open: boolean, folder: string, q: string) {
           if (!cancelled) setAssets(rows);
         })
         .catch(() => {
-          if (!cancelled) setError("Gagal memuat Media Library.");
+          if (!cancelled) setError("Failed to load the Media Library.");
         })
         .finally(() => {
           if (!cancelled) setLoading(false);

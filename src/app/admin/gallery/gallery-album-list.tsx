@@ -26,13 +26,13 @@ export function AlbumRow({
               {album.name}
             </span>
             {album.isPublished ? (
-              <Badge tone="green">Tayang</Badge>
+              <Badge tone="green">Published</Badge>
             ) : (
-              <Badge tone="muted">Draf</Badge>
+              <Badge tone="muted">Draft</Badge>
             )}
           </div>
           <p className="mt-0.5 truncate text-xs text-neutral-500">
-            /{album.slug} · {album._count.photos} foto
+            /{album.slug} · {album._count.photos} photos
           </p>
         </div>
       </div>
@@ -43,7 +43,7 @@ export function AlbumRow({
             <input type="hidden" name="id" value={album.id} />
             <input type="hidden" name="direction" value="up" />
             <SmallSubmit
-              title={`Naikkan urutan album ${album.name}`}
+              title={`Move album ${album.name} up`}
               disabled={index === 0}
             >
               ↑
@@ -53,7 +53,7 @@ export function AlbumRow({
             <input type="hidden" name="id" value={album.id} />
             <input type="hidden" name="direction" value="down" />
             <SmallSubmit
-              title={`Turunkan urutan album ${album.name}`}
+              title={`Move album ${album.name} down`}
               disabled={index === count - 1}
             >
               ↓
@@ -64,13 +64,13 @@ export function AlbumRow({
           href={`/admin/gallery/${album.id}`}
           className="text-neutral-800 underline"
         >
-          Kelola foto
+          Manage photos
         </Link>
         <Link
           href={`/admin/gallery/albums/${album.id}`}
           className="text-neutral-600 underline"
         >
-          Ubah album
+          Edit album
         </Link>
       </div>
     </li>

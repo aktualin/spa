@@ -31,13 +31,13 @@ export function GiftCardForm({
     <div className="mx-auto max-w-2xl">
       <h1 className="text-xl font-semibold text-neutral-900">Gift Card</h1>
       <p className="mt-1 text-sm text-neutral-600">
-        Satu-satunya informasi gift card yang tampil di halaman publik
+        The only gift card information shown on the public page
         <span className="font-medium"> /gift-card</span>.
       </p>
       {isNew ? (
         <p className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          Informasi gift card belum pernah disimpan. Form ini berisi teks bawaan
-          yang sekarang tampil di situs — ubah lalu tekan Simpan.
+          Gift card information has never been saved. This form contains the default
+          text currently shown on the site — edit it and press Save.
         </p>
       ) : null}
 

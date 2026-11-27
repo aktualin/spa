@@ -10,10 +10,10 @@ const seoTone: Record<SeoLengthState, string> = {
 };
 
 const seoText: Record<SeoLengthState, string> = {
-  empty: "memakai nilai bawaan",
-  short: "terlalu pendek",
-  ideal: "panjang ideal",
-  long: "terlalu panjang, bisa terpotong di Google",
+  empty: "uses the default value",
+  short: "too short",
+  ideal: "ideal length",
+  long: "too long, may be truncated in Google",
 };
 
 /** Indikator panjang teks SEO (jumlah karakter + status). */
@@ -21,7 +21,7 @@ export function SeoCounter({ value, ideal }: { value: string; ideal: number }) {
   const state = seoLengthState(value.trim().length, ideal);
   return (
     <span className={seoTone[state]}>
-      {value.trim().length}/{ideal} karakter · {seoText[state]}
+      {value.trim().length}/{ideal} characters · {seoText[state]}
     </span>
   );
 }
@@ -43,16 +43,16 @@ export function SeoGooglePreview({
   return (
     <div className="rounded-md bg-neutral-50 p-3">
       <p className="text-[11px] uppercase tracking-wide text-neutral-500">
-        Perkiraan tampilan di Google
+        Estimated appearance in Google
       </p>
       <p className="mt-1 truncate text-sm text-blue-800">
-        {seoTitle.trim() || title.trim() || "Judul artikel"}
+        {seoTitle.trim() || title.trim() || "Article title"}
       </p>
       <p className="truncate text-xs text-green-800">
-        {journalPath(effectiveSlug || "slug-artikel")}
+        {journalPath(effectiveSlug || "article-slug")}
       </p>
       <p className="mt-0.5 line-clamp-2 text-xs text-neutral-600">
-        {seoDescription.trim() || excerpt.trim() || "Ringkasan artikel akan tampil di sini."}
+        {seoDescription.trim() || excerpt.trim() || "The article summary will appear here."}
       </p>
     </div>
   );

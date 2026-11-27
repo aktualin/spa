@@ -77,7 +77,7 @@ export function StringListField({
         }}
         className={secondaryButtonClass}
       >
-        + Tambah {itemLabel}
+        + Add {itemLabel}
       </button>
     </fieldset>
   );

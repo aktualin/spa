@@ -15,13 +15,13 @@ export function LocationFields({
   return (
     <fieldset className="space-y-5">
       <legend className="text-base font-semibold text-neutral-900">
-        Lokasi &amp; jam buka
+        Location &amp; opening hours
       </legend>
 
       <Field
-        label="Alamat"
+        label="Address"
         htmlFor="address"
-        hint="Alamat cabang utama (South Jakarta) di halaman kontak."
+        hint="Main branch address (South Jakarta) on the contact page."
       >
         <textarea
           id="address"
@@ -40,10 +40,10 @@ export function LocationFields({
         htmlFor="mapsEmbedUrl"
         hint={
           <>
-            Di Google Maps pilih Share → Embed a map, lalu tempel URL atau
-            seluruh kode <code>&lt;iframe&gt;</code>; sistem hanya
-            menyimpan URL <code>https://www.google.com/maps/embed?…</code>.
-            Kosongkan bila peta tidak ingin ditampilkan.
+            In Google Maps choose Share → Embed a map, then paste the URL or
+            the entire <code>&lt;iframe&gt;</code> code; the system only
+            stores the <code>https://www.google.com/maps/embed?…</code> URL.
+            Leave empty if the map should not be shown.
           </>
         }
       >

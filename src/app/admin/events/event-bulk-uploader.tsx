@@ -12,8 +12,8 @@ export function EventBulkUploader({ eventId }: { eventId: string }) {
   return (
     <BulkPhotoUploader
       folder="events"
-      noun="galeri event"
-      hintTail="caption bisa diisi setelahnya."
+      noun="event gallery"
+      hintTail="captions can be filled in afterwards."
       onSave={(urls) => addEventPhotosAction(eventId, urls)}
     />
   );

@@ -61,7 +61,7 @@ export function AdminNav({ groups }: { groups: Group[] }) {
       >
         <span className="flex items-center gap-2.5">
           <IconDashboard />
-          Ringkasan
+          Overview
         </span>
       </Link>
 

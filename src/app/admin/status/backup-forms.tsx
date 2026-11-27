@@ -32,8 +32,8 @@ export function GithubBackupForm({ enabled, reason }: { enabled: boolean; reason
   return (
     <form action={formAction} className="space-y-3">
       <PendingButton
-        label="Jalankan backup pg_dump sekarang"
-        pendingLabel="Menghubungi GitHub…"
+        label="Run pg_dump backup now"
+        pendingLabel="Contacting GitHub…"
         disabled={!enabled}
       />
       {!enabled && reason ? <p className="text-xs text-neutral-500">{reason}</p> : null}
@@ -54,9 +54,9 @@ export function HandoverForm() {
   return (
     <form action={formAction} className="space-y-4">
       <Field
-        label="Lokasi penyimpanan"
+        label="Storage location"
         htmlFor="location"
-        hint="Contoh: Google Drive klien › Serah Terima › kamaspa-20270105-100000.sql.gz.gpg. Jangan tulis password atau connection string."
+        hint="Example: client Google Drive › Handover › kamaspa-20270105-100000.sql.gz.gpg. Do not write passwords or connection strings."
       >
         <input id="location" name="location" required maxLength={200} className={inputClass} />
       </Field>
@@ -64,7 +64,7 @@ export function HandoverForm() {
         <Field
           label="Checksum SHA-256"
           htmlFor="sha256"
-          hint="Tempel baris SHA-256 yang dicetak scripts/backup-db.sh (atau keluaran shasum -a 256)."
+          hint="Paste the SHA-256 line printed by scripts/backup-db.sh (or the output of shasum -a 256)."
         >
           <input
             id="sha256"
@@ -75,19 +75,19 @@ export function HandoverForm() {
             className={`${inputClass} font-mono`}
           />
         </Field>
-        <Field label="Ukuran (opsional)" htmlFor="sizeBytes" hint="Mis. 1,2 MB">
+        <Field label="Size (optional)" htmlFor="sizeBytes" hint="E.g. 1.2 MB">
           <input id="sizeBytes" name="sizeBytes" className={inputClass} />
         </Field>
       </div>
       <label className="flex items-center gap-2 text-sm text-neutral-700">
         <input type="checkbox" name="restoreTested" className="size-4 rounded border-neutral-300" />
-        <span>Uji restore ke database terpisah sudah berhasil</span>
+        <span>Restore test to a separate database has succeeded</span>
       </label>
-      <Field label="Catatan (opsional)" htmlFor="note" hint="Mis. diserahkan ke siapa, tempat passphrase disimpan (tanpa menulis passphrase-nya).">
+      <Field label="Note (optional)" htmlFor="note" hint="E.g. who it was handed to, where the passphrase is stored (without writing the passphrase itself).">
         <textarea id="note" name="note" rows={2} maxLength={500} className={inputClass} />
       </Field>
       <ErrorMessage error={state.error} />
-      <SaveButton label="Catat backup serah terima" />
+      <SaveButton label="Record handover backup" />
     </form>
   );
 }

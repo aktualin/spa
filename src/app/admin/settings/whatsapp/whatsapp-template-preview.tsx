@@ -25,7 +25,7 @@ export function TemplatePreview({
   return (
     <div className="space-y-2 rounded-md bg-neutral-50 p-3 text-xs text-neutral-600">
       <p>
-        Placeholder tersedia:{" "}
+        Available placeholders:{" "}
         {context.placeholders.length > 0
           ? context.placeholders.map((placeholder) => (
               <button
@@ -38,7 +38,7 @@ export function TemplatePreview({
                 {`{{${placeholder.name}}}`}
               </button>
             ))
-          : "tidak ada (pesan dipakai apa adanya)"}
+          : "none (the message is used as-is)"}
       </p>
       {context.placeholders.length > 0 ? (
         <ul className="list-inside list-disc">
@@ -49,16 +49,16 @@ export function TemplatePreview({
           ))}
         </ul>
       ) : null}
-      <p className="whitespace-pre-wrap text-neutral-700">Pratinjau: {preview}</p>
+      <p className="whitespace-pre-wrap text-neutral-700">Preview: {preview}</p>
       {number ? (
         <p className="truncate">
-          Tautan:{" "}
+          Link:{" "}
           <a href={link} target="_blank" rel="noreferrer" className="text-neutral-800 underline">
             {link}
           </a>
         </p>
       ) : (
-        <p>Nomor WhatsApp belum diatur di Kontak &amp; Umum — pratinjau tautan disembunyikan.</p>
+        <p>The WhatsApp number is not set in Contact &amp; General — the link preview is hidden.</p>
       )}
       {errors.map((error) => (
         <p key={error} className="text-red-700">
@@ -67,7 +67,7 @@ export function TemplatePreview({
       ))}
       {warnings.map((warning) => (
         <p key={warning} className="text-amber-700">
-          Perhatian: {warning}
+          Warning: {warning}
         </p>
       ))}
     </div>

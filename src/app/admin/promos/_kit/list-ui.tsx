@@ -5,7 +5,7 @@
 export function StatusBanners({
   saved,
   deleted,
-  deletedLabel = "Data dihapus.",
+  deletedLabel = "Data deleted.",
 }: {
   saved?: string;
   deleted?: string;
@@ -18,7 +18,7 @@ export function StatusBanners({
           role="status"
           className="mt-4 rounded-md bg-green-50 px-3 py-2 text-sm text-green-800"
         >
-          Perubahan tersimpan.
+          Changes saved.
         </p>
       ) : null}
       {deleted ? (
@@ -93,7 +93,7 @@ export function Thumb({ src, alt = "" }: { src: string | null; alt?: string }) {
         // eslint-disable-next-line @next/next/no-img-element
         <img src={src} alt={alt} className="size-full object-cover" />
       ) : (
-        <span className="text-[9px] text-neutral-400">kosong</span>
+        <span className="text-[9px] text-neutral-400">empty</span>
       )}
     </div>
   );

@@ -17,10 +17,10 @@ export function ContentBodyFields({
     <>
       <StringListField
         name="benefits"
-        legend="Benefit (daftar centang di bagian #benefits)"
-        hint="Satu benefit per baris. Daftar kosong = memakai benefit bawaan."
+        legend="Benefits (checklist in the #benefits section)"
+        hint="One benefit per line. An empty list = the default benefits are used."
         itemLabel="benefit"
-        placeholder="Contoh: Reduced stress and burnout"
+        placeholder="Example: Reduced stress and burnout"
         defaultValue={content.benefits}
         max={limits.maxBenefits}
       />
@@ -29,31 +29,31 @@ export function ContentBodyFields({
 
       <RichTextField
         name="inSpaHtml"
-        label="Deskripsi In-Spa Corporate Experience"
+        label="In-Spa Corporate Experience description"
         defaultValue={content.inSpaHtml}
         folder="corporate"
       />
 
       <StringListField
         name="inSpaItems"
-        legend='Daftar "Ideal For" (In-Spa)'
-        hint="Satu item per baris. Daftar kosong = memakai daftar bawaan."
+        legend='"Ideal For" list (In-Spa)'
+        hint="One item per line. An empty list = the default list is used."
         itemLabel="item"
-        placeholder="Contoh: Team Wellness Days"
+        placeholder="Example: Team Wellness Days"
         defaultValue={content.inSpaItems}
         max={limits.maxInSpaItems}
       />
 
       <RichTextField
         name="inOfficeHtml"
-        label="Catatan tambahan In-Office (opsional, tampil di bawah kartu program)"
+        label="In-Office additional note (optional, shown below the program cards)"
         defaultValue={content.inOfficeHtml}
         folder="corporate"
       />
 
       <RichTextField
         name="stepsHtml"
-        label="Catatan tambahan langkah kolaborasi (opsional, tampil di bawah langkah)"
+        label="Collaboration steps additional note (optional, shown below the steps)"
         defaultValue={content.stepsHtml}
         folder="corporate"
       />

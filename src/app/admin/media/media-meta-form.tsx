@@ -28,9 +28,9 @@ export function MediaMetaForm({
       <input type="hidden" name="id" value={id} />
 
       <Field
-        label="Nama file"
+        label="File name"
         htmlFor="media-fileName"
-        hint={`Nama tampilan di Media Library (maksimal ${MAX_DISPLAY_NAME} karakter, tanpa / atau \\). Alamat URL berkas tidak berubah.`}
+        hint={`Display name in the Media Library (maximum ${MAX_DISPLAY_NAME} characters, no / or \\). The file's URL address does not change.`}
       >
         <input
           id="media-fileName"
@@ -42,14 +42,14 @@ export function MediaMetaForm({
         />
       </Field>
 
-      <Field label="Judul" htmlFor="media-title" hint="Opsional, membantu pencarian.">
+      <Field label="Title" htmlFor="media-title" hint="Optional, helps with search.">
         <input id="media-title" name="title" defaultValue={title} maxLength={200} className={inputClass} />
       </Field>
 
       <Field
-        label="Teks alternatif (alt)"
+        label="Alternative text (alt)"
         htmlFor="media-altText"
-        hint="Deskripsi singkat isi gambar untuk pembaca layar dan mesin pencari."
+        hint="A short description of the image content for screen readers and search engines."
       >
         <input id="media-altText" name="altText" defaultValue={altText} maxLength={300} className={inputClass} />
       </Field>

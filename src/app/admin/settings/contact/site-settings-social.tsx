@@ -8,11 +8,11 @@ export function SocialFields({ values }: { values: SiteSettingsInput }) {
   return (
     <fieldset className="space-y-5">
       <legend className="text-base font-semibold text-neutral-900">
-        Media sosial &amp; booking online
+        Social media &amp; online booking
       </legend>
       <p className="text-xs text-neutral-500">
-        Isi alamat lengkap yang diawali <code>https://</code>. Field yang
-        dikosongkan tidak ditampilkan di situs.
+        Fill in the full address starting with <code>https://</code>. Fields
+        left empty are not shown on the site.
       </p>
 
       <Field label="Instagram" htmlFor="instagramUrl">
@@ -29,7 +29,7 @@ export function SocialFields({ values }: { values: SiteSettingsInput }) {
       <Field
         label="Username Instagram"
         htmlFor="instagramUsername"
-        hint="Tanpa @ — opsional. Tautan sosial di footer memakai field URL Instagram di atas."
+        hint="Without the @ — optional. The social link in the footer uses the Instagram URL field above."
       >
         <div className="flex items-stretch">
           <span className="flex items-center rounded-l-md border border-r-0 border-neutral-300 bg-neutral-50 px-3 text-sm text-neutral-500">
@@ -72,7 +72,7 @@ export function SocialFields({ values }: { values: SiteSettingsInput }) {
       <Field
         label="Fresha"
         htmlFor="freshaUrl"
-        hint="Halaman booking Fresha. Bila diisi, tombol “Booking via Fresha” muncul di kartu cabang utama halaman kontak."
+        hint="Fresha booking page. If filled in, a “Booking via Fresha” button appears on the main branch card of the contact page."
       >
         <input
           id="freshaUrl"

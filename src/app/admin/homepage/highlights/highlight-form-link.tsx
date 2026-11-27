@@ -9,11 +9,11 @@ import type { HighlightFormData } from "./highlight-form.types";
 export function HighlightLinkFields({ highlight }: { highlight: HighlightFormData }) {
   return (
     <fieldset className="space-y-4 rounded-md border border-neutral-200 p-4">
-      <legend className="px-1 text-sm font-medium text-neutral-700">Tautan</legend>
+      <legend className="px-1 text-sm font-medium text-neutral-700">Link</legend>
       <Field
-        label="Tujuan tautan (opsional)"
+        label="Link destination (optional)"
         htmlFor="href"
-        hint="Path internal (/menu#massage), anchor (#home_whats_new), atau https://…. Kosong = kartu tidak bisa diklik dan tanpa teks tombol."
+        hint="Internal path (/menu#massage), anchor (#home_whats_new), or https://…. Empty = the card is not clickable and has no button text."
       >
         <input
           id="href"
@@ -24,9 +24,9 @@ export function HighlightLinkFields({ highlight }: { highlight: HighlightFormDat
         />
       </Field>
       <Field
-        label="Teks tombol (opsional)"
+        label="Button text (optional)"
         htmlFor="ctaLabel"
-        hint="Kosong = memakai teks cadangan dari modul Teks Halaman (home.whats_new.cta_fallback). Hanya dipakai bila tujuan tautan diisi."
+        hint="Empty = uses the fallback text from the Page Text module (home.whats_new.cta_fallback). Used only when a link destination is set."
       >
         <input
           id="ctaLabel"
@@ -45,9 +45,9 @@ export function HighlightPeriodFields({ highlight }: { highlight: HighlightFormD
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       <Field
-        label="Mulai tampil (opsional)"
+        label="Start showing (optional)"
         htmlFor="startDate"
-        hint="Kosong = langsung tampil. Mulai pukul 00.00 WIB."
+        hint="Empty = shows immediately. Starts at 00:00 WIB."
       >
         <input
           id="startDate"
@@ -58,9 +58,9 @@ export function HighlightPeriodFields({ highlight }: { highlight: HighlightFormD
         />
       </Field>
       <Field
-        label="Berhenti tampil (opsional)"
+        label="Stop showing (optional)"
         htmlFor="endDate"
-        hint="Kosong = tampil terus. Berakhir pukul 23.59 WIB."
+        hint="Empty = keeps showing. Ends at 23:59 WIB."
       >
         <input
           id="endDate"
