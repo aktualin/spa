@@ -44,7 +44,7 @@ export function SignatureTreatmentCard({
           {treatment.name}
         </h3>
         {treatment.description ? (
-          <p className="line-clamp-3 text-body text-cocoa/70">
+          <p className="text-body text-cocoa/70">
             {toPlainText(treatment.description)}
           </p>
         ) : null}
