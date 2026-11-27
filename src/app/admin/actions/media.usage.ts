@@ -23,6 +23,7 @@ export async function usageByUrl(urls: readonly string[]): Promise<Map<string, M
 
   const columnQueries = MEDIA_URL_COLUMNS.map(async (column) => {
     const describe = DESCRIBE[column.model];
+    if (!describe) return;
     const rows = await delegateOf(prisma, column.model).findMany({
       where: { [column.field]: { in: urlList } },
       select: { ...describe.select, [column.field]: true },
@@ -40,6 +41,7 @@ export async function usageByUrl(urls: readonly string[]): Promise<Map<string, M
   const prefix = bucketPrefix();
   const htmlQueries = MEDIA_HTML_COLUMNS.map(async (column) => {
     const describe = DESCRIBE[column.model];
+    if (!describe) return;
     const rows = await delegateOf(prisma, column.model).findMany({
       where: { [column.field]: { contains: prefix } },
       select: { ...describe.select, [column.field]: true },
@@ -56,6 +58,7 @@ export async function usageByUrl(urls: readonly string[]): Promise<Map<string, M
 
   const arrayQueries = MEDIA_URL_ARRAY_COLUMNS.map(async (column) => {
     const describe = DESCRIBE[column.model];
+    if (!describe) return;
     const rows = await delegateOf(prisma, column.model).findMany({
       where: { [column.field]: { hasSome: urlList } },
       select: { ...describe.select, [column.field]: true },
